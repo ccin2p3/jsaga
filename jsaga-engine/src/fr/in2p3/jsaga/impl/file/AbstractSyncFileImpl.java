@@ -177,7 +177,12 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
     public void _copyAndMonitor(URL target, int flags, AbstractCopyTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.OVERWRITE, Flags.CREATEPARENTS);
         if (Flags.DEREFERENCE.isSet(flags)) {
-            this._dereferenceEntry().copySync(target, flags - Flags.DEREFERENCE.getValue());
+            AbstractSyncNSEntryImpl entry = this._dereferenceEntry();
+            try {
+                entry.copySync(target, flags - Flags.DEREFERENCE.getValue());
+            } finally {
+                entry.close();
+            }
             return; //==========> EXIT
         }
         URL effectiveTarget = this._getEffectiveURL(target);
@@ -207,7 +212,12 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
     public void _copyFromAndMonitor(URL source, int flags, AbstractCopyFromTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.OVERWRITE);
         if (Flags.DEREFERENCE.isSet(flags)) {
-            this._dereferenceEntry().copyFromSync(source, flags - Flags.DEREFERENCE.getValue());
+            AbstractSyncNSEntryImpl entry = this._dereferenceEntry();
+            try {
+                entry.copyFromSync(source, flags - Flags.DEREFERENCE.getValue());
+            } finally {
+                entry.close();
+            }
             return; //==========> EXIT
         }
         URL effectiveSource = this._getEffectiveURL(source);

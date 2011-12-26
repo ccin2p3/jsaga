@@ -34,8 +34,8 @@ import org.ogf.saga.url.URLFactory;
  *
  */
 public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImpl implements SyncNSEntry {
-    private static Logger s_logger = Logger.getLogger(AbstractSyncNSEntryImpl.class);
 
+    private static Logger s_logger = Logger.getLogger(AbstractSyncNSEntryImpl.class);
     protected int m_flags;
     private boolean m_disconnectable;
     private Integer m_implicitCloseTimeout;
@@ -55,13 +55,14 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         m_disconnectable = false;
         m_implicitCloseTimeout = EngineProperties.getInteger(EngineProperties.DATA_IMPLICIT_CLOSE_TIMEOUT);
     }
+
     protected static URL _resolveRelativeUrl(URL baseUrl, URL relativeUrl) throws NotImplementedException, IncorrectURLException, BadParameterException, NoSuccessException {
-        if (relativeUrl==null) {
+        if (relativeUrl == null) {
             throw new IncorrectURLException("URL must not be null");
-        } else if (relativeUrl.getUserInfo()!=null && !relativeUrl.getUserInfo().equals(baseUrl.getUserInfo())) {
-            throw new IncorrectURLException("You must not modify the user part of the URL: "+ baseUrl.getUserInfo());
-        } else if (relativeUrl.getHost()!=null && !relativeUrl.getHost().equals(baseUrl.getHost())) {
-            throw new IncorrectURLException("You must not modify the host of the URL: "+ baseUrl.getHost());
+        } else if (relativeUrl.getUserInfo() != null && !relativeUrl.getUserInfo().equals(baseUrl.getUserInfo())) {
+            throw new IncorrectURLException("You must not modify the user part of the URL: " + baseUrl.getUserInfo());
+        } else if (relativeUrl.getHost() != null && !relativeUrl.getHost().equals(baseUrl.getHost())) {
+            throw new IncorrectURLException("You must not modify the host of the URL: " + baseUrl.getHost());
         }
         return URLHelper.createURL(baseUrl, relativeUrl);
     }
@@ -73,11 +74,12 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         m_disconnectable = false;
         m_implicitCloseTimeout = EngineProperties.getInteger(EngineProperties.DATA_IMPLICIT_CLOSE_TIMEOUT);
     }
+
     private static URL _resolveAbsolutePath(URL baseUrl, String absolutePath) throws NotImplementedException, IncorrectURLException, BadParameterException, NoSuccessException {
-        if (absolutePath==null) {
+        if (absolutePath == null) {
             throw new IncorrectURLException("URL must not be null");
-        } else if (! absolutePath.startsWith("/")) {
-            throw new IncorrectURLException("URL must contain an absolute path: "+ baseUrl.getPath());
+        } else if (!absolutePath.startsWith("/")) {
+            throw new IncorrectURLException("URL must contain an absolute path: " + baseUrl.getPath());
         }
         return URLHelper.createURL(baseUrl, absolutePath);
     }
@@ -92,7 +94,6 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
     }
 
     //////////////////////////////////////////// interface SyncNSEntry ////////////////////////////////////////////
-
     public URL getURLSync() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         return m_url;
     }
@@ -115,11 +116,11 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
 
     public boolean exists() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof DataReaderAdaptor) {
-            return ((DataReaderAdaptor)m_adaptor).exists(
+            return ((DataReaderAdaptor) m_adaptor).exists(
                     m_url.getPath(),
                     m_url.getQuery());
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme(), this);
         }
     }
 
@@ -136,10 +137,10 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
     public boolean isLinkSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LinkAdaptor) {
             try {
-                return ((LinkAdaptor)m_adaptor).isLink(
+                return ((LinkAdaptor) m_adaptor).isLink(
                         m_url.getPath());
             } catch (DoesNotExistException doesNotExist) {
-                throw new IncorrectStateException("Link does not exist: "+ m_url, doesNotExist);
+                throw new IncorrectStateException("Link does not exist: " + m_url, doesNotExist);
             }
         } else {
             FileAttributes attrs = this._getFileAttributes();
@@ -152,13 +153,13 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
             String absolutePath;
             try {
                 try {
-                    absolutePath = ((LinkAdaptor)m_adaptor).readLink(
+                    absolutePath = ((LinkAdaptor) m_adaptor).readLink(
                             m_url.getPath());
                 } catch (DoesNotExistException doesNotExist) {
-                    throw new IncorrectStateException("Link does not exist: "+ m_url, doesNotExist);
+                    throw new IncorrectStateException("Link does not exist: " + m_url, doesNotExist);
                 }
             } catch (NotLink notLink) {
-                throw new IncorrectStateException("Not a link: "+ m_url, this);
+                throw new IncorrectStateException("Not a link: " + m_url, this);
             }
             try {
                 return URLHelper.createURL(URLHelper.getParentURL(m_url), absolutePath);
@@ -166,16 +167,18 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
                 throw new IncorrectStateException(e);
             }
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme(), this);
         }
     }
 
     public abstract void copySync(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException;
+
     public void copySync(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         this.copySync(target, Flags.NONE.getValue());
     }
 
     public abstract void copyFromSync(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException;
+
     public void copyFromSync(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         this.copyFromSync(target, Flags.NONE.getValue());
     }
@@ -191,7 +194,12 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
             throw new NotImplementedException("Support of RECURSIVE flags with method link() is not implemented by the SAGA engine", this);
         }
         if (Flags.DEREFERENCE.isSet(flags)) {
-            this._dereferenceEntry().linkSync(link, flags - Flags.DEREFERENCE.getValue());
+            AbstractSyncNSEntryImpl entry = this._dereferenceEntry();
+            try {
+                entry.linkSync(link, flags - Flags.DEREFERENCE.getValue());
+            } finally {
+                entry.close();
+            }
             return; //==========> EXIT
         }
         URL effectiveLink = this._getEffectiveURL(link);
@@ -199,38 +207,39 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
             boolean overwrite = Flags.OVERWRITE.isSet(flags);
             try {
                 try {
-                    ((LinkAdaptor)m_adaptor).link(
+                    ((LinkAdaptor) m_adaptor).link(
                             m_url.getPath(),
                             effectiveLink.getPath(),
                             overwrite);
                 } catch (DoesNotExistException doesNotExist) {
-                    throw new DoesNotExistException("Entry does not exist: "+ m_url, doesNotExist);
+                    throw new DoesNotExistException("Entry does not exist: " + m_url, doesNotExist);
                 } catch (AlreadyExistsException alreadyExists) {
-                    throw new AlreadyExistsException("Target entry already exists: "+effectiveLink, alreadyExists.getCause());
+                    throw new AlreadyExistsException("Target entry already exists: " + effectiveLink, alreadyExists.getCause());
                 }
-            } catch(DoesNotExistException e) {
+            } catch (DoesNotExistException e) {
                 if (Flags.CREATEPARENTS.isSet(flags)) {
                     // make parent directories
                     this._makeParentDirs();
                     // create link
                     try {
-                        ((LinkAdaptor)m_adaptor).link(
+                        ((LinkAdaptor) m_adaptor).link(
                                 m_url.getPath(),
                                 effectiveLink.getPath(),
                                 overwrite);
                     } catch (DoesNotExistException doesNotExist) {
-                        throw new DoesNotExistException("Entry does not exist: "+ m_url, doesNotExist);
+                        throw new DoesNotExistException("Entry does not exist: " + m_url, doesNotExist);
                     } catch (AlreadyExistsException alreadyExists) {
-                        throw new AlreadyExistsException("Target entry already exists: "+effectiveLink, alreadyExists.getCause());
+                        throw new AlreadyExistsException("Target entry already exists: " + effectiveLink, alreadyExists.getCause());
                     }
                 } else {
                     throw e;
                 }
             }
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme());
+            throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme());
         }
     }
+
     public void linkSync(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         this.linkSync(target, Flags.NONE.getValue());
     }
@@ -238,33 +247,38 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
     public void moveSync(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         new FlagsHelper(flags).allowed(Flags.DEREFERENCE, Flags.OVERWRITE, Flags.CREATEPARENTS);
         if (Flags.DEREFERENCE.isSet(flags)) {
-            this._dereferenceEntry().moveSync(target, flags - Flags.DEREFERENCE.getValue());
+            AbstractSyncNSEntryImpl entry = this._dereferenceEntry();
+            try {
+                entry.moveSync(target, flags - Flags.DEREFERENCE.getValue());
+            } finally {
+                entry.close();
+            }
             return; //==========> EXIT
         }
         URL effectiveTarget = this._getEffectiveURL(target);
         boolean overwrite = Flags.OVERWRITE.isSet(flags);
         if (m_adaptor instanceof DataRename
                 && m_url.getScheme().equals(effectiveTarget.getScheme())
-                && (m_url.getUserInfo()==null || m_url.getUserInfo().equals(effectiveTarget.getUserInfo()))
-                && (m_url.getHost()==null || m_url.getHost().equals(effectiveTarget.getHost()))
-                && (m_url.getPort()==effectiveTarget.getPort()))
-        {
+                && (m_url.getUserInfo() == null || m_url.getUserInfo().equals(effectiveTarget.getUserInfo()))
+                && (m_url.getHost() == null || m_url.getHost().equals(effectiveTarget.getHost()))
+                && (m_url.getPort() == effectiveTarget.getPort())) {
             try {
-                ((DataRename)m_adaptor).rename(
+                ((DataRename) m_adaptor).rename(
                         m_url.getPath(),
                         effectiveTarget.getPath(),
                         overwrite,
                         m_url.getQuery());
             } catch (DoesNotExistException doesNotExist) {
-                throw new IncorrectStateException("File does not exist: "+ m_url, doesNotExist);
+                throw new IncorrectStateException("File does not exist: " + m_url, doesNotExist);
             } catch (AlreadyExistsException alreadyExists) {
-                throw new AlreadyExistsException("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
+                throw new AlreadyExistsException("Target entry already exists: " + effectiveTarget, alreadyExists.getCause());
             }
         } else {
             this.copySync(effectiveTarget, flags);
             this.removeSync(flags);
         }
     }
+
     public void moveSync(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         this.moveSync(target, Flags.NONE.getValue());
     }
@@ -273,7 +287,12 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         new FlagsHelper(flags).allowed(Flags.DEREFERENCE);
         if (Flags.DEREFERENCE.isSet(flags)) {
             try {
-                this._dereferenceEntry().removeSync(flags - Flags.DEREFERENCE.getValue());
+                AbstractSyncNSEntryImpl entry = this._dereferenceEntry();
+                try {
+                    entry.removeSync(flags - Flags.DEREFERENCE.getValue());
+                } finally {
+                    entry.close();
+                }
             } catch (IncorrectURLException e) {
                 throw new NoSuccessException(e);
             }
@@ -283,23 +302,24 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
             URL parent = this._getParentDirURL();
             String fileName = this._getEntryName();
             try {
-                ((DataWriterAdaptor)m_adaptor).removeFile(
+                ((DataWriterAdaptor) m_adaptor).removeFile(
                         parent.getPath(),
                         fileName,
                         m_url.getQuery());
             } catch (DoesNotExistException doesNotExist) {
-                throw new IncorrectStateException("File does not exist: "+ m_url, doesNotExist);
+                throw new IncorrectStateException("File does not exist: " + m_url, doesNotExist);
             }
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme());
+            throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme());
         }
     }
+
     public void removeSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         this.removeSync(Flags.NONE.getValue());
     }
-
     /** timeout not supported */
     private boolean m_disconnected = false;
+
     public synchronized void close() throws NotImplementedException, NoSuccessException {
         if (m_disconnectable && !m_disconnected) {
             m_disconnected = true;
@@ -314,7 +334,12 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         new FlagsHelper(flags).allowed(Flags.DEREFERENCE);
         if (Flags.DEREFERENCE.isSet(flags)) {
             try {
-                this._dereferenceEntry().permissionsAllowSync(id, permissions, flags - Flags.DEREFERENCE.getValue());
+                AbstractSyncNSEntryImpl entry = this._dereferenceEntry();
+                try {
+                    entry.permissionsAllowSync(id, permissions, flags - Flags.DEREFERENCE.getValue());
+                } finally {
+                    entry.close();
+                }
             } catch (IncorrectURLException e) {
                 throw new NoSuccessException(e);
             }
@@ -327,7 +352,12 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         new FlagsHelper(flags).allowed(Flags.DEREFERENCE);
         if (Flags.DEREFERENCE.isSet(flags)) {
             try {
-                this._dereferenceEntry().permissionsDenySync(id, permissions, flags - Flags.DEREFERENCE.getValue());
+                AbstractSyncNSEntryImpl entry = this._dereferenceEntry();
+                try {
+                    entry.permissionsDenySync(id, permissions, flags - Flags.DEREFERENCE.getValue());
+                } finally {
+                    entry.close();
+                }
             } catch (IncorrectURLException e) {
                 throw new NoSuccessException(e);
             } catch (IncorrectStateException e) {
@@ -343,7 +373,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         if (m_implicitCloseTimeout == null) {
             // log unclosed
             if (m_disconnectable && !m_disconnected) {
-                s_logger.error("NSEntry objects MUST be closed in order to free resources");
+                s_logger.error("NSEntry objects MUST be closed in order to free resources " + this.getURLSync());
             }
         } else {
             this.close((float) m_implicitCloseTimeout);
@@ -353,34 +383,34 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
 
     public long getMTimeSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         FileAttributes attrs = this._getFileAttributes();
-        if (attrs!=null && attrs.getLastModified()>0) {
+        if (attrs != null && attrs.getLastModified() > 0) {
             return attrs.getLastModified();
         }
-        throw new NotImplementedException("Not supported for this protocol: "+m_url.getScheme(), this);
+        throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme(), this);
     }
 
     /** used by method copy() */
     public void setMTime(long lastModified) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof DataWriterTimes) {
             try {
-                ((DataWriterTimes)m_adaptor).setLastModified(
+                ((DataWriterTimes) m_adaptor).setLastModified(
                         m_url.getPath(),
                         m_url.getQuery(),
                         lastModified);
             } catch (DoesNotExistException doesNotExist) {
-                throw new IncorrectStateException("Entry does not exist: "+m_url, doesNotExist);
+                throw new IncorrectStateException("Entry does not exist: " + m_url, doesNotExist);
             }
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme(), this);
         }
     }
 
     ///////////////////////////////////////// protected methods /////////////////////////////////////////
-
     public abstract NSDirectory openAbsoluteDir(String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException;
+
     public abstract NSEntry openAbsolute(String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException;
 
-    protected AbstractSyncNSDirectoryImpl _dereferenceDir()  throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    protected AbstractSyncNSDirectoryImpl _dereferenceDir() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             String absolutePath = this.readLinkSync().getPath();
             return (AbstractSyncNSDirectoryImpl) this.openAbsoluteDir(absolutePath, Flags.NONE.getValue());
@@ -391,7 +421,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         }
     }
 
-    protected AbstractSyncNSEntryImpl _dereferenceEntry()  throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    protected AbstractSyncNSEntryImpl _dereferenceEntry() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             String absolutePath = this.readLinkSync().getPath();
             return (AbstractSyncNSEntryImpl) this.openAbsolute(absolutePath, Flags.NONE.getValue());
@@ -413,6 +443,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
     protected URL _getParentDirURL() throws NotImplementedException, BadParameterException, NoSuccessException {
         return URLHelper.getParentURL(m_url);
     }
+
     protected String _getEntryName() throws NotImplementedException {
         return URLHelper.getName(m_url);
     }
@@ -420,7 +451,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
     protected void _makeParentDirs() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, TimeoutException, NoSuccessException {
         try {
             String parentAbsolutePath = this._getParentDirURL().getPath();
-            this.openAbsoluteDir(parentAbsolutePath, Flags.CREATE.or(Flags.CREATEPARENTS));
+            this.openAbsoluteDir(parentAbsolutePath, Flags.CREATE.or(Flags.CREATEPARENTS)).close();
         } catch (DoesNotExistException e) {
             throw new NoSuccessException(e);
         } catch (IncorrectStateException e) {
@@ -435,24 +466,29 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         } catch (DoesNotExistException e) {
             throw new NoSuccessException("Unexpected exception", e);
         }
-        if (! (targetEntry.m_adaptor instanceof DataWriterTimes) ) {
-            throw new NotImplementedException("Flag PRESERVETIMES ("+JSAGAFlags.PRESERVETIMES+") not supported for protocol: "+target.getScheme());
+        if (!(targetEntry.m_adaptor instanceof DataWriterTimes)) {
+            targetEntry.close();
+            throw new NotImplementedException("Flag PRESERVETIMES (" + JSAGAFlags.PRESERVETIMES + ") not supported for protocol: " + target.getScheme());
         }
         return targetEntry;
     }
 
     protected long _getSourceTimes_checkPreserveTimes(URL source) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (! (m_adaptor instanceof DataWriterTimes) ) {
-            throw new NotImplementedException("Flag PRESERVETIMES ("+JSAGAFlags.PRESERVETIMES+") not supported for protocol: "+m_url.getScheme());
+        if (!(m_adaptor instanceof DataWriterTimes)) {
+            throw new NotImplementedException("Flag PRESERVETIMES (" + JSAGAFlags.PRESERVETIMES + ") not supported for protocol: " + m_url.getScheme());
         }
         AbstractNSEntryImpl sourceEntry;
         try {
             sourceEntry = (AbstractNSEntryImpl) NSFactory.createNSEntry(JSAGA_FACTORY, m_session, source);
-        } catch(AlreadyExistsException e) {
+            try {
+                long mtime = sourceEntry.getMTime();
+                return mtime;
+            } finally {
+                sourceEntry.close();
+            }
+        } catch (AlreadyExistsException e) {
             throw new NoSuccessException("Unexpected exception", e);
         }
-        long mtime = sourceEntry.getMTime();
-        sourceEntry.close();
-        return mtime;
+
     }
 }

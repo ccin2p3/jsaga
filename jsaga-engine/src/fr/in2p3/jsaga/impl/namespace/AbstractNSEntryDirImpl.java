@@ -18,18 +18,19 @@ import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
-* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
-* ***             http://cc.in2p3.fr/             ***
-* ***************************************************
-* File:   AbstractNSEntryDirImpl
-* Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   17 sept. 2007
-* ***************************************************
-* Description:                                      */
+ * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+ * ***             http://cc.in2p3.fr/             ***
+ * ***************************************************
+ * File:   AbstractNSEntryDirImpl
+ * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
+ * Date:   17 sept. 2007
+ * ***************************************************
+ * Description:                                      */
 /**
  * This class override some methods of AbstractNSEntryImpl for directories
  */
 public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl implements SyncNSDirectory {
+
     /** constructor for factory */
     protected AbstractNSEntryDirImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, url, adaptor, flags);
@@ -46,7 +47,6 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     }
 
     ////////////////////////////////////// override methods of SyncNSEntry //////////////////////////////////////
-
     /** override super.getCWDSync() */
     public URL getCWDSync() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         return m_url.normalize();
@@ -66,10 +66,14 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             // allow permission on child entries
             for (FileAttributes child : this._listAttributes(m_url.getPath())) {
                 SyncNSEntry childEntry = this._openNS(child);
-                int childFlags = (childEntry instanceof AbstractSyncNSDirectoryImpl
-                        ? flags
-                        : flags - Flags.RECURSIVE.getValue());
-                childEntry.permissionsAllowSync(id, permissions, childFlags);
+                try {
+                    int childFlags = (childEntry instanceof AbstractSyncNSDirectoryImpl
+                            ? flags
+                            : flags - Flags.RECURSIVE.getValue());
+                    childEntry.permissionsAllowSync(id, permissions, childFlags);
+                } finally {
+                    ((NSEntry) childEntry).close();
+                }
             }
         } catch (IncorrectURLException e) {
             throw new NoSuccessException(e);
@@ -90,10 +94,14 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             // deny permission on child entries
             for (FileAttributes child : this._listAttributes(m_url.getPath())) {
                 SyncNSEntry childEntry = this._openNS(child);
-                int childFlags = (childEntry instanceof AbstractSyncNSDirectoryImpl
-                        ? flags
-                        : flags - Flags.RECURSIVE.getValue());
-                childEntry.permissionsDenySync(id, permissions, childFlags);
+                try {
+                    int childFlags = (childEntry instanceof AbstractSyncNSDirectoryImpl
+                            ? flags
+                            : flags - Flags.RECURSIVE.getValue());
+                    childEntry.permissionsDenySync(id, permissions, childFlags);
+                } finally {
+                    ((NSEntry) childEntry).close();
+                }
             }
         } catch (IncorrectURLException e) {
             throw new NoSuccessException(e);
@@ -104,6 +112,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     public void copySync(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         this._copyAndMonitor(target, flags, null);
     }
+
     public void _copyAndMonitor(URL target, int flags, AbstractCopyTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.RECURSIVE, Flags.OVERWRITE, Flags.CREATEPARENTS);
         new FlagsHelper(flags).required(Flags.RECURSIVE);
@@ -117,22 +126,26 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             this._makeDir(effectiveTarget, flags);
             // copy source childs
             FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
-            for (int i=0; i<sourceChilds.length; i++) {
+            for (int i = 0; i < sourceChilds.length; i++) {
                 SyncNSEntry sourceChildEntry = this._openNS(sourceChilds[i]);
-                if (sourceChildEntry instanceof AbstractSyncNSDirectoryImpl) {
-                    ((AbstractSyncNSDirectoryImpl)sourceChildEntry)._copyAndMonitor(effectiveTarget, flags, progressMonitor);
-                } else {
-                    // remove RECURSIVE flag (which is always set for NSDirectory.copy())
-                    int childFlags = flags - Flags.RECURSIVE.getValue();
-                    if (sourceChildEntry instanceof FileImpl) {
-                        ((FileImpl)sourceChildEntry)._copyAndMonitor(effectiveTarget, childFlags, progressMonitor);
+                try {
+                    if (sourceChildEntry instanceof AbstractSyncNSDirectoryImpl) {
+                        ((AbstractSyncNSDirectoryImpl) sourceChildEntry)._copyAndMonitor(effectiveTarget, flags, progressMonitor);
                     } else {
-                        sourceChildEntry.copySync(effectiveTarget, childFlags);
+                        // remove RECURSIVE flag (which is always set for NSDirectory.copy())
+                        int childFlags = flags - Flags.RECURSIVE.getValue();
+                        if (sourceChildEntry instanceof FileImpl) {
+                            ((FileImpl) sourceChildEntry)._copyAndMonitor(effectiveTarget, childFlags, progressMonitor);
+                        } else {
+                            sourceChildEntry.copySync(effectiveTarget, childFlags);
+                        }
                     }
+                } finally {
+                    ((NSEntry) sourceChildEntry).close();
                 }
             }
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme(), this);
         }
     }
 
@@ -153,7 +166,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
                 throw new IncorrectStateException("Unexpected exception", e);
             }
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme(), this);
         }
     }
 
@@ -166,57 +179,60 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             return; //==========> EXIT
         }
         URL effectiveTarget;
-    	try {
-    		NSFactory.createNSDirectory(JSAGA_FACTORY, m_session, target, Flags.NONE.getValue()).close();
-    		// Target Directory already exists, operation is MOVE
-        	effectiveTarget = this._getEffectiveURL(target);
-    	} catch (DoesNotExistException dnee) {
-    		// Target directory does not exist: operation is RENAME
-        	effectiveTarget = target;
-    	}
+        try {
+            NSFactory.createNSDirectory(JSAGA_FACTORY, m_session, target, Flags.NONE.getValue()).close();
+            // Target Directory already exists, operation is MOVE
+            effectiveTarget = this._getEffectiveURL(target);
+        } catch (DoesNotExistException dnee) {
+            // Target directory does not exist: operation is RENAME
+            effectiveTarget = target;
+        }
         if (m_adaptor instanceof DataRename
                 && m_url.getScheme().equals(effectiveTarget.getScheme())
-                && (m_url.getUserInfo()==null || m_url.getUserInfo().equals(effectiveTarget.getUserInfo()))
-                && (m_url.getHost()==null || m_url.getHost().equals(effectiveTarget.getHost()))
-                && (m_url.getPort()==effectiveTarget.getPort()))
-        {
+                && (m_url.getUserInfo() == null || m_url.getUserInfo().equals(effectiveTarget.getUserInfo()))
+                && (m_url.getHost() == null || m_url.getHost().equals(effectiveTarget.getHost()))
+                && (m_url.getPort() == effectiveTarget.getPort())) {
             boolean overwrite = Flags.OVERWRITE.isSet(flags);
             try {
-                ((DataRename)m_adaptor).rename(
+                ((DataRename) m_adaptor).rename(
                         m_url.getPath(),
                         effectiveTarget.getPath(),
                         overwrite,
                         m_url.getQuery());
             } catch (DoesNotExistException doesNotExist) {
-                throw new IncorrectStateException("Directory does not exist: "+ m_url, doesNotExist);
+                throw new IncorrectStateException("Directory does not exist: " + m_url, doesNotExist);
             } catch (AlreadyExistsException alreadyExists) {
-                throw new AlreadyExistsException("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
+                throw new AlreadyExistsException("Target entry already exists: " + effectiveTarget, alreadyExists.getCause());
             }
             if (m_url instanceof AbstractURLImpl) {
-            	((AbstractURLImpl)m_url).setCache(null);
+                ((AbstractURLImpl) m_url).setCache(null);
             }
         } else if (m_adaptor instanceof DataReaderAdaptor) {
             // make target directory
             this._makeDir(effectiveTarget, flags);
             // move source childs to target directory
             FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
-            for (int i=0; i<sourceChilds.length; i++) {
+            for (int i = 0; i < sourceChilds.length; i++) {
                 URL remoteChild = URLHelper.createURL(effectiveTarget, sourceChilds[i].getRelativePath());
                 SyncNSEntry entry = this._openNS(sourceChilds[i]);
-                if (entry instanceof SyncNSDirectory) {
-                    entry.moveSync(remoteChild, flags);
-                } else {
-                    // remove RECURSIVE flag (always set for NSDirectory.move())
-                    entry.moveSync(remoteChild, flags - Flags.RECURSIVE.getValue());
+                try {
+                    if (entry instanceof SyncNSDirectory) {
+                        entry.moveSync(remoteChild, flags);
+                    } else {
+                        // remove RECURSIVE flag (always set for NSDirectory.move())
+                        entry.moveSync(remoteChild, flags - Flags.RECURSIVE.getValue());
+                    }
+                } finally {
+                    ((NSEntry) entry).close();
                 }
             }
             // remove source directory
             this.removeSync(flags);
             if (m_url instanceof AbstractURLImpl) {
-            	((AbstractURLImpl)m_url).setCache(null);
+                ((AbstractURLImpl) m_url).setCache(null);
             }
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme(), this);
         }
     }
 
@@ -238,57 +254,62 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             if (Flags.RECURSIVE.isSet(flags)) {
                 // remove childs
                 FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
-                for (int i=0; i<sourceChilds.length; i++) {
+                for (int i = 0; i < sourceChilds.length; i++) {
                     SyncNSEntry entry;
                     try {
                         entry = this._openNS(sourceChilds[i]);
+                        try {
+                            if (entry instanceof SyncNSDirectory) {
+                                entry.removeSync(flags);
+                            } else {
+                                // remove RECURSIVE flag (always set here)
+                                entry.removeSync(flags - Flags.RECURSIVE.getValue());
+                            }
+                        } finally {
+                            ((NSEntry) entry).close();
+                        }
                     } catch (IncorrectURLException e) {
                         throw new NoSuccessException(e);
-                    }
-                    if (entry instanceof SyncNSDirectory) {
-                        entry.removeSync(flags);
-                    } else {
-                        // remove RECURSIVE flag (always set here)
-                        entry.removeSync(flags - Flags.RECURSIVE.getValue());
                     }
                 }
             } else {
                 // check that there is no child
                 FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
                 if (sourceChilds.length > 0) {
-                    throw new BadParameterException("Flag 'Recursive' is required for non-empty directory: "+m_url);
+                    throw new BadParameterException("Flag 'Recursive' is required for non-empty directory: " + m_url);
                 }
             }
-            
+
             // remove this directory
             URL parent = super._getParentDirURL();
             String directoryName = super._getEntryName();
             try {
-                ((DataWriterAdaptor)m_adaptor).removeDir(
+                ((DataWriterAdaptor) m_adaptor).removeDir(
                         parent.getPath(),
                         directoryName,
                         m_url.getQuery());
             } catch (DoesNotExistException doesNotExist) {
-                throw new IncorrectStateException("Directory does not exist: "+ m_url, doesNotExist);
+                throw new IncorrectStateException("Directory does not exist: " + m_url, doesNotExist);
             }
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme(), this);
         }
     }
 
     ////////////////////////////////////// interface NSDirectory //////////////////////////////////////
-
     public abstract NSDirectory openDir(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException;
+
     public abstract NSDirectory openDir(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException;
+
     public abstract NSEntry open(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException;
+
     public abstract NSEntry open(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException;
 
     ///////////////////////////////////////// protected methods /////////////////////////////////////////
-
     /** override super._getEffectiveURL() */
     protected URL _getEffectiveURL(URL target) throws NotImplementedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
         if (target.getPath().endsWith("/")) {
-            return URLHelper.createURL(target, super._getEntryName()+"/");
+            return URLHelper.createURL(target, super._getEntryName() + "/");
         } else {
             return target;
         }
@@ -297,20 +318,20 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     protected FileAttributes[] _listAttributes(String absolutePath) throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof DataReaderAdaptor) {
             try {
-                return ((DataReaderAdaptor)m_adaptor).listAttributes(absolutePath, m_url.getQuery());
+                return ((DataReaderAdaptor) m_adaptor).listAttributes(absolutePath, m_url.getQuery());
             } catch (BadParameterException badParameter) {
-                throw new IncorrectStateException("Entry is not a directory: "+absolutePath, badParameter);
+                throw new IncorrectStateException("Entry is not a directory: " + absolutePath, badParameter);
             } catch (DoesNotExistException doesNotExist) {
-                throw new IncorrectStateException("Directory does not exist: "+absolutePath, doesNotExist);
+                throw new IncorrectStateException("Directory does not exist: " + absolutePath, doesNotExist);
             }
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme(), this);
         }
     }
 
     //does not throw DoesNotExistException because it would mean "parent directory does not exist"
     protected SyncNSEntry _openNS(FileAttributes attr) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
-        switch(attr.getType()) {
+        switch (attr.getType()) {
             case FileAttributes.TYPE_DIRECTORY:
                 return this._openNSDir(URLFactory.createURL(JSAGA_FACTORY, attr.getRelativePath()));
             case FileAttributes.TYPE_FILE:
@@ -352,7 +373,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     protected void _makeDir(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         // set makeDirFlags
         int makeDirFlags = Flags.CREATE.getValue();
-        if (! Flags.OVERWRITE.isSet(flags)) {
+        if (!Flags.OVERWRITE.isSet(flags)) {
             makeDirFlags = Flags.EXCL.or(makeDirFlags);
         }
         if (Flags.CREATEPARENTS.isSet(flags)) {
