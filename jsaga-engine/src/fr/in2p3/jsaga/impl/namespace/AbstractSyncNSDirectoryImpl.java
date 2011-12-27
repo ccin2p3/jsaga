@@ -147,7 +147,12 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     private List<URL> _list(String pattern, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         new FlagsHelper(flags).allowed(Flags.DEREFERENCE);
         if (Flags.DEREFERENCE.isSet(flags)) {
-            return this._dereferenceDir()._list(pattern, flags - Flags.DEREFERENCE.getValue());
+            AbstractSyncNSDirectoryImpl dir = this._dereferenceDir();
+            try {
+                return dir._list(pattern, flags - Flags.DEREFERENCE.getValue());
+            } finally {
+                dir.close();
+            }
         }
 
         // get list
@@ -184,7 +189,12 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
         new FlagsHelper(flags).allowed(Flags.DEREFERENCE, Flags.RECURSIVE);
         if (Flags.DEREFERENCE.isSet(flags)) {
             try {
-                return this._dereferenceDir().findSync(pattern, flags - Flags.DEREFERENCE.getValue());
+                AbstractSyncNSDirectoryImpl dir = this._dereferenceDir();
+                try {
+                    return dir.findSync(pattern, flags - Flags.DEREFERENCE.getValue());
+                } finally {
+                    dir.close();
+                }
             } catch (IncorrectURLException e) {
                 throw new NoSuccessException(e);
             }

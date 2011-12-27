@@ -58,7 +58,12 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         new FlagsHelper(flags).required(Flags.RECURSIVE);
         try {
             if (Flags.DEREFERENCE.isSet(flags)) {
-                this._dereferenceDir().permissionsAllowSync(id, permissions, flags - Flags.DEREFERENCE.getValue());
+                AbstractSyncNSEntryImpl dir = this._dereferenceDir();
+                try {
+                    dir.permissionsAllowSync(id, permissions, flags - Flags.DEREFERENCE.getValue());
+                } finally {
+                    dir.close();
+                }
                 return; //==========> EXIT
             }
             // allow permission on current directory
@@ -86,7 +91,12 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         new FlagsHelper(flags).required(Flags.RECURSIVE);
         try {
             if (Flags.DEREFERENCE.isSet(flags)) {
-                this._dereferenceDir().permissionsDenySync(id, permissions, flags - Flags.DEREFERENCE.getValue());
+                AbstractSyncNSEntryImpl dir = this._dereferenceDir();
+                try {
+                    dir.permissionsDenySync(id, permissions, flags - Flags.DEREFERENCE.getValue());
+                } finally {
+                    dir.close();
+                }
                 return; //==========> EXIT
             }
             // deny permission on current directory
@@ -117,7 +127,12 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.RECURSIVE, Flags.OVERWRITE, Flags.CREATEPARENTS);
         new FlagsHelper(flags).required(Flags.RECURSIVE);
         if (Flags.DEREFERENCE.isSet(flags)) {
-            this._dereferenceDir().copySync(target, flags - Flags.DEREFERENCE.getValue());
+            AbstractSyncNSEntryImpl dir = this._dereferenceDir();
+            try {
+                dir.copySync(target, flags - Flags.DEREFERENCE.getValue());
+            } finally {
+                dir.close();
+            }
             return; //==========> EXIT
         }
         URL effectiveTarget = this._getEffectiveURL(target);
@@ -154,14 +169,22 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.RECURSIVE, Flags.OVERWRITE);
         new FlagsHelper(flags).required(Flags.RECURSIVE);
         if (Flags.DEREFERENCE.isSet(flags)) {
-            this._dereferenceDir().copyFromSync(source, flags - Flags.DEREFERENCE.getValue());
+            AbstractSyncNSEntryImpl dir = this._dereferenceDir();
+            try {
+                dir.copyFromSync(source, flags - Flags.DEREFERENCE.getValue());
+            } finally {
+                dir.close();
+            }
             return; //==========> EXIT
         }
         if (m_adaptor instanceof DataWriterAdaptor) {
             try {
                 NSDirectory sourceDir = NSFactory.createNSDirectory(JSAGA_FACTORY, m_session, source);
-                sourceDir.copy(m_url, flags);
-                sourceDir.close();
+                try {
+                    sourceDir.copy(m_url, flags);
+                } finally {
+                    sourceDir.close();
+                }
             } catch (AlreadyExistsException e) {
                 throw new IncorrectStateException("Unexpected exception", e);
             }
@@ -175,7 +198,12 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         new FlagsHelper(flags).allowed(Flags.DEREFERENCE, Flags.RECURSIVE, Flags.OVERWRITE, Flags.CREATEPARENTS);
         new FlagsHelper(flags).required(Flags.RECURSIVE);
         if (Flags.DEREFERENCE.isSet(flags)) {
-            this._dereferenceDir().moveSync(target, flags - Flags.DEREFERENCE.getValue());
+            AbstractSyncNSEntryImpl dir = this._dereferenceDir();
+            try {
+                dir.moveSync(target, flags - Flags.DEREFERENCE.getValue());
+            } finally {
+                dir.close();
+            }
             return; //==========> EXIT
         }
         URL effectiveTarget;
@@ -244,7 +272,12 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         new FlagsHelper(flags).allowed(Flags.DEREFERENCE, Flags.RECURSIVE);
         if (Flags.DEREFERENCE.isSet(flags)) {
             try {
-                this._dereferenceDir().removeSync(flags - Flags.DEREFERENCE.getValue());
+                AbstractSyncNSEntryImpl dir = this._dereferenceDir();
+                try {
+                    dir.removeSync(flags - Flags.DEREFERENCE.getValue());
+                } finally {
+                    dir.close();
+                }
             } catch (IncorrectURLException e) {
                 throw new NoSuccessException(e);
             }
