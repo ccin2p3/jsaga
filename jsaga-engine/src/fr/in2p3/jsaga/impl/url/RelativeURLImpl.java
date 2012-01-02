@@ -36,7 +36,7 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
     /** Encode the relative path + set the cache */
 	RelativeURLImpl(FileAttributes cache) throws BadParameterException {
         this(cache.getRelativePath());
-        m_cache = cache;
+        setCache(cache);
     }
 
     public SagaObject clone() throws CloneNotSupportedException {
@@ -45,6 +45,7 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
         clone.url_query = url_query;
         clone.url_fragment = url_fragment;
         clone.m_cache = m_cache;
+        clone.m_cache_creation_time = m_cache_creation_time;
         return clone;
     }
 
