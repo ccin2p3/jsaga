@@ -23,6 +23,7 @@
         <module>cog-axis</module>
         <module>cog-jglobus</module>
         <module>cog-url</module>
+        <module>commonj</module>
         <module>concurrent</module>
         <module>cryptix-asn1</module>
         <module>cryptix32</module>
