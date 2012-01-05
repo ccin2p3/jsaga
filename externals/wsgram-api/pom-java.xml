@@ -14,6 +14,10 @@
 	<name>WS GRAM external libraries</name>
 	<description>These are the external libraries for the WS GRAM adaptor.</description>
     <url>http://www.globus.org/</url>
+    <!-- Sequence of commands:
+    		mvn -f pom-java.xml install
+    		mvn -Ddescriptor=assembly.xml assembly:assembly (ignore FATAL ERROR and InvalidArtifactRTException)
+    		mvn -N -f pom-java.xml install -->
 	<build>
 		<directory>build</directory>
 	    <plugins>
