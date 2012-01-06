@@ -71,7 +71,9 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <descriptor>src/assembly.xml</descriptor>
+                            <descriptors>
+                                <descriptor>src/assembly.xml</descriptor>
+                            </descriptors>
                             <attach>false</attach>
                         </configuration>
                     </execution>
