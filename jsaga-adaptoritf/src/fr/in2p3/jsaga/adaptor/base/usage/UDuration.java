@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -49,7 +51,13 @@ public class UDuration extends U {
     }
 
     public static int toInt(Object value) throws ParseException {
-        return (int) (toLong((String) value) / 1000);
+		// value can be either ISO8601 or "-1" or a number of seconds
+    	try {
+    		if (value.equals(String.valueOf(SecurityCredential.INFINITE_LIFETIME))) return SecurityCredential.INFINITE_LIFETIME;
+    		return Integer.parseInt((String) value);
+    	} catch (NumberFormatException nfe) {
+    		return (int) (toLong((String) value) / 1000);
+    	}
     }
 
     private static long toLong(String value) throws ParseException {
