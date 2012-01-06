@@ -36,7 +36,7 @@ class SSHJobMonitorAdaptor extends SSHAdaptor with QueryIndividualJob {
     try {
       val stream = new ByteArrayOutputStream
       SFTPDataAdaptor.getToStream(sftpClient, SSHJobProcess.getEndCodeFile(jobId), "", stream)
-      SSHJobStatus(jobId, new String(stream.toByteArray).toInt)
+      SSHJobStatus(jobId, new String(stream.toByteArray).replaceAll("[\\r\\n]", "").toInt)
     } catch {
       case e => 
         if(SFTPDataAdaptor.exists(sftpClient, SSHJobProcess.getPidFile(jobId), "")) SSHJobStatus.running(jobId)
