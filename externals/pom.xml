@@ -28,7 +28,6 @@
         <module>cryptix-asn1</module>
         <module>cryptix32</module>
         <module>file-system</module>
-        <module>ganymed-ssh2</module>
         <module>glite-security</module>
         <module>glite-jdl-api-java</module>
         <module>glite-wms-wmproxy-api-java</module>
@@ -36,16 +35,12 @@
         <module>glite-ce-cream-api-java</module>
         <module>glite-ce-delegation</module>
         <module>jargon</module>
-        <module>jce-jdk13</module>
         <module>jeldoclet</module>
-        <module>jsch</module>
-        <module>jzlib</module>
         <module>naregi-ss-api</module>
         <module>opensaml</module>
         <module>puretls</module>
         <module>vomsjapi</module>
         <module>wsgram-api</module>
-        <module>xmlsec</module>
     </modules>
     <build>
         <directory>build</directory>

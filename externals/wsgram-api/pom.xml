@@ -91,22 +91,22 @@
 			<artifactId>naming-factory</artifactId>
 			<version>0.8</version>
         </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>jce-jdk13</artifactId>
-            <version>1.3.1</version>
-            <scope>compile</scope>
-        </dependency>
+		<dependency>
+		    <groupId>bouncycastle</groupId>
+		    <artifactId>bcprov-jdk13</artifactId>
+		    <version>140</version>
+		</dependency>
 		 <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
             <version>3.0</version>
             <scope>compile</scope>
         </dependency>
-		<dependency>
-			<groupId>xmlsec</groupId>
-			<artifactId>xmlsec</artifactId>
-			<version>1.4.1</version>
+        <dependency>
+            <groupId>org.apache.santuario</groupId>
+            <artifactId>xmlsec</artifactId>
+            <version>1.4.5</version>
+            <scope>compile</scope>
         </dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -119,7 +119,7 @@
 			<version>1.5</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.globus</groupId>
+			<groupId>org.globus</groupId>
 			<artifactId>commonj</artifactId>
 			<version>4.0.0</version>
 		</dependency>

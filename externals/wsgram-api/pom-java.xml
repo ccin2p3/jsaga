@@ -11,9 +11,15 @@
     <artifactId>wsgram-api</artifactId>
     <version>4.0.0</version>
 	<packaging>pom</packaging>
+	<!-- CAUTION: this module cannot be built anymore -->
 	<name>WS GRAM external libraries</name>
 	<description>These are the external libraries for the WS GRAM adaptor.</description>
     <url>http://www.globus.org/</url>
+    <!-- Sequence of commands:
+    		mvn -f pom-java.xml install
+    		mvn -Ddescriptor=assembly.xml assembly:assembly (ignore FATAL ERROR and InvalidArtifactRTException)
+    		cp -p build/wsgram-api-4.0.0.jar wsgram-api.jar
+    -->
 	<build>
 		<directory>build</directory>
 	    <plugins>
