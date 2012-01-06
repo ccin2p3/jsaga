@@ -50,11 +50,6 @@ public class SSHExecutionTestSuite extends JSAGATestSuite {
     }
 
     // test cases
-    public static class SSHJobRunSandboxTest extends JobRunSandboxTest {
-        public SSHJobRunSandboxTest() throws Exception {super("ssh2");}
-    }
-    
-    // test cases
     public static class SSHJobRunOptionalTest extends JobRunOptionalTest {
         public SSHJobRunOptionalTest() throws Exception {super("ssh2");}
         public void test_resume_done() { super.ignore("not supported"); }
@@ -63,6 +58,7 @@ public class SSHExecutionTestSuite extends JSAGATestSuite {
         public void test_suspend_running() { super.ignore("not supported"); }
         public void test_simultaneousShortJob() throws Exception { super.ignore("not working");}
         public void test_simultaneousLongJob() throws Exception { super.ignore("not working");}
+        public void test_listJob() throws Exception { super.ignore("not implemented");}
     }
     
  	// test cases
@@ -71,11 +67,7 @@ public class SSHExecutionTestSuite extends JSAGATestSuite {
         public void test_run_queueRequirement() { super.ignore("not supported"); }
         public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
         public void test_run_memoryRequirement() { super.ignore("not supported"); }
+        public void test_run_inWorkingDirectory() { super.ignore("not supported"); }
     }
     
-    // test cases
-    public static class SSHJobRunInteractiveTest extends JobRunInteractiveTest {
-        public SSHJobRunInteractiveTest() throws Exception {super("ssh2");}
-        public void test_simultaneousStdin()  { super.ignore("Not supported");}
-    }
 }
