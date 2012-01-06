@@ -23,11 +23,13 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus
 
 object SSHJobStatus {
   val PROCESS_CANCELED = 143
+  val COMMAND_NOT_FOUND = 127
   
   def apply(jobId: String, retCode: Int) = 
     new SSHJobStatus(jobId,
       if(retCode >= LocalJobProcess.PROCESS_DONE_OK)
             if(retCode == PROCESS_CANCELED) SubState.CANCELED
+            else if(retCode == COMMAND_NOT_FOUND) SubState.FAILED_ERROR
             else SubState.DONE
       else SubState.FAILED_ERROR)
          
