@@ -62,6 +62,9 @@ abstract class SSHAdaptor extends ClientAdaptor {
 
   override def connect(userInfo: String, host: String, port: Int, basePath: String, attributes: java.util.Map[_, _]) = {
     try {
+      // Disable some INFO message from ganymed
+      java.util.logging.Logger.getLogger("ch.ethz.ssh2").setLevel(java.util.logging.Level.WARNING)
+      
       // Creating a connection instance
       connection = new Connection(host, port)
       
