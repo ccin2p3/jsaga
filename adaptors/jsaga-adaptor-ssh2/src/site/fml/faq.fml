@@ -14,6 +14,21 @@
 			</answer>
 		</faq>
 	</part>
+	<part id="bugs">
+		<title>Known bugs and limitations</title>
+		<faq id="bugs">
+			<question>Can I use this adaptor in production ?</question>
+			<answer>
+			This adaptor is still unstable and not recommended to be used in production. Know bugs and limitations are:
+                <ul>
+                <li>Data staging is not supported yet</li>
+                <li>Listing jobs is not supported yet</li>
+                <li>File copy with OVERWRITE flag is not supported</li>
+                <li>Wrong exception thrown by mkdir()</li>
+                </ul>
+			</answer>
+		</faq>
+	</part>
 	<part id="security">
 		<title>Security</title>
 		<faq id="known-hosts">
@@ -38,20 +53,12 @@
 			<question>What is the URL syntax understood by this plug-in ?</question>
 			<answer>
 				The URL must be:
-				<pre><![CDATA[ssh://<HOSTNAME>[:<PORT>]/
+				<pre><![CDATA[ssh2://<HOSTNAME>[:<PORT>]/
 Where:
     <HOSTNAME> is the name of the host running the SSH daemon,
     <PORT> is 22 by default.
 ]]></pre>
 			</answer>
-		</faq>
-		<faq id="encoding">
-			<question>What encoding is used for remote filenames ?</question>
-			<answer>The plug-in does not explicitly set any filename encoding, so
-				the default on the server is used. If
-				you want to force a particular encoding for filenames, please use the
-				"FilenameEncoding" parameter.
-            </answer>
 		</faq>
 	</part>
 </faqs>
