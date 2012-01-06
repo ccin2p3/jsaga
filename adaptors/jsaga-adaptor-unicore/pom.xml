@@ -22,9 +22,31 @@
     </developers>
 	<repositories>
 	  <repository>
+	      <releases>
+	        <enabled>true</enabled>
+	        <updatePolicy>never</updatePolicy>
+	      </releases>
+	      <snapshots>
+	        <enabled>true</enabled>
+	        <updatePolicy>never</updatePolicy>
+	      </snapshots>
 	    <id>unicore.eu</id>
 	    <name>UNICORE repository</name>
 	    <url>http://unicore-dev.zam.kfa-juelich.de/maven</url>
+	  </repository>
+	  <!-- disable zam904.zam.kfa-juelich.de because it does not exist anymore -->
+	  <repository>
+	      <releases>
+	        <enabled>false</enabled>
+	        <updatePolicy>never</updatePolicy>
+	      </releases>
+	      <snapshots>
+	        <enabled>false</enabled>
+	        <updatePolicy>never</updatePolicy>
+	      </snapshots>
+	    <id>vsgc-public</id>
+	    <name>VSGC repository (Obsolete)</name>
+	    <url>http://zam904.zam.kfa-juelich.de/maven</url>
 	  </repository>
 	</repositories>
     <dependencies>
