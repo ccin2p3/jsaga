@@ -99,6 +99,8 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
         try {
             // Creating a connection instance
             connexion = new Connection(host);
+            // Disable some INFO message from ganymed
+            java.util.logging.Logger.getLogger("ch.ethz.ssh2").setLevel(java.util.logging.Level.WARNING);
             // Now connect
             connexion.connect();
 
