@@ -54,6 +54,14 @@
         <developerConnection>scm:git:ssh://git.in2p3.fr/jsaga</developerConnection>
         <url>https://git.in2p3.fr/public/jsaga</url>
     </scm>
+    <ciManagement>
+        <system>Jenkins</system>
+        <url>http://cccetest01.in2p3.fr:8080/</url>
+    </ciManagement>
+    <issueManagement>
+        <system>Redmine</system>
+        <url>http://forge.in2p3.fr/projects/jsaga/issues</url>
+    </issueManagement>
     <distributionManagement>
         <repository>
             <id>maven2-repository</id>

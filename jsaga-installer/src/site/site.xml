@@ -20,7 +20,6 @@
             <item name="Download" href="download.html"/>
             <item name="Dependencies" href="dependencies-licenses.html"/>
             <item name="Related Projects" href="projects.html"/>
-            <item name="Issue Tracking" href="https://forge.in2p3.fr/projects/jsaga/issues"/>
             <item name="Development Release" href="http://grid.in2p3.fr/software/jsaga-dev/index.html"/>
         </menu>
         <menu name="User Documentation">
