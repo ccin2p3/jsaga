@@ -146,9 +146,10 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
             file.close();
             checkWrited(file2Url, new_content);
             // check size of root directory: should be size of both files in subDir
+            // use SAGA compliant getSize(URL) instead of JSAGA getSize()
             assertEquals(
                     DEFAULT_CONTENT.length() + new_content.length(),
-                    ((Directory)m_dir).getSize(createURL(m_dirUrl, ".")));
+                    ((Directory)m_dir).getSize(m_dirUrl));
             // delete created file
             file.remove();
         } else {

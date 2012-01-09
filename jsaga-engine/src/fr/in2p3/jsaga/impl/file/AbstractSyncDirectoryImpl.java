@@ -131,14 +131,22 @@ public class AbstractSyncDirectoryImpl extends AbstractNSDirectoryImpl implement
         } catch (BadParameterException bpe) {
             // This is extra-spec: catch BadParameterException thrown by URLHelper in case URL is a directory (eg ".")
         	if (bpe.getStackTrace()[0].getClassName().equals(fr.in2p3.jsaga.impl.url.URLHelper.class.getName())) {
-        		// TODO: test if current directory or other directory
-        		return this.getSizeSync(flags);
+        		if (name.normalize().getPath().equals(m_url.getPath())) {
+        			return this.getSizeSync(flags);
+        		} else {
+        			try {
+						return ((DirectoryImpl)this.openDir(name, flags)).getSize();
+					} catch (AlreadyExistsException aee) {
+			        	// This should never happen since only DEREFERENCE flag is allowed
+			            throw new NoSuccessException("Wrong exception thrown: "+ name, aee);
+					}
+        		}
         	} else {
         		throw bpe;
         	}
-        } catch (AlreadyExistsException alreadyExists) {
+        } catch (AlreadyExistsException aee) {
         	// This should never happen since only DEREFERENCE flag is allowed
-            throw new NoSuccessException("Wrong exception thrown: "+ name, alreadyExists);
+            throw new NoSuccessException("Wrong exception thrown: "+ name, aee);
         }
     }
     public long getSizeSync(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
