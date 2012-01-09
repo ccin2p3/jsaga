@@ -5,6 +5,7 @@ import java.util.List;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.impl.namespace.*;
 import fr.in2p3.jsaga.impl.url.AbstractURLImpl;
+import fr.in2p3.jsaga.impl.url.URLFactoryImpl;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import fr.in2p3.jsaga.sync.file.SyncDirectory;
 import org.ogf.saga.SagaObject;
@@ -96,15 +97,18 @@ public class AbstractSyncDirectoryImpl extends AbstractNSDirectoryImpl implement
     // <extra specs>
     public long getSizeSync(int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
 		int total_size = 0;
-		List list = null;
 		try {
-			list = this.list(flags);
+			List list = this.list(flags);
 	    	for (int i=0; i<list.size(); i++) {
 				AbstractURLImpl url = (AbstractURLImpl)list.get(i);
 				if (url.getPath().endsWith("/")) {
 					total_size += ((DirectoryImpl)this.openDir(url, flags)).getSize();
 				} else {
-					total_size += ((FileImpl)this.openFile(url, flags)).getSize();
+					if (url.hasCache()) {
+						total_size += url.getCache().getSize();
+					} else {
+						total_size += ((FileImpl)this.openFile(url, flags)).getSize();
+					}
 				}
 	    	}
 			return total_size;
@@ -126,6 +130,9 @@ public class AbstractSyncDirectoryImpl extends AbstractNSDirectoryImpl implement
     	// Allowed flags are DEREFERENCED and NONE
         new FlagsHelper(flags).allowed(Flags.NONE, Flags.DEREFERENCE);
         // TODO handle DEREFERENCE
+//        if (Flags.DEREFERENCE.isSet(flags)) {
+//            return this._dereferenceDir()._list(pattern, flags - Flags.DEREFERENCE.getValue());
+//        }
         try {
             return this.openFile(name, flags).getSize();
         } catch (BadParameterException bpe) {
