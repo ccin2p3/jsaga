@@ -41,6 +41,23 @@ public abstract class AbstractAsyncDirectoryImpl extends AbstractSyncDirectoryIm
 
     ////////////////////////////////////////// interface Directory //////////////////////////////////////////
 
+    // <extra specs>
+    public Task<Directory, Long> getSize(TaskMode mode) throws NotImplementedException {
+        return new AbstractThreadedTask<Directory,Long>(mode) {
+            public Long invoke() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+                return AbstractAsyncDirectoryImpl.super.getSizeSync();
+            }
+        };
+    }
+    public Task<Directory, Long> getSize(TaskMode mode, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<Directory,Long>(mode) {
+            public Long invoke() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+                return AbstractAsyncDirectoryImpl.super.getSizeSync(flags);
+            }
+        };
+    }
+    // </extra specs>
+
     public Task<Directory, Long> getSize(TaskMode mode, final URL name, final int flags) throws NotImplementedException {
         return new AbstractThreadedTask<Directory,Long>(mode) {
             public Long invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {

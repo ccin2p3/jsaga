@@ -1,7 +1,10 @@
 package fr.in2p3.jsaga.impl.file;
 
+import java.util.List;
+
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.impl.namespace.*;
+import fr.in2p3.jsaga.impl.url.AbstractURLImpl;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import fr.in2p3.jsaga.sync.file.SyncDirectory;
 import org.ogf.saga.SagaObject;
@@ -90,11 +93,52 @@ public class AbstractSyncDirectoryImpl extends AbstractNSDirectoryImpl implement
 
     /////////////////////////////////// interface Directory ///////////////////////////////////
 
+    // <extra specs>
+    public long getSizeSync(int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+		int total_size = 0;
+		List list = null;
+		try {
+			list = this.list(flags);
+	    	for (int i=0; i<list.size(); i++) {
+				AbstractURLImpl url = (AbstractURLImpl)list.get(i);
+				if (url.getPath().endsWith("/")) {
+					total_size += ((DirectoryImpl)this.openDir(url, flags)).getSize();
+				} else {
+					total_size += ((FileImpl)this.openFile(url, flags)).getSize();
+				}
+	    	}
+			return total_size;
+		} catch (IncorrectURLException e) {
+			throw new NoSuccessException(e);
+		} catch (DoesNotExistException e) {
+			throw new NoSuccessException(e);
+		} catch (AlreadyExistsException e) {
+			throw new NoSuccessException(e);
+		}
+    }
+    
+    public long getSizeSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
+        return this.getSizeSync(Flags.NONE.getValue());
+    }
+    // </extra specs>
+    
     public long getSizeSync(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
+    	// Allowed flags are DEREFERENCED and NONE
+        new FlagsHelper(flags).allowed(Flags.NONE, Flags.DEREFERENCE);
+        // TODO handle DEREFERENCE
         try {
             return this.openFile(name, flags).getSize();
+        } catch (BadParameterException bpe) {
+            // This is extra-spec: catch BadParameterException thrown by URLHelper in case URL is a directory (eg ".")
+        	if (bpe.getStackTrace()[0].getClassName().equals(fr.in2p3.jsaga.impl.url.URLHelper.class.getName())) {
+        		// TODO: test if current directory or other directory
+        		return this.getSizeSync(flags);
+        	} else {
+        		throw bpe;
+        	}
         } catch (AlreadyExistsException alreadyExists) {
-            throw new IncorrectStateException("Entry already exists: "+ name, alreadyExists);
+        	// This should never happen since only DEREFERENCE flag is allowed
+            throw new NoSuccessException("Wrong exception thrown: "+ name, alreadyExists);
         }
     }
     public long getSizeSync(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
