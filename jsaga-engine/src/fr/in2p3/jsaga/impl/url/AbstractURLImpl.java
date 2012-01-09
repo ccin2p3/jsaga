@@ -36,6 +36,13 @@ public abstract class AbstractURLImpl extends AbstractSagaObjectImpl implements 
 	AbstractURLImpl() throws BadParameterException {
 	}
 
+    public SagaObject clone() throws CloneNotSupportedException {
+    	AbstractURLImpl clone = (AbstractURLImpl) super.clone();
+        clone.m_cache = m_cache;
+        clone.m_cache_creation_time = m_cache_creation_time;
+        return clone;
+    }
+
     /** Encode the relative path + set the cache */
 	/*AbstractURLImpl(FileAttributes cache) throws BadParameterException {
         this(cache.getRelativePath());

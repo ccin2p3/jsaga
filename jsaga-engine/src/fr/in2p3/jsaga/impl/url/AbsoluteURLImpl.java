@@ -33,7 +33,7 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
 
     AbsoluteURLImpl(FileAttributes cache) throws BadParameterException {
         this(cache.getRelativePath());
-        m_cache = cache;
+        this.setCache(cache);
     }
 
     /** DO NOT encode the URL */
@@ -45,7 +45,6 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
     public SagaObject clone() throws CloneNotSupportedException {
         AbsoluteURLImpl clone = (AbsoluteURLImpl) super.clone();
         clone.u = u;
-        clone.m_cache = m_cache;
         return clone;
     }
 
