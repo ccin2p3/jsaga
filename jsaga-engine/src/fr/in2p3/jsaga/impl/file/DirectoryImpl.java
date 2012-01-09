@@ -5,6 +5,7 @@ import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.*;
+import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.url.URL;
@@ -38,6 +39,38 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
     }
 
     ////////////////////////////////////////// interface Directory //////////////////////////////////////////
+
+    // <extra specs>
+    public long getSize() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("getSize");
+        if (timeout == WAIT_FOREVER) {
+            return super.getSizeSync();
+        } else {
+            try {
+                return (Long) getResult(super.getSize(TaskMode.ASYNC), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+			catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+			catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);} 
+        }
+    }
+    
+    public long getSize(int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("getSize");
+        if (timeout == WAIT_FOREVER) {
+            return super.getSizeSync(flags);
+        } else {
+            try {
+                return (Long) getResult(super.getSize(TaskMode.ASYNC, flags), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+			catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+			catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
+        }
+    }
+    // </extra specs>
 
     public long getSize(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         float timeout = this.getTimeout("getSize");
