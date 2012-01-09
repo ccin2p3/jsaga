@@ -4,6 +4,7 @@
     </properties>
     <body>
         <release version="0.9.15">
+            <action dev="rreuillon" type="add">New SSH adaptor based upon Ganymed-ssh2 library</action>
             <action dev="rreuillon" type="fix">Fix bug in external library vomsjapi</action>
             <action dev="lschwarz" type="add">New job adaptor for GenesisII (BES implementation)</action>
             <action dev="lschwarz" type="add">New data adaptor for Unicore</action>
