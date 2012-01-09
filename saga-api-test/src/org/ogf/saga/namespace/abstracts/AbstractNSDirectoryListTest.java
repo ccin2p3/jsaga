@@ -1,7 +1,15 @@
 package org.ogf.saga.namespace.abstracts;
 
+import org.ogf.saga.buffer.Buffer;
+import org.ogf.saga.buffer.BufferFactory;
+import org.ogf.saga.error.AlreadyExistsException;
 import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.file.Directory;
+import org.ogf.saga.file.File;
 import org.ogf.saga.namespace.Flags;
+import org.ogf.saga.namespace.NSEntry;
+import org.ogf.saga.namespace.NSFactory;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 import java.util.List;
@@ -115,6 +123,38 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
         assertEquals(
                 DEFAULT_FILENAME,
                 m_subDir.getEntry(0).toString());
+    }
+
+    public void test_getSizeUrl() throws Exception {
+        if (m_file instanceof File) {
+            assertEquals(
+                    DEFAULT_CONTENT.length(),
+                    ((Directory)m_subDir).getSize(m_fileUrl));
+        } else {
+            fail("Not an instance of class: File");
+        }
+    }
+
+    public void test_getSizeRecursive() throws Exception {
+    	String new_content = "new_content";
+        if (m_file instanceof File) {
+        	// Write another file
+            URL file2Url = createURL(m_subDirUrl, "File2.txt");
+            NSEntry file = m_subDir.open(file2Url, FLAGS_FILE);
+            Buffer buffer = BufferFactory.createBuffer(new_content.getBytes());
+            ((File)file).write(buffer);
+            file.close();
+            checkWrited(file2Url, new_content);
+            // check size of root directory: should be size of both files in subDir
+            assertEquals(
+                    DEFAULT_CONTENT.length() + new_content.length(),
+                    ((Directory)m_dir).getSize(createURL(m_dirUrl, ".")));
+            // delete created file
+            file.remove();
+        } else {
+            fail("Not an instance of class: File");
+        }
+        
     }
 
     /////////////////////////////////// overloaded methods ///////////////////////////////////
