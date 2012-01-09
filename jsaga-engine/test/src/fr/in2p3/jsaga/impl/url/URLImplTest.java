@@ -8,6 +8,11 @@ import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
+import fr.in2p3.jsaga.EngineProperties;
+import fr.in2p3.jsaga.adaptor.data.WaitForEverFileAttributes;
+import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
@@ -359,6 +364,62 @@ public class URLImplTest extends AbstractTest {
         url.setString(_uri+_user+_host+_port+"////"+_abs_path+_file);
         // path should not be considered as HOST
         assertEquals(_abs_path+_file, url.getPath());
+    }
+    
+    public void test_cache() throws Exception {
+    	AbstractURLImpl url;
+    	url = new RelativeURLImpl(new URLAttributes(_url_relative));
+    	assertTrue(url.hasCache());
+    	url = new AbsoluteURLImpl(new URLAttributes(_url_simple));
+    	assertTrue(url.hasCache());
+
+    	EngineProperties.setProperty(EngineProperties.DATA_ATTRIBUTES_CACHE_LIFETIME, "0");
+    	url = new RelativeURLImpl(new URLAttributes(_url_relative));
+    	assertFalse(url.hasCache());
+    	url = new AbsoluteURLImpl(new URLAttributes(_url_simple));
+    	assertFalse(url.hasCache());
+    }
+
+    private class URLAttributes extends FileAttributes {
+    	private String m_name;
+    	
+    	public URLAttributes(String name) {
+    		m_name = name;
+    	}
+		public String getName() {
+			return m_name;
+		}
+        public int getType() {
+            return TYPE_UNKNOWN;
+        }
+
+        public long getSize() {
+            return SIZE_UNKNOWN;
+        }
+
+        public PermissionBytes getUserPermission() {
+            return PERMISSION_UNKNOWN;
+        }
+
+        public PermissionBytes getGroupPermission() {
+            return PERMISSION_UNKNOWN;
+        }
+
+        public PermissionBytes getAnyPermission() {
+            return PERMISSION_UNKNOWN;
+        }
+
+        public String getOwner() {
+            return ID_UNKNOWN;
+        }
+
+        public String getGroup() {
+            return ID_UNKNOWN;
+        }
+
+        public long getLastModified() {
+            return DATE_UNKNOWN;
+        }
     }
 
 }
