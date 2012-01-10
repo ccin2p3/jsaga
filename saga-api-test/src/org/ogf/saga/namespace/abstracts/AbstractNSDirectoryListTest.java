@@ -125,39 +125,6 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
                 m_subDir.getEntry(0).toString());
     }
 
-    public void test_getSizeUrl() throws Exception {
-        if (m_file instanceof File) {
-            assertEquals(
-                    DEFAULT_CONTENT.length(),
-                    ((Directory)m_subDir).getSize(m_fileUrl));
-        } else {
-            fail("Not an instance of class: File");
-        }
-    }
-
-    public void test_getSizeRecursive() throws Exception {
-    	String new_content = "new_content";
-        if (m_file instanceof File) {
-        	// Write another file
-            URL file2Url = createURL(m_subDirUrl, "File2.txt");
-            NSEntry file = m_subDir.open(file2Url, FLAGS_FILE);
-            Buffer buffer = BufferFactory.createBuffer(new_content.getBytes());
-            ((File)file).write(buffer);
-            file.close();
-            checkWrited(file2Url, new_content);
-            // check size of root directory: should be size of both files in subDir
-            // use SAGA compliant getSize(URL) instead of JSAGA getSize()
-            assertEquals(
-                    DEFAULT_CONTENT.length() + new_content.length(),
-                    ((Directory)m_dir).getSize(m_dirUrl));
-            // delete created file
-            file.remove();
-        } else {
-            fail("Not an instance of class: File");
-        }
-        
-    }
-
     /////////////////////////////////// overloaded methods ///////////////////////////////////
 
     public void test_isDir() throws Exception {
