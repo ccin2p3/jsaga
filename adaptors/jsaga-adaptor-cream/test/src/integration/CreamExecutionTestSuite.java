@@ -50,8 +50,6 @@ public class CreamExecutionTestSuite extends JSAGATestSuite {
         public CreamJobRunDescriptionTest() throws Exception {super("cream");}
         public void test_run_inWorkingDirectory() { super.ignore("WorkingDirectory is not supported"); }
         public void test_run_queueRequirement() throws Exception {super.ignore("SAGA queue is override by Queue in URL"); }
-        // todo: uncomment when CREAM-CE is fixed
-        //public void test_run_cpuTimeRequirement() throws Exception { super.ignore("TotalCPUTime is ignored");}
     }
 
     public static class CreamJobRunOptionalTest extends JobRunOptionalTest {
