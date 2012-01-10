@@ -373,11 +373,18 @@ public class URLImplTest extends AbstractTest {
     	url = new AbsoluteURLImpl(new URLAttributes(_url_simple));
     	assertTrue(url.hasCache());
 
+    	String oldLifeTime = EngineProperties.getProperty(EngineProperties.DATA_ATTRIBUTES_CACHE_LIFETIME);
+    	Boolean hasCache;
+    	
     	EngineProperties.setProperty(EngineProperties.DATA_ATTRIBUTES_CACHE_LIFETIME, "0");
-    	url = new RelativeURLImpl(new URLAttributes(_url_relative));
-    	assertFalse(url.hasCache());
-    	url = new AbsoluteURLImpl(new URLAttributes(_url_simple));
-    	assertFalse(url.hasCache());
+    	hasCache = new RelativeURLImpl(new URLAttributes(_url_relative)).hasCache();
+    	EngineProperties.setProperty(EngineProperties.DATA_ATTRIBUTES_CACHE_LIFETIME, oldLifeTime);
+    	assertFalse(hasCache);
+
+    	EngineProperties.setProperty(EngineProperties.DATA_ATTRIBUTES_CACHE_LIFETIME, "0");
+    	hasCache = new AbsoluteURLImpl(new URLAttributes(_url_simple)).hasCache();
+    	EngineProperties.setProperty(EngineProperties.DATA_ATTRIBUTES_CACHE_LIFETIME, oldLifeTime);
+    	assertFalse(hasCache);
     }
 
     private class URLAttributes extends FileAttributes {
