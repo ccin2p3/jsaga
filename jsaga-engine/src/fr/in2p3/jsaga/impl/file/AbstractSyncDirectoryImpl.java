@@ -127,12 +127,7 @@ public class AbstractSyncDirectoryImpl extends AbstractNSDirectoryImpl implement
     // </extra specs>
     
     public long getSizeSync(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-    	// Allowed flags are DEREFERENCED and NONE
         new FlagsHelper(flags).allowed(Flags.NONE, Flags.DEREFERENCE);
-        // TODO handle DEREFERENCE
-//        if (Flags.DEREFERENCE.isSet(flags)) {
-//            return this._dereferenceDir()._list(pattern, flags - Flags.DEREFERENCE.getValue());
-//        }
         try {
             return this.openFile(name, flags).getSize();
         } catch (BadParameterException bpe) {
@@ -156,6 +151,7 @@ public class AbstractSyncDirectoryImpl extends AbstractNSDirectoryImpl implement
             throw new NoSuccessException("Wrong exception thrown: "+ name, aee);
         }
     }
+    
     public long getSizeSync(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         return this.getSizeSync(name, Flags.NONE.getValue());
     }
