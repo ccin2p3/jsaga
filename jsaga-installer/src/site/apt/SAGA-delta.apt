@@ -15,9 +15,9 @@ Deviations from SAGA specifications
 
     * Methods
 
-        * getAttribute(USER_ID) (<<deprecated>>): set default attributes and initialise the context.
+        * getAttribute(USER_ID) (<<deprecated>>): set default attributes and initialize the context.
 
-        * toString(): overrided to dump a description of the security context instance.
+        * toString(): override to dump a description of the security context instance.
 
 * Data management
 
@@ -41,15 +41,21 @@ Deviations from SAGA specifications
 
         * NSEntry.remove(): allow no RECURSIVE flag for directory (for enabling "rmdir-like" behavior).
 
+        * Directory.getSize(URL): URL can be a subdirectory or the directory itself. The size is the total size of all files in directory and sub-directories
+          <(Example: dir.getSize(dir.getURL());)>
+
+        * Directory.getSize(): added to get cumulative sizes of all files in directory and sub-directories.
+          <(Note: This method is accessible by casting Directory instances to DirectoryImpl)>
+
 * Job management
 
     * Job description attributes
 
         * JobStartTime: not supported
-          <(NOTE: this attribute is ’not supported by JSDL and might disappear in future versions of the SAGA API)>
+          <(NOTE: this attribute is ï¿½not supported by JSDL and might disappear in future versions of the SAGA API)>
 
         * JobContact: not supported
-          <(NOTE: this attribute is ’not supported by JSDL and might disappear in future versions of the SAGA API)>
+          <(NOTE: this attribute is ï¿½not supported by JSDL and might disappear in future versions of the SAGA API)>
 
         * CPUArchitecture: defined as scalar attribute
           <(NOTE: for compliance with JSDL)>
