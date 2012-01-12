@@ -1,11 +1,8 @@
 package fr.in2p3.jsaga.impl.file;
 
-import java.util.List;
-
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.impl.namespace.*;
 import fr.in2p3.jsaga.impl.url.AbstractURLImpl;
-import fr.in2p3.jsaga.impl.url.URLFactoryImpl;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import fr.in2p3.jsaga.sync.file.SyncDirectory;
 import org.ogf.saga.SagaObject;
@@ -14,6 +11,8 @@ import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
+
+import java.util.List;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -129,7 +128,12 @@ public class AbstractSyncDirectoryImpl extends AbstractNSDirectoryImpl implement
     public long getSizeSync(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         new FlagsHelper(flags).allowed(Flags.NONE, Flags.DEREFERENCE);
         try {
-            return this.openFile(name, flags).getSize();
+            File entry = this.openFile(name, flags);
+            try {
+                return entry.getSize();
+            } finally {
+                entry.close();
+            }
         } catch (BadParameterException bpe) {
             // This is extra-spec: catch BadParameterException thrown by URLHelper in case URL is a directory (eg ".")
         	if (bpe.getStackTrace()[0].getClassName().equals(fr.in2p3.jsaga.impl.url.URLHelper.class.getName())) {
