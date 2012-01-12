@@ -161,6 +161,22 @@ git branch -d mergedBranch
 git branch -al</pre>
             </answer>
         </faq>
+        <faq id="apply-conflicting-patch">
+            <question>How to apply and merge a conflicting patch ?</question>
+            <answer>Checkout a non-conflicting (past) version of branch 'master':
+                <pre>$ git rev-list -n 1 --before="2011-12-27 00:00" master
+e0ad6b79cc64d5720a9754231146438ceb1ddaf3
+
+$ git checkout -b new_branch_name e0ad6b79cc64d5720a9754231146438ceb1ddaf3
+HEAD is now at e0ad6b7... log message of patch</pre>
+                <ul>
+                    <li>Apply patch (see above)</li>
+                    <li>Interactively rebase 'new_branch_name' onto 'master'</li>
+                    <li>Configure 'master' as the tracked branch</li>
+                    <li>Push active changes</li>
+                </ul>
+            </answer>
+        </faq>
         <faq id="rebase-published-branch">
             <question>How to rebase a published branch</question>
             <answer>Note: you should not rebase a branch if it has been modified by other contributors.
