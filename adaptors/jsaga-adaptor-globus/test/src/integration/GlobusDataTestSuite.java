@@ -1,8 +1,14 @@
 package integration;
 
+import java.util.Random;
+
 import junit.framework.Test;
+
+import org.ogf.saga.buffer.Buffer;
+import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
+import org.ogf.saga.url.URL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -57,6 +63,23 @@ public class GlobusDataTestSuite extends JSAGATestSuite {
     }
     public static class Gsiftp_to_EmulatorNSCopyTest extends NSCopyTest {
         public Gsiftp_to_EmulatorNSCopyTest() throws Exception {super("gsiftp", "test");}
+        public void test_copy_1MB() throws Exception {
+        	String File1MBName = "file1MB.txt";
+        	String bufferString = "01234567";
+        	for (int i=0; i<17; i++) {
+        		bufferString += bufferString;
+        	}
+        	NSEntry m_file_1MB = m_dir.open(createURL(m_subDirUrl, File1MBName), FLAGS_FILE);
+            Buffer buffer = BufferFactory.createBuffer(bufferString.getBytes());
+            ((File)m_file_1MB).write(buffer);
+            m_file_1MB.close();
+   	
+            URL target = createURL(m_dirUrl2, File1MBName);
+            m_file_1MB.copy(m_dirUrl2, Flags.NONE.getValue());
+            checkCopied(target, bufferString, 1024*1024);
+            m_file_1MB.remove();
+            
+        }
     }
     public static class Gsiftp_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public Gsiftp_to_EmulatorNSCopyRecursiveTest() throws Exception {super("gsiftp", "test");}
@@ -64,4 +87,5 @@ public class GlobusDataTestSuite extends JSAGATestSuite {
     public static class Gsiftp_to_EmulatorNSMoveTest extends NSMoveTest {
         public Gsiftp_to_EmulatorNSMoveTest() throws Exception {super("gsiftp", "test");}
     }
+
 }
