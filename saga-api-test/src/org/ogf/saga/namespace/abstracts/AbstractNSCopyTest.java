@@ -105,8 +105,11 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
     }
 
     //////////////////////////////////////// protected methods ////////////////////////////////////////
-
     protected void checkCopied(URL url, String expectedContent) throws Exception {
+    	checkCopied(url, expectedContent, 1024);
+    }
+    
+    protected void checkCopied(URL url, String expectedContent, int bufferSize) throws Exception {
         NSEntry entry = NSFactory.createNSEntry(m_session, url, Flags.READ.getValue());
         File reader;
         if (entry instanceof LogicalFile) {
@@ -117,7 +120,7 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
         } else {
             reader = (File) entry;
         }
-        Buffer buffer = BufferFactory.createBuffer(1024);
+        Buffer buffer = BufferFactory.createBuffer(bufferSize);
         int len = reader.read(buffer);
         assertEquals(
                 expectedContent.length(),
