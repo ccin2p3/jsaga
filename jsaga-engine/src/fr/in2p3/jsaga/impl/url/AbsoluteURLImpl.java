@@ -45,6 +45,8 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
     public SagaObject clone() throws CloneNotSupportedException {
         AbsoluteURLImpl clone = (AbsoluteURLImpl) super.clone();
         clone.u = u;
+        clone.m_cache = m_cache;
+        clone.m_cache_creation_time = m_cache_creation_time;
         return clone;
     }
 

@@ -9,13 +9,6 @@ import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Date;
-import java.util.regex.Pattern;
-
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
