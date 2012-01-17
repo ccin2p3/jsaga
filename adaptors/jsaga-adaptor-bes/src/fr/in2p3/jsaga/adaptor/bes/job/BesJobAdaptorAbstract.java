@@ -290,7 +290,7 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
         username.setObjectValue("indiaInterop");
         usernameToken.addChild(username);
         password.addAttribute(null, secextNS, "Type", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText");
-        password.setObjectValue("1nd!@B3S");
+        password.setObjectValue("XXXXX");
         usernameToken.addChild(password);
         wsseSecurity.appendChild(usernameToken);
 		return wsseSecurity;
