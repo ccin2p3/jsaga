@@ -41,10 +41,6 @@ public class WaitForEverDataAdaptorPhysical extends WaitForEverDataAdaptorAbstra
 
     ////////////////////////////////////////// interface LinkAdaptor //////////////////////////////////////////
 
-    public boolean isLink(String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        hang();
-        return false;
-    }
     public String readLink(String absolutePath) throws NotLink, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         hang();
         return absolutePath;

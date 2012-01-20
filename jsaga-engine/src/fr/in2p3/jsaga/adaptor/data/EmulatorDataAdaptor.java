@@ -148,11 +148,6 @@ public class EmulatorDataAdaptor implements FileReaderStreamFactory, FileWriterS
         if(Base.DEBUG) m_server.commit();
     }
 
-    public boolean isLink(String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        EntryType entry = m_server.getEntry(absolutePath);
-        return entry instanceof FileType && ((FileType)entry).getLink()!=null;
-    }
-
     public String readLink(String absolutePath) throws NotLink, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         EntryType entry = m_server.getEntry(absolutePath);
         if (entry instanceof FileType && ((FileType)entry).getLink()!=null) {

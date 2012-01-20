@@ -255,11 +255,6 @@ public class PersonalCatalogDataAdaptor implements LogicalReaderMetaData, Logica
         if(Base.DEBUG) m_catalog.commit();
     }
 
-    public boolean isLink(String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        EntryType entry = m_catalog.getEntry(absolutePath);
-        return entry instanceof FileType && entry.getLink()!=null;
-    }
-
     public String readLink(String absolutePath) throws NotLink, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         EntryType entry = m_catalog.getEntry(absolutePath);
         if (entry instanceof FileType && entry.getLink()!=null) {

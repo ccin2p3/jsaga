@@ -135,17 +135,8 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
     }
 
     public boolean isLinkSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        if (m_adaptor instanceof LinkAdaptor) {
-            try {
-                return ((LinkAdaptor) m_adaptor).isLink(
-                        m_url.getPath());
-            } catch (DoesNotExistException doesNotExist) {
-                throw new IncorrectStateException("Link does not exist: " + m_url, doesNotExist);
-            }
-        } else {
-            FileAttributes attrs = this._getFileAttributes();
-            return (attrs.getType() == FileAttributes.TYPE_LINK);
-        }
+        FileAttributes attrs = this._getFileAttributes();
+        return (attrs.getType() == FileAttributes.TYPE_LINK);
     }
 
     public URL readLinkSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {

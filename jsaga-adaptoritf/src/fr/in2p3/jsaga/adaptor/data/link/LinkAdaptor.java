@@ -17,15 +17,6 @@ import org.ogf.saga.error.*;
  */
 public interface LinkAdaptor extends DataAdaptor {
     /**
-     * Tests this entry for being a link.
-     * @param absolutePath the absolute path of the entry.
-     * @return true if the entry is a link.
-     * @throws DoesNotExistException if absolutePath does not exist.
-     */
-    public boolean isLink(String absolutePath)
-        throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
-
-    /**
      * Returns the absolute path of the link target. Resolves one link level
      * only.
      * @param absolutePath the absolute path of the entry.

@@ -590,33 +590,6 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		logger.debug("DONE: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")");
 	}
 
-	public boolean isLink(String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-		logger.debug("DOING: isLink("+absolutePath+")");
-		try {
-			boolean isSymlink = m_lfcConnector.stat(connection, absolutePath, 0L, false).isSymbolicLink();
-			logger.debug("DONE: isLink("+absolutePath+")");
-			if(isSymlink){
-				return true;
-			}else{
-				return false;
-			}
-		}catch (IOException e) {
-			logger.debug("ERROR: isLink("+absolutePath+"): "+e.getMessage());
-			throw new NoSuccessException(e);
-		} catch (ReceiveException e) {
-			logger.debug("ERROR: isLink("+absolutePath+"): "+e.getMessage());
-			if(DMError.EACCES.equals(e.getDMError())){
-				throw new PermissionDeniedException(e.toString());
-			}else if(DMError.SETIMEDOUT.equals(e.getDMError())){
-				throw new TimeoutException(e.getMessage());
-			}else if (DMError.ENOENT.equals(e.getDMError())) {
-					throw new DoesNotExistException(e);
-			}else{
-				throw new NoSuccessException(e);
-			}
-		}
-	}
-
 	public String readLink(String absolutePath) throws NotLink, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
 		logger.debug("DOING: readLink("+absolutePath+")");
 		String path = null;
