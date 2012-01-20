@@ -74,12 +74,6 @@ public class LinuxDataAdaptor extends FileDataAdaptor implements LinkAdaptor, Pe
     /********************************************/
     /* LinkAdaptor */
     /********************************************/
-	public boolean isLink(String absolutePath)
-			throws PermissionDeniedException, DoesNotExistException,
-			TimeoutException, NoSuccessException {
-        return (((LinuxFileAttributes)getAttributes(absolutePath, null)).getType() == LinuxFileAttributes.TYPE_LINK);
-	}
-
 	public String readLink(String absolutePath) throws NotLink,
 			PermissionDeniedException, DoesNotExistException, TimeoutException,
 			NoSuccessException {
