@@ -1,8 +1,12 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
+import org.ogf.saga.monitoring.Callback;
+import org.ogf.saga.monitoring.Metric;
+import org.ogf.saga.monitoring.Monitorable;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.State;
@@ -26,6 +30,7 @@ import java.util.regex.Pattern;
  */
 public class JobStatus extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
+    private static final String OPT_MONITOR = "m", LONGOPT_MONITOR = "monitor";
 
     protected JobStatus() {
         super("jsaga-job-status", new String[]{"jobId"}, new String[]{OPT_HELP, LONGOPT_HELP});
@@ -56,6 +61,27 @@ public class JobStatus extends AbstractCommand {
             Session session = SessionFactory.createSession(true);
             JobService service = JobFactory.createJobService(session, serviceURL);
             Job job = service.getJob(nativeJobId);
+
+            if (line.hasOption(OPT_MONITOR)) {
+                Metric metric = job.getMetric(Job.JOB_STATE);
+                metric.addCallback(new Callback(){
+                    public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplementedException, AuthorizationFailedException {
+                        try {
+                            String value = metric.getAttribute(Metric.VALUE);
+                            System.out.println("Current state: "+value);
+                        }
+                        catch (NotImplementedException e) {throw e;}
+                        catch (AuthorizationFailedException e) {throw e;}
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        // callback must stay registered
+                        return true;
+                    }
+                });
+                job.waitFor();
+            }
+            
             State state = job.getState();
 
             // display status
@@ -88,6 +114,10 @@ public class JobStatus extends AbstractCommand {
         opt.addOption(OptionBuilder.withDescription("Display this help and exit")
                 .withLongOpt(LONGOPT_HELP)
                 .create(OPT_HELP));
+        opt.addOption(OptionBuilder.withDescription("Monitor job")
+                .isRequired(false)
+                .withLongOpt(LONGOPT_MONITOR)
+                .create(OPT_MONITOR));
 
         // returns
         return opt;
