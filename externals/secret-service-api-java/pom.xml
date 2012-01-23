@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>fr.in2p3.jsaga</groupId>
+        <artifactId>externals</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.freedesktop</groupId>
+    <artifactId>secret-service-api-java</artifactId>
+    <version>0.1</version>
+    <name>Secret Service Java API</name>
+    <description>Secret Service Java API</description>
+    <url>http://specs.freedesktop.org/secret-service/</url>
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+<!--         <plugins>
+            <plugin>copy jar
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+        </plugins>
+ -->    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.freedesktop</groupId>
+            <artifactId>libdbus-java</artifactId>
+            <version>2.7</version>
+        </dependency>
+    </dependencies>
+
+</project>
