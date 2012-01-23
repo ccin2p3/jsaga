@@ -6,15 +6,15 @@ import org.freedesktop.dbus.Struct;
 public final class Secret extends Struct
 {
    @Position(0)
-   public final DBusInterface a;
+   public final DBusInterface session;
    @Position(1)
-   public final List<Byte> b;
+   public final List<Byte> parameters;
    @Position(2)
-   public final List<Byte> c;
+   public final List<Byte> value;
   public Secret(DBusInterface a, List<Byte> b, List<Byte> c)
   {
-   this.a = a;
-   this.b = b;
-   this.c = c;
+   this.session = a;
+   this.parameters = b;
+   this.value = c;
   }
 }
