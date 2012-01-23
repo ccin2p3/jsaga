@@ -19,7 +19,7 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -30,30 +30,35 @@ import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential;
 * Date:   2 mai 2011
 * ***************************************************/
 
-public class FreedesktopSecretsSecurityAdaptor extends UserPassStoreSecurityAdaptor {
+public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 
 	protected static final String BUS_NAME = "org.freedesktop.secrets";
 	protected static final String ITEM_INTERFACE_NAME = "org.freedesktop.Secret.Item";
 	protected static final String ROOT_OBJECT_PATH = "/org/freedesktop/secrets";
 	protected static final String COLLECTION_OBJECT_PATH = ROOT_OBJECT_PATH + "/collection";
-	protected static final String KEYRING = "Keyring";
+	protected static final String COLLECTION = "Collection";
 	protected static final String ID = "Id";
 
+	public Class getSecurityCredentialClass() {
+        return UserPassSecurityCredential.class;
+	}
+	
 	public String getType() {
 		return "Freedesktop";
 	}
 
 	public Usage getUsage() {
+		// TODO: Id obligatoire
     	return new UAnd(
    			 new Usage[]{
-   					 new UOptional(KEYRING),
+   					 new UOptional(COLLECTION),
    			 }
    			 );
 	}
 
 	public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{
-       		 new Default(KEYRING, "login"),
+       		 new Default(COLLECTION, "login"),
         };
 	}
 
@@ -63,7 +68,6 @@ public class FreedesktopSecretsSecurityAdaptor extends UserPassStoreSecurityAdap
 			TimeoutException, NoSuccessException {
 		// TODO export this
 		System.setProperty("java.library.path", "/home/schwarz/usr/local/lib/libmatthew/lib/jni/");
-		UserPassStoreSecurityCredential upsc = new UserPassStoreSecurityCredential();
 		DBusConnection conn;
 		try {
 			conn = DBusConnection.getConnection(DBusConnection.SESSION);
@@ -81,11 +85,12 @@ public class FreedesktopSecretsSecurityAdaptor extends UserPassStoreSecurityAdap
 			prop = (Properties) conn.getRemoteObject(BUS_NAME, objectPath, Properties.class);
 			
 			Service serv = (Service) conn.getRemoteObject(BUS_NAME, objectPath, Service.class);
-			// TODO: check if eencrypt is needed
+			// TODO: plain ?
 			Pair<org.freedesktop.dbus.Variant,DBusInterface> osr = serv.OpenSession("plain", new org.freedesktop.dbus.Variant(""));
 			dbusSession = osr.b;
 			
-			objectPath = COLLECTION_OBJECT_PATH + "/" + (String) attributes.get(KEYRING) + "/" + (String) attributes.get(ID);
+			String id = (String) attributes.get(ID);
+			objectPath = COLLECTION_OBJECT_PATH + "/" + (String) attributes.get(COLLECTION) + "/" + id;
 			Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("ObjectPath="+objectPath);
 			in = (Introspectable) conn.getRemoteObject(BUS_NAME, objectPath, Introspectable.class);
 			Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
@@ -98,12 +103,12 @@ public class FreedesktopSecretsSecurityAdaptor extends UserPassStoreSecurityAdap
 				pw[i] = s.value.get(i);
 			}
 			String password = new String(pw);
+			String label = (String) prop.Get(ITEM_INTERFACE_NAME, "Label");
+			return new UserPassSecurityCredential(id,password);
 		} catch (DBusException e) {
 			e.printStackTrace();
 			throw new NoSuccessException(e);
 		}
-		// TODO: build upsc
-		return upsc;
 	}
-	
+
 }

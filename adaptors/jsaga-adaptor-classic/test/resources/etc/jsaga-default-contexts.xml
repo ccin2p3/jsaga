@@ -13,8 +13,8 @@
         <context type="Netrc">
         </context>
         <context type="Freedesktop">
-        	<attribute name="Keyring" value="login"/>
-        	<attribute name="Id" value="21"/>
+        	<!-- <attribute name="Collection" value="login"/> -->
+        	<attribute name="Id" value="${FREEDESKTOP_CRED_ID}"/>
         </context>
         <context type="None">
             <job type="local">
