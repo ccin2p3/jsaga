@@ -57,8 +57,8 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
     	return new UAnd(
    			 new Usage[]{
    					 new UOptional(COLLECTION),
-   					 new UOptional(ID),
-   					 new UOptional(LABEL),
+   					 new U(ID),
+//   					 new UOptional(LABEL),
    			 }
    			 );
 	}
@@ -66,7 +66,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 	public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{
        		 new Default(COLLECTION, "login"),
-       		 new Default(LABEL, System.getProperty("user.name")),
+//       		 new Default(LABEL, System.getProperty("user.name")),
         };
 	}
 
@@ -111,7 +111,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
 	
 				prop = (Properties) conn.getRemoteObject(BUS_NAME, objectPath, Properties.class);
-				label = (String) prop.Get(ITEM_INTERFACE_NAME, "Label");
+				label = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
 				Item inter = (Item) conn.getRemoteObject(BUS_NAME, objectPath, Item.class);
 				secret = inter.GetSecret(dbusSession);
 			} else { // Search by Name: get all secrets from collection
@@ -124,7 +124,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 				
 				HashMap searchprop = new HashMap();
 				label = (String) attributes.get(LABEL);
-				searchprop.put("Label", label);
+				searchprop.put(LABEL, label);
 				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("Searching " + label);
 				// FIXME: wrong return type
 				List<DBusInterface> itemList = collection.SearchItems(searchprop);
