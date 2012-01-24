@@ -1,11 +1,14 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.freedesktop.DBus.Introspectable;
 import org.freedesktop.DBus.Properties;
+import org.freedesktop.Secret.Collection;
 import org.freedesktop.Secret.Item;
 import org.freedesktop.Secret.Pair;
 import org.freedesktop.Secret.Service;
@@ -32,7 +35,7 @@ import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 * Date:   24 jan 2012
 * ***************************************************/
 
-//TODO: deal with VMarg -Djava.library.path=/home/schwarz/usr/local/lib/libmatthew/lib/jni/
+// TODO: extends UserPassSecurityAdaptor?
 public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 
 	protected static final String BUS_NAME = "org.freedesktop.secrets";
@@ -41,6 +44,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 	protected static final String COLLECTION_OBJECT_PATH = ROOT_OBJECT_PATH + "/collection";
 	protected static final String COLLECTION = "Collection";
 	protected static final String ID = "Id";
+	protected static final String LABEL = "Label";
 
 	public Class getSecurityCredentialClass() {
         return UserPassSecurityCredential.class;
@@ -54,7 +58,8 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
     	return new UAnd(
    			 new Usage[]{
    					 new UOptional(COLLECTION),
-   					 new U(ID),
+   					 new UOptional(ID),
+   					 new UOptional(LABEL),
    			 }
    			 );
 	}
@@ -62,6 +67,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 	public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{
        		 new Default(COLLECTION, "login"),
+       		 new Default(LABEL, System.getProperty("user.name")),
         };
 	}
 
@@ -82,6 +88,9 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 			Introspectable in;
 			Properties prop;
 			DBusInterface dbusSession=null;
+			String id;
+			String label;
+			Secret secret;
 			
 			objectPath = ROOT_OBJECT_PATH;
 			in = (Introspectable) conn.getRemoteObject(BUS_NAME, objectPath, Introspectable.class);
@@ -95,22 +104,40 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 			Pair<org.freedesktop.dbus.Variant,DBusInterface> osr = serv.OpenSession("plain", new org.freedesktop.dbus.Variant(""));
 			dbusSession = osr.b;
 			
-			String id = (String) attributes.get(ID);
-			objectPath = COLLECTION_OBJECT_PATH + "/" + (String) attributes.get(COLLECTION) + "/" + id;
-			Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("ObjectPath="+objectPath);
-			in = (Introspectable) conn.getRemoteObject(BUS_NAME, objectPath, Introspectable.class);
-			Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
-
-			prop = (Properties) conn.getRemoteObject(BUS_NAME, objectPath, Properties.class);
-			Item inter = (Item) conn.getRemoteObject(BUS_NAME, objectPath, Item.class);
-			Secret s = inter.GetSecret(dbusSession);
-			byte[] pw = new byte[s.value.size()];
+			if (attributes.containsKey(ID)) {
+				id = (String) attributes.get(ID);
+				objectPath = COLLECTION_OBJECT_PATH + "/" + (String) attributes.get(COLLECTION) + "/" + id;
+				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("ObjectPath="+objectPath);
+				in = (Introspectable) conn.getRemoteObject(BUS_NAME, objectPath, Introspectable.class);
+				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
+	
+				prop = (Properties) conn.getRemoteObject(BUS_NAME, objectPath, Properties.class);
+				label = (String) prop.Get(ITEM_INTERFACE_NAME, "Label");
+				Item inter = (Item) conn.getRemoteObject(BUS_NAME, objectPath, Item.class);
+				secret = inter.GetSecret(dbusSession);
+			} else { // Search by Name: get all secrets from collection
+				objectPath = COLLECTION_OBJECT_PATH + "/" + (String) attributes.get(COLLECTION);
+				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("ObjectPath="+objectPath);
+				in = (Introspectable) conn.getRemoteObject(BUS_NAME, objectPath, Introspectable.class);
+				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
+	
+				Collection collection = (Collection) conn.getRemoteObject(BUS_NAME, objectPath, Collection.class);
+				
+				HashMap searchprop = new HashMap();
+				label = (String) attributes.get(LABEL);
+				searchprop.put("Label", label);
+				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("Searching " + label);
+				// FIXME: wrong return type
+				List<DBusInterface> itemList = collection.SearchItems(searchprop);
+				Item inter = (Item) itemList.get(0);
+				secret = inter.GetSecret(dbusSession);
+			}
+			byte[] pw = new byte[secret.value.size()];
 			for (int i=0; i<pw.length; i++) {
-				pw[i] = s.value.get(i);
+				pw[i] = secret.value.get(i);
 			}
 			String password = new String(pw);
-			String label = (String) prop.Get(ITEM_INTERFACE_NAME, "Label");
-			return new UserPassSecurityCredential(id,password);
+			return new UserPassSecurityCredential(label,password);
 		} catch (DBusException e) {
 			throw new NoSuccessException(e);
 		} catch (SecurityException e) {
