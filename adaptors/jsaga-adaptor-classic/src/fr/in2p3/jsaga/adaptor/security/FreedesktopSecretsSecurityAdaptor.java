@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -16,6 +17,7 @@ import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.TimeoutException;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
@@ -25,11 +27,12 @@ import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   UserPassStoreSecurityAdaptor
+* File:   FreedesktopSecretsSecurityAdaptor
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
-* Date:   2 mai 2011
+* Date:   24 jan 2012
 * ***************************************************/
 
+//TODO: deal with VMarg -Djava.library.path=/home/schwarz/usr/local/lib/libmatthew/lib/jni/
 public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 
 	protected static final String BUS_NAME = "org.freedesktop.secrets";
@@ -48,10 +51,10 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 	}
 
 	public Usage getUsage() {
-		// TODO: Id obligatoire
     	return new UAnd(
    			 new Usage[]{
    					 new UOptional(COLLECTION),
+   					 new U(ID),
    			 }
    			 );
 	}
@@ -66,10 +69,13 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 	public SecurityCredential createSecurityCredential(int usage,
 			Map attributes, String contextId) throws IncorrectStateException,
 			TimeoutException, NoSuccessException {
-		// TODO export this
-		System.setProperty("java.library.path", "/home/schwarz/usr/local/lib/libmatthew/lib/jni/");
 		DBusConnection conn;
 		try {
+		    //set sys_paths to null: java.library.path will be re-read by JVM before classloader run
+		    final Field sysPathsField = ClassLoader.class.getDeclaredField("sys_paths");
+		    sysPathsField.setAccessible(true);
+		    sysPathsField.set(null, null);
+		    
 			conn = DBusConnection.getConnection(DBusConnection.SESSION);
 
 			String objectPath;
@@ -85,7 +91,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 			prop = (Properties) conn.getRemoteObject(BUS_NAME, objectPath, Properties.class);
 			
 			Service serv = (Service) conn.getRemoteObject(BUS_NAME, objectPath, Service.class);
-			// TODO: plain ?
+			// TODO: encrypted ?
 			Pair<org.freedesktop.dbus.Variant,DBusInterface> osr = serv.OpenSession("plain", new org.freedesktop.dbus.Variant(""));
 			dbusSession = osr.b;
 			
@@ -106,7 +112,14 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 			String label = (String) prop.Get(ITEM_INTERFACE_NAME, "Label");
 			return new UserPassSecurityCredential(id,password);
 		} catch (DBusException e) {
-			e.printStackTrace();
+			throw new NoSuccessException(e);
+		} catch (SecurityException e) {
+			throw new NoSuccessException(e);
+		} catch (NoSuchFieldException e) {
+			throw new NoSuccessException(e);
+		} catch (IllegalArgumentException e) {
+			throw new NoSuccessException(e);
+		} catch (IllegalAccessException e) {
 			throw new NoSuccessException(e);
 		}
 	}
