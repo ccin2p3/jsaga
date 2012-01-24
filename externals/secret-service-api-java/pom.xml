@@ -24,13 +24,7 @@
                 </configuration>
             </plugin>
         </plugins>
-<!--         <plugins>
-            <plugin>copy jar
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-            </plugin>
-        </plugins>
- -->    </build>
+    </build>
     <dependencies>
         <dependency>
             <groupId>org.freedesktop</groupId>
