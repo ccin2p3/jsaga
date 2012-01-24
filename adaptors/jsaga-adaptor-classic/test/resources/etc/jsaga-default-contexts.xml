@@ -10,7 +10,7 @@
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/https/mycert.jks"/>
             <attribute name="KeystorePass" value="changeit"/>
         </context>
-        <context type="Netrc">
+        <context type="UserPassStore">
         </context>
         <context type="Freedesktop">
         	<!-- <attribute name="Collection" value="login"/> -->
