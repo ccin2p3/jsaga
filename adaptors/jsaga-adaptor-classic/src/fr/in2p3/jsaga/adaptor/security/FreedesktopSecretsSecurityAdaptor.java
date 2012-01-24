@@ -35,7 +35,6 @@ import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 * Date:   24 jan 2012
 * ***************************************************/
 
-// TODO: extends UserPassSecurityAdaptor?
 public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 
 	protected static final String BUS_NAME = "org.freedesktop.secrets";
