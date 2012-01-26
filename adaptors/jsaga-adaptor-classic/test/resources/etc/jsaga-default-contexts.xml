@@ -14,7 +14,7 @@
         </context>
         <context type="Freedesktop">
         	<!-- <attribute name="Collection" value="login"/> -->
-        	<attribute name="Id" value="${FREEDESKTOP_CRED_ID}"/>
+        	<!-- <attribute name="Label" value="${FREEDESKTOP_CRED_ID}"/> -->
         </context>
         <context type="None">
             <job type="local">

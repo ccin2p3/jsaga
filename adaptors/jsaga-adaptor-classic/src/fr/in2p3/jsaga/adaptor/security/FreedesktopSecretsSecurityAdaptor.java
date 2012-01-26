@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.freedesktop.Secret.Item;
 import org.freedesktop.Secret.Pair;
 import org.freedesktop.Secret.Service;
 import org.freedesktop.Secret.Secret;
+import org.freedesktop.dbus.DBusAsyncReply;
 import org.freedesktop.dbus.DBusConnection;
 import org.freedesktop.dbus.DBusInterface;
 import org.freedesktop.dbus.exceptions.DBusException;
@@ -57,8 +59,8 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
     	return new UAnd(
    			 new Usage[]{
    					 new UOptional(COLLECTION),
-   					 new U(ID),
-//   					 new UOptional(LABEL),
+   					 new UOptional(ID),
+   					 new UOptional(LABEL),
    			 }
    			 );
 	}
@@ -66,7 +68,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 	public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{
        		 new Default(COLLECTION, "login"),
-//       		 new Default(LABEL, System.getProperty("user.name")),
+       		 new Default(LABEL, System.getProperty("user.name")),
         };
 	}
 
@@ -124,12 +126,43 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 				
 				HashMap searchprop = new HashMap();
 				label = (String) attributes.get(LABEL);
-				searchprop.put(LABEL, label);
-				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("Searching " + label);
-				// FIXME: wrong return type
-				List<DBusInterface> itemList = collection.SearchItems(searchprop);
-				Item inter = (Item) itemList.get(0);
-				secret = inter.GetSecret(dbusSession);
+				// FIXME: return no credentials
+//				searchprop.put(LABEL, label);
+				Pair<List<DBusInterface>,List<DBusInterface>> itemList = collection.SearchItems(searchprop);
+				List<DBusInterface> unlockedItems = itemList.a;
+				List<DBusInterface> lockedItems = itemList.b;
+//				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("nbLocked=" + lockedItems.size());
+//				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("nbUnLocked=" + unlockedItems.size());
+				if (lockedItems.size()+unlockedItems.size() == 0) {
+					throw new NoSuccessException("No credential matching Label '" + label + "'");
+				}
+				if (unlockedItems.size() == 0) {
+					throw new NoSuccessException("Matching credentials are locked");
+				}
+				secret = null;
+				// objects sent by SearchItems do not implement Item, but Properties and Introspectable only
+				// so we cannot use directly the GetSecret method
+				// instead we get the objectPath as String and get the remote object that implements Item
+				for (int i=0; i<unlockedItems.size(); i++) {
+					prop = (Properties)unlockedItems.get(i);
+//					Method[] methods = prop.getClass().getDeclaredMethods();
+//					for (int j=0; j<methods.length; j++) {
+//						Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("method=" + methods[j].getName());
+//					}
+					String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
+					Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found label: " + foundLabel);
+					if (foundLabel.equals(label)) {
+						// get the Object path from toString() !!! because there is not getObjectPath() method...
+						// toString = ":busadress+":"+objectpath+":"+iface"
+						objectPath = prop.toString().split(":")[2];
+						Item inter = (Item) conn.getRemoteObject(BUS_NAME, objectPath, Item.class);
+						secret = inter.GetSecret(dbusSession);
+						break;
+					}
+				}
+				if (secret==null) {
+					throw new NoSuccessException("No credential matching Label '" + label + "'");
+				}
 			}
 			byte[] pw = new byte[secret.value.size()];
 			for (int i=0; i<pw.length; i++) {
