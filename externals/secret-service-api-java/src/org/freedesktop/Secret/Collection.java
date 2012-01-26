@@ -36,7 +36,7 @@ public interface Collection extends DBusInterface
    }
 
   public DBusInterface Delete();
-  public List<DBusInterface> SearchItems(Map<String,String> attributes);
+  public Pair<List<DBusInterface>, List<DBusInterface>> SearchItems(Map<String,String> attributes);
   public Pair<DBusInterface, DBusInterface> CreateItem(Map<String,Variant> props, Secret secret, boolean replace);
 
 }
