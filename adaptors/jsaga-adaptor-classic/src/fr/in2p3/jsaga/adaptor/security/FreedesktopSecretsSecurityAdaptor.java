@@ -17,6 +17,7 @@ import org.freedesktop.Secret.Secret;
 import org.freedesktop.dbus.DBusAsyncReply;
 import org.freedesktop.dbus.DBusConnection;
 import org.freedesktop.dbus.DBusInterface;
+import org.freedesktop.dbus.Variant;
 import org.freedesktop.dbus.exceptions.DBusException;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
@@ -126,13 +127,10 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 				
 				HashMap searchprop = new HashMap();
 				label = (String) attributes.get(LABEL);
-				// FIXME: return no credentials
-//				searchprop.put(LABEL, label);
+				// SearchItems works with Attributes. Label is not part of Attributes. We send an empty Map
 				Pair<List<DBusInterface>,List<DBusInterface>> itemList = collection.SearchItems(searchprop);
 				List<DBusInterface> unlockedItems = itemList.a;
 				List<DBusInterface> lockedItems = itemList.b;
-//				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("nbLocked=" + lockedItems.size());
-//				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("nbUnLocked=" + unlockedItems.size());
 				if (lockedItems.size()+unlockedItems.size() == 0) {
 					throw new NoSuccessException("No credential matching Label '" + label + "'");
 				}
@@ -140,18 +138,14 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 					throw new NoSuccessException("Matching credentials are locked");
 				}
 				secret = null;
-				// objects sent by SearchItems do not implement Item, but Properties and Introspectable only
-				// so we cannot use directly the GetSecret method
-				// instead we get the objectPath as String and get the remote object that implements Item
 				for (int i=0; i<unlockedItems.size(); i++) {
 					prop = (Properties)unlockedItems.get(i);
-//					Method[] methods = prop.getClass().getDeclaredMethods();
-//					for (int j=0; j<methods.length; j++) {
-//						Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("method=" + methods[j].getName());
-//					}
 					String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
 					Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found label: " + foundLabel);
 					if (foundLabel.equals(label)) {
+						// objects sent by SearchItems do not implement Item, but Properties and Introspectable only
+						// so we cannot use directly the GetSecret method
+						// instead we get the objectPath as String and get the remote object that implements Item
 						// get the Object path from toString() !!! because there is not getObjectPath() method...
 						// toString = ":busadress+":"+objectpath+":"+iface"
 						objectPath = prop.toString().split(":")[2];
