@@ -27,6 +27,7 @@
         <module>concurrent</module>
         <module>cryptix-asn1</module>
         <module>cryptix32</module>
+        <module>dbus-java</module>
         <module>file-system</module>
         <module>glite-security</module>
         <module>glite-jdl-api-java</module>
@@ -36,9 +37,11 @@
         <module>glite-ce-delegation</module>
         <module>jargon</module>
         <module>jeldoclet</module>
+        <module>libmatthew-java</module>
         <module>naregi-ss-api</module>
         <module>opensaml</module>
         <module>puretls</module>
+        <module>secret-service-api-java</module>
         <module>vomsjapi</module>
         <module>wsgram-api</module>
     </modules>
