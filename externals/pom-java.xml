@@ -9,13 +9,9 @@
 
     <modules>
         <module>glite-lb-api-java</module>
-        <module>jsch</module>
-        <module>jzlib</module>
         <module>naregi-ss-api</module>
-        <module>unicore6-api</module>
         <module>vomsjapi</module>
         <module>wsgram-api</module>
-        <module>bes-api-java</module>
     </modules>
     <build>
         <directory>build</directory>
