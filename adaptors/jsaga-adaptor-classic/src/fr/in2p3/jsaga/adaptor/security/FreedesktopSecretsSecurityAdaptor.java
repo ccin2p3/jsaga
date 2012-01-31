@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.freedesktop.DBus;
 import org.freedesktop.DBus.Introspectable;
 import org.freedesktop.DBus.Properties;
 import org.freedesktop.Secret.Collection;
@@ -37,6 +38,7 @@ import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   24 jan 2012
 * ***************************************************/
+// TODO: support of keys
 
 public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 
@@ -75,8 +77,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 
 
 	public SecurityCredential createSecurityCredential(int usage,
-			Map attributes, String contextId) throws IncorrectStateException,
-			TimeoutException, NoSuccessException {
+			Map attributes, String contextId) throws IncorrectStateException, TimeoutException, NoSuccessException {
 		DBusConnection conn;
 		try {
 		    //set sys_paths to null: java.library.path will be re-read by JVM before classloader run
@@ -84,7 +85,11 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 		    sysPathsField.setAccessible(true);
 		    sysPathsField.set(null, null);
 		    
-			conn = DBusConnection.getConnection(DBusConnection.SESSION);
+		    try {
+		    	conn = DBusConnection.getConnection(DBusConnection.SESSION);
+		    } catch (UnsatisfiedLinkError ule) {
+		    	throw new NoSuccessException(ule.getMessage() + "; check that java.library.path points to the location /path/to/libmatthew/lib/jni");
+		    }
 
 			String objectPath;
 			Introspectable in;
@@ -95,9 +100,13 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 			Secret secret;
 			
 			objectPath = ROOT_OBJECT_PATH;
+			
 			in = (Introspectable) conn.getRemoteObject(BUS_NAME, objectPath, Introspectable.class);
-			Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
-
+			try {
+				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
+			} catch (DBus.Error.ServiceUnknown su) {
+				throw new NoSuccessException("Your Gnome keyring or KDE KWallet should be installed and running");
+			}
 			
 			prop = (Properties) conn.getRemoteObject(BUS_NAME, objectPath, Properties.class);
 			
@@ -132,16 +141,13 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 				List<DBusInterface> unlockedItems = itemList.a;
 				List<DBusInterface> lockedItems = itemList.b;
 				if (lockedItems.size()+unlockedItems.size() == 0) {
-					throw new NoSuccessException("No credential matching Label '" + label + "'");
-				}
-				if (unlockedItems.size() == 0) {
-					throw new NoSuccessException("Matching credentials are locked");
+					throw new NoSuccessException("The collection is empty");
 				}
 				secret = null;
 				for (int i=0; i<unlockedItems.size(); i++) {
 					prop = (Properties)unlockedItems.get(i);
 					String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
-					Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found label: " + foundLabel);
+					Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found unlocked: " + foundLabel);
 					if (foundLabel.equals(label)) {
 						// objects sent by SearchItems do not implement Item, but Properties and Introspectable only
 						// so we cannot use directly the GetSecret method
@@ -155,6 +161,16 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 					}
 				}
 				if (secret==null) {
+					// check if password is locked
+					for (int i=0; i<lockedItems.size(); i++) {
+						prop = (Properties)lockedItems.get(i);
+						String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
+						Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found locked: " + foundLabel);
+						if (foundLabel.equals(label)) {
+							// TODO: prompt and unlock
+							throw new NoSuccessException("The item is locked. Please unlock before using it.");
+						}
+					}
 					throw new NoSuccessException("No credential matching Label '" + label + "'");
 				}
 			}
