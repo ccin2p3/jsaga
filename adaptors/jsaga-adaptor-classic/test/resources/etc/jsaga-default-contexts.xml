@@ -13,8 +13,8 @@
         <context type="UserPassStore">
         </context>
         <context type="Freedesktop">
-        	<!-- <attribute name="Collection" value="login"/> -->
-        	<!-- <attribute name="Label" value="${FREEDESKTOP_CRED_ID}"/> -->
+        	<attribute name="Collection" value="login"/>
+        	<attribute name="Label" value="${FREEDESKTOP_CRED_ID}"/>
         </context>
         <context type="None">
             <job type="local">

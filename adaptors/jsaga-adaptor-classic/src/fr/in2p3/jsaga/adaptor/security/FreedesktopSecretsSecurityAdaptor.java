@@ -1,10 +1,12 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.freedesktop.DBus;
@@ -15,12 +17,11 @@ import org.freedesktop.Secret.Item;
 import org.freedesktop.Secret.Pair;
 import org.freedesktop.Secret.Service;
 import org.freedesktop.Secret.Secret;
-import org.freedesktop.dbus.DBusAsyncReply;
 import org.freedesktop.dbus.DBusConnection;
 import org.freedesktop.dbus.DBusInterface;
-import org.freedesktop.dbus.Variant;
 import org.freedesktop.dbus.exceptions.DBusException;
 import org.freedesktop.dbus.exceptions.DBusExecutionException;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.TimeoutException;
@@ -62,17 +63,17 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 	public Usage getUsage() {
     	return new UAnd(
    			 new Usage[]{
-   					 new UOptional(COLLECTION),
+   					 new U(COLLECTION),
    					 new UOptional(ID),
    					 new UOptional(LABEL),
+   					 new UOptional(Context.USERID),
    			 }
    			 );
 	}
 
 	public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{
-       		 new Default(COLLECTION, "login"),
-       		 new Default(LABEL, System.getProperty("user.name")),
+       		 new Default(Context.USERID, System.getProperty("user.name")),
         };
 	}
 
@@ -109,7 +110,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 				throw new NoSuccessException("Your Gnome keyring or KDE KWallet should be installed and running");
 			}
 			
-			prop = (Properties) conn.getRemoteObject(BUS_NAME, objectPath, Properties.class);
+//			prop = (Properties) conn.getRemoteObject(BUS_NAME, objectPath, Properties.class);
 			
 			Service serv = (Service) conn.getRemoteObject(BUS_NAME, objectPath, Service.class);
 			// TODO: encrypted ?
@@ -127,7 +128,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 					throw new NoSuccessException("The collection '" + (String) attributes.get(COLLECTION) + "' does not exist");
 				}				
 			}
-			
+
 			// Search item in collection
 			if (attributes.containsKey(ID)) {
 				id = (String) attributes.get(ID);
@@ -137,7 +138,8 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
 	
 				prop = (Properties) conn.getRemoteObject(BUS_NAME, objectPath, Properties.class);
-				label = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
+				// obsolete: use Context.USERID
+//				label = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
 				Item inter = (Item) conn.getRemoteObject(BUS_NAME, objectPath, Item.class);
 				try {
 					secret = inter.GetSecret(dbusSession);
@@ -153,8 +155,16 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 				Collection collection = (Collection) conn.getRemoteObject(BUS_NAME, objectPath, Collection.class);
 				
 				HashMap searchprop = new HashMap();
-				label = (String) attributes.get(LABEL);
-				// SearchItems works with Attributes. Label is not part of Attributes. We send an empty Map
+				// Get all Attribute whose name starts with "Attribute-" and use for searching
+				Iterator it = attributes.entrySet().iterator();
+				while (it.hasNext()) {
+					Map.Entry attr = (Entry) it.next();
+					if(attr.getKey().toString().startsWith("Attribute-")) {
+						String key = attr.getKey().toString().substring("Attribute-".length());
+						searchprop.put(key, (String)attr.getValue());
+					}
+				}
+				
 				Pair<List<DBusInterface>,List<DBusInterface>> itemList = collection.SearchItems(searchprop);
 				List<DBusInterface> unlockedItems = itemList.a;
 				List<DBusInterface> lockedItems = itemList.b;
@@ -162,30 +172,67 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 					throw new NoSuccessException("The collection is empty");
 				}
 				secret = null;
+				// If unlocked has 1 item take this one
+//				if (unlockedItems.size() == 1) {
+//					secret = getItem(conn,(Properties)unlockedItems.get(0)).GetSecret(dbusSession);
+//				} else {
+//					// More than 1 item, search the one that matches the Label
+//					label = (String) attributes.get(LABEL);
+//					for (int i=0; i<unlockedItems.size(); i++) {
+//						prop = (Properties)unlockedItems.get(i);
+//						String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
+//						Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found unlocked: " + foundLabel);
+//						if (foundLabel.equals(label)) {
+//							// objects sent by SearchItems do not implement Item, but Properties and Introspectable only
+//							// so we cannot use directly the GetSecret method
+//							// instead we get the objectPath as String and get the remote object that implements Item
+//							secret = getItem(conn,prop).GetSecret(dbusSession);
+//							break;
+//						}
+//					}
+//				}
 				for (int i=0; i<unlockedItems.size(); i++) {
+					// if propery Label exists, check that it matches
 					prop = (Properties)unlockedItems.get(i);
-					String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
-					Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found unlocked: " + foundLabel);
-					if (foundLabel.equals(label)) {
-						// objects sent by SearchItems do not implement Item, but Properties and Introspectable only
-						// so we cannot use directly the GetSecret method
-						// instead we get the objectPath as String and get the remote object that implements Item
-						// get the Object path from toString() !!! because there is not getObjectPath() method...
-						// toString = ":busadress+":"+objectpath+":"+iface"
-						objectPath = prop.toString().split(":")[2];
-						Item inter = (Item) conn.getRemoteObject(BUS_NAME, objectPath, Item.class);
-						secret = inter.GetSecret(dbusSession);
+					if (attributes.containsKey(LABEL)) {
+						label = (String) attributes.get(LABEL);
+						String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
+						Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found unlocked: " + foundLabel);
+						if (foundLabel.equals(label)) {
+							// objects sent by SearchItems do not implement Item, but Properties and Introspectable only
+							// so we cannot use directly the GetSecret method
+							// instead we get the objectPath as String and get the remote object that implements Item
+							secret = getItem(conn,prop).GetSecret(dbusSession);
+							break;
+						}
+					} else {
+						secret = getItem(conn,prop).GetSecret(dbusSession);
 						break;
 					}
 				}
 				if (secret==null) {
 					// check if password is locked
+					label = (String) attributes.get(LABEL);
 					for (int i=0; i<lockedItems.size(); i++) {
 						prop = (Properties)lockedItems.get(i);
 						String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
 						Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found locked: " + foundLabel);
 						if (foundLabel.equals(label)) {
-							// TODO: prompt and unlock
+							// FIXME: unlock item: error NotConnected
+							objectPath = prop.toString().split(":")[2];
+							List<DBusInterface> itemsToUnlock = new ArrayList<DBusInterface>(1);
+							itemsToUnlock.add(getItem(conn,prop));
+							Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(itemsToUnlock);
+							// FIXME: unlock all items: error NotConnected
+//							Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(lockedItems);
+							// FIXME: unlock collection: error NotConnected
+//							List<DBusInterface> collToUnlock = new ArrayList<DBusInterface>(1);
+//							collToUnlock.add(collection);
+							// FIXME: Wrong return type: failed to create proxy object for / exported by 1.5
+//							Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(new ArrayList<DBusInterface>());
+
+//							unlockedItems = usr.a;
+//							Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(unlockedItems.size());
 							throw new NoSuccessException("The item is locked. Please unlock before using it.");
 						}
 					}
@@ -197,7 +244,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 				pw[i] = secret.value.get(i);
 			}
 			String password = new String(pw);
-			return new UserPassSecurityCredential(label,password);
+			return new UserPassSecurityCredential((String) attributes.get(Context.USERID),password);
 		} catch (DBusException e) {
 			throw new NoSuccessException(e);
 		} catch (SecurityException e) {
@@ -211,4 +258,9 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 		}
 	}
 
+	// get the Object path from toString() !!! because there is not getObjectPath() method...
+	// toString = ":busadress+":"+objectpath+":"+iface"
+	private Item getItem(DBusConnection c , Properties p) throws DBusException {
+		return (Item) c.getRemoteObject(BUS_NAME, p.toString().split(":")[2], Item.class);
+	}
 }

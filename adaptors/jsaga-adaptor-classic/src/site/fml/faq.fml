@@ -134,8 +134,13 @@ JAVA=/your/path/to/java JAVAC=/your/path/to/javac JAR=/your/path/to/jar PREFIX=/
     		<answer>Use the "Freedesktop" context type with following attributes:
     		<ul>
     			<li>Collection: name of the keyring (Gnome) or Folder (KWallet) that contains the password (for example 'login' is the Gnome keyring with all passwords available after logged in)</li>
+    			<li>Id: unique identifier of a password</li>
     			<li>Label: name of the password to get</li>
+    			<li>Attribute-xxx: key-dependent attribute (for example if your password has attrbute protocol=xmpp, use Attribute-protocol)</li>
+    			<li>UserID: user name that will be used by JSAGA associated with the password found</li>
     		</ul>
+    		If "Id" is given, only one password can match. All other attributes are ignored.
+    		If "Id" is not given, the first password that matches attributes of type Attribute-xxx and that matches Label if given is taken. 
     		</answer>
     	</faq>
     	<faq id="manage">
