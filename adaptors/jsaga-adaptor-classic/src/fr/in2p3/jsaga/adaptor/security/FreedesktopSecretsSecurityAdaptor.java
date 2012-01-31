@@ -20,6 +20,7 @@ import org.freedesktop.dbus.DBusConnection;
 import org.freedesktop.dbus.DBusInterface;
 import org.freedesktop.dbus.Variant;
 import org.freedesktop.dbus.exceptions.DBusException;
+import org.freedesktop.dbus.exceptions.DBusExecutionException;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.TimeoutException;
@@ -114,10 +115,23 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 			// TODO: encrypted ?
 			Pair<org.freedesktop.dbus.Variant,DBusInterface> osr = serv.OpenSession("plain", new org.freedesktop.dbus.Variant(""));
 			dbusSession = osr.b;
+
+			// First test if the collection exists
+			objectPath = COLLECTION_OBJECT_PATH + "/" + (String) attributes.get(COLLECTION);
+			Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("ObjectPath="+objectPath);
+			in = (Introspectable) conn.getRemoteObject(BUS_NAME, objectPath, Introspectable.class);
+			try {
+				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
+			} catch (DBusExecutionException dbee) {
+				if (dbee.getType().equals(org.freedesktop.Secret.Error.NoSuchObject.class.getCanonicalName())) {
+					throw new NoSuccessException("The collection '" + (String) attributes.get(COLLECTION) + "' does not exist");
+				}				
+			}
 			
+			// Search item in collection
 			if (attributes.containsKey(ID)) {
 				id = (String) attributes.get(ID);
-				objectPath = COLLECTION_OBJECT_PATH + "/" + (String) attributes.get(COLLECTION) + "/" + id;
+				objectPath = objectPath + "/" + id;
 				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("ObjectPath="+objectPath);
 				in = (Introspectable) conn.getRemoteObject(BUS_NAME, objectPath, Introspectable.class);
 				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
@@ -125,12 +139,16 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 				prop = (Properties) conn.getRemoteObject(BUS_NAME, objectPath, Properties.class);
 				label = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
 				Item inter = (Item) conn.getRemoteObject(BUS_NAME, objectPath, Item.class);
-				secret = inter.GetSecret(dbusSession);
+				try {
+					secret = inter.GetSecret(dbusSession);
+				} catch (DBusExecutionException dbee) {
+					if (dbee.getType().equals(org.freedesktop.Secret.Error.IsLocked.class.getCanonicalName())) {
+						throw new NoSuccessException("The item is locked. Please unlock before using it.");
+					} else {
+						throw new NoSuccessException(dbee);
+					}
+				}
 			} else { // Search by Name: get all secrets from collection
-				objectPath = COLLECTION_OBJECT_PATH + "/" + (String) attributes.get(COLLECTION);
-				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("ObjectPath="+objectPath);
-				in = (Introspectable) conn.getRemoteObject(BUS_NAME, objectPath, Introspectable.class);
-				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
 	
 				Collection collection = (Collection) conn.getRemoteObject(BUS_NAME, objectPath, Collection.class);
 				

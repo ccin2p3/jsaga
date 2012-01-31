@@ -150,6 +150,10 @@ JAVA=/your/path/to/java JAVAC=/your/path/to/javac JAR=/your/path/to/jar PREFIX=/
     		<question>Why do I get this error "Your Gnome keyring or KDE KWallet should be installed and running" ?</question>
     		<answer>You are not runnning Gnome nor KDE (>= 4.8), or the corresponding service is not running. Check your desktop system documentation</answer>
     	</faq>
+    	<faq id="error_nocollection">
+    		<question>Why do I get this error "The collection does not exist" ?</question>
+    		<answer>The collection that you specified in attributes (or 'login' by default) does not exist</answer>
+    	</faq>
     	<faq id="error_empty">
     		<question>Why do I get this error "The collection is empty" ?</question>
     		<answer>The collection that you specified in attributes does not contain any password/key</answer>
