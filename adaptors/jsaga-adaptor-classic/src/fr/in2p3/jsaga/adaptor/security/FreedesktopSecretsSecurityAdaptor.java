@@ -40,7 +40,6 @@ import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   24 jan 2012
 * ***************************************************/
-// TODO: support of keys
 
 public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 
@@ -66,7 +65,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
    					 new U(COLLECTION),
    					 new UOptional(ID),
    					 new UOptional(LABEL),
-   					 new UOptional(Context.USERID),
+   					 new U(Context.USERID),
    			 }
    			 );
 	}
@@ -110,8 +109,6 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 				throw new NoSuccessException("Your Gnome keyring or KDE KWallet should be installed and running");
 			}
 			
-//			prop = (Properties) conn.getRemoteObject(BUS_NAME, objectPath, Properties.class);
-			
 			Service serv = (Service) conn.getRemoteObject(BUS_NAME, objectPath, Service.class);
 			// TODO: encrypted ?
 			Pair<org.freedesktop.dbus.Variant,DBusInterface> osr = serv.OpenSession("plain", new org.freedesktop.dbus.Variant(""));
@@ -138,8 +135,6 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
 	
 				prop = (Properties) conn.getRemoteObject(BUS_NAME, objectPath, Properties.class);
-				// obsolete: use Context.USERID
-//				label = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
 				Item inter = (Item) conn.getRemoteObject(BUS_NAME, objectPath, Item.class);
 				try {
 					secret = inter.GetSecret(dbusSession);
@@ -165,6 +160,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 					}
 				}
 				
+				// Get matching items
 				Pair<List<DBusInterface>,List<DBusInterface>> itemList = collection.SearchItems(searchprop);
 				List<DBusInterface> unlockedItems = itemList.a;
 				List<DBusInterface> lockedItems = itemList.b;
@@ -172,28 +168,11 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 					throw new NoSuccessException("The collection is empty");
 				}
 				secret = null;
-				// If unlocked has 1 item take this one
-//				if (unlockedItems.size() == 1) {
-//					secret = getItem(conn,(Properties)unlockedItems.get(0)).GetSecret(dbusSession);
-//				} else {
-//					// More than 1 item, search the one that matches the Label
-//					label = (String) attributes.get(LABEL);
-//					for (int i=0; i<unlockedItems.size(); i++) {
-//						prop = (Properties)unlockedItems.get(i);
-//						String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
-//						Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found unlocked: " + foundLabel);
-//						if (foundLabel.equals(label)) {
-//							// objects sent by SearchItems do not implement Item, but Properties and Introspectable only
-//							// so we cannot use directly the GetSecret method
-//							// instead we get the objectPath as String and get the remote object that implements Item
-//							secret = getItem(conn,prop).GetSecret(dbusSession);
-//							break;
-//						}
-//					}
-//				}
+
+				// iterate on unlocked items
 				for (int i=0; i<unlockedItems.size(); i++) {
-					// if propery Label exists, check that it matches
 					prop = (Properties)unlockedItems.get(i);
+					// if JSAGA attribute Label exists, check that it matches
 					if (attributes.containsKey(LABEL)) {
 						label = (String) attributes.get(LABEL);
 						String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
@@ -212,31 +191,18 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 				}
 				if (secret==null) {
 					// check if password is locked
-					label = (String) attributes.get(LABEL);
 					for (int i=0; i<lockedItems.size(); i++) {
-						prop = (Properties)lockedItems.get(i);
-						String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
-						Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found locked: " + foundLabel);
-						if (foundLabel.equals(label)) {
-							// FIXME: unlock item: error NotConnected
-							objectPath = prop.toString().split(":")[2];
-							List<DBusInterface> itemsToUnlock = new ArrayList<DBusInterface>(1);
-							itemsToUnlock.add(getItem(conn,prop));
-							Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(itemsToUnlock);
-							// FIXME: unlock all items: error NotConnected
-//							Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(lockedItems);
-							// FIXME: unlock collection: error NotConnected
-//							List<DBusInterface> collToUnlock = new ArrayList<DBusInterface>(1);
-//							collToUnlock.add(collection);
-							// FIXME: Wrong return type: failed to create proxy object for / exported by 1.5
-//							Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(new ArrayList<DBusInterface>());
-
-//							unlockedItems = usr.a;
-//							Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(unlockedItems.size());
-							throw new NoSuccessException("The item is locked. Please unlock before using it.");
+						if (attributes.containsKey(LABEL)) {
+							label = (String) attributes.get(LABEL);
+							prop = (Properties)lockedItems.get(i);
+							String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
+							Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found locked: " + foundLabel);
+							if (foundLabel.equals(label)) {
+								throw new NoSuccessException("The item is locked. Please unlock before using it.");
+							}
 						}
 					}
-					throw new NoSuccessException("No credential matching Label '" + label + "'");
+					throw new NoSuccessException("No matching passwords");
 				}
 			}
 			byte[] pw = new byte[secret.value.size()];
@@ -263,4 +229,23 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 	private Item getItem(DBusConnection c , Properties p) throws DBusException {
 		return (Item) c.getRemoteObject(BUS_NAME, p.toString().split(":")[2], Item.class);
 	}
+	
+	
+	// not working
+	// FIXME: unlock item: error NotConnected
+//	objectPath = prop.toString().split(":")[2];
+//	List<DBusInterface> itemsToUnlock = new ArrayList<DBusInterface>(1);
+//	itemsToUnlock.add(getItem(conn,prop));
+//	Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(itemsToUnlock);
+	// FIXME: unlock all items: error NotConnected
+//	Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(lockedItems);
+	// FIXME: unlock collection: error NotConnected
+//	List<DBusInterface> collToUnlock = new ArrayList<DBusInterface>(1);
+//	collToUnlock.add(collection);
+	// FIXME: Wrong return type: failed to create proxy object for / exported by 1.5
+//	Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(new ArrayList<DBusInterface>());
+
+//	unlockedItems = usr.a;
+//	Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(unlockedItems.size());
+
 }
