@@ -198,6 +198,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 							String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
 							Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found locked: " + foundLabel);
 							if (foundLabel.equals(label)) {
+								// TODO unlock
 								throw new NoSuccessException("The item is locked. Please unlock before using it.");
 							}
 						}
@@ -229,23 +230,4 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 	private Item getItem(DBusConnection c , Properties p) throws DBusException {
 		return (Item) c.getRemoteObject(BUS_NAME, p.toString().split(":")[2], Item.class);
 	}
-	
-	
-	// not working
-	// FIXME: unlock item: error NotConnected
-//	objectPath = prop.toString().split(":")[2];
-//	List<DBusInterface> itemsToUnlock = new ArrayList<DBusInterface>(1);
-//	itemsToUnlock.add(getItem(conn,prop));
-//	Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(itemsToUnlock);
-	// FIXME: unlock all items: error NotConnected
-//	Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(lockedItems);
-	// FIXME: unlock collection: error NotConnected
-//	List<DBusInterface> collToUnlock = new ArrayList<DBusInterface>(1);
-//	collToUnlock.add(collection);
-	// FIXME: Wrong return type: failed to create proxy object for / exported by 1.5
-//	Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(new ArrayList<DBusInterface>());
-
-//	unlockedItems = usr.a;
-//	Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(unlockedItems.size());
-
 }
