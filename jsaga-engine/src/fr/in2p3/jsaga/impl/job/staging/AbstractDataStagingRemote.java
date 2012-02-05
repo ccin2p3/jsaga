@@ -35,8 +35,11 @@ public abstract class AbstractDataStagingRemote extends AbstractDataStaging {
         int append = (m_append ? Flags.APPEND : Flags.OVERWRITE).getValue();
         try {
             File file = FileFactory.createFile(JSAGA_FACTORY, session, sourceUrl, Flags.NONE.getValue());
-            file.copy(targetUrl, append);
-            file.close();
+            try { 
+                file.copy(targetUrl, append);
+            } finally {
+                file.close();
+            }
         } catch (AlreadyExistsException e) {
             throw new NoSuccessException(e);
         } catch (IncorrectURLException e) {
@@ -47,8 +50,11 @@ public abstract class AbstractDataStagingRemote extends AbstractDataStaging {
     public void cleanup(Session session) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         try {
             File file = FileFactory.createFile(JSAGA_FACTORY, session, m_workerURL, Flags.NONE.getValue());
-            file.remove();
-            file.close();
+            try {
+                file.remove();
+            } finally {
+                file.close();
+            }
         } catch (AlreadyExistsException e) {
             throw new NoSuccessException(e);
         } catch (IncorrectURLException e) {
