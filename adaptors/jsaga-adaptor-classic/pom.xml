@@ -41,17 +41,5 @@ execution management technologies (fork).</description>
             <version>1.2.8</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.freedesktop</groupId>
-		    <artifactId>libdbus-java</artifactId>
-    		<version>2.7</version>
-    		<scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.freedesktop</groupId>
-		    <artifactId>secret-service-api-java</artifactId>
-    		<version>0.1</version>
-    		<scope>compile</scope>
-        </dependency>
     </dependencies>
 </project>

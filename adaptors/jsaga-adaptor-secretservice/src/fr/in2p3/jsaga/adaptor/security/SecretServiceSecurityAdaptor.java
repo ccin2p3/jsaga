@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -36,12 +35,12 @@ import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   FreedesktopSecretsSecurityAdaptor
+* File:   SecretServiceSecurityAdaptor
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   24 jan 2012
 * ***************************************************/
 
-public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
+public abstract class SecretServiceSecurityAdaptor implements SecurityAdaptor {
 
 	protected static final String BUS_NAME = "org.freedesktop.secrets";
 	protected static final String ITEM_INTERFACE_NAME = "org.freedesktop.Secret.Item";
@@ -51,14 +50,12 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 	protected static final String ID = "Id";
 	protected static final String LABEL = "Label";
 
+	protected abstract String getDefaultCollection();
+	
 	public Class getSecurityCredentialClass() {
         return UserPassSecurityCredential.class;
 	}
 	
-	public String getType() {
-		return "Freedesktop";
-	}
-
 	public Usage getUsage() {
     	return new UAnd(
    			 new Usage[]{
@@ -73,6 +70,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 	public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{
        		 new Default(Context.USERID, System.getProperty("user.name")),
+       		 new Default(COLLECTION, getDefaultCollection()),
         };
 	}
 
@@ -104,7 +102,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 			
 			in = (Introspectable) conn.getRemoteObject(BUS_NAME, objectPath, Introspectable.class);
 			try {
-				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
+				Logger.getLogger(SecretServiceSecurityAdaptor.class).debug(in.Introspect());
 			} catch (DBus.Error.ServiceUnknown su) {
 				throw new NoSuccessException("Your Gnome keyring or KDE KWallet should be installed and running");
 			}
@@ -116,10 +114,10 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 
 			// First test if the collection exists
 			objectPath = COLLECTION_OBJECT_PATH + "/" + (String) attributes.get(COLLECTION);
-			Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("ObjectPath="+objectPath);
+			Logger.getLogger(SecretServiceSecurityAdaptor.class).debug("ObjectPath="+objectPath);
 			in = (Introspectable) conn.getRemoteObject(BUS_NAME, objectPath, Introspectable.class);
 			try {
-				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
+				Logger.getLogger(SecretServiceSecurityAdaptor.class).debug(in.Introspect());
 			} catch (DBusExecutionException dbee) {
 				if (dbee.getType().equals(org.freedesktop.Secret.Error.NoSuchObject.class.getCanonicalName())) {
 					throw new NoSuccessException("The collection '" + (String) attributes.get(COLLECTION) + "' does not exist");
@@ -130,16 +128,25 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 			if (attributes.containsKey(ID)) {
 				id = (String) attributes.get(ID);
 				objectPath = objectPath + "/" + id;
-				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("ObjectPath="+objectPath);
+				Logger.getLogger(SecretServiceSecurityAdaptor.class).debug("ObjectPath="+objectPath);
 				in = (Introspectable) conn.getRemoteObject(BUS_NAME, objectPath, Introspectable.class);
-				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
+				try {
+					Logger.getLogger(SecretServiceSecurityAdaptor.class).debug(in.Introspect());
+				} catch (DBusExecutionException dbee) {
+					if (dbee.getType().equals(org.freedesktop.Secret.Error.NoSuchObject.class.getCanonicalName())) {
+						throw new NoSuccessException("Found no item with identifier '" + id + "'");
+					}				
+				}
 	
 				prop = (Properties) conn.getRemoteObject(BUS_NAME, objectPath, Properties.class);
-				Item inter = (Item) conn.getRemoteObject(BUS_NAME, objectPath, Item.class);
+				Item item = (Item) conn.getRemoteObject(BUS_NAME, objectPath, Item.class);
 				try {
-					secret = inter.GetSecret(dbusSession);
+					secret = item.GetSecret(dbusSession);
 				} catch (DBusExecutionException dbee) {
 					if (dbee.getType().equals(org.freedesktop.Secret.Error.IsLocked.class.getCanonicalName())) {
+//						List<DBusInterface> itemsToUnlock = new ArrayList<DBusInterface>(1);
+//						itemsToUnlock.add(item);
+//						Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(itemsToUnlock);
 						throw new NoSuccessException("The item is locked. Please unlock before using it.");
 					} else {
 						throw new NoSuccessException(dbee);
@@ -149,9 +156,9 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 	
 				Collection collection = (Collection) conn.getRemoteObject(BUS_NAME, objectPath, Collection.class);
 				
-				HashMap searchprop = new HashMap();
+				HashMap<String, String> searchprop = new HashMap<String, String>();
 				// Get all Attribute whose name starts with "Attribute-" and use for searching
-				Iterator it = attributes.entrySet().iterator();
+				Iterator<?> it = attributes.entrySet().iterator();
 				while (it.hasNext()) {
 					Map.Entry attr = (Entry) it.next();
 					if(attr.getKey().toString().startsWith("Attribute-")) {
@@ -176,7 +183,7 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 					if (attributes.containsKey(LABEL)) {
 						label = (String) attributes.get(LABEL);
 						String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
-						Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found unlocked: " + foundLabel);
+						Logger.getLogger(SecretServiceSecurityAdaptor.class).debug("found unlocked: " + foundLabel);
 						if (foundLabel.equals(label)) {
 							// objects sent by SearchItems do not implement Item, but Properties and Introspectable only
 							// so we cannot use directly the GetSecret method
@@ -196,9 +203,25 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 							label = (String) attributes.get(LABEL);
 							prop = (Properties)lockedItems.get(i);
 							String foundLabel = (String) prop.Get(ITEM_INTERFACE_NAME, LABEL);
-							Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found locked: " + foundLabel);
+							Logger.getLogger(SecretServiceSecurityAdaptor.class).debug("found locked: " + foundLabel);
 							if (foundLabel.equals(label)) {
 								// TODO unlock
+								// not working
+								// FIXME: unlock item: error NotConnected
+//								objectPath = prop.toString().split(":")[2];
+//								List<DBusInterface> itemsToUnlock = new ArrayList<DBusInterface>(1);
+//								itemsToUnlock.add(getItem(conn,prop));
+//								Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(itemsToUnlock);
+								// FIXME: unlock all items: error NotConnected
+								Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(lockedItems);
+								// FIXME: unlock collection: error NotConnected
+//								List<DBusInterface> collToUnlock = new ArrayList<DBusInterface>(1);
+//								collToUnlock.add(collection);
+								// FIXME: Wrong return type: failed to create proxy object for / exported by 1.5
+//								Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(new ArrayList<DBusInterface>());
+
+//								unlockedItems = usr.a;
+//								Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(unlockedItems.size());
 								throw new NoSuccessException("The item is locked. Please unlock before using it.");
 							}
 						}
