@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs title="Frequently Asked Questions">
+    <part id="module">
+        <title>Adaptor module</title>
+        <faq id="jsaga-help">
+            <question>How do I use this module ?</question>
+            <answer>The command "jsaga-help" provides some useful information about the usage
+                and the current configuration of the plug-ins.
+                <pre>jsaga-help -help</pre>
+                If this command does not provides the answer to your question, then
+                please contact us so that we can fill out this FAQ.
+            </answer>
+        </faq>
+    </part>
+    <part id="freedesktopsecrets">
+    	<title>Freedesktop Secrets</title>
+    	<faq id="whatisit">
+    		<question>What is this ?</question>
+    		<answer>It is a security adaptor that will allow JSAGA to use passwords stored in your desktop environment (Gnome-keyring or KDE KWallet) </answer>
+    	</faq>
+    	<faq id="requirements">
+    		<question>What are the requirements to use it ?</question>
+    		<answer>
+    		<ul>
+    		<li>You must use Gnome or KDE 4.8 or later</li>
+    		<li>Java 1.5 only is supported</li>
+    		<li>You must install an external library (download at http://grid.in2p3.fr/maven2/libmatthew/libmatthew-java/0.8/ and untar/uzip)
+    		<pre>
+cd libmatthew-java-0.8/
+JAVA=/your/path/to/java JAVAC=/your/path/to/javac JAR=/your/path/to/jar PREFIX=/your/path/to/libmatthew make install
+    		</pre>with appropriate paths (ignore the JAVA, JAVC and JAR variables if your default JVM is 1.5). Then you have to specify the appropriate library path where you have installed
+    		the libmatthew library (using PREFIX) using the "java.library.path" property:
+    		<pre>java.library.path=/your/path/to/libmatthew/lib/jni/</pre>
+    		</li>
+    		</ul>
+    		</answer>
+    	</faq>
+    	<faq id="use">
+    		<question>How do I setup JSAGA in order to use passwords stored in my desktop environment ?</question>
+    		<answer>Use the "Freedesktop" context type with following attributes:
+    		<ul>
+    			<li>Collection: name of the keyring (Gnome) or Folder (KWallet) that contains the password (for example 'login' is the Gnome keyring with all passwords available after logged in)</li>
+    			<li>Id: unique identifier of a password</li>
+    			<li>Label: name of the password to get</li>
+    			<li>Attribute-xxx: key-dependent attribute (for example if your password has attrbute protocol=xmpp, use Attribute-protocol)</li>
+    			<li>UserID: user name that will be used by JSAGA associated with the password found</li>
+    		</ul>
+    		If "Id" is given, only one password can match. All other attributes are ignored.
+    		If "Id" is not given, the first password that matches attributes of type Attribute-xxx and that matches Label if given is taken. 
+    		</answer>
+    	</faq>
+    	<faq id="manage">
+    		<question>How do I define/manage passwords in my desktop environment ?</question>
+    		<answer>In gnome, use "Seahorse". In KDE, use "KWallet"</answer>
+    	</faq>
+    	<faq id="java-unix">
+    		<question>Why do I get this error "no unix-java in java.library.path" ?</question>
+    		<answer>Check that the "java.library.path" property points to the location you have installed libmatthew: "/path/to/libmatthew/lib/jni"</answer>
+    	</faq>
+    	<faq id="error_run">
+    		<question>Why do I get this error "Your Gnome keyring or KDE KWallet should be installed and running" ?</question>
+    		<answer>You are not runnning Gnome nor KDE (>= 4.8), or the corresponding service is not running. Check your desktop system documentation</answer>
+    	</faq>
+    	<faq id="error_nocollection">
+    		<question>Why do I get this error "The collection does not exist" ?</question>
+    		<answer>The collection that you specified in attributes (or 'login' by default) does not exist</answer>
+    	</faq>
+    	<faq id="error_empty">
+    		<question>Why do I get this error "The collection is empty" ?</question>
+    		<answer>The collection that you specified in attributes does not contain any password/key</answer>
+    	</faq>
+    	<faq id="error_locked">
+    		<question>Why do I get this error "The item is locked. Please unlock before using it." ?</question>
+    		<answer>The password or key is locked and cannot be used until you unlock it on your desktop.</answer>
+    	</faq>
+    	<faq id="error_nokey">
+    		<question>Why do I get this error "No credential matching Label" ?</question>
+    		<answer>No password/key label matches the Label you specifiy in attributes.</answer>
+    	</faq>
+    </part>
+</faqs>

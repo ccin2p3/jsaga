@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>fr.in2p3.jsaga.adaptor</groupId>
+        <artifactId>adaptors</artifactId>
+        <version>0.9.15-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>jsaga-adaptor-secretservice</artifactId>
+    <name>Adaptors for SecretService authentication</name>
+    <description>This module provides support for authenticating on the Gnome (gnome-keyring) or on the KDE (kwallet) desktop
+    via the common Secret Service API</description>
+    <dependencies>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.8</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.freedesktop</groupId>
+		    <artifactId>libdbus-java</artifactId>
+    		<version>2.7</version>
+    		<scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.freedesktop</groupId>
+		    <artifactId>secret-service-api-java</artifactId>
+    		<version>0.1</version>
+    		<scope>compile</scope>
+        </dependency>
+    </dependencies>
+</project>
