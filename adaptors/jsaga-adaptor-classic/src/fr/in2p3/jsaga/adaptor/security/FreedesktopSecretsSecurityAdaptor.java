@@ -132,14 +132,23 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 				objectPath = objectPath + "/" + id;
 				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("ObjectPath="+objectPath);
 				in = (Introspectable) conn.getRemoteObject(BUS_NAME, objectPath, Introspectable.class);
-				Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
+				try {
+					Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(in.Introspect());
+				} catch (DBusExecutionException dbee) {
+					if (dbee.getType().equals(org.freedesktop.Secret.Error.NoSuchObject.class.getCanonicalName())) {
+						throw new NoSuccessException("Found no item with identifier '" + id + "'");
+					}				
+				}
 	
 				prop = (Properties) conn.getRemoteObject(BUS_NAME, objectPath, Properties.class);
-				Item inter = (Item) conn.getRemoteObject(BUS_NAME, objectPath, Item.class);
+				Item item = (Item) conn.getRemoteObject(BUS_NAME, objectPath, Item.class);
 				try {
-					secret = inter.GetSecret(dbusSession);
+					secret = item.GetSecret(dbusSession);
 				} catch (DBusExecutionException dbee) {
 					if (dbee.getType().equals(org.freedesktop.Secret.Error.IsLocked.class.getCanonicalName())) {
+//						List<DBusInterface> itemsToUnlock = new ArrayList<DBusInterface>(1);
+//						itemsToUnlock.add(item);
+//						Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(itemsToUnlock);
 						throw new NoSuccessException("The item is locked. Please unlock before using it.");
 					} else {
 						throw new NoSuccessException(dbee);
@@ -149,9 +158,9 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 	
 				Collection collection = (Collection) conn.getRemoteObject(BUS_NAME, objectPath, Collection.class);
 				
-				HashMap searchprop = new HashMap();
+				HashMap<String, String> searchprop = new HashMap<String, String>();
 				// Get all Attribute whose name starts with "Attribute-" and use for searching
-				Iterator it = attributes.entrySet().iterator();
+				Iterator<?> it = attributes.entrySet().iterator();
 				while (it.hasNext()) {
 					Map.Entry attr = (Entry) it.next();
 					if(attr.getKey().toString().startsWith("Attribute-")) {
@@ -199,6 +208,22 @@ public class FreedesktopSecretsSecurityAdaptor implements SecurityAdaptor {
 							Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug("found locked: " + foundLabel);
 							if (foundLabel.equals(label)) {
 								// TODO unlock
+								// not working
+								// FIXME: unlock item: error NotConnected
+//								objectPath = prop.toString().split(":")[2];
+//								List<DBusInterface> itemsToUnlock = new ArrayList<DBusInterface>(1);
+//								itemsToUnlock.add(getItem(conn,prop));
+//								Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(itemsToUnlock);
+								// FIXME: unlock all items: error NotConnected
+								Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(lockedItems);
+								// FIXME: unlock collection: error NotConnected
+//								List<DBusInterface> collToUnlock = new ArrayList<DBusInterface>(1);
+//								collToUnlock.add(collection);
+								// FIXME: Wrong return type: failed to create proxy object for / exported by 1.5
+//								Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(new ArrayList<DBusInterface>());
+
+//								unlockedItems = usr.a;
+//								Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(unlockedItems.size());
 								throw new NoSuccessException("The item is locked. Please unlock before using it.");
 							}
 						}
