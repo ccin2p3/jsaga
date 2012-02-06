@@ -59,13 +59,17 @@ keytool -keystore usercert.jks -list -storepass changeit -alias CERT -printcert<
         <faq id="url">
             <question>What is the URL syntax understood by this plug-in ?</question>
             <answer>The root URL must be:
-                <pre><![CDATA[unicore://<HOSTNAME>[:<PORT>]/
+                <pre><![CDATA[unicore://<HOSTNAME>[:<PORT>]/[?[Target=<TARGET>]]
 Where:
     <HOSTNAME> is the name of the host running the Unicore 6 service,
     <PORT> is 8080 by default,
 You can add parameters in the query part of the URL like:
 	Target (ie sitename : "DEMO-SITE" by default)
-Or put these parameters in the configuration file
+Or put these parameters in the configuration file.
+For example, if the Unicore URL is:
+https://localhost:8080/XNJS/services/Registry?res=default_registry
+The SAGA URL will be:
+unicore://localhost:8080/?Target=XNJS
 ]]></pre>
             </answer>
         </faq>
