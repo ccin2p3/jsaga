@@ -12,10 +12,6 @@
         </context>
         <context type="UserPassStore">
         </context>
-        <context type="Freedesktop">
-        	<attribute name="Collection" value="login"/>
-        	<attribute name="Label" value="${FREEDESKTOP_CRED_ID}"/>
-        </context>
         <context type="None">
             <job type="local">
                 <!-- <attribute name="ShellPath" value="c:/cygwin/bin/bash.exe"/> -->
