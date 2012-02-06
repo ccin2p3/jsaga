@@ -22,7 +22,7 @@
     		<question>What are the requirements to use it ?</question>
     		<answer>
     		<ul>
-    		<li>You must use Gnome or KDE 4.8 or later</li>
+    		<li>You must use Gnome or KDE>=4.8</li>
     		<li>Java 1.5 only is supported</li>
     		<li>You must install an external library (download at http://grid.in2p3.fr/maven2/libmatthew/libmatthew-java/0.8/ and untar/uzip)
     		<pre>
@@ -37,9 +37,10 @@ JAVA=/your/path/to/java JAVAC=/your/path/to/javac JAR=/your/path/to/jar PREFIX=/
     	</faq>
     	<faq id="use">
     		<question>How do I setup JSAGA in order to use passwords stored in my desktop environment ?</question>
-    		<answer>Use the "Freedesktop" context type with following attributes:
+    		<answer>Use a context of type "gnome-keyring" pr "kwallet" (depending on your desktop) with following attributes:
     		<ul>
-    			<li>Collection: name of the keyring (Gnome) or Folder (KWallet) that contains the password (for example 'login' is the Gnome keyring with all passwords available after logged in)</li>
+    			<li>Collection: name of the keyring (Gnome) or Folder (KWallet) that contains the password (for example 'login' is the Gnome keyring with all passwords available after logged in). The default 
+    			is 'login' for Gnome and 'passwords' for KDE</li>
     			<li>Id: unique identifier of a password</li>
     			<li>Label: name of the password to get</li>
     			<li>Attribute-xxx: key-dependent attribute (for example if your password has attrbute protocol=xmpp, use Attribute-protocol)</li>
@@ -63,11 +64,11 @@ JAVA=/your/path/to/java JAVAC=/your/path/to/javac JAR=/your/path/to/jar PREFIX=/
     	</faq>
     	<faq id="error_nocollection">
     		<question>Why do I get this error "The collection does not exist" ?</question>
-    		<answer>The collection that you specified in attributes (or 'login' by default) does not exist</answer>
+    		<answer>The collection that you specified in attributes (or the default value) does not exist</answer>
     	</faq>
     	<faq id="error_empty">
     		<question>Why do I get this error "The collection is empty" ?</question>
-    		<answer>The collection that you specified in attributes does not contain any password/key</answer>
+    		<answer>The collection that you specified in attributes does not contain any password</answer>
     	</faq>
     	<faq id="error_locked">
     		<question>Why do I get this error "The item is locked. Please unlock before using it." ?</question>
@@ -75,7 +76,7 @@ JAVA=/your/path/to/java JAVAC=/your/path/to/javac JAR=/your/path/to/jar PREFIX=/
     	</faq>
     	<faq id="error_nokey">
     		<question>Why do I get this error "No credential matching Label" ?</question>
-    		<answer>No password/key label matches the Label you specifiy in attributes.</answer>
+    		<answer>No password label matches the Label you specifiy in attributes.</answer>
     	</faq>
     </part>
 </faqs>

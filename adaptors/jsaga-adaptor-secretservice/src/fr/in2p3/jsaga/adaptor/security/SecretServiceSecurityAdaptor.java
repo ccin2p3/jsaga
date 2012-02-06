@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
