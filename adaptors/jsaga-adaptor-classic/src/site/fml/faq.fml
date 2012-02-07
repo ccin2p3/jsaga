@@ -12,27 +12,8 @@
             </answer>
         </faq>
     </part>
-    <part id="https">
-        <title>HTTPS</title>
-        <faq id="client-authentication">
-            <question>How to enable client authentication ?</question>
-            <answer>Configure the HTTPS plug-in to use a security context of one of the following types:
-                <ul>
-                    <li>X509: the certificate must be in a PKCS12 file</li>
-                    <li>JKS: the certificate must be in a Java Keystore</li>
-                </ul>
-            </answer>
-        </faq>
-        <faq id="mutual-authentication">
-            <question>How to enable mutual authentication ?</question>
-            <answer>Configure the HTTPS plug-in...
-                <ul>
-                    <li>with attribute "MutualAuthentication" set to value "true"</li>
-                    <li>use a security context of type "JKS" (mutual authentication
-                        with context type "X509" is not supported)</li>
-                </ul>
-            </answer>
-        </faq>
+    <part id="security">
+    	<title>Security</title>
         <faq id="jks">
         	<question>How do I use the Java keystore in JSAGA ?</question>
         	<answer>Specify the keystore name and password in Java properties:
@@ -53,29 +34,31 @@
         		It is possible to override these values in the JKS adaptor configuration.
         	</answer>
         </faq>
-        <faq id="jks-keys">
-        	<question>Does JSAGA support multiple keys in a keystore ?</question>
-        	<answer>Yes but each key must have an alias in the keystore. The alias must be specified in the configuration
-        	for the adaptor to be able to retrieve the appropriate key for authentication.</answer>
-        </faq>
         <faq id="jks-import-keys">
             <question>How to import a certificate and a key into the Java Keystore ?</question>
             <answer>The certificate and the key should be in a PKCS12 (.p12) file. You can use
             the JKSImportCert utility provided with JSAGA:
-                 <pre>java -cp $JSAGA_HOME/lib-adaptors/jsaga-adaptor-classic-*.jar \
- fr.in2p3.jsaga.adaptor.security.JKSImportCert mycert.p12 passphrase</pre>
-                 If the keystore already exist, you may need to change the default values:
-                 <pre>-Djavax.net.ssl.keyStore=your_keystore -Djavax.net.ssl.keyStorePassword=your_password</pre>
+                 <pre>java -Djavax.net.ssl.keyStore=mykeystore.jks -Djavax.net.ssl.keyStorePassword=YOUR_KEYSTORE_PASSWORD \
+	java -cp $JSAGA_HOME/lib-adaptors/jsaga-adaptor-classic-*.jar \
+	fr.in2p3.jsaga.adaptor.security.JKSImportCert mycert.p12 YOUR_PKCS12_PASSPHRASE
+     			</pre>
+Remember to choose a password with at least 6 characters for your keystore.
             </answer>
         </faq>
         <faq id="jks-import-certs">
             <question>How to import CA certificates into the Java Keystore ?</question>
             <answer>Use the "keytool" command line interface from Java distribution (use a different alias for each imported CA)
-				<pre>keytool -import -alias alias_name -file CA_certificate -keystore your_truststore</pre>
+				<pre>keytool -import -alias ALIAS_NAME -file CA_CERTIFICATE_FILE -keystore mykeystore.jks</pre>
+            To import multiple certificates with a single command (within the directory where certificates are located):
+            <pre>for i in *.pem ; do \
+	keytool -keystore mykeystore.jks -import -file $i -noprompt \
+	-alias `basename $i` -storepass YOUR_KEYSTORE_PASSWORD; done</pre>
             </answer>
-            To import multiple certificates with a single command:
-            <pre>for i in *.pem ; do keytool -keystore your_truststore -import -file $i -noprompt \
- -alias `basename $i`; done</pre>
+        </faq>
+        <faq id="jks-keys">
+        	<question>Does JSAGA support multiple keys in a keystore ?</question>
+        	<answer>Yes but each key must have an alias in the keystore. The alias must be specified in the configuration
+        	for the adaptor to be able to retrieve the appropriate key for authentication.</answer>
         </faq>
         <faq id="pem_to_p12">
             <question>How to convert certificate from PEM to PKCS12 ?</question>
@@ -87,6 +70,52 @@
             <question>How to convert certificate from CRT to PKCS12 ?</question>
             <answer>Use the "openssl" command line interface from Linux/Cygwin distribution:
                 <pre>openssl pkcs12 -export -in mycert.crt -inkey mycert.key -out mycert.p12</pre>
+            </answer>
+        </faq>
+        <faq id="jks_adaptor">
+        	<question>How to set up a "JKS" context ? </question>
+        	<answer>Available attributes are:
+        		<ul>
+        			<li>Keystore: the path of your keystore file (.jks)</li>
+        			<li>KeystorePass: the password of your keystore</li>
+        			<li>Truststore: the path of the truststore file (the file that contains CA certificates). It can be the same file as the keystore</li>
+        			<li>TruststorePass: the password of the truststore</li>
+        			<li>UserAlias: the alias of the certificate to use within your keystore if your keystore contains more than 1 certificate.</li>
+        			<li>UserPass: the password of the certificate to use</li>
+        		</ul>
+        	</answer>
+        </faq>
+        <faq id="axisjks_adaptor">
+        	<question>How to set up a "AxisJKS" context ? </question>
+        	<answer>This context does not provide any attributes to set. If your application does use a context of type "AxisJKS",
+        	it must be run with the following JVM properties:
+        		<ul>
+        			<li>-Djavax.net.ssl.keyStore=YOUR_KEYSTORE_FILE</li>
+        			<li>-Djavax.net.ssl.keyStorePassword=YOUR_KEYSTORE_PASSWORD</li>
+        		</ul>
+        		Those properties can also be set in the SAGA property file.
+        	</answer>
+        </faq>
+    </part>
+    <part id="https">
+        <title>Data Management</title>
+        <faq id="client-authentication">
+            <question>How to enable client authentication for HTTPS ?</question>
+            <answer>Configure the HTTPS plug-in to use a security context of one of the following types:
+                <ul>
+                    <li>X509: the certificate must be in a PKCS12 file</li>
+                    <li>JKS: the certificate must be in a Java Keystore</li>
+                </ul>
+            </answer>
+        </faq>
+        <faq id="mutual-authentication">
+            <question>How to enable mutual authentication ?</question>
+            <answer>Configure the HTTPS plug-in...
+                <ul>
+                    <li>with attribute "MutualAuthentication" set to value "true"</li>
+                    <li>use a security context of type "JKS" (mutual authentication
+                        with context type "X509" is not supported)</li>
+                </ul>
             </answer>
         </faq>
     </part>

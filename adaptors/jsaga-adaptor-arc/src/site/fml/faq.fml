@@ -25,18 +25,9 @@ Where:
     </part>
     <part id="security">
         <title>Security</title>
-        <faq id="jks">
-            <question>How to generate the keystore (JKS file) required to authenticate to A-REX ?</question>
-            <answer>Move to your certificates directory, then convert your X509 certificate to PKCS12:
-                <pre>openssl pkcs12 -export -in usercert.pem -inkey userkey.pem -out usercert.p12</pre>
-                Then insert certificates of all CAs into the keystore:
-                <pre>for i in certificates/*.0; do \
-     keytool -keystore usercert.jks -import -file $i -noprompt -alias `basename $i` -storepass changeit; done</pre>
-                And insert your PKCS12 certificate:
-                <pre>java -Djavax.net.ssl.keyStore=usercert.jks -Djavax.net.ssl.keyStorePassword=changeit \
-     -cp $JSAGA_HOME/lib/jsaga-adaptor-classic-*.jar fr.in2p3.jsaga.adaptor.security.JKSImportCert \
-     usercert.p12 YOUR_PKCS12_PASSPHRASE</pre>
-                Remember to choose a password with at least 6 characters.
+        <faq id="context">
+            <question>What security context should I use ?</question>
+            <answer>The context must be of type <a href="../jsaga-adaptor-classic/faq.html#axisjks_adaptor">"AxisJKS"</a>.
             </answer>
         </faq>
     </part>

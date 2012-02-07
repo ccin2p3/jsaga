@@ -29,18 +29,9 @@ Where:
     </part>
     <part id="security">
         <title>Security</title>
-        <faq id="jks">
-            <question>How to generate the keystore (JKS file) required to authenticate to GenesisII services ?</question>
-            <answer>Move to your certificates directory, then convert your X509 certificate to PKCS12:
-                <pre>openssl pkcs12 -export -in &lt;YOUR_CERT_FILE&gt; -inkey &lt;YOUR_KEY_FILE&gt; -out &lt;YOUR_PKCS12_FILE&gt;</pre>
-                Then insert certificates of all CAs into the keystore:
-                <pre>for i in &lt;YOUR_CA_CERT_LIST&gt;; do \
-     keytool -keystore &lt;YOUR_KEYSTORE&gt; -import -file $i -noprompt -alias `basename $i` -storepass &lt;YOUR_KEYSTORE_PASSWORD&gt;; done</pre>
-                And insert your PKCS12 certificate:
-                <pre>java -Djavax.net.ssl.keyStore=&lt;YOUR_KEYSTORE&gt; -Djavax.net.ssl.keyStorePassword=&lt;YOUR_KEYSTORE_PASSWORD&gt; \
-     -cp $JSAGA_HOME/lib/jsaga-adaptor-classic-*.jar fr.in2p3.jsaga.adaptor.security.JKSImportCert \
-     &lt;YOUR_PKCS12_FILE&gt; &lt;YOUR_KEYSTORE_PASSWORD&gt;</pre>
-                Remember to choose a password with at least 6 characters.
+        <faq id="context">
+            <question>What security context should I use ?</question>
+            <answer>The context must be of type <a href="../jsaga-adaptor-classic/faq.html#axisjks_adaptor">"AxisJKS"</a>.
             </answer>
         </faq>
     </part>
