@@ -53,13 +53,16 @@ public class LibraryLoader {
                 String version = extractVersion(jar.getName());
                 File dir = jar.getParentFile();
                 lib = new File(dir, System.mapLibraryName(libName+"-"+version));
+            } else if ("build".equals(parentDirName)) {
+                // find library in build directory (for testing from maven)
+                File rootDir = jar.getParentFile().getParentFile().getParentFile();
+                String prefix = System.mapLibraryName(libName).endsWith(".so")?"lib":"";
+                File dir = new File(new File(rootDir, prefix+libName), "build");
+                lib = new File(dir, System.mapLibraryName(libName));
             } else {
                 // find library in maven repository (for testing from maven)
                 File projectDir = jar.getParentFile().getParentFile().getParentFile();
                 String version = jar.getParentFile().getName();
-                if ("build".equals(version)) {
-                    throw new RuntimeException("Unexpected library path: "+url);
-                }
                 String prefix = System.mapLibraryName(libName).endsWith(".so")?"lib":"";
                 File dir = new File(new File(projectDir, prefix+libName), version);
                 lib = new File(dir, System.mapLibraryName(libName+"-"+version));
