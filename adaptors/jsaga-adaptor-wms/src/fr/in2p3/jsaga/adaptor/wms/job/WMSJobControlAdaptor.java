@@ -37,7 +37,7 @@ import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.TrustedCertificates;
 import org.globus.gsi.bc.BouncyCastleCertProcessingFactory;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
-import org.globus.gsi.gssapi.auth.HostAuthorization;
+import org.globus.gsi.gssapi.auth.NoAuthorization;
 import org.gridsite.www.namespaces.delegation_1.DelegationSoapBindingStub;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.AuthenticationFailedException;
@@ -163,13 +163,13 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             ((Stub) m_client)._setProperty(GSIConstants.GSI_CREDENTIALS, m_credential);
             ((Stub) m_client)._setProperty(GSIConstants.GSI_TRANSPORT, GSIConstants.ENCRYPTION);
             ((Stub) m_client)._setProperty(GSIConstants.TRUSTED_CERTIFICATES, trustedCertificates);
-            ((Stub) m_client)._setProperty(GSIConstants.GSI_AUTHORIZATION, HostAuthorization.getInstance());
+            ((Stub) m_client)._setProperty(GSIConstants.GSI_AUTHORIZATION, NoAuthorization.getInstance());
 
             DelegationSoapBindingStub delegationServiceStub = (DelegationSoapBindingStub) serviceLocator.getWMProxyDelegation_PortType(new URL(m_wmsServerUrl));
             ((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_CREDENTIALS, m_credential);
             ((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_TRANSPORT, GSIConstants.ENCRYPTION);
             ((Stub) delegationServiceStub)._setProperty(GSIConstants.TRUSTED_CERTIFICATES, trustedCertificates);
-            ((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_AUTHORIZATION, HostAuthorization.getInstance());
+            ((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_AUTHORIZATION, NoAuthorization.getInstance());
 
             String certReq = delegationServiceStub.getProxyReq(m_delegationId);
 
