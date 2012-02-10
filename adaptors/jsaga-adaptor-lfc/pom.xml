@@ -11,7 +11,7 @@
 	<developers>
 		<developer>
 			<name>Jérôme Revillard</name>
-			<email>jrevillard@maatg.com</email>
+			<email>jrevillard@maatg.fr</email>
 			<organization>MAAT France</organization>
 			<organizationUrl>http://www.maatg.com/</organizationUrl>
 			<properties>
@@ -62,8 +62,7 @@
 		<dependency>
 			<groupId>fr.maatg</groupId>
 			<artifactId>glite.dm</artifactId>
-			<version>0.4</version>
-			<scope>compile</scope>
+			<version>0.5</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>

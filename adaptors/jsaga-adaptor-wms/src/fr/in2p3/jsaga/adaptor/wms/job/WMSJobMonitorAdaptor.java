@@ -30,6 +30,7 @@ import org.glite.wsdl.types.lb.holders.JobStatusArrayHolder;
 import org.globus.axis.gsi.GSIConstants;
 import org.globus.axis.transport.HTTPSSender;
 import org.globus.gsi.TrustedCertificates;
+import org.globus.gsi.gssapi.auth.NoAuthorization;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
@@ -258,6 +259,8 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
         ((Stub)loggingAndBookkeepingPortType)._setProperty(GSIConstants.GSI_CREDENTIALS, m_credential);
         ((Stub)loggingAndBookkeepingPortType)._setProperty(GSIConstants.GSI_TRANSPORT, GSIConstants.ENCRYPTION);
         ((Stub)loggingAndBookkeepingPortType)._setProperty(GSIConstants.TRUSTED_CERTIFICATES, TrustedCertificates.load(m_certRepository.getAbsolutePath()));
+        ((Stub)loggingAndBookkeepingPortType)._setProperty(GSIConstants.GSI_AUTHORIZATION, NoAuthorization.getInstance());
+
         ((Stub)loggingAndBookkeepingPortType).setTimeout(120 * 1000); //2 mins
         return loggingAndBookkeepingPortType;
 	}
