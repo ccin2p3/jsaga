@@ -14,6 +14,13 @@
     </part>
     <part id="security">
         <title>Security</title>
+        <faq id="url">
+            <question>Where can I find the URL to set for attribute "Server" ?</question>
+            <answer>The Server URL is built with the information found under section "VOMS information"
+of the <a href="http://operations-portal.in2p3.fr/vo">EGI Operations Portal</a> for your VO :
+                <pre>voms://{Host}:{Vomses port}{DN}</pre>
+            </answer>
+        </faq>
         <faq id="ca">
             <question>How to name the Certificate Authority (on client side) ?</question>
             <answer>Use the "openssl" command line interface from Linux/Cygwin distribution:
