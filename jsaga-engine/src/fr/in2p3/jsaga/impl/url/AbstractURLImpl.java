@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.impl.url;
 import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
-import org.ogf.saga.SagaObject;
+
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.session.Session;
