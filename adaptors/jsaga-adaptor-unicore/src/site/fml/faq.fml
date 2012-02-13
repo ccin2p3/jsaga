@@ -60,5 +60,12 @@ unicore://localhost:8080/?Target=XNJS
 ]]></pre>
             </answer>
         </faq>
+        <faq id="datastaging">
+        	<question>Which transfer protocol will be used for data staging ?</question>
+        	<answer>The transfer protocol will be the first of your choice that is supported by the remote server. 
+        	You can use the "TransferProtocols" attribute to set your preferred protocol (in order). Supported protocols are "BFT", "RBYTEIO"
+        	and "SBYTEIO". Specify your preferred protocol in order separated with space or comma. If you do not specify preferred protocol,
+        	JSAGA will try to use "BFT" and then "RBYTEIO"</answer>
+        </faq>
     </part>
 </faqs>

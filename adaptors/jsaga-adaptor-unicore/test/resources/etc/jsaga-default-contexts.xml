@@ -5,7 +5,9 @@
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/unicore6/demouser.jks"/>
             <attribute name="KeystorePass" value="the!user"/>
 
-            <data type="unicore"/>
+            <data type="unicore">
+            	<attribute name="TransferProtocols" value="RBYTEIO BFT"/>
+            </data>
 			<job type="unicore"/>
             <include host="localhost6"/>
             <exclude host="localhost6" domain="de"/>

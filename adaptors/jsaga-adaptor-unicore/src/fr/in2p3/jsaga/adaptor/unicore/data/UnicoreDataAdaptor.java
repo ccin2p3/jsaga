@@ -1,14 +1,19 @@
 package fr.in2p3.jsaga.adaptor.unicore.data;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
 import fr.in2p3.jsaga.adaptor.unicore.UnicoreAbstract;
-
+import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
 import org.unigrids.services.atomic.types.GridFileType;
+import org.unigrids.services.atomic.types.ProtocolType;
 import org.unigrids.services.atomic.types.ProtocolType.Enum;
 
 import de.fzj.unicore.uas.client.FileTransferClient;
@@ -33,26 +38,51 @@ import java.util.*;
  *
  */
 public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPutter, FileReaderGetter {
+    private static final String TRANSFER_PROTOCOLS = "TransferProtocols";
     private String m_serverFileSeparator ;
 	private StorageClient m_client;
 	private Enum[] m_protocols;
     private String rootDirectory = ".";
+    private Logger logger = Logger.getLogger(UnicoreDataAdaptor.class);
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
     	return new Default[]{
+                new Default(TRANSFER_PROTOCOLS, ProtocolType.BFT.toString() + " " + ProtocolType.RBYTEIO.toString()),
     			new Default(TARGET, "DEMO-SITE"),
     			new Default(SERVICE_NAME, "StorageManagement"), 
     			new Default(RES, "default_storage"),
     			};
     }
+    public Usage getUsage() {
+        return new UAnd(new U[]{
+                new UOptional(TRANSFER_PROTOCOLS),
+                (U) super.getUsage(),
+        });
+    }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	super.connect(userInfo, host, port, basePath, attributes);
-    	
     	try {
 			m_client = new StorageClient(m_epr,m_uassecprop);
-			m_protocols = m_client.getSupportedProtocols();
-			// TODO customize this
+			logger.debug("Server version: " + m_client.getServerVersion());
+			for (Enum sp : m_client.getSupportedProtocols()) {
+				logger.debug("Supported protocol: " + sp.toString());
+			}
+            String value = (String) attributes.get(TRANSFER_PROTOCOLS);
+            StringTokenizer tokenizer = new StringTokenizer(value, ", \t\n\r\f");
+            m_protocols = new Enum[tokenizer.countTokens()];
+            for (int i=0; i<tokenizer.countTokens(); i++) {
+            	String p = tokenizer.nextToken();
+            	if (p.equals(ProtocolType.BFT.toString())) {
+            		m_protocols[i] = ProtocolType.BFT;
+            	} else if (p.equals(ProtocolType.RBYTEIO.toString())) {
+            		m_protocols[i] = ProtocolType.RBYTEIO;
+            	} else if (p.equals(ProtocolType.SBYTEIO.toString())) {
+            		m_protocols[i] = ProtocolType.SBYTEIO;
+            	} else {
+            		throw new NoSuccessException("Unsupported transfer protocol: " + p);
+            	}
+            }
 			m_serverFileSeparator = "/";
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
@@ -137,7 +167,9 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
 			throw new NoSuccessException("Append not supported.");
 		}
 		try {
-			FileTransferClient io_client = m_client.getExport(absolutePath, m_protocols);
+			logger.debug("calling client.getExport with: " + absolutePath);
+			FileTransferClient io_client = m_client.getImport(absolutePath, m_protocols);
+			logger.debug("protocol used: " + io_client.getProtocol().toString());
 			io_client.writeAllData(stream);
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
@@ -150,7 +182,9 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
 			OutputStream stream) throws PermissionDeniedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
 		try {
-			FileTransferClient io_client = m_client.getImport(absolutePath, m_protocols);
+			logger.debug("calling client.getImport with: " + absolutePath);
+			FileTransferClient io_client = m_client.getExport(absolutePath, m_protocols);
+			logger.debug("protocol used: " + io_client.getProtocol().toString());
 			io_client.readAllData(stream);
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
