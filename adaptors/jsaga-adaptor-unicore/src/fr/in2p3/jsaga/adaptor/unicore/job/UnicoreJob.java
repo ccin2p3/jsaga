@@ -6,17 +6,16 @@ import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDescriptionType;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.TimeoutException;
 import org.unigrids.services.atomic.types.StatusInfoType;
-import org.unigrids.x2006.x04.services.jms.JobPropertiesDocument;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
 
 import de.fzj.unicore.uas.client.JobClient;
-import de.fzj.unicore.uas.security.IUASSecurityProperties;
-import de.fzj.unicore.wsrflite.exceptions.ClientException;
 import de.fzj.unicore.wsrflite.xmlbeans.BaseFault;
 import de.fzj.unicore.wsrflite.xmlbeans.exceptions.InvalidResourcePropertyQNameFault;
 import de.fzj.unicore.wsrflite.xmlbeans.exceptions.ResourceNotDestroyedFault;
 import de.fzj.unicore.wsrflite.xmlbeans.exceptions.ResourceUnavailableFault;
 import de.fzj.unicore.wsrflite.xmlbeans.exceptions.ResourceUnknownFault;
+import de.fzj.unicore.wsrflite.security.ISecurityProperties;
+import eu.unicore.security.util.client.IClientProperties;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
 /* ***************************************************
@@ -35,11 +34,11 @@ public class UnicoreJob {
 		m_client = jc;
 	}
 	
-	public UnicoreJob(EndpointReferenceType address, IUASSecurityProperties sec) throws Exception {
+	public UnicoreJob(EndpointReferenceType address, IClientProperties sec) throws Exception {
 		this(new JobClient(address.getAddress().getStringValue(), address, sec));
 	}
 	
-	public UnicoreJob(String jobNativeID, IUASSecurityProperties sec) throws Exception {
+	public UnicoreJob(String jobNativeID, IClientProperties sec) throws Exception {
 		EndpointReferenceType _epr = EndpointReferenceType.Factory.newInstance();
 	    _epr.addNewAddress().setStringValue(jobNativeID);
 		m_client = new JobClient(_epr.getAddress().getStringValue(), _epr, sec);

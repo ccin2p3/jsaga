@@ -77,6 +77,7 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
     	try {
 		    // Find a target system
 			TSFClient cl = new TSFClient(m_epr.getAddress().getStringValue(), m_epr, m_uassecprop);
+			// FIXME NullPointer 
 			Iterator<EndpointReferenceType> flavoursIter = cl.getAccessibleTargetSystems().iterator(); 
 			if (flavoursIter.hasNext()) {
 				EndpointReferenceType _tss_epr = flavoursIter.next();

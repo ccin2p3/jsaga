@@ -64,6 +64,7 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
     	super.connect(userInfo, host, port, basePath, attributes);
     	try {
 			m_client = new StorageClient(m_epr,m_uassecprop);
+<<<<<<< HEAD
 			logger.debug("Server version: " + m_client.getServerVersion());
 			for (Enum sp : m_client.getSupportedProtocols()) {
 				logger.debug("Supported protocol: " + sp.toString());
@@ -83,6 +84,14 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
             		throw new NoSuccessException("Unsupported transfer protocol: " + p);
             	}
             }
+=======
+			// TODO: attributes preferred protocols
+			m_protocols = m_client.getSupportedProtocols();
+			for (Enum p : m_protocols) {
+				logger.debug("Supported protocol: " + p.toString());
+			}
+			m_protocols = new Enum[]{ProtocolType.BFT};
+>>>>>>> upgrade to uas-core 1.4.2-p2
 			m_serverFileSeparator = "/";
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
@@ -167,7 +176,13 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
 			throw new NoSuccessException("Append not supported.");
 		}
 		try {
+<<<<<<< HEAD
 			logger.debug("calling client.getExport with: " + absolutePath);
+=======
+//			absolutePath = absolutePath.replaceFirst("/", "");
+			logger.debug("calling client.getExport with: " + absolutePath);
+			// TODO: swap Import/Export
+>>>>>>> upgrade to uas-core 1.4.2-p2
 			FileTransferClient io_client = m_client.getImport(absolutePath, m_protocols);
 			logger.debug("protocol used: " + io_client.getProtocol().toString());
 			io_client.writeAllData(stream);
@@ -182,7 +197,13 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
 			OutputStream stream) throws PermissionDeniedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
 		try {
+<<<<<<< HEAD
 			logger.debug("calling client.getImport with: " + absolutePath);
+=======
+//			absolutePath = absolutePath.replaceFirst("/", "");
+			logger.debug("calling client.getImport with: " + absolutePath);
+			// TODO: swap Import/Export
+>>>>>>> upgrade to uas-core 1.4.2-p2
 			FileTransferClient io_client = m_client.getExport(absolutePath, m_protocols);
 			logger.debug("protocol used: " + io_client.getProtocol().toString());
 			io_client.readAllData(stream);
