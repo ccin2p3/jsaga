@@ -116,7 +116,7 @@ public class JKSSecurityAdaptor implements SecurityAdaptor {
     		// load CA certs
     		String trustStorePath = System.getProperty(JAVAX_NET_SSL_TRUSTSTORE);
     		if (attributes.containsKey(TRUSTSTORE)) 
-				keyStorePath = (String) attributes.get(TRUSTSTORE);
+    			trustStorePath = (String) attributes.get(TRUSTSTORE);
 
     		KeyStore trustStore;
     		String trustStorePass;
@@ -127,7 +127,7 @@ public class JKSSecurityAdaptor implements SecurityAdaptor {
     		} else {
         		trustStorePass = System.getProperty(JAVAX_NET_SSL_TRUSTSTOREPASSWORD);
         		if (attributes.containsKey(TRUSTSTORE_PASS)) 
-    				keyStorePath = (String) attributes.get(TRUSTSTORE_PASS);
+        			trustStorePass = (String) attributes.get(TRUSTSTORE_PASS);
     			trustStore = KeyStore.getInstance("jks");
     			char[] password = (trustStorePass != null)?trustStorePass.toCharArray():null;
     			if (trustStorePath != null) {
