@@ -128,7 +128,11 @@ public class UnicoreJobMonitorAdaptor extends UnicoreJobAdaptorAbstract implemen
 	}
 
 	public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException {
-		throw new NotImplementedException();
+		try {
+			return new UnicoreJob(nativeJobId, m_uassecprop).getTerminationTime().getTime();
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
 	}
 
 	public String[] getExecutionHosts(String nativeJobId) throws NotImplementedException, NoSuccessException {

@@ -11,6 +11,11 @@ import org.w3.x2005.x08.addressing.EndpointReferenceType;
 
 import de.fzj.unicore.uas.client.JobClient;
 import de.fzj.unicore.uas.security.IUASSecurityProperties;
+import de.fzj.unicore.wsrflite.exceptions.ClientException;
+import de.fzj.unicore.wsrflite.xmlbeans.BaseFault;
+import de.fzj.unicore.wsrflite.xmlbeans.exceptions.InvalidResourcePropertyQNameFault;
+import de.fzj.unicore.wsrflite.xmlbeans.exceptions.ResourceUnavailableFault;
+import de.fzj.unicore.wsrflite.xmlbeans.exceptions.ResourceUnknownFault;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
 /* ***************************************************
@@ -66,6 +71,10 @@ public class UnicoreJob {
 	
 	public Calendar getSubmissionTime() {
 		return m_client.getSubmissionTime();
+	}
+	
+	public Calendar getTerminationTime() throws InvalidResourcePropertyQNameFault, BaseFault, ResourceUnavailableFault, ResourceUnknownFault, ClientException {
+		return m_client.getTerminationTime();
 	}
 	
 	public JobStatus getStatus() throws Exception {
