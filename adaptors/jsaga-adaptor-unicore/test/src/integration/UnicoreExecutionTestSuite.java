@@ -1,5 +1,7 @@
 package integration;
 
+import java.io.InputStream;
+
 import junit.framework.Test;
 
 import org.ogf.saga.error.NoSuccessException;
@@ -94,12 +96,13 @@ public class UnicoreExecutionTestSuite extends JSAGATestSuite {
             
         }
 
-        public void test_run_supportedApplication() throws Exception {
+        public void test_run_dateApplication() throws Exception {
             
-        	Attribute[] attributes = new Attribute[1];
-        	attributes[0] = new Attribute(JobDescription.JOBPROJECT, "Perl");
-        	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
-        	
+            JobDescription desc = JobFactory.createJobDescription();
+            desc.setAttribute(JobDescription.OUTPUT, "stdout.txt");
+            desc.setAttribute(JobDescription.INTERACTIVE, "True");
+            desc.setAttribute(JobDescription.JOBPROJECT, "Date");
+
         	// submit
             Job job = runJob(desc);
             
@@ -111,6 +114,13 @@ public class UnicoreExecutionTestSuite extends JSAGATestSuite {
                     State.DONE,
                     job.getState());       
             
+            byte[] buffer = new byte[1024];
+            InputStream stdout = job.getStdout();
+            for (int len; (len=stdout.read(buffer))>-1; ) {
+                System.err.write(buffer, 0, len);
+            }
+            stdout.close();
+            assertFalse(new String(buffer).equals(""));
         }
 
     }
