@@ -14,6 +14,7 @@ import de.fzj.unicore.uas.security.IUASSecurityProperties;
 import de.fzj.unicore.wsrflite.exceptions.ClientException;
 import de.fzj.unicore.wsrflite.xmlbeans.BaseFault;
 import de.fzj.unicore.wsrflite.xmlbeans.exceptions.InvalidResourcePropertyQNameFault;
+import de.fzj.unicore.wsrflite.xmlbeans.exceptions.ResourceNotDestroyedFault;
 import de.fzj.unicore.wsrflite.xmlbeans.exceptions.ResourceUnavailableFault;
 import de.fzj.unicore.wsrflite.xmlbeans.exceptions.ResourceUnknownFault;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
@@ -75,6 +76,11 @@ public class UnicoreJob {
 	
 	public Calendar getTerminationTime() throws InvalidResourcePropertyQNameFault, BaseFault, ResourceUnavailableFault, ResourceUnknownFault, ClientException {
 		return m_client.getTerminationTime();
+	}
+	
+	
+	public void destroy() throws BaseFault, ResourceUnavailableFault, ResourceUnknownFault, ResourceNotDestroyedFault, ClientException {
+		m_client.destroy();
 	}
 	
 	public JobStatus getStatus() throws Exception {

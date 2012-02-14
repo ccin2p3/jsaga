@@ -127,8 +127,7 @@ public class UnicoreExecutionTestSuite extends JSAGATestSuite {
 
     public static class UnicoreJobRunInfoTest extends JobRunInfoTest {
     	public UnicoreJobRunInfoTest() throws Exception {super("unicore");}
-    	// TODO: get dates in JobPropertiesDocument <rl:TerminationTime>
-    	public void test_dates() {super.ignore("Started and finished dates not supported"); }
+    	public void test_dates() {super.ignore("getStarted is not supported"); }
     	public void test_execution_hosts() {super.ignore("not supported"); }
     }
     

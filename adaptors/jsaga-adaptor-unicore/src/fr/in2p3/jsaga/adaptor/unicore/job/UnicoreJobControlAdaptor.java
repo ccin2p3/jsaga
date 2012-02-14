@@ -12,6 +12,7 @@ import javax.xml.namespace.QName;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.codehaus.xfire.XFireRuntimeException;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinitionDocument;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinitionType;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDescriptionType;
@@ -35,6 +36,7 @@ import de.fzj.unicore.wsrflite.xmlbeans.BaseFault;
 
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.HoldableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
@@ -52,7 +54,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 * ***************************************************/
 
 public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract 
-	implements JobControlAdaptor, HoldableJobAdaptor, StagingJobAdaptorTwoPhase {
+	implements JobControlAdaptor, HoldableJobAdaptor, StagingJobAdaptorTwoPhase, CleanableJobAdaptor {
 
     protected static final String PRE_STAGING_TRANSFERS_TAGNAME = "PreStagingIn";
     protected static final String POST_STAGING_TRANSFERS_TAGNAME = "PostStagingOut";
@@ -84,20 +86,9 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 				logger.debug("No TSS found, creating a new one");
 		    	m_client = cl.createTSS();
 		    }
-			logger.info("Target System is " + m_client.getTargetSystemName());
+			logger.info("Unicore server " + m_client.getServerVersion() + " at " + m_client.getEPR().getAddress().getStringValue());
 			// Get remote applications supported
 			m_remoteApplications = m_client.getApplications();
-//			boolean customExecutableAvailable = false;
-//			Iterator<ApplicationResourceType> _apps = m_client.getApplications().iterator();
-//			String appName;
-//			while (_apps.hasNext()) {
-//				appName = _apps.next().getApplicationName();
-//				logger.debug("Found this application: " + appName);
-//				if (appName.equals("Custom executable")) 
-//					customExecutableAvailable = true;
-//			}
-//			if (! customExecutableAvailable)
-//				logger.warn("Application \"Custom executable\" is not available, jobs may fail");
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
@@ -124,8 +115,6 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 			sub.setJobDefinition(jdt);
 			sd.setSubmit(sub);
 			JobClient jc = m_client.submit(sd);
-			logger.debug("Job submitted, id=" + jc.getUrl());
-//			JobPropertiesDocument zzz = jc.getResourcePropertiesDocument();
 			return jc.getUrl();
 		} catch (XmlException e) {
 			throw new NoSuccessException(e);
@@ -142,14 +131,26 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 		}
 	}
 
+	public void clean(String nativeJobId) throws PermissionDeniedException,	TimeoutException, NoSuccessException {
+		try {
+			new UnicoreJob(nativeJobId, m_uassecprop).destroy();
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
+	}
+
 	public boolean hold(String nativeJobId)	throws PermissionDeniedException, TimeoutException,	NoSuccessException {
 		try {
 			new UnicoreJob(nativeJobId, m_uassecprop).hold();
 			return true;
 		} catch (Exception e) {
-			if (e instanceof BaseFault) {
+			if (e instanceof BaseFault) { 
 				BaseFault fault = (BaseFault)e;
-				if (fault.getMessage().startsWith("Could not hold")) {
+				if (fault.getMessage().startsWith("Could not hold")) { // Job Done
+					return false;
+				}
+			} else if (e instanceof XFireRuntimeException) { 
+				if (e.getCause().getMessage().contains("does not exist")) { // Job Cleaned
 					return false;
 				}
 			}
@@ -271,10 +272,10 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 		String appName;
 		while (_apps.hasNext()) {
 			appName = _apps.next().getApplicationName();
-//			logger.debug("Found this application: " + appName);
 			if (appName.equals(app)) 
 				return true;
 		}
 		return false;
     }
+
 }
