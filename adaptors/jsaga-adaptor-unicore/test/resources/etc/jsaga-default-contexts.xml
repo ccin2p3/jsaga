@@ -4,6 +4,8 @@
         <context type="JKS" id="Demo">
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/unicore6/demouser.jks"/>
             <attribute name="KeystorePass" value="the!user"/>
+            <attribute name="Truststore" value="${user.home}/.jsaga/contexts/unicore6/demouser.jks"/>
+            <attribute name="TruststorePass" value="the!user"/>
 
             <data type="unicore">
             	<attribute name="TransferProtocols" value="RBYTEIO BFT"/>
