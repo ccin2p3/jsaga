@@ -23,13 +23,11 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
+import org.unigrids.x2006.x04.services.jms.JobPropertiesDocument;
 import org.unigrids.x2006.x04.services.tss.ApplicationResourceType;
 import org.unigrids.x2006.x04.services.tss.SubmitDocument;
 import org.unigrids.x2006.x04.services.tss.SubmitDocument.Submit;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import de.fzj.unicore.uas.client.JobClient;
 import de.fzj.unicore.uas.client.TSFClient;
 import de.fzj.unicore.uas.client.TSSClient;
@@ -58,8 +56,11 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 
     protected static final String PRE_STAGING_TRANSFERS_TAGNAME = "PreStagingIn";
     protected static final String POST_STAGING_TRANSFERS_TAGNAME = "PostStagingOut";
+    protected static final String DEFAULT_APPLICATION = "Custom executable";
+    
     private Logger logger = Logger.getLogger(UnicoreJobControlAdaptor.class);
-
+    protected List<ApplicationResourceType> m_remoteApplications;
+    
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
     	return new JobDescriptionTranslatorXSLT("xsl/job/unicore-jsdl.xsl");
     }
@@ -84,18 +85,19 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 		    	m_client = cl.createTSS();
 		    }
 			logger.info("Target System is " + m_client.getTargetSystemName());
-			// Check if the special "Custom executable" is supported on the server
-			boolean customExecutableAvailable = false;
-			Iterator<ApplicationResourceType> _apps = m_client.getApplications().iterator();
-			String appName;
-			while (_apps.hasNext()) {
-				appName = _apps.next().getApplicationName();
-				logger.debug("Found this application: " + appName);
-				if (appName.equals("Custom executable")) 
-					customExecutableAvailable = true;
-			}
-			if (! customExecutableAvailable)
-				logger.warn("Application \"Custom executable\" is not available, jobs may fail");
+			// Get remote applications supported
+			m_remoteApplications = m_client.getApplications();
+//			boolean customExecutableAvailable = false;
+//			Iterator<ApplicationResourceType> _apps = m_client.getApplications().iterator();
+//			String appName;
+//			while (_apps.hasNext()) {
+//				appName = _apps.next().getApplicationName();
+//				logger.debug("Found this application: " + appName);
+//				if (appName.equals("Custom executable")) 
+//					customExecutableAvailable = true;
+//			}
+//			if (! customExecutableAvailable)
+//				logger.warn("Application \"Custom executable\" is not available, jobs may fail");
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
@@ -105,13 +107,25 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 			throws PermissionDeniedException, TimeoutException,
 			NoSuccessException, BadResource {
 		try {
+			logger.debug("** Job description **");
+			logger.debug(jobDesc);
+			JobDefinitionType jdt = JobDefinitionDocument.Factory.parse(jobDesc).getJobDefinition();
+			String jobType;
+			try {
+				jobType = jdt.getJobDescription().getJobIdentification().getJobProjectArray(0);
+			} catch (Exception e) {
+				jobType = DEFAULT_APPLICATION;
+			}
+			// Check that requested application is installed on the remote server
+			if (!isSupportedApplication(jobType))
+				throw new BadResource("The remote server does not support jobs of type: " + jobType);
 			SubmitDocument sd = SubmitDocument.Factory.newInstance();
 			Submit sub = sd.addNewSubmit();
-			JobDefinitionType jdt = JobDefinitionDocument.Factory.parse(jobDesc).getJobDefinition();
 			sub.setJobDefinition(jdt);
 			sd.setSubmit(sub);
 			JobClient jc = m_client.submit(sd);
 			logger.debug("Job submitted, id=" + jc.getUrl());
+//			JobPropertiesDocument zzz = jc.getResourcePropertiesDocument();
 			return jc.getUrl();
 		} catch (XmlException e) {
 			throw new NoSuccessException(e);
@@ -250,5 +264,17 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 	
     private static XmlObject[] getElementsByTagName(XmlObject obj, String elmt)  {
     	return obj.selectChildren(new QName("http://www.in2p3.fr/jsdl-extension", elmt, "jsaga"));
+    }
+    
+    private boolean isSupportedApplication(String app) {
+		Iterator<ApplicationResourceType> _apps = m_remoteApplications.iterator();
+		String appName;
+		while (_apps.hasNext()) {
+			appName = _apps.next().getApplicationName();
+//			logger.debug("Found this application: " + appName);
+			if (appName.equals(app)) 
+				return true;
+		}
+		return false;
     }
 }

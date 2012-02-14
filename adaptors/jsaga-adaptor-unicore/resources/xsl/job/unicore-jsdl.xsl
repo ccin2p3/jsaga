@@ -19,8 +19,15 @@
 
 	<xsl:template match="jsdl:Application">
 	  <xsl:copy>
-	    <!-- With this, UNICORE does the chmod +x and adds . in $PATH -->
-	    <jsdl:ApplicationName>Custom executable</jsdl:ApplicationName>
+        <xsl:choose>
+          <xsl:when test="../jsdl:JobIdentification/jsdl:JobProject">
+	      		<jsdl:ApplicationName><xsl:value-of select="../jsdl:JobIdentification/jsdl:JobProject/text()"></xsl:value-of></jsdl:ApplicationName>
+          </xsl:when>
+          <xsl:otherwise>
+	        <!-- With this, UNICORE does the chmod +x and adds . in $PATH -->
+	        <jsdl:ApplicationName>Custom executable</jsdl:ApplicationName>
+          </xsl:otherwise>
+        </xsl:choose>
 	    <xsl:apply-templates select="@* | node()"/>
 	  </xsl:copy>
 	</xsl:template>

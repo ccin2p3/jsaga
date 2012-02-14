@@ -1,7 +1,11 @@
 package integration;
 
 import junit.framework.Test;
+
+import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.job.*;
+import org.ogf.saga.job.abstracts.Attribute;
+import org.ogf.saga.task.State;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -55,10 +59,65 @@ public class UnicoreExecutionTestSuite extends JSAGATestSuite {
         public void test_run_inWorkingDirectory() { super.ignore("not supported"); }
         public void test_run_queueRequirement() { super.ignore("not supported"); }
         public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
+        public void test_run_MPI() throws Exception {
+            
+        	Attribute[] attributes = new Attribute[3];
+        	attributes[0] = new Attribute(JobDescription.SPMDVARIATION, "http://www.ogf.org/jsdl/2007/02/jsdl-spmd/OpenMPI");
+        	attributes[1] = new Attribute(JobDescription.NUMBEROFPROCESSES, "4");
+        	attributes[2] = new Attribute(JobDescription.PROCESSESPERHOST, "2");
+        	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
+        	
+        	// submit
+            Job job = runJob(desc);
+            
+            // wait for the end
+            job.waitFor();  
+            
+            // check job status
+            assertEquals(
+                    State.DONE,
+                    job.getState());       
+        }
+            
+        public void test_run_unsupportedApplication() throws Exception {
+            
+        	Attribute[] attributes = new Attribute[1];
+        	attributes[0] = new Attribute(JobDescription.JOBPROJECT, "Unsupported application");
+        	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
+        	
+        	// submit
+        	try {
+        		Job job = runJob(desc);
+        		fail("Expected exception");
+        	} catch (NoSuccessException nse) {
+        	}
+            
+        }
+
+        public void test_run_supportedApplication() throws Exception {
+            
+        	Attribute[] attributes = new Attribute[1];
+        	attributes[0] = new Attribute(JobDescription.JOBPROJECT, "Perl");
+        	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
+        	
+        	// submit
+            Job job = runJob(desc);
+            
+            // wait for the end
+            job.waitFor();  
+            
+            // check job status
+            assertEquals(
+                    State.DONE,
+                    job.getState());       
+            
+        }
+
     }
 
     public static class UnicoreJobRunInfoTest extends JobRunInfoTest {
     	public UnicoreJobRunInfoTest() throws Exception {super("unicore");}
+    	// TODO: get dates in JobPropertiesDocument <rl:TerminationTime>
     	public void test_dates() {super.ignore("Started and finished dates not supported"); }
     	public void test_execution_hosts() {super.ignore("not supported"); }
     }
