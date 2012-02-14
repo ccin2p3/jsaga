@@ -9,6 +9,7 @@ import org.unigrids.services.atomic.types.StatusInfoType;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
 
 import de.fzj.unicore.uas.client.JobClient;
+import de.fzj.unicore.wsrflite.xfire.ClientException;
 import de.fzj.unicore.wsrflite.xmlbeans.BaseFault;
 import de.fzj.unicore.wsrflite.xmlbeans.exceptions.InvalidResourcePropertyQNameFault;
 import de.fzj.unicore.wsrflite.xmlbeans.exceptions.ResourceNotDestroyedFault;
