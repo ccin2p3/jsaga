@@ -54,9 +54,9 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
     			};
     }
     public Usage getUsage() {
-        return new UAnd(new U[]{
+        return new UAnd(new Usage[]{
                 new UOptional(TRANSFER_PROTOCOLS),
-                (U) super.getUsage(),
+                super.getUsage(),
         });
     }
 

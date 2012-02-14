@@ -67,7 +67,7 @@ unicore://localhost:8080/?Target=XNJS
         	and "SBYTEIO". Specify your preferred protocol in order separated with space or comma. If you do not specify preferred protocol,
         	JSAGA will try to use "BFT" and then "RBYTEIO"</answer>
         </faq>
-        <faq>
+        <faq id="pre-installed applications">
         	<question>Is it possible to use Unicore pre-installed applications ?</question>
         	<answer>Yes, use the Description.JOBPROJECT attribute:
         	<pre>jobdesc.setAttribute(JobDescription.JOBPROJECT, "Date");</pre>
