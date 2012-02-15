@@ -8,10 +8,12 @@ import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
+import fr.in2p3.jsaga.adaptor.unicore.security.UnicoreSecurityProperties;
 
 import de.fzj.unicore.uas.client.StorageClient;
-import de.fzj.unicore.uas.security.IUASSecurityProperties;
-import de.fzj.unicore.uas.security.UASSecurityProperties;
+import de.fzj.unicore.wsrflite.security.ISecurityProperties;
+import de.fzj.unicore.wsrflite.security.UASSecurityProperties;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
@@ -24,6 +26,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.*;
 
 import javax.net.ssl.SSLSocket;
@@ -69,7 +75,6 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
     	JobDescriptionTranslator translator =  super.getJobDescriptionTranslator();
    		translator.setAttribute(XSLTPARAM_TARGET, m_target);
     	translator.setAttribute(XSLTPARAM_RES, "default_storage");
-    	// TODO: passer un paramètre pour indiquer si "Custom executable" est supporté
     	return translator;
     }
 
@@ -83,18 +88,20 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
     	m_target = _ds_url.getQuery().split("=")[1];
     	String _serverUrl = "https://"+host+":"+port+"/"+m_target+"/services/StorageManagement?res=default_storage";
     	
-    	UASSecurityProperties _uassecprop = new UASSecurityProperties();
-    	_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL, "true");
-    	_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_CLIENTAUTH, "true");
-		
-        //keystore and truststore locations
-    	_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_KEYSTORE, m_credential.getKeyStorePath());
-    	_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_KEYPASS, m_credential.getKeyStorePass());
-    	_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_KEYALIAS, m_credential.getKeyStoreAlias());
-    	_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_TRUSTSTORE, m_credential.getTrustStorePath());
-    	if (m_credential.getTrustStorePass() != null) {
-    		_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_TRUSTPASS, m_credential.getTrustStorePass());
-    	}
+    	UASSecurityProperties _uassecprop;
+    	try {
+    		_uassecprop = new UnicoreSecurityProperties(m_credential);
+		} catch (UnrecoverableKeyException e) {
+			throw new AuthenticationFailedException(e);
+		} catch (KeyStoreException e) {
+			throw new AuthenticationFailedException(e);
+		} catch (NoSuchAlgorithmException e) {
+			throw new NoSuccessException(e);
+		} catch (CertificateException e) {
+			throw new NoSuccessException(e);
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		}
 
     	EndpointReferenceType _epr = EndpointReferenceType.Factory.newInstance();
 	    _epr.addNewAddress().setStringValue(_serverUrl);

@@ -25,6 +25,7 @@
 	<!-- This Intermediary URL for unicore server will be commented when Unicore will support
 		URL like unicore://localhost6:8080/DEMO-SITE/... -->
 	<xsl:variable name="IntermediaryUnicoreURL">
+		<!-- TODO: protocol as a parameter -->
 		<xsl:text/>BFT:https://<xsl:value-of select="$HostName"/>:<xsl:value-of select="$Port"/>/<xsl:value-of select="$Target"/>/services/StorageManagement?res=<xsl:value-of select="$Res"/>#<xsl:value-of select="$Path"/>/<xsl:value-of select="$UniqId"/>
 	</xsl:variable>
 
@@ -43,8 +44,15 @@
 		
 	<xsl:template match="jsdl:Application">
 	  <xsl:copy>
-	    <!-- With this, UNICORE does the chmod +X and adds . in $PATH -->
-	    <jsdl:ApplicationName>Custom executable</jsdl:ApplicationName>
+        <xsl:choose>
+          <xsl:when test="../jsdl:JobIdentification/jsdl:JobProject">
+	      		<jsdl:ApplicationName><xsl:value-of select="../jsdl:JobIdentification/jsdl:JobProject/text()"></xsl:value-of></jsdl:ApplicationName>
+          </xsl:when>
+          <xsl:otherwise>
+	        <!-- With this, UNICORE does the chmod +x and adds . in $PATH -->
+	        <jsdl:ApplicationName>Custom executable</jsdl:ApplicationName>
+          </xsl:otherwise>
+        </xsl:choose>
 	    <xsl:apply-templates select="@* | node()"/>
 	  </xsl:copy>
 	</xsl:template>

@@ -8,8 +8,6 @@ import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStatusType;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
 
 /* ***************************************************
@@ -21,7 +19,7 @@ import java.util.Map;
 * Date:   9 déc. 2010
 * ***************************************************/
 
-public class BesUnicoreJobMonitorAdaptor extends BesJobMonitorAdaptor  {
+public class BesUnicoreJobMonitorAdaptor extends BesJobMonitorAdaptor {
         
     public String getType() {
         return "bes-unicore";

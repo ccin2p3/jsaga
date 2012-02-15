@@ -30,6 +30,13 @@
 			<!--  TODO: back to runtime when HttpRequest no more needed at submission -->
 			<scope>compile</scope>
 		</dependency>
+		<!-- incompatibility with 1.2.8 -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+            <scope>provided</scope>
+        </dependency>
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-bes</artifactId>
