@@ -15,7 +15,6 @@ import de.fzj.unicore.wsrflite.xmlbeans.exceptions.InvalidResourcePropertyQNameF
 import de.fzj.unicore.wsrflite.xmlbeans.exceptions.ResourceNotDestroyedFault;
 import de.fzj.unicore.wsrflite.xmlbeans.exceptions.ResourceUnavailableFault;
 import de.fzj.unicore.wsrflite.xmlbeans.exceptions.ResourceUnknownFault;
-import de.fzj.unicore.wsrflite.security.ISecurityProperties;
 import eu.unicore.security.util.client.IClientProperties;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 

@@ -24,7 +24,6 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
-import org.unigrids.x2006.x04.services.jms.JobPropertiesDocument;
 import org.unigrids.x2006.x04.services.tss.ApplicationResourceType;
 import org.unigrids.x2006.x04.services.tss.SubmitDocument;
 import org.unigrids.x2006.x04.services.tss.SubmitDocument.Submit;
@@ -77,7 +76,6 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
     	try {
 		    // Find a target system
 			TSFClient cl = new TSFClient(m_epr.getAddress().getStringValue(), m_epr, m_uassecprop);
-			// FIXME NullPointer 
 			Iterator<EndpointReferenceType> flavoursIter = cl.getAccessibleTargetSystems().iterator(); 
 			if (flavoursIter.hasNext()) {
 				EndpointReferenceType _tss_epr = flavoursIter.next();
