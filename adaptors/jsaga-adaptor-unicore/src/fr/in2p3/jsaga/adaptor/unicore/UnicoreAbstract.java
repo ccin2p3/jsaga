@@ -26,6 +26,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
+import fr.in2p3.jsaga.adaptor.unicore.security.UnicoreSecurityProperties;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -44,7 +45,7 @@ public abstract class UnicoreAbstract implements ClientAdaptor {
 	protected static final String TARGET = "Target";
 	protected String m_target;
 	protected JKSSecurityCredential m_credential;
-	protected UASSecurityProperties m_uassecprop = null;
+	protected UnicoreSecurityProperties m_uassecprop = null;
 	protected EndpointReferenceType m_epr = null;
     private Logger logger = Logger.getLogger(UnicoreAbstract.class);
     
@@ -76,22 +77,10 @@ public abstract class UnicoreAbstract implements ClientAdaptor {
     	m_target = (String) attributes.get(TARGET);
     	String serverUrl = "https://"+host+":"+port+"/"+m_target+"/services/"+(String) attributes.get(SERVICE_NAME)+"?res="+(String) attributes.get(RES);
     	
-    	Properties p = new Properties();
-//    	p.put(ISecurityProperties.WSRF_SSL_KEYSTORE, m_credential.getKeyStorePath());
-//    	p.put(ISecurityProperties.WSRF_SSL, "true");
-//    	p.put(ISecurityProperties.WSRF_SSL_CLIENTAUTH, "true");
-//		
-//        //keystore and truststore locations
-//    	p.put(ISecurityProperties.WSRF_SSL_KEYSTORE, m_credential.getKeyStorePath());
-//    	p.put(ISecurityProperties.WSRF_SSL_KEYPASS, m_credential.getKeyStorePass());
-//    	p.put(ISecurityProperties.WSRF_SSL_KEYALIAS, m_credential.getKeyStoreAlias());
-//    	p.put(ISecurityProperties.WSRF_SSL_TRUSTSTORE, m_credential.getTrustStorePath());
-//    	if (m_credential.getTrustStorePass() != null) {
-//    		p.put(ISecurityProperties.WSRF_SSL_TRUSTPASS, m_credential.getTrustStorePass());
-//    	}
+//    	Properties p = new Properties();
     	
     	try {
-			m_uassecprop = new UASSecurityProperties(p);
+			m_uassecprop = new UnicoreSecurityProperties(m_credential);
 		} catch (UnrecoverableKeyException e) {
 			throw new AuthenticationFailedException(e);
 		} catch (KeyStoreException e) {
@@ -104,17 +93,17 @@ public abstract class UnicoreAbstract implements ClientAdaptor {
 			throw new NoSuccessException(e);
 		}
 
-        m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL, "true");
-        m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL_CLIENTAUTH, "true");
-
-        //keystore and truststore locations
-        m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL_KEYSTORE, m_credential.getKeyStorePath());
-        m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL_KEYPASS, m_credential.getKeyStorePass());
-        m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL_KEYALIAS, m_credential.getKeyStoreAlias());
-        m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL_TRUSTSTORE, m_credential.getTrustStorePath());
-        if (m_credential.getTrustStorePass() != null) {
-                m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL_TRUSTPASS, m_credential.getTrustStorePass());
-        }
+//        m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL, "true");
+//        m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL_CLIENTAUTH, "true");
+//
+//        //keystore and truststore locations
+//        m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL_KEYSTORE, m_credential.getKeyStorePath());
+//        m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL_KEYPASS, m_credential.getKeyStorePass());
+//        m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL_KEYALIAS, m_credential.getKeyStoreAlias());
+//        m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL_TRUSTSTORE, m_credential.getTrustStorePath());
+//        if (m_credential.getTrustStorePass() != null) {
+//                m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL_TRUSTPASS, m_credential.getTrustStorePass());
+//        }
 
         m_epr = EndpointReferenceType.Factory.newInstance();
 	    m_epr.addNewAddress().setStringValue(serverUrl);
