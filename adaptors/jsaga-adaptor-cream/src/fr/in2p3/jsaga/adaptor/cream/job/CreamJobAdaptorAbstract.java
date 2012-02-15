@@ -48,6 +48,10 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
         m_credential = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
         try {
             m_vo = credential.getAttribute(Context.USERVO);
+        } catch (Exception e) {
+            /* ignore */
+        }
+        try {
             m_certRepository = ((GSSCredentialSecurityCredential) credential).getCertRepository();
         } catch (Exception e) {
             /* ignore */
