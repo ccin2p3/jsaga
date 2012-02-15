@@ -19,21 +19,9 @@ public class UnicoreSecurityProperties extends UASSecurityProperties {
 		super(parent);
 	}
 
-	public UnicoreSecurityProperties(JKSSecurityCredential cred) throws UnrecoverableKeyException, KeyStoreException,
-	NoSuchAlgorithmException, CertificateException, IOException {
-//    	p.put(ISecurityProperties.WSRF_SSL_KEYSTORE, m_credential.getKeyStorePath());
-//    	p.put(ISecurityProperties.WSRF_SSL, "true");
-//    	p.put(ISecurityProperties.WSRF_SSL_CLIENTAUTH, "true");
-//		
-//        //keystore and truststore locations
-//    	p.put(ISecurityProperties.WSRF_SSL_KEYSTORE, m_credential.getKeyStorePath());
-//    	p.put(ISecurityProperties.WSRF_SSL_KEYPASS, m_credential.getKeyStorePass());
-//    	p.put(ISecurityProperties.WSRF_SSL_KEYALIAS, m_credential.getKeyStoreAlias());
-//    	p.put(ISecurityProperties.WSRF_SSL_TRUSTSTORE, m_credential.getTrustStorePath());
-//    	if (m_credential.getTrustStorePass() != null) {
-//    		p.put(ISecurityProperties.WSRF_SSL_TRUSTPASS, m_credential.getTrustStorePass());
-//    	}
-    	
+	public UnicoreSecurityProperties(JKSSecurityCredential cred) 
+			throws UnrecoverableKeyException, KeyStoreException,
+			NoSuchAlgorithmException, CertificateException, IOException {
 		super(new Properties());
 
         setProperty(ISecurityProperties.WSRF_SSL, "true");
