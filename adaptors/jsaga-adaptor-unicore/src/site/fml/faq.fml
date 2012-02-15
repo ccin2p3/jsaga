@@ -24,7 +24,7 @@
         <title>Execution management</title>
         <faq id="unicore-servers">
             <question>Which UNICORE server is compatible with this plugin ?</question>
-            <answer>The bes-unicore has been tested against UNICORE-6.4.0 and UNICORE-6.4.1. Before startup, the 'default_storage' 
+            <answer>The bes-unicore has been tested against UNICORE-6.4.1 and UNICORE-6.4.2-p2. Before startup, the 'default_storage' 
             resource needs to be started: in the file
             <pre>unicorex/conf/uas.config</pre>
             modify the variable:
