@@ -51,7 +51,7 @@ public class EngineProperties {
             //s_prop.setProperty(DATA_IMPLICIT_CLOSE_TIMEOUT, "-1");
             s_prop.setProperty(DATA_COPY_BUFFER_SIZE, "16384");
             s_prop.setProperty(DATA_ATTRIBUTES_CACHE_LIFETIME, "60000");
-            s_prop.setProperty(JOB_MONITOR_POLL_PERIOD, "1000");
+            s_prop.setProperty(JOB_MONITOR_POLL_PERIOD, "60000");
             s_prop.setProperty(JOB_MONITOR_ERROR_THRESHOLD, "3");
             s_prop.setProperty(JOB_CONTROL_CHECK_AVAILABILITY, "false");
             s_prop.setProperty(JOB_CONTROL_CHECK_MATCH, "false");
