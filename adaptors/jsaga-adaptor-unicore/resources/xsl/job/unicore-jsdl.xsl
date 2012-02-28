@@ -4,7 +4,8 @@
                 xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
                 xmlns:posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
                 xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
-                xmlns:jsaga="http://www.in2p3.fr/jsdl-extension">
+                xmlns:jsaga="http://www.in2p3.fr/jsdl-extension"
+                xmlns:unicore="http://www.unicore.eu/unicore/jsdl-extensions">
 	<xsl:output method="xml"/>
 	
 	<!-- JSAGA parameters -->
@@ -50,6 +51,35 @@
           </xsl:otherwise>
         </xsl:choose>
       </jsaga:DataStaging>
+	</xsl:template>
+
+	<xsl:template match="jsdl:Resources">
+	  <xsl:copy>
+			<xsl:if test="../jsdl:Application/spmd:SPMDApplication/spmd:NumberOfProcesses">
+				<jsdl:IndividualCPUCount>
+					<jsdl:Exact><xsl:value-of select="../jsdl:Application/spmd:SPMDApplication/spmd:NumberOfProcesses/text()"/></jsdl:Exact>
+				</jsdl:IndividualCPUCount>
+				<jsdl:TotalResourceCount>
+					<jsdl:Exact>1</jsdl:Exact>
+				</jsdl:TotalResourceCount>
+			</xsl:if>
+	  </xsl:copy>
+	  <xsl:if test="../jsdl:Application/spmd:SPMDApplication">
+	  	<unicore:ExecutionEnvironment>
+	  		<xsl:if test="../jsdl:Application/spmd:SPMDApplication/spmd:SPMDVariation">
+	  			<unicore:Name><xsl:value-of select="../jsdl:Application/spmd:SPMDApplication/spmd:SPMDVariation/text()"/></unicore:Name>
+	  		</xsl:if>
+	  		<xsl:if test="../jsdl:Application/spmd:SPMDApplication/spmd:NumberOfProcesses">
+	  			<unicore:Argument>
+	  				<unicore:Name>Processes</unicore:Name>
+	  				<unicore:Value><xsl:value-of select="../jsdl:Application/spmd:SPMDApplication/spmd:NumberOfProcesses/text()"/></unicore:Value>
+	  			</unicore:Argument>
+	  		</xsl:if>
+	  	</unicore:ExecutionEnvironment>
+	  </xsl:if>
+	</xsl:template>
+
+	<xsl:template match="spmd:SPMDApplication">
 	</xsl:template>
 
 </xsl:stylesheet>
