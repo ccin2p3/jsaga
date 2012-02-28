@@ -97,9 +97,8 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 			throws PermissionDeniedException, TimeoutException,
 			NoSuccessException, BadResource {
 		try {
-			logger.debug("** Job description **");
-			logger.debug(jobDesc);
 			JobDefinitionType jdt = JobDefinitionDocument.Factory.parse(jobDesc).getJobDefinition();
+			logger.debug(jdt.toString());
 			String jobType;
 			try {
 				jobType = jdt.getJobDescription().getJobIdentification().getJobProjectArray(0);
