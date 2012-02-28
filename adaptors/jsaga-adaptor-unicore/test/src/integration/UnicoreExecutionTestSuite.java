@@ -64,7 +64,7 @@ public class UnicoreExecutionTestSuite extends JSAGATestSuite {
         public void test_run_MPI() throws Exception {
             
         	Attribute[] attributes = new Attribute[3];
-        	attributes[0] = new Attribute(JobDescription.SPMDVARIATION, "http://www.ogf.org/jsdl/2007/02/jsdl-spmd/OpenMPI");
+        	attributes[0] = new Attribute(JobDescription.SPMDVARIATION, "OpenMPI");
         	attributes[1] = new Attribute(JobDescription.NUMBEROFPROCESSES, "4");
         	attributes[2] = new Attribute(JobDescription.PROCESSESPERHOST, "2");
         	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
