@@ -52,6 +52,10 @@ public class UnicoreJob {
 		try {
 			m_client.waitUntilReady(600000); // 10mn
 		} catch (Exception e) {
+			String msg = e.getMessage();
+			if (msg.startsWith("Job is already done")) {
+				throw new NoSuccessException(e);
+			}
 			throw new TimeoutException("Job was not READY after 10mn");
 		} 
 		try {
