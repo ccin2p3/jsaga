@@ -55,13 +55,14 @@
 
 	<xsl:template match="jsdl:Resources">
 	  <xsl:copy>
-			<xsl:if test="../jsdl:Application/spmd:SPMDApplication/spmd:NumberOfProcesses">
+	    	<xsl:apply-templates select="@* | node()"/>
+			<xsl:if test="../jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost">
 				<jsdl:IndividualCPUCount>
-					<jsdl:Exact><xsl:value-of select="../jsdl:Application/spmd:SPMDApplication/spmd:NumberOfProcesses/text()"/></jsdl:Exact>
+					<jsdl:Exact><xsl:value-of select="../jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost/text()"/></jsdl:Exact>
 				</jsdl:IndividualCPUCount>
-				<jsdl:TotalResourceCount>
+				<!-- <jsdl:TotalResourceCount>
 					<jsdl:Exact>1</jsdl:Exact>
-				</jsdl:TotalResourceCount>
+				</jsdl:TotalResourceCount>-->
 			</xsl:if>
 	  </xsl:copy>
 	  <xsl:if test="../jsdl:Application/spmd:SPMDApplication">
