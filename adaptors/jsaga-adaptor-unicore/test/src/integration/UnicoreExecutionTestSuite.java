@@ -63,11 +63,12 @@ public class UnicoreExecutionTestSuite extends JSAGATestSuite {
         public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
         public void test_run_MPI() throws Exception {
             
-        	Attribute[] attributes = new Attribute[4];
+        	Attribute[] attributes = new Attribute[5];
         	attributes[0] = new Attribute(JobDescription.SPMDVARIATION, "OpenMPI");
         	attributes[1] = new Attribute(JobDescription.NUMBEROFPROCESSES, "4");
         	attributes[2] = new Attribute(JobDescription.PROCESSESPERHOST, "2");
         	attributes[3] = new Attribute(JobDescription.TOTALCPUCOUNT, "2");
+        	attributes[4] = new Attribute(JobDescription.THREADSPERPROCESS, "3");
         	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
         	
         	// submit

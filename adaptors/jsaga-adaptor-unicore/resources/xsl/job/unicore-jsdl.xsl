@@ -72,15 +72,30 @@
 	  		</xsl:if>
 	  		<xsl:if test="../jsdl:Application/spmd:SPMDApplication/spmd:NumberOfProcesses">
 	  			<unicore:Argument>
-	  				<unicore:Name>Processes</unicore:Name>
+	  				<unicore:Name>NumberOfProcesses</unicore:Name>
 	  				<unicore:Value><xsl:value-of select="../jsdl:Application/spmd:SPMDApplication/spmd:NumberOfProcesses/text()"/></unicore:Value>
 	  			</unicore:Argument>
 	  		</xsl:if>
+	  		<xsl:if test="../jsdl:Application/spmd:SPMDApplication/spmd:ThreadsPerProcess">
+	  			<unicore:Argument>
+	  				<unicore:Name>ThreadsPerProcess</unicore:Name>
+	  				<unicore:Value><xsl:value-of select="../jsdl:Application/spmd:SPMDApplication/spmd:ThreadsPerProcess/text()"/></unicore:Value>
+	  			</unicore:Argument>
+	  		</xsl:if>
+	  		<xsl:if test="../jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost">
+	  			<unicore:Argument>
+	  				<unicore:Name>ProcessesPerHost</unicore:Name>
+	  				<unicore:Value><xsl:value-of select="../jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost/text()"/></unicore:Value>
+	  			</unicore:Argument>
+	  		</xsl:if>
+	  		<!-- TODO
+	  		<unicore:UserPreCommand>XXX</unicore:UserPreCommand>
+	  		 -->
 	  	</unicore:ExecutionEnvironment>
 	  </xsl:if>
 	</xsl:template>
 
-	<xsl:template match="spmd:SPMDApplication">
-	</xsl:template>
+	<!-- <xsl:template match="spmd:SPMDApplication">
+	</xsl:template> -->
 
 </xsl:stylesheet>
