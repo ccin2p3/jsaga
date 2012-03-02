@@ -61,7 +61,8 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 
         // set SSL_CA_FILES
         System.setProperty(SSL_CA_FILES, m_certRepository.getPath() + "/*.0");
-
+        System.setProperty("crlEnabled", "false");
+        
         // extract parameters from basePath
         Matcher m = Pattern.compile("/cream-(.*)-(.*)").matcher(basePath);
         if (m.matches()) {
