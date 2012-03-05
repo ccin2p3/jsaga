@@ -4,6 +4,7 @@ import junit.framework.Test;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.permissions.PermissionsTest;
+import org.ogf.saga.url.URL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -41,6 +42,17 @@ public class SRMIntegrationTestSuite extends JSAGATestSuite {
     }
     public static class SRMFileReadTest extends FileReadTest {
         public SRMFileReadTest() throws Exception {super("srm");}
+        /*
+        public void test_size_2GB() throws Exception {
+        	// this test only works with srm.base.url=srm://ccsrm02.in2p3.fr:8443/pnfs/in2p3.fr/data/dteam/JSAGA/
+        	long size = 2150643248L;
+        	URL file2BGURL = createURL(m_dirUrl, "../2BG.data");
+            NSEntry file2BG = m_dir.open(file2BGURL, Flags.READ.getValue());
+            assertEquals(
+                    size,
+                    ((File)file2BG).getSize());
+        }
+        */
     }
     public static class SRMFileWriteTest extends FileWriteTest {
         public SRMFileWriteTest() throws Exception {super("srm");}

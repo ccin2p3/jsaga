@@ -13,7 +13,7 @@
             <action dev="lschwarz" type="update">Implementation of data staging for BES adaptor for Unicore</action>
             <action dev="lschwarz" type="update">Separate job service attributes from data service attributes</action>
             <action dev="lschwarz" type="update">Deprecated adaptor for unicore6 has been removed</action>
-            <action dev="lschwarz" type="update">Support of asynchronous SRM LS</action>
+            <action dev="lschwarz" type="update">Support of asynchronous SRM LS and fix for file size > 2GB</action>
             <action dev="lschwarz" type="fix">Removed explicit filename encoding in SFTP adaptor</action>
             <action dev="lschwarz" type="fix">Fixed various bugs in GridFTP adaptor</action>
             <action dev="lschwarz" type="update">Upgrade cog-jglobus library from 1.4 to 1.8</action>

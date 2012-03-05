@@ -49,7 +49,7 @@ public class SRM22FileAttributes extends FileAttributes {
 
     public long getSize() {
         if (m_entry.getSize() != null) {
-            return m_entry.getSize().intValue();
+            return m_entry.getSize().longValue();
         } else {
             return SIZE_UNKNOWN;
         }
