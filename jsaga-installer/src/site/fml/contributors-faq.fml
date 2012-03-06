@@ -7,7 +7,7 @@
             <answer>
                 <ul>
                     <li>Install <a href="http://java.sun.com/j2se/1.5/download.html">JDK 1.5</a> (or above)</li>
-                    <li>Install <a href="http://maven.apache.org/download.html">Maven 2.2.1</a> (or above)</li>
+                    <li>Install <a href="http://maven.apache.org/download.html">Maven 2.2.1</a></li>
                 </ul>
             </answer>
         </faq>
