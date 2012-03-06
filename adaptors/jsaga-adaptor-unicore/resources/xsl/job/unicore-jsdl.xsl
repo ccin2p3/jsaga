@@ -95,7 +95,7 @@
 	  </xsl:if>
 	</xsl:template>
 
-	<!-- <xsl:template match="spmd:SPMDApplication">
-	</xsl:template> -->
+	<xsl:template match="spmd:SPMDApplication">
+	</xsl:template>
 
 </xsl:stylesheet>
