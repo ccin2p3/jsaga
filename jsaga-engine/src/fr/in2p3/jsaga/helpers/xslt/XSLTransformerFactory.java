@@ -35,8 +35,8 @@ public class XSLTransformerFactory {
         return _instance;
     }
     private XSLTransformerFactory() {
-        // force using XALAN because SAXON is too restrictive for stylesheet jsaga-default-contexts-merge.xsl
-        System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
+        // force using TRAX because SAXON is too restrictive for stylesheet jsaga-default-contexts-merge.xsl
+        System.setProperty("javax.xml.transform.TransformerFactory", "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
         m_factory = TransformerFactory.newInstance();
         m_templatesMap = new HashMap();
         m_debugBaseDir = new File(Base.JSAGA_VAR, "debug");
