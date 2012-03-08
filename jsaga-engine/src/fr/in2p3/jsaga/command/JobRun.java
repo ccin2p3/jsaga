@@ -130,6 +130,9 @@ public class JobRun extends AbstractCommand {
                             }
                         } else if (State.FAILED.compareTo(state) == 0) {
                             try {
+                                if ("true".equalsIgnoreCase(desc.getAttribute(JobDescription.INTERACTIVE))) {
+                                    copyStream(job.getStderr(), System.err);
+                                }
                                 String exitCode = job.getAttribute(Job.EXITCODE);
                                 System.out.println("Job failed with exit code: "+exitCode);
                             } catch(SagaException e) {
