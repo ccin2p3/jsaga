@@ -8,7 +8,7 @@ import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.log4j.Logger;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.components.crypto.CertificateStore;
+//import org.apache.ws.security.components.crypto.CertificateStore;
 import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecUsernameToken;
@@ -258,21 +258,21 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 	/**
 	 * @deprecated
 	 */
-	private SOAPHeaderElement buildEncryptedKey() throws Exception {
-	    String secextNS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
-		WSSecEncryptedKey token = new WSSecEncryptedKey();
-		token.setUseThisCert(m_credential.getCertificate()); 
-		token.setUserInfo(m_credential.getUserID());
-        SOAPHeaderElement wsseSecurity = new SOAPHeaderElement(new org.apache.axis.message.PrefixedQName(secextNS,"Security", "wsse"));
-        WSSecHeader secHeader = new WSSecHeader();
-        Document doc = wsseSecurity.getAsDocument();
-        secHeader.setMustUnderstand(true);
-        secHeader.setActor("http://schemas.xmlsoap.org/soap/actor/next");
-        secHeader.insertSecurityHeader(doc);
-        token.prepare(doc, new CertificateStore(new X509Certificate[]{m_credential.getCertificate()}));
-        token.appendToHeader(secHeader);
-        return new SOAPHeaderElement(secHeader.getSecurityHeader());
-	}
+//	private SOAPHeaderElement buildEncryptedKey() throws Exception {
+//	    String secextNS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+//		WSSecEncryptedKey token = new WSSecEncryptedKey();
+//		token.setUseThisCert(m_credential.getCertificate()); 
+//		token.setUserInfo(m_credential.getUserID());
+//        SOAPHeaderElement wsseSecurity = new SOAPHeaderElement(new org.apache.axis.message.PrefixedQName(secextNS,"Security", "wsse"));
+//        WSSecHeader secHeader = new WSSecHeader();
+//        Document doc = wsseSecurity.getAsDocument();
+//        secHeader.setMustUnderstand(true);
+//        secHeader.setActor("http://schemas.xmlsoap.org/soap/actor/next");
+//        secHeader.insertSecurityHeader(doc);
+//        token.prepare(doc, new CertificateStore(new X509Certificate[]{m_credential.getCertificate()}));
+//        token.appendToHeader(secHeader);
+//        return new SOAPHeaderElement(secHeader.getSecurityHeader());
+//	}
 
 	/**
 	 * @deprecated
