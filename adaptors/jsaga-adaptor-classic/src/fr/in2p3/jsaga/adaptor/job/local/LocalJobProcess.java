@@ -143,7 +143,7 @@ public class LocalJobProcess implements Serializable {
 	public Date getStarted() throws NoSuccessException {
 		long startTime = new File(this.getPidfile()).lastModified();
 		if (startTime == 0) {
-			throw new NoSuccessException("Could not get time of " + this.getPidfile());
+			return null;
 		}
 		return new Date(startTime);
 	}
@@ -151,7 +151,7 @@ public class LocalJobProcess implements Serializable {
 	public Date getFinished() throws NoSuccessException {
 		long endTime = new File(this.getEndcodefile()).lastModified();
 		if (endTime == 0) {
-			throw new NoSuccessException("Could not get time of " + this.getEndcodefile());
+			return null;
 		}
 		return new Date(endTime);
 	}
