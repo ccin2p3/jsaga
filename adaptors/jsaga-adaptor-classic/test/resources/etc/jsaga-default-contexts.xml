@@ -11,6 +11,7 @@
             <attribute name="KeystorePass" value="changeit"/>
         </context>
         <context type="UserPassStore">
+            <attribute name="StoreFile" value="${user.home}/.jsaga/contexts/userpassstore/netrc"/>
         </context>
         <context type="None">
             <job type="local">
