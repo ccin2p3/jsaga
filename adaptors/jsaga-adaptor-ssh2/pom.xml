@@ -41,9 +41,9 @@
             <scope>provided</scope>
         </dependency>
 		<dependency>
-		    <groupId>org.jvnet.hudson</groupId>
+		    <groupId>com.googlecode.ganymed-ssh-2</groupId>
 		    <artifactId>ganymed-ssh-2</artifactId>
-		    <version>build260</version>
+		    <version>260</version>
 		</dependency>
         <!-- 
         <dependency>

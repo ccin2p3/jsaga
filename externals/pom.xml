@@ -29,6 +29,7 @@
         <module>cryptix32</module>
         <module>dbus-java</module>
         <module>file-system</module>
+        <module>ganymed-ssh-2</module>
         <module>glite-security</module>
         <module>glite-jdl-api-java</module>
         <module>glite-wms-wmproxy-api-java</module>
