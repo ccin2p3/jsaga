@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.job.staging;
 
+import org.apache.commons.codec.binary.Base64;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.*;
@@ -7,7 +8,6 @@ import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
-import sun.misc.BASE64Decoder;
 
 import java.io.*;
 
@@ -71,7 +71,7 @@ public class OutputDataStagingFromWorker extends AbstractDataStagingWorker {
                 encoded.append(line);
                 encoded.append('\n');
             }
-            return new BASE64Decoder().decodeBuffer(encoded.toString());
+            return Base64.decodeBase64(encoded.toString());
         } catch (IOException e) {
             throw new NoSuccessException(e);
         }

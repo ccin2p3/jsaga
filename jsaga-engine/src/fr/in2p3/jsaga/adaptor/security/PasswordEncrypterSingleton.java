@@ -1,10 +1,11 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import sun.misc.BASE64Encoder;
-
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.commons.codec.binary.Base64;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.security.Key;
@@ -53,7 +54,7 @@ public class PasswordEncrypterSingleton extends PasswordAbstract {
         Cipher cipher = Cipher.getInstance(CIPHER);
         cipher.init(Cipher.ENCRYPT_MODE, m_key);
         byte[] crypted = cipher.doFinal(uncrypted.getBytes());
-        return new BASE64Encoder().encode(crypted);
+        return Base64.encodeBase64String(crypted);
     }
 
     public static int getExpiryDate(int lifetime) {

@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.security;
 
+import org.apache.commons.codec.binary.Base64;
 import org.ogf.saga.error.BadParameterException;
-import sun.misc.BASE64Decoder;
 
 import javax.crypto.Cipher;
 
@@ -38,7 +38,7 @@ public class PasswordDecrypterSingleton extends PasswordAbstract {
     }
 
     public String decrypt(String cryptedBase64) throws Exception {
-        byte[] crypted = new BASE64Decoder().decodeBuffer(cryptedBase64);
+        byte[] crypted = Base64.decodeBase64(cryptedBase64);
         Cipher cipher = Cipher.getInstance(CIPHER);
         cipher.init(Cipher.DECRYPT_MODE, m_key);
         byte[] decrypted = cipher.doFinal(crypted);

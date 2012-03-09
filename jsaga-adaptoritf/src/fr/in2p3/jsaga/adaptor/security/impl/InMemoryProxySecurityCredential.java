@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security.impl;
 
+import org.apache.commons.codec.binary.Base64;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.NoSuccessException;
@@ -40,7 +41,9 @@ public class InMemoryProxySecurityCredential extends GSSCredentialSecurityCreden
             out.writeObject(proxy);
             out.close();
             byte[] buffer = bytes.toByteArray();
-            return new sun.misc.BASE64Encoder().encodeBuffer(buffer);
+//            new org.apache.commons.codec.binary.Base64();
+			return Base64.encodeBase64String(buffer);
+            //return new sun.misc.BASE64Encoder().encodeBuffer(buffer);
         } catch (IOException e) {
             throw new NoSuccessException(e);
         }
@@ -48,7 +51,9 @@ public class InMemoryProxySecurityCredential extends GSSCredentialSecurityCreden
 
     public static GSSCredential toGSSCredential(String base64) throws NoSuccessException {
         try {
-            byte[] buffer = new sun.misc.BASE64Decoder().decodeBuffer(base64);
+//        	new org.apache.commons.codec.binary.Base64();
+			//            byte[] buffer = new sun.misc.BASE64Decoder().decodeBuffer(base64);
+        	byte[] buffer = Base64.decodeBase64(base64);
             ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buffer));
             GSSCredential cred = (GSSCredential) in.readObject();
             in.close();
