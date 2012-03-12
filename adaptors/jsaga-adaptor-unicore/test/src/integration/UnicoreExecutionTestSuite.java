@@ -67,7 +67,7 @@ public class UnicoreExecutionTestSuite extends JSAGATestSuite {
         	attributes[0] = new Attribute(JobDescription.SPMDVARIATION, "OpenMPI");
         	attributes[1] = new Attribute(JobDescription.NUMBEROFPROCESSES, "4");
         	attributes[2] = new Attribute(JobDescription.PROCESSESPERHOST, "2");
-        	attributes[3] = new Attribute(JobDescription.TOTALCPUCOUNT, "2");
+        	attributes[3] = new Attribute(JobDescription.TOTALCPUCOUNT, "4");
         	attributes[4] = new Attribute(JobDescription.THREADSPERPROCESS, "3");
         	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
         	

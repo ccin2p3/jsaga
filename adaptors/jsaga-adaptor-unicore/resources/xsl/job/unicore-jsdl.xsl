@@ -60,9 +60,13 @@
 				<jsdl:IndividualCPUCount>
 					<jsdl:Exact><xsl:value-of select="../jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost/text()"/></jsdl:Exact>
 				</jsdl:IndividualCPUCount>
-				<!-- <jsdl:TotalResourceCount>
-					<jsdl:Exact>1</jsdl:Exact>
-				</jsdl:TotalResourceCount>-->
+				<xsl:if test="../jsdl:Application/spmd:SPMDApplication/spmd:NumberOfProcesses">
+					<jsdl:TotalResourceCount>
+						<jsdl:Exact>
+							<xsl:value-of select="../jsdl:Application/spmd:SPMDApplication/spmd:NumberOfProcesses/text() div ../jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost/text()"/>
+						</jsdl:Exact>
+					</jsdl:TotalResourceCount>
+				</xsl:if>
 			</xsl:if>
 	  </xsl:copy>
 	  <xsl:if test="../jsdl:Application/spmd:SPMDApplication">
@@ -73,6 +77,10 @@
 	  		<xsl:if test="../jsdl:Application/spmd:SPMDApplication/spmd:NumberOfProcesses">
 	  			<unicore:Argument>
 	  				<unicore:Name>NumberOfProcesses</unicore:Name>
+	  				<unicore:Value><xsl:value-of select="../jsdl:Application/spmd:SPMDApplication/spmd:NumberOfProcesses/text()"/></unicore:Value>
+	  			</unicore:Argument>
+	  			<unicore:Argument>
+	  				<unicore:Name>Processes</unicore:Name>
 	  				<unicore:Value><xsl:value-of select="../jsdl:Application/spmd:SPMDApplication/spmd:NumberOfProcesses/text()"/></unicore:Value>
 	  			</unicore:Argument>
 	  		</xsl:if>

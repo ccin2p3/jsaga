@@ -32,6 +32,9 @@ import de.fzj.unicore.uas.client.JobClient;
 import de.fzj.unicore.uas.client.TSFClient;
 import de.fzj.unicore.uas.client.TSSClient;
 import de.fzj.unicore.wsrflite.xmlbeans.BaseFault;
+import de.fzj.unicore.xnjs.util.XmlBeansUtils;
+import eu.unicore.jsdl.extensions.ArgumentDocument.Argument;
+import eu.unicore.jsdl.extensions.ExecutionEnvironmentDocument;
 
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
@@ -99,6 +102,20 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 		try {
 			JobDefinitionType jdt = JobDefinitionDocument.Factory.parse(jobDesc).getJobDefinition();
 			logger.debug(jdt.toString());
+			try {
+				Double totalCPUCount = jdt.getJobDescription().getResources().getTotalCPUCount().getExactArray(0).getDoubleValue();
+				XmlObject eObj=XmlBeansUtils.extractFirstAnyElement(jdt, ExecutionEnvironmentDocument.type.getDocumentElementName());
+				ExecutionEnvironmentDocument eed=(ExecutionEnvironmentDocument)eObj;
+				for (Argument arg : eed.getExecutionEnvironment().getArgumentArray()) {
+					if ( arg.getName().equals("NumberOfProcesses") || arg.getName().equals("Processes")) {
+						if (totalCPUCount != new Double(arg.getValue())) {
+							throw new BadResource("incompatible values TOTALCPUCOUNT and NUMBEROFPROCESSES");
+						}
+					}
+				}
+			} catch (NullPointerException e) {
+				// ignore
+			}
 			String jobType;
 			try {
 				jobType = jdt.getJobDescription().getJobIdentification().getJobProjectArray(0);
