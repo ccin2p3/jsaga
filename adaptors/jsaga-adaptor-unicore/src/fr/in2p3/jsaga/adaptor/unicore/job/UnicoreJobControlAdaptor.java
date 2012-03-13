@@ -108,7 +108,7 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 				ExecutionEnvironmentDocument eed=(ExecutionEnvironmentDocument)eObj;
 				for (Argument arg : eed.getExecutionEnvironment().getArgumentArray()) {
 					if ( arg.getName().equals("NumberOfProcesses") || arg.getName().equals("Processes")) {
-						if (totalCPUCount != new Double(arg.getValue())) {
+						if (totalCPUCount != new Double(arg.getValue()).doubleValue()) {
 							throw new BadResource("incompatible values TOTALCPUCOUNT and NUMBEROFPROCESSES");
 						}
 					}
