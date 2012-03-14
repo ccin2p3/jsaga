@@ -7,6 +7,7 @@ import junit.framework.Test;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.job.*;
 import org.ogf.saga.job.abstracts.Attribute;
+import org.ogf.saga.job.abstracts.AttributeVector;
 import org.ogf.saga.task.State;
 
 /* ***************************************************
@@ -69,7 +70,9 @@ public class UnicoreExecutionTestSuite extends JSAGATestSuite {
         	attributes[2] = new Attribute(JobDescription.PROCESSESPERHOST, "2");
         	attributes[3] = new Attribute(JobDescription.TOTALCPUCOUNT, "4");
         	attributes[4] = new Attribute(JobDescription.THREADSPERPROCESS, "3");
-        	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
+        	AttributeVector[] vAttributes = new AttributeVector[1];
+        	vAttributes[0] = new AttributeVector("Extension", new String[]{"UserPreCommand=mpicc job.c"});
+        	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, vAttributes);
         	
         	// submit
             Job job = runJob(desc);

@@ -96,9 +96,11 @@
 	  				<unicore:Value><xsl:value-of select="../jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost/text()"/></unicore:Value>
 	  			</unicore:Argument>
 	  		</xsl:if>
-	  		<!-- TODO
-	  		<unicore:UserPreCommand>XXX</unicore:UserPreCommand>
-	  		 -->
+	  		<xsl:if test="../jsdl:JobIdentification/UserPreCommand">
+	  			<unicore:UserPreCommand>
+	  				<xsl:value-of select="../jsdl:JobIdentification/UserPreCommand/text()"/>
+	  			</unicore:UserPreCommand>
+	  		</xsl:if>
 	  	</unicore:ExecutionEnvironment>
 	  </xsl:if>
 	</xsl:template>
