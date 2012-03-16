@@ -31,7 +31,7 @@ public class GsiftpOutputStream extends GridFTPOutputStream {
 		} catch (IOException e) {
 			// when socket is already closed, ignore it
 			// use getMessage() because buggy getCause() returns null
-			if (!(e.getMessage().toLowerCase().contains("socket closed"))) {
+			if (e.getMessage()==null || !e.getMessage().toLowerCase().contains("socket closed")) {
 				throw e;
 			}
 		}
