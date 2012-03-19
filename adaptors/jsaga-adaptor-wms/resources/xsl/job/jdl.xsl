@@ -74,7 +74,7 @@ Requirements = true <xsl:text/>
         <xsl:for-each select="jsdl:Resources/jsdl:TotalCPUTime/jsdl:UpperBoundedRange/text()">
 &amp;&amp; other.GlueCEPolicyMaxCPUTime >= <xsl:value-of select="."/> <xsl:text/>
         </xsl:for-each>
-        <xsl:for-each select="jsdl:Resources/jsdl:WallTimeLimit/jsdl:UpperBoundedRange/text()">
+        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WallTimeLimit/text()">
 &amp;&amp; other.GlueCEPolicyMaxWallClockTime >= <xsl:value-of select="."/> <xsl:text/>
         </xsl:for-each>
 		<xsl:for-each select="jsdl:Resources/jsdl:TotalPhysicalMemory/jsdl:UpperBoundedRange/text()">
