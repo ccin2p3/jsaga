@@ -19,6 +19,7 @@
             	<attribute name="ReferenceParameterValue" value="FC59F12A-CA13-79C0-3C7A-318435C6C49F"/>
             </job>
             <include host="i134r" domain="idp.iu.futuregrid.org"/>
+            <include host="129.114.32.10"/>
         </context>
         <context type="AxisJKS" id="Unicore-Sierra">
             <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
