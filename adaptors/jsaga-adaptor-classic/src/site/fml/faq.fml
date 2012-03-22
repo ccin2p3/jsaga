@@ -39,7 +39,7 @@
             <answer>The certificate and the key should be in a PKCS12 (.p12) file. You can use
             the JKSImportCert utility provided with JSAGA:
                  <pre>java -Djavax.net.ssl.keyStore=mykeystore.jks -Djavax.net.ssl.keyStorePassword=YOUR_KEYSTORE_PASSWORD \
-	java -cp $JSAGA_HOME/lib-adaptors/jsaga-adaptor-classic-*.jar \
+	-cp $JSAGA_HOME/lib-adaptors/jsaga-adaptor-classic-*.jar \
 	fr.in2p3.jsaga.adaptor.security.JKSImportCert mycert.p12 YOUR_PKCS12_PASSPHRASE
      			</pre>
 Remember to choose a password with at least 6 characters for your keystore.
