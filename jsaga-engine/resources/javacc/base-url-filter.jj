@@ -53,6 +53,8 @@ BaseUrlItem[] parse(): {
                     (postHost=<STAR>)?           { result.set(1, new HostItem(host.toString(), preHost, postHost)); }
                 )
             |   preHost=<STAR>
+            |   host=<NUMBER><SEP_DOMAIN><NUMBER><SEP_DOMAIN><NUMBER><SEP_DOMAIN><NUMBER>
+                                                 { result.set(1, new HostItem(host.toString(), null, null)); }
             )
             (   <SEP_DOMAIN>
                 (   (   (preDomain=<STAR>)?
