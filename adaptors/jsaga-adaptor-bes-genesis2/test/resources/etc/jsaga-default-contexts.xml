@@ -11,7 +11,7 @@
         <context type="AxisJKS" id="GenesisII-alamo">
             <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
             <job type="bes-genesis2">
-            	<attribute name="ReferenceParameterValue" value="40D784B8-9611-D69E-929E-9EE716D5783E"/>
+            	<attribute name="ReferenceParameterValue" value="963FEE3C-F27B-8E9A-A407-ED48B76EA50E"/>
             </job>
             <include host="129.114.32.10"/>
         </context>

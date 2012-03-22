@@ -24,9 +24,9 @@
         <context type="AxisJKS" id="GenesisII-Alamo">
             <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
             <job type="bes">
-            	<!-- <attribute name="ReferenceParameterNS" value="http://edu.virginia.vcgr.genii/ref-params"/>
+            	<attribute name="ReferenceParameterNS" value="http://edu.virginia.vcgr.genii/ref-params"/>
             	<attribute name="ReferenceParameterName" value="resource-key"/>
-            	<attribute name="ReferenceParameterValue" value="FC59F12A-CA13-79C0-3C7A-318435C6C49F"/> -->
+            	<attribute name="ReferenceParameterValue" value="963FEE3C-F27B-8E9A-A407-ED48B76EA50E"/>
             </job>
             <include host="129.114.32.10"/>
         </context>
