@@ -1,8 +1,13 @@
 package fr.in2p3.jsaga.adaptor.bes_genesis2.job;
 
+import java.util.Map;
+
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
+
+import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 
 
@@ -24,6 +29,13 @@ public class BesGenesisIIJobControlAdaptor extends /*BesJobControlStagingOnePhas
 		return 18443;
 	}
 
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
+    	return new Default[]{
+    			new Default(ATTR_REF_PARAM_NS, "http://edu.virginia.vcgr.genii/ref-params"),
+    			new Default(ATTR_REF_PARAM_NAME, "resource-key"),
+    	};
+    }
+    
     protected String getJobDescriptionTranslatorFilename() throws NoSuccessException {
     	return "xsl/job/bes-genesis2-jsdl.xsl";
     }
