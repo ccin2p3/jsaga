@@ -22,6 +22,7 @@ import ch.ethz.ssh2.packets.TypesWriter;
 import ch.ethz.ssh2.sftp.AttribFlags;
 import ch.ethz.ssh2.sftp.ErrorCodes;
 import ch.ethz.ssh2.sftp.Packet;
+import java.util.Arrays;
 import java.util.TreeMap;
 
 /**
@@ -1368,7 +1369,6 @@ public class SFTPv3Client {
      * any status from the server
      */
     private static class OutstandingStatusRequest {
-
         int req_id;
     }
 
@@ -1385,7 +1385,7 @@ public class SFTPv3Client {
      * @throws IOException
      */
     public void write(SFTPv3FileHandle handle, long fileOffset, byte[] src, int srcoff, int len) throws IOException {
-        OutstandingStatusRequest req = submitWriteRequest(handle, fileOffset, src, srcoff, len);
+        OutstandingStatusRequest req = submitWriteRequest(handle, fileOffset, Arrays.copyOf(src, src.length), srcoff, len);
         //Message msg = receiveAMessage();
         //proccesWriteMessage(req, msg);
         // recieveAndProcessWriteMsg();
@@ -1395,9 +1395,13 @@ public class SFTPv3Client {
             recieveAndProcessWriteMsg();
         }
     }
+    
+    //private int aniticipatedReadRequests = 32;
     private int concurentWriteRequests = 32;
     private Map<Integer, OutstandingStatusRequest> writeRequests = new TreeMap<Integer, OutstandingStatusRequest>();
+    //private Map<Integer, OutstandingReadRequest> readRequests = new TreeMap<Integer, OutstandingReadRequest>();
 
+    
     public void setConcurentWriteRequests(int concurentWriteRequests) {
         this.concurentWriteRequests = concurentWriteRequests;
     }
