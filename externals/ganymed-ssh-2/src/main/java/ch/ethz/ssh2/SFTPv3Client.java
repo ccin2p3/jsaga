@@ -22,6 +22,7 @@ import ch.ethz.ssh2.packets.TypesWriter;
 import ch.ethz.ssh2.sftp.AttribFlags;
 import ch.ethz.ssh2.sftp.ErrorCodes;
 import ch.ethz.ssh2.sftp.Packet;
+import java.util.TreeMap;
 
 /**
  * A
@@ -252,6 +253,9 @@ public class SFTPv3Client {
 
     private int generateNextRequestID() {
         synchronized (this) {
+            if (next_request_id == Integer.MAX_VALUE) {
+                next_request_id = 0;
+            }
             return next_request_id++;
         }
     }
@@ -1358,6 +1362,7 @@ public class SFTPv3Client {
         return proccessReadMessage(req, tr);
     }
 
+    //private SFTPv3FileHandle readingHandle
     /**
      * A read is divided into multiple requests sent sequentially before reading
      * any status from the server
@@ -1381,8 +1386,26 @@ public class SFTPv3Client {
      */
     public void write(SFTPv3FileHandle handle, long fileOffset, byte[] src, int srcoff, int len) throws IOException {
         OutstandingStatusRequest req = submitWriteRequest(handle, fileOffset, src, srcoff, len);
-        Message message = receiveAMessage();
-        proccesWriteMessage(req, message);
+        //Message msg = receiveAMessage();
+        //proccesWriteMessage(req, msg);
+        // recieveAndProcessWriteMsg();
+        writeRequests.put(req.req_id, req);
+
+        while (writeRequests.size() >= concurentWriteRequests) {
+            recieveAndProcessWriteMsg();
+        }
+    }
+    private int concurentWriteRequests = 32;
+    private Map<Integer, OutstandingStatusRequest> writeRequests = new TreeMap<Integer, OutstandingStatusRequest>();
+
+    public void setConcurentWriteRequests(int concurentWriteRequests) {
+        this.concurentWriteRequests = concurentWriteRequests;
+    }
+
+    private void recieveAndProcessWriteMsg() throws IOException {
+        Message msg = receiveAMessage();
+        OutstandingStatusRequest req = writeRequests.remove(msg.reqestId);
+        proccesWriteMessage(req, msg);
     }
 
     /**
@@ -1393,6 +1416,10 @@ public class SFTPv3Client {
      */
     public void closeFile(SFTPv3FileHandle handle) throws IOException {
         try {
+            while (!writeRequests.isEmpty()) {
+                recieveAndProcessWriteMsg();
+            }
+
             if (!handle.isClosed) {
                 closeHandle(handle.fileHandle);
             }
