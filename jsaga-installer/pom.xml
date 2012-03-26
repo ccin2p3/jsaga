@@ -119,6 +119,21 @@
                     </execution>
 
                     <execution>
+                        <id>generate-commands-web-page</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                        <configuration>
+                            <xslFile>src/site/xsl/commands.xsl</xslFile>
+                            <destDir>${project.build.directory}/generated-site/xdoc</destDir>
+                            <srcDir>assembly</srcDir>
+                            <srcIncludes>scripts.xml</srcIncludes>
+                            <fileNameRegex>scripts.xml</fileNameRegex>
+                            <fileNameReplacement>commands.xml</fileNameReplacement>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>generate-contributors-guide-web-page</id>
                         <phase>pre-site</phase>
                         <goals>
