@@ -129,6 +129,14 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
 			response = _bes_pt.terminateActivities(request);
 			TerminateActivityResponseType r = response.getResponse(0);
 			Logger.getLogger(BesJobControlAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(r));
+			try {
+				// Try to catch the "Access denied" error
+				String exception = r.getFault().getDetail().get_any()[0].getFirstChild().getNodeValue();
+				if (exception.contains("Access denied"))
+					throw new PermissionDeniedException(exception);
+			} catch (NullPointerException npe) {
+				// ignore
+			}
 			if (!r.isCancelled()) throw new NoSuccessException("Unable to cancel job");
 		} catch (RemoteException e) {
 			Logger.getLogger(BesJobControlAdaptor.class).error(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
