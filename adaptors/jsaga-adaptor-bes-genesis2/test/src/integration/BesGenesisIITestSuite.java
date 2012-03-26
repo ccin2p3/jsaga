@@ -56,7 +56,6 @@ public class BesGenesisIITestSuite extends JSAGATestSuite {
  	// test cases
     public static class BesGenesisIIJobRunDescriptionTest extends JobRunDescriptionTest {
         public BesGenesisIIJobRunDescriptionTest() throws Exception {super("bes-genesis2");}
-        public void test_run_inWorkingDirectory() { super.ignore("return code not supported"); }
         public void test_run_queueRequirement() { super.ignore("not supported"); }
         public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
     }
