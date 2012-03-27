@@ -24,7 +24,7 @@ if test -z "$JSAGA_HOME" ; then
 fi
 
 # set system properties
-PROPERTIES=
+#PROPERTIES=
 PROPERTIES="${PROPERTIES} -DJSAGA_HOME=$JSAGA_HOME"
 #PROPERTIES="${PROPERTIES} -Ddebug"
 

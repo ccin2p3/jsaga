@@ -24,7 +24,7 @@ if "%JSAGA_HOME%_"=="_" (
 )
 
 REM # set system properties
-set PROPERTIES=
+REM set PROPERTIES=
 set PROPERTIES=%PROPERTIES% -DJSAGA_HOME="%JSAGA_HOME%"
 rem set PROPERTIES=%PROPERTIES% -Ddebug
 
