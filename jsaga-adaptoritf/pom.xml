@@ -9,6 +9,22 @@
     <artifactId>jsaga-adaptoritf</artifactId>
     <name>Interfaces for adaptors</name>
     <description>Set of interfaces to be implemented by JSAGA adaptors.</description>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+		</plugins>
+	</build>
     <reporting>
         <plugins>
             <plugin>
