@@ -435,8 +435,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         if (calendar != null){
          */
         calendar.setTimeZone(java.util.TimeZone.getTimeZone("GMT"));
-        date = dayStr[calendar.get(Calendar.DAY_OF_WEEK)] + " "
-                + monthStr[calendar.get(Calendar.MONTH)] + " "
+        date = dayStr[calendar.get(Calendar.DAY_OF_WEEK) - 1] + " " // Calendar.SUNDAY = 1
+                + monthStr[calendar.get(Calendar.MONTH)] + " "		// Calendar.JANUARY = 0
                 + twodigits(calendar.get(Calendar.DAY_OF_MONTH)) + " "
                 + calendar.get(Calendar.YEAR) + " ";
         //hours =  - (calendar.get(Calendar.ZONE_OFFSET)/ (60*60*1000));
