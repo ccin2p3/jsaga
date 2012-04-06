@@ -69,6 +69,10 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
         return null;
     }
 
+	public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+		return m_adaptor.getOutputStagingTransfer(nativeJobId);
+	}
+
     protected static void transfer(Session session, StagingTransfer transfer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         int append = (transfer.isAppend() ? Flags.APPEND : Flags.NONE).getValue();
         try {

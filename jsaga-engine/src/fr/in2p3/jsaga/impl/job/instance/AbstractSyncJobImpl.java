@@ -7,6 +7,7 @@ import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
@@ -48,6 +49,8 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     private static final String MODEL = "JSAGA";
     /** Job attribute (deviation from SAGA specification) */
     public static final String NATIVEJOBDESCRIPTION = "NativeJobDescription";
+    /** Job vector attribute (deviation from SAGA specification) */
+    public static final String OUTPUTURL = "OutputURL";
     /** logger */
     private static Logger s_logger = Logger.getLogger(AbstractSyncJobImpl.class);
 
@@ -666,6 +669,13 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         } else {
             throw new NotImplementedException("Job attribute not supported by this adaptor: "+monitorAdaptor.getClass());
         }
+    }
+    
+    StagingTransfer[] getOutputStagingTransfer() throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    	if (m_stagingMgr instanceof DataStagingManagerThroughSandbox) {
+    		return ((DataStagingManagerThroughSandbox)m_stagingMgr).getOutputStagingTransfer(m_nativeJobId);
+    	}
+    	return null;
     }
 
     ////////////////////////////////////// private methods //////////////////////////////////////
