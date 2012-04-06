@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.impl.attributes.ScalarAttributeImpl;
 import fr.in2p3.jsaga.impl.attributes.VectorAttributeImpl;
 import fr.in2p3.jsaga.impl.monitoring.MetricMode;
@@ -31,6 +32,8 @@ public class JobAttributes implements Cloneable {
     ScalarAttributeImpl<Integer> m_ExitCode;
     /** deviation from SAGA specification */
     ScalarAttributeImpl<String> m_NativeJobDescription;
+    /** deviation from SAGA specification */
+    VectorAttributeImpl<String> m_outputURLs;
 
     /** constructor */
     JobAttributes(final AbstractSyncJobImpl job) {
@@ -132,6 +135,31 @@ public class JobAttributes implements Cloneable {
                 MetricMode.ReadOnly,
                 MetricType.String,
                 null));
+        
+        m_outputURLs = job._addVectorAttribute(new VectorAttributeImpl<String>(
+                AbstractSyncJobImpl.OUTPUTURL,
+                "output files staging URLs by the job service (deviation from SAGA specification)",
+                MetricMode.ReadOnly,
+                MetricType.String,
+                null){
+        	public String[] getValues() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+                if(job.getNativeJobId()==null) throw new IncorrectStateException("Job has not been submitted");
+                StagingTransfer[] stagingTransfers;
+				try {
+					stagingTransfers = job.getOutputStagingTransfer();
+				} catch (Exception e) {
+					throw new NoSuccessException(e);
+				}
+                if (stagingTransfers == null) {
+                    return null;
+                }
+                String[] result = new String[stagingTransfers.length];
+                for (int i = 0; i < stagingTransfers.length; i++) {
+                	result[i] = stagingTransfers[i].getTo();
+				}
+                return result;
+            }
+        });
     }
 
     /** clone */
