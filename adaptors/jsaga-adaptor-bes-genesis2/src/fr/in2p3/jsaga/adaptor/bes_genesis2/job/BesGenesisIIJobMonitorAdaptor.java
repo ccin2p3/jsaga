@@ -1,12 +1,14 @@
 package fr.in2p3.jsaga.adaptor.bes_genesis2.job;
 
-import java.util.List;
+import java.util.Map;
 
 import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStatusType;
+import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
@@ -29,6 +31,13 @@ public class BesGenesisIIJobMonitorAdaptor extends BesJobMonitorAdaptor  {
 		return 18443;
 	}
 	
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
+    	return new Default[]{
+    			new Default(ATTR_REF_PARAM_NS, "http://edu.virginia.vcgr.genii/ref-params"),
+    			new Default(ATTR_REF_PARAM_NAME, "resource-key"),
+    	};
+    }
+    
 	@Override
 	protected JobStatus getJobStatus(String nativeJobId, ActivityStatusType ast) throws NoSuccessException {
 		return new BesGenesisIIJobStatus(nativeJobId, ast);

@@ -82,7 +82,10 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                                 }
                         }),
                         new UNoPrompt(USAGE_MEMORY, VOMSContext.USERPROXYOBJECT),
-                        new UFile(USAGE_LOAD, Context.USERPROXY)
+                        new UOr(new Usage[]{
+                        		new UFile(USAGE_LOAD, Context.USERPROXY),
+                        		new UProxyValue(USAGE_LOAD,  Context.USERPROXY)
+                        })
                 }),
                 new UFile(Context.CERTREPOSITORY),
                 new UFile(VOMSContext.VOMSDIR)
@@ -156,8 +159,16 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                 case USAGE_LOAD:
                 {
                     CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
-                    File proxyFile = new File((String) attributes.get(Context.USERPROXY));
-                    GSSCredential cred = load(proxyFile);
+                    String userProxy = (String) attributes.get(Context.USERPROXY);
+                    GSSCredential cred = null;
+                    if(userProxy.startsWith("-----")){
+                    	//Proxy value
+                    	cred = load(userProxy);
+                    }else{
+                    	//Proxy File
+                    	File proxyFile = new File(userProxy);
+                        cred = load(proxyFile);
+                    }
                     return this.createSecurityAdaptor(cred, attributes);
                 }
                 default:
@@ -222,11 +233,19 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
         Util.destroy(proxyFile);
     }
 
+    protected static GSSCredential load(String proxyValue) throws IOException, GSSException {
+        return realLoad(proxyValue.getBytes());
+    }
+    
     protected static GSSCredential load(File proxyFile) throws IOException, GSSException {
         byte [] proxyBytes = new byte[(int) proxyFile.length()];
         FileInputStream in = new FileInputStream(proxyFile);
         in.read(proxyBytes);
         in.close();
+        return realLoad(proxyBytes);
+    }
+        
+   private static GSSCredential realLoad(byte[] proxyBytes) throws IOException, GSSException {
         ExtendedGSSManager manager = (ExtendedGSSManager) ExtendedGSSManager.getInstance();
         return manager.createCredential(
                 proxyBytes,

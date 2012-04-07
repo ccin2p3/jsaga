@@ -56,37 +56,37 @@ Environment = {<xsl:text/>
 <!--  Requirements -->
 CERequirements = "true <xsl:text/>
         <xsl:for-each select="jsdl:JobIdentification/JDLRequirements/text()">
-			<xsl:text>&amp;&amp; <xsl:value-of select="."/> </xsl:text>
+			<xsl:text>&amp;&amp;</xsl:text> <xsl:value-of select="."/><xsl:text> </xsl:text>
         </xsl:for-each>
         <xsl:for-each select="jsdl:Resources/jsdl:TotalCPUTime/jsdl:UpperBoundedRange/text()">
-        	<xsl:text>&amp;&amp; other.GlueCEPolicyMaxCPUTime >= <xsl:value-of select="."/> </xsl:text>
+        	<xsl:text>&amp;&amp; other.GlueCEPolicyMaxCPUTime >= </xsl:text><xsl:value-of select="."/><xsl:text> </xsl:text>
         </xsl:for-each>
         <xsl:for-each select="jsdl:Resources/jsdl:TotalCPUCount/jsdl:UpperBoundedRange/text()">
-			<xsl:text>&amp;&amp; other.GlueCEPolicyAssignedJobSlots >= <xsl:value-of select="."/> </xsl:text>
+			<xsl:text>&amp;&amp; other.GlueCEPolicyAssignedJobSlots >= </xsl:text><xsl:value-of select="."/><xsl:text> </xsl:text>
         </xsl:for-each>
 		<xsl:for-each select="jsdl:Resources/jsdl:TotalPhysicalMemory/jsdl:UpperBoundedRange/text()">
-			<xsl:text>&amp;&amp; other.GlueHostMainMemoryRAMSize >= <xsl:value-of select="."/> </xsl:text>
+			<xsl:text>&amp;&amp; other.GlueHostMainMemoryRAMSize >= </xsl:text><xsl:value-of select="."/><xsl:text> </xsl:text>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:Resources/jsdl:TotalVirtualMemory/jsdl:UpperBoundedRange/text()">
-			<xsl:text>&amp;&amp; other.GlueHostMainMemoryVirtualSize >= <xsl:value-of select="."/> </xsl:text>
+			<xsl:text>&amp;&amp; other.GlueHostMainMemoryVirtualSize >= </xsl:text><xsl:value-of select="."/><xsl:text> </xsl:text>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WallTimeLimit/text()">
-			<xsl:text>&amp;&amp; other.GlueCEPolicyMaxWallClockTime >= <xsl:value-of select="."/> </xsl:text>
+			<xsl:text>&amp;&amp; other.GlueCEPolicyMaxWallClockTime >= </xsl:text><xsl:value-of select="."/><xsl:text> </xsl:text>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:CPUTimeLimit/text()">
-			<xsl:text>&amp;&amp; other.GlueCEPolicyMaxCPUTime >= <xsl:value-of select="."/> </xsl:text>
+			<xsl:text>&amp;&amp; other.GlueCEPolicyMaxCPUTime >= </xsl:text><xsl:value-of select="."/><xsl:text> </xsl:text>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost/text()">
-			<xsl:text>&amp;&amp; other.GlueHostArchitectureSMPSize  >= <xsl:value-of select="."/> </xsl:text>
+			<xsl:text>&amp;&amp; other.GlueHostArchitectureSMPSize  >= </xsl:text><xsl:value-of select="."/><xsl:text> </xsl:text>
 		</xsl:for-each>
  		<xsl:for-each select="jsdl:Resources/jsdl:CPUArchitecture/jsdl:CPUArchitectureName/text()">
-			<xsl:text>&amp;&amp; other.GlueHostArchitecturePlatformType == "<xsl:value-of select="."/>" </xsl:text>
+			<xsl:text>&amp;&amp; other.GlueHostArchitecturePlatformType == "</xsl:text><xsl:value-of select="."/><xsl:text>" </xsl:text>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:Resources/jsdl:OperatingSystem/jsdl:OperatingSystemType/jsdl:OperatingSystemName/text()">
-			<xsl:text>&amp;&amp; other.GlueHostOperatingSystemName == "<xsl:value-of select="."/>" </xsl:text>
+			<xsl:text>&amp;&amp; other.GlueHostOperatingSystemName == "</xsl:text><xsl:value-of select="."/><xsl:text>" </xsl:text>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:Resources/jsdl:OperatingSystem/jsdl:OperatingSystemType/jsdl:OperatingSystemVersion/text()">
-			<xsl:text>&amp;&amp; other.GlueHostOperatingSystemVersion == "<xsl:value-of select="."/>" </xsl:text>
+			<xsl:text>&amp;&amp; other.GlueHostOperatingSystemVersion == "</xsl:text><xsl:value-of select="."/><xsl:text>" </xsl:text>
 		</xsl:for-each>
 <xsl:text>";</xsl:text>
 

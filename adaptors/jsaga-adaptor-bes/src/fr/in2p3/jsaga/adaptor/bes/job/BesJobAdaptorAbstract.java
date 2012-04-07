@@ -54,6 +54,10 @@ import javax.xml.soap.SOAPException;
  */
 public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 
+	protected static final String ATTR_REF_PARAM_NS = "ReferenceParameterNS";
+	protected static final String ATTR_REF_PARAM_NAME = "ReferenceParameterName";
+	protected static final String ATTR_REF_PARAM_VALUE = "ReferenceParameterValue";
+	
 	protected URI _bes_url ;
 	protected JKSSecurityCredential m_credential;
 
@@ -65,8 +69,6 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 	// Contained resources
 	// Can be of type BasicResourceAttributesDocumentType or FactoryResourceAttributesDocumentType
 	protected Object[] _cr = null;
-
-    
 
 	//////////////////////////////////////////////////
 	// Implementation of the ClientAdaptor interface
@@ -110,10 +112,10 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 			_bes_service.setBESFactoryPortTypeEndpointAddress(_bes_url.toString());
 	        _bes_pt= _bes_service.getBESFactoryPortType();
 	        
-			String referenceParameter = (String) attributes.get("ReferenceParameterValue");
+			String referenceParameter = (String) attributes.get(ATTR_REF_PARAM_VALUE);
 	        if (referenceParameter != null) {
-	        	String nameSpace = (String) attributes.get("ReferenceParameterNS");
-	        	String name = (String) attributes.get("ReferenceParameterName");
+	        	String nameSpace = (String) attributes.get(ATTR_REF_PARAM_NS);
+	        	String name = (String) attributes.get(ATTR_REF_PARAM_NAME);
 	        	if (nameSpace == null || name == null)
 	        		throw new NoSuccessException("Missing ReferenceParameter attributes");
 	        	// add reference parameter
@@ -169,8 +171,11 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
     	Iterator iter = attributes.entrySet().iterator();
     	while (iter.hasNext()) {
     		Map.Entry me = ((Map.Entry)iter.next());
-    		if (!me.getKey().equals("CheckAvailability")){
-        		uri += me.getKey() + "=" + me.getValue()+"?";
+    		if (!me.getKey().equals("CheckAvailability")
+    				&& !me.getKey().equals(ATTR_REF_PARAM_NS)
+    				&& !me.getKey().equals(ATTR_REF_PARAM_NAME)
+    				&& !me.getKey().equals(ATTR_REF_PARAM_VALUE)){
+        		uri += me.getKey() + "=" + me.getValue()+"&";
     		}
     	}
     	// remove trailing char (either & or ?)
