@@ -453,12 +453,14 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             message += "ErrorCode: " + ec + "\n";
         }
         // fault cause(s)
-        for (int i = 0; i < cause.length; i++) {
-            if (i == 0) {
-                message += "Cause: " + cause[i] + "\n";
-            } else {
-                message += cause[i] + "\n";
-            }
+        if(cause != null){
+	        for (int i = 0; i < cause.length; i++) {
+	            if (i == 0) {
+	                message += "Cause: " + cause[i] + "\n";
+	            } else {
+	                message += cause[i] + "\n";
+	            }
+	        }
         }
         return message;
     }
