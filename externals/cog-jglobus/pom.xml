@@ -26,15 +26,21 @@
         </plugins>
     </build>
     <dependencies>
-		<dependency>
-		    <groupId>bouncycastle</groupId>
-		    <artifactId>bcprov-jdk13</artifactId>
-		    <version>140</version>
-		</dependency>
+	<dependency>
+	    <groupId>bouncycastle</groupId>
+	    <artifactId>bcprov-jdk13</artifactId>
+	    <version>140</version>
+	</dependency>
         <dependency>
             <groupId>com.claymoresystems</groupId>
             <artifactId>puretls</artifactId>
             <version>0.9-beta-4</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>12.0-rc2</version>
             <scope>runtime</scope>
         </dependency>
     </dependencies>
