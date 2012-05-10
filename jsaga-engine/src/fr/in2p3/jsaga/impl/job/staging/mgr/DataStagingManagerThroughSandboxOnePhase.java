@@ -34,13 +34,21 @@ public class DataStagingManagerThroughSandboxOnePhase extends DataStagingManager
         String stagingDir = adaptor.getStagingDirectory(nativeJobDescription, uniqId);
         if (stagingDir != null) {
             URL url = URLFactory.createURL(JSAGA_FACTORY, stagingDir);
+            Directory dir = null;
             try {
-                Directory dir = FileFactory.createDirectory(JSAGA_FACTORY, job.getSession(), url, Flags.CREATE.getValue());
-                dir.close();
+                dir = FileFactory.createDirectory(JSAGA_FACTORY, job.getSession(), url, Flags.CREATE.getValue());
             } catch (IncorrectURLException e) {
                 throw new NoSuccessException(e);
             } catch (AlreadyExistsException e) {
-                throw new NoSuccessException(e);
+            	throw new NoSuccessException(e);
+            }finally{
+                if(dir != null){
+    	        	try{
+    	        		dir.close();
+    	        	}catch (Exception e) {
+    					// Ignore it: A problem during the close should not be a problem.
+    				}
+            	}
             }
         }
 

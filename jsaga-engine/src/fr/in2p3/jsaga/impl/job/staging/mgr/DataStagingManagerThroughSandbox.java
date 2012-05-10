@@ -75,16 +75,24 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
 
     protected static void transfer(Session session, StagingTransfer transfer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         int append = (transfer.isAppend() ? Flags.APPEND : Flags.NONE).getValue();
+        File file = null;
         try {
             URL from = URLFactory.createURL(JSAGA_FACTORY, pathToURL(transfer.getFrom()));
             URL to = URLFactory.createURL(JSAGA_FACTORY, pathToURL(transfer.getTo()));
-            File file = FileFactory.createFile(JSAGA_FACTORY, session, from, Flags.NONE.getValue());
+            file = FileFactory.createFile(JSAGA_FACTORY, session, from, Flags.NONE.getValue());
             file.copy(to, append);
-            file.close();
         } catch (AlreadyExistsException e) {
             throw new NoSuccessException(e);
         } catch (IncorrectURLException e) {
             throw new NoSuccessException(e);
+        }finally{
+        	if(file != null){
+	        	try{
+	        		file.close();
+	        	}catch (Exception e) {
+					// Ignore it: A problem during the close should not be a problem.
+				}
+        	}
         }
     }
     private static String pathToURL(String path) {
@@ -103,15 +111,23 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
     }
 
     private static void remove(Session session, String url) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        try {
+    	File file = null;
+    	try {
             URL urlToRemove = URLFactory.createURL(JSAGA_FACTORY, url);
-            File file = FileFactory.createFile(JSAGA_FACTORY, session, urlToRemove, Flags.NONE.getValue());
+            file = FileFactory.createFile(JSAGA_FACTORY, session, urlToRemove, Flags.NONE.getValue());
             file.remove();
-            file.close();
         } catch (AlreadyExistsException e) {
             throw new NoSuccessException(e);
         } catch (IncorrectURLException e) {
             throw new NoSuccessException(e);
+        }finally{
+        	if(file != null){
+	        	try{
+	        		file.close();
+	        	}catch (Exception e) {
+					// Ignore it: A problem during the close should not be a problem.
+				}
+        	}
         }
     }
 }
