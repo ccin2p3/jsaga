@@ -68,6 +68,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             // set security
             Stub stub = (Stub) m_stub;
             stub._setProperty(GSIConstants.GSI_CREDENTIALS, m_credential);
+            stub.setTimeout(120 * 1000); //2 mins
 //            stub._setProperty(GSIConstants.GSI_MODE, GSIConstants.GSI_MODE_FULL_DELEG);
         } catch (MalformedURLException e) {
             throw new NoSuccessException("unexpected exception", e);
