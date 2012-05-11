@@ -166,12 +166,14 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             ((Stub) m_client)._setProperty(GSIConstants.GSI_TRANSPORT, GSIConstants.ENCRYPTION);
             ((Stub) m_client)._setProperty(GSIConstants.TRUSTED_CERTIFICATES, trustedCertificates);
             ((Stub) m_client)._setProperty(GSIConstants.GSI_AUTHORIZATION, NoAuthorization.getInstance());
+            ((org.apache.axis.client.Stub) m_client).setTimeout(120 * 1000); //2 mins
 
             delegationServiceStub = (DelegationSoapBindingStub) serviceLocator.getWMProxyDelegation_PortType(new URL(m_wmsServerUrl));
             ((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_CREDENTIALS, m_credential);
             ((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_TRANSPORT, GSIConstants.ENCRYPTION);
             ((Stub) delegationServiceStub)._setProperty(GSIConstants.TRUSTED_CERTIFICATES, trustedCertificates);
             ((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_AUTHORIZATION, NoAuthorization.getInstance());
+            ((org.apache.axis.client.Stub) delegationServiceStub).setTimeout(120 * 1000); //2 mins
             
         } catch (Exception exc) {
             disconnect();
