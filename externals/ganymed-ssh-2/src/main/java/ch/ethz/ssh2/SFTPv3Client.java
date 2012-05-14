@@ -22,8 +22,8 @@ import ch.ethz.ssh2.packets.TypesWriter;
 import ch.ethz.ssh2.sftp.AttribFlags;
 import ch.ethz.ssh2.sftp.ErrorCodes;
 import ch.ethz.ssh2.sftp.Packet;
-import java.util.Arrays;
-import java.util.TreeMap;
+import java.util.*;
+import javax.imageio.IIOException;
 
 /**
  * A
@@ -234,7 +234,7 @@ public class SFTPv3Client {
      * @return the message contents
      * @throws IOException
      */
-    private byte[] receiveMessage(int maxlen) throws IOException {
+    private byte[] receiveRawMessage(int maxlen) throws IOException {
         byte[] msglen = new byte[4];
 
         readBytes(msglen, 0, 4);
@@ -349,14 +349,12 @@ public class SFTPv3Client {
         log.debug("Sending SSH_FXP_FSTAT...");
         sendMessage(Packet.SSH_FXP_FSTAT, req_id, tw.getBytes());
 
-        byte[] resp = receiveMessage(Integer.MAX_VALUE);
+        Message resp = receiveANonWriteMessage();
 
-        TypesReader tr = new TypesReader(resp);
+        int t = resp.packetType;
+        int rep_id = resp.reqestId;
+        TypesReader tr = resp.tr;
 
-        int t = tr.readByte();
-        listener.read(Packet.forName(t));
-
-        int rep_id = tr.readUINT32();
         if (rep_id != req_id) {
             throw new IOException("The server sent an invalid id field.");
         }
@@ -384,14 +382,12 @@ public class SFTPv3Client {
         log.debug("Sending SSH_FXP_STAT/SSH_FXP_LSTAT...");
         sendMessage(statMethod, req_id, tw.getBytes());
 
-        byte[] resp = receiveMessage(Integer.MAX_VALUE);
+        Message resp = receiveANonWriteMessage();
 
-        TypesReader tr = new TypesReader(resp);
+        int t = resp.packetType;
+        int rep_id = resp.reqestId;
+        TypesReader tr = resp.tr;
 
-        int t = tr.readByte();
-        listener.read(Packet.forName(t));
-
-        int rep_id = tr.readUINT32();
         if (rep_id != req_id) {
             throw new IOException("The server sent an invalid id field.");
         }
@@ -457,14 +453,13 @@ public class SFTPv3Client {
         log.debug("Sending SSH_FXP_READLINK...");
         sendMessage(Packet.SSH_FXP_READLINK, req_id, tw.getBytes());
 
-        byte[] resp = receiveMessage(Integer.MAX_VALUE);
+        Message resp = receiveANonWriteMessage();
 
-        TypesReader tr = new TypesReader(resp);
+        int t = resp.packetType;
+        int rep_id = resp.reqestId;
+        TypesReader tr = resp.tr;
 
-        int t = tr.readByte();
-        listener.read(Packet.forName(t));
 
-        int rep_id = tr.readUINT32();
         if (rep_id != req_id) {
             throw new IOException("The server sent an invalid id field.");
         }
@@ -490,14 +485,11 @@ public class SFTPv3Client {
     }
 
     private void expectStatusOKMessage(int id) throws IOException {
-        byte[] resp = receiveMessage(Integer.MAX_VALUE);
+        Message resp = receiveANonWriteMessage();
 
-        TypesReader tr = new TypesReader(resp);
-
-        int t = tr.readByte();
-        listener.read(Packet.forName(t));
-
-        int rep_id = tr.readUINT32();
+        int t = resp.packetType;
+        int rep_id = resp.reqestId;
+        TypesReader tr = resp.tr;
         if (rep_id != id) {
             throw new IOException("The server sent an invalid id field.");
         }
@@ -610,14 +602,13 @@ public class SFTPv3Client {
         log.debug("Sending SSH_FXP_REALPATH...");
         sendMessage(Packet.SSH_FXP_REALPATH, req_id, tw.getBytes());
 
-        byte[] resp = receiveMessage(Integer.MAX_VALUE);
+        Message resp = receiveANonWriteMessage();
 
-        TypesReader tr = new TypesReader(resp);
+        int t = resp.packetType;
+        int rep_id = resp.reqestId;
+        TypesReader tr = resp.tr;
 
-        int t = tr.readByte();
-        listener.read(Packet.forName(t));
 
-        int rep_id = tr.readUINT32();
         if (rep_id != req_id) {
             throw new IOException("The server sent an invalid id field.");
         }
@@ -656,14 +647,13 @@ public class SFTPv3Client {
             log.debug("Sending SSH_FXP_READDIR...");
             sendMessage(Packet.SSH_FXP_READDIR, req_id, tw.getBytes());
 
-            byte[] resp = receiveMessage(Integer.MAX_VALUE);
+            Message resp = receiveANonWriteMessage();
 
-            TypesReader tr = new TypesReader(resp);
+            int t = resp.packetType;
+            int rep_id = resp.reqestId;
+            TypesReader tr = resp.tr;
 
-            int t = tr.readByte();
-            listener.read(Packet.forName(t));
 
-            int rep_id = tr.readUINT32();
             if (rep_id != req_id) {
                 throw new IOException("The server sent an invalid id field.");
             }
@@ -712,14 +702,12 @@ public class SFTPv3Client {
         log.debug("Sending SSH_FXP_OPENDIR...");
         sendMessage(Packet.SSH_FXP_OPENDIR, req_id, tw.getBytes());
 
-        byte[] resp = receiveMessage(Integer.MAX_VALUE);
+        Message resp = receiveANonWriteMessage();
 
-        TypesReader tr = new TypesReader(resp);
+        int t = resp.packetType;
+        int rep_id = resp.reqestId;
+        TypesReader tr = resp.tr;
 
-        int t = tr.readByte();
-        listener.read(Packet.forName(t));
-
-        int rep_id = tr.readUINT32();
         if (rep_id != req_id) {
             throw new IOException("The server sent an invalid id field.");
         }
@@ -772,7 +760,7 @@ public class SFTPv3Client {
          */
 
         log.debug("Waiting for SSH_FXP_VERSION...");
-        TypesReader tr = new TypesReader(receiveMessage(Integer.MAX_VALUE)); /*
+        TypesReader tr = new TypesReader(receiveRawMessage(Integer.MAX_VALUE)); /*
          * Should be enough for any reasonable server
          */
 
@@ -1147,14 +1135,12 @@ public class SFTPv3Client {
         log.debug("Sending SSH_FXP_OPEN...");
         sendMessage(Packet.SSH_FXP_OPEN, req_id, tw.getBytes());
 
-        byte[] resp = receiveMessage(Integer.MAX_VALUE);
+        Message resp = receiveANonWriteMessage();
 
-        TypesReader tr = new TypesReader(resp);
+        int t = resp.packetType;
+        int rep_id = resp.reqestId;
+        TypesReader tr = resp.tr;
 
-        int t = tr.readByte();
-        listener.read(Packet.forName(t));
-
-        int rep_id = tr.readUINT32();
         if (rep_id != req_id) {
             throw new IOException("The server sent an invalid id field.");
         }
@@ -1237,16 +1223,15 @@ public class SFTPv3Client {
         return req;
     }
 
-    public OutstandingStatusRequest submitWriteRequest(SFTPv3FileHandle handle, long fileOffset, byte[] src, int srcoff, int len) throws IOException {
+    public int submitWriteRequest(SFTPv3FileHandle handle, long fileOffset, byte[] src, int srcoff, int len) throws IOException {
         checkHandleValidAndOpen(handle);
 
         int clientOffset = srcoff;
         long serverOffset = fileOffset;
 
-        OutstandingStatusRequest req = new OutstandingStatusRequest();
-        req.req_id = generateNextRequestID();
+        int req = generateNextRequestID();
 
-        sendWriteRequest(req.req_id, handle, serverOffset, src, clientOffset, len);
+        sendWriteRequest(req, handle, serverOffset, src, clientOffset, len);
         return req;
     }
 
@@ -1263,8 +1248,18 @@ public class SFTPv3Client {
         }
     }
 
-    public Message receiveAMessage() throws IOException {
-        byte[] resp = receiveMessage(Integer.MAX_VALUE);
+    private Message receiveANonWriteMessage() throws IOException {
+        while (true) {
+            Message msg = receiveAMessage();
+            if (!writeRequests.contains(msg.reqestId)) {
+                return msg;
+            }
+            processWriteMessage(msg);
+        }
+    }
+
+    private Message receiveAMessage() throws IOException {
+        byte[] resp = receiveRawMessage(Integer.MAX_VALUE);
         TypesReader tr = new TypesReader(resp);
         int t = tr.readByte();
         listener.read(Packet.forName(t));
@@ -1312,28 +1307,6 @@ public class SFTPv3Client {
         throw new IOException("The SFTP server sent an unexpected packet type (" + t + ")");
     }
 
-    private void proccesWriteMessage(OutstandingStatusRequest req, Message writeMessage) throws IOException {
-        TypesReader tr = writeMessage.tr;
-        int t = writeMessage.packetType;
-
-        // Evaluate the answer
-        if (t == Packet.SSH_FXP_STATUS) {
-            // In any case, stop sending more packets
-            int code = tr.readUINT32();
-            if (log.isDebugEnabled()) {
-                String[] desc = ErrorCodes.getDescription(code);
-                log.debug("Got SSH_FXP_STATUS (" + req.req_id + ") (" + ((desc != null) ? desc[0] : "UNKNOWN") + ")");
-            }
-            if (code == ErrorCodes.SSH_FX_OK) {
-                return;
-            }
-            String msg = tr.readString();
-            listener.read(msg);
-            throw new SFTPException(msg, code);
-        }
-        throw new IOException("The SFTP server sent an unexpected packet type (" + t + ")");
-    }
-
     /**
      * Read bytes from a file in a parallel fashion. As many bytes as you want
      * will be read.
@@ -1359,7 +1332,7 @@ public class SFTPv3Client {
      */
     public int read(SFTPv3FileHandle handle, long fileOffset, byte[] dst, int dstoff, int len) throws IOException {
         OutstandingReadRequest req = submitReadRequest(handle, fileOffset, dst, dstoff, len);
-        Message tr = receiveAMessage();
+        Message tr = receiveANonWriteMessage();
         return proccessReadMessage(req, tr);
     }
 
@@ -1368,9 +1341,9 @@ public class SFTPv3Client {
      * A read is divided into multiple requests sent sequentially before reading
      * any status from the server
      */
-    private static class OutstandingStatusRequest {
+    /*private static class OutstandingStatusRequest {
         int req_id;
-    }
+    }*/
 
     /**
      * Write bytes to a file. If
@@ -1385,31 +1358,52 @@ public class SFTPv3Client {
      * @throws IOException
      */
     public void write(SFTPv3FileHandle handle, long fileOffset, byte[] src, int srcoff, int len) throws IOException {
-        OutstandingStatusRequest req = submitWriteRequest(handle, fileOffset, Arrays.copyOf(src, src.length), srcoff, len);
-        //Message msg = receiveAMessage();
-        //proccesWriteMessage(req, msg);
-        // recieveAndProcessWriteMsg();
-        writeRequests.put(req.req_id, req);
+        int req = submitWriteRequest(handle, fileOffset, Arrays.copyOf(src, src.length), srcoff, len);
+        writeRequests.add(req);
 
         while (writeRequests.size() >= concurentWriteRequests) {
-            recieveAndProcessWriteMsg();
+            recieveAndProcessWriteMessage();
         }
     }
     
-    //private int aniticipatedReadRequests = 32;
     private int concurentWriteRequests = 32;
-    private Map<Integer, OutstandingStatusRequest> writeRequests = new TreeMap<Integer, OutstandingStatusRequest>();
-    //private Map<Integer, OutstandingReadRequest> readRequests = new TreeMap<Integer, OutstandingReadRequest>();
+    private Set<Integer> writeRequests = new TreeSet<Integer>();
 
-    
     public void setConcurentWriteRequests(int concurentWriteRequests) {
         this.concurentWriteRequests = concurentWriteRequests;
     }
 
-    private void recieveAndProcessWriteMsg() throws IOException {
+    private void recieveAndProcessWriteMessage() throws IOException {
         Message msg = receiveAMessage();
-        OutstandingStatusRequest req = writeRequests.remove(msg.reqestId);
-        proccesWriteMessage(req, msg);
+        processWriteMessage(msg);
+    }
+
+    private void processWriteMessage(Message msg) throws IOException {
+        //if(!writeRequests.contains(msg.reqestId)) throw new IOException("Request id doesn't match a write request " + msg.reqestId);
+        writeRequests.remove(msg.reqestId);
+        proccesWriteMessage(msg);
+    }
+
+    private void proccesWriteMessage(Message writeMessage) throws IOException {
+        TypesReader tr = writeMessage.tr;
+        int t = writeMessage.packetType;
+
+        // Evaluate the answer
+        if (t == Packet.SSH_FXP_STATUS) {
+            // In any case, stop sending more packets
+            int code = tr.readUINT32();
+            if (log.isDebugEnabled()) {
+                String[] desc = ErrorCodes.getDescription(code);
+                log.debug("Got SSH_FXP_STATUS (" + writeMessage.reqestId + ") (" + ((desc != null) ? desc[0] : "UNKNOWN") + ")");
+            }
+            if (code == ErrorCodes.SSH_FX_OK) {
+                return;
+            }
+            String msg = tr.readString();
+            listener.read(msg);
+            throw new SFTPException(msg, code);
+        }
+        throw new IOException("The SFTP server sent an unexpected packet type (" + t + ")");
     }
 
     /**
@@ -1421,7 +1415,7 @@ public class SFTPv3Client {
     public void closeFile(SFTPv3FileHandle handle) throws IOException {
         try {
             while (!writeRequests.isEmpty()) {
-                recieveAndProcessWriteMsg();
+                recieveAndProcessWriteMessage();
             }
 
             if (!handle.isClosed) {
