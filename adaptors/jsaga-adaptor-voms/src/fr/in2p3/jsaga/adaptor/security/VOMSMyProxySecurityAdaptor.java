@@ -122,9 +122,9 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
                     // create local temporary proxy
                     //String tempFile = File.createTempFile("vomsmyproxy", "txt").getAbsolutePath();
                     //attributes.put(Context.USERPROXY, tempFile);
-                    String oldLifeTime = (String) attributes.put(Context.LIFETIME, "PT12H");
+                    //String oldLifeTime = (String) attributes.put(Context.LIFETIME, "PT12H");
                     VOMSSecurityCredential adaptor = (VOMSSecurityCredential) super.createSecurityCredential(usage, attributes, contextId);
-                    attributes.put(Context.LIFETIME, oldLifeTime);
+                    //attributes.put(Context.LIFETIME, oldLifeTime);
                     GSSCredential cred = adaptor.getGSSCredential();
 
                     // send it to MyProxy server
