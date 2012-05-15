@@ -14,6 +14,13 @@
             	<attribute name="ReferenceParameterValue" value="963FEE3C-F27B-8E9A-A407-ED48B76EA50E"/>
             </job>
             <include host="129.114.32.10"/>
+        	</context>
+        <context type="AxisJKS" id="GenesisII-camillus">
+            <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
+            <job type="bes-genesis2">
+            	<attribute name="ReferenceParameterValue" value="726888AA-7905-7BFD-BDC4-5DF92C9FA4E7"/>
+            </job>
+            <include host="camillus" domain="cs.virginia.edu"/>
         </context>
     </session>
 </jsaga-default>

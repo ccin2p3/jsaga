@@ -40,16 +40,28 @@ public class BesTestSuite extends JSAGATestSuite {
     	public BesConnectionTest() throws Exception {super();}
    
     	public void test_AREX_Nordugrid() throws Exception {
+    		System.setProperty("javax.net.ssl.keyStore", "/home/schwarz/.jsaga/keystoreGrid2.jks");
+    		System.setProperty("javax.net.ssl.trustStore", "/home/schwarz/.jsaga/truststore.jks");
         	this.test_BES("bes://interop.grid.niif.hu:2010/arex-x509");
         }
         
     	public void test_GenesisII_Futuregrid_India() throws Exception {
+    		System.setProperty("javax.net.ssl.keyStore", "/home/schwarz/.jsaga/keystoreGrid2.jks");
+    		System.setProperty("javax.net.ssl.trustStore", "/home/schwarz/.jsaga/truststore.jks");
         	this.test_BES("bes://i134r.idp.iu.futuregrid.org:18443/axis/services/GeniiBESPortType?genii-container-id=ECBCAEC8-5FFF-11E0-B887-28C73890A7D4");
+        }
+        
+    	public void test_GenesisII_Futuregrid_Camillus() throws Exception {
+    		System.setProperty("javax.net.ssl.keyStore", "/home/schwarz/.jsaga/keystoreGrid2.jks");
+    		System.setProperty("javax.net.ssl.trustStore", "/home/schwarz/.jsaga/truststore.jks");
+        	this.test_BES("bes://camillus.cs.virginia.edu:18445/axis/services/GeniiBESPortType?genii-container-id=D384C93A-86A5-EC0F-CCF3-3040B22C8582");
         }
         
     	public void test_GenesisII_Futuregrid_Alamo() throws Exception {
         	// resource 40D784B8-9611-D69E-929E-9EE716D5783E is unknown
-        	this.test_BES("bes://129.114.32.10:18443/axis/services/GeniiBESPortType?genii-container-id=98B3AC57-D09F-63F1-6EE6-2664E1EF9699");
+    		System.setProperty("javax.net.ssl.keyStore", "/home/schwarz/.jsaga/keystoreGrid2.jks");
+    		System.setProperty("javax.net.ssl.trustStore", "/home/schwarz/.jsaga/truststore.jks");
+        	this.test_BES("bes://129.114.32.10:18443/axis/services/GeniiBESPortType?genii-container-id=8B3AC57-D09F-63F1-6EE6-2664E1EF9699");
         }
 
 //        public void test_GenesisII_Futuregrid_Sierra() throws Exception {
@@ -58,6 +70,8 @@ public class BesTestSuite extends JSAGATestSuite {
 //        }
 
     	public void test_Unicore6_local() throws Exception {
+    		System.setProperty("javax.net.ssl.keyStore", "/home/schwarz/.jsaga/keystoreDemoUser.jks");
+    		System.setProperty("javax.net.ssl.trustStore", "/home/schwarz/.jsaga/truststore.jks");
         	this.test_BES("bes://localhost6:8080/DEMO-SITE/services/BESFactory?res=default_bes_factory");
         }
     	
