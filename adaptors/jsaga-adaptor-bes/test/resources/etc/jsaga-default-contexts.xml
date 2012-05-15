@@ -2,17 +2,17 @@
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <session>
         <context type="AxisJKS" id="LocalUnicore">
-            <attribute name="UserAlias" value="demo user"/>
+            <!-- <attribute name="UserAlias" value="demo user"/> -->
             <job type="bes"/>
             <include host="localhost6"/>
         </context>
         <context type="AxisJKS" id="Arc">
-            <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
+            <!-- <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/> -->
             <job type="bes"/>
             <include host="interop" domain="grid.niif.hu"/>
         </context>
         <context type="AxisJKS" id="GenesisII-India">
-            <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
+            <!-- <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/> -->
             <job type="bes">
             	<attribute name="ReferenceParameterNS" value="http://edu.virginia.vcgr.genii/ref-params"/>
             	<attribute name="ReferenceParameterName" value="resource-key"/>
@@ -22,7 +22,7 @@
             <include host="149.165.146.134"/>
         </context>
         <context type="AxisJKS" id="GenesisII-Alamo">
-            <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
+            <!-- <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/> -->
             <job type="bes">
             	<attribute name="ReferenceParameterNS" value="http://edu.virginia.vcgr.genii/ref-params"/>
             	<attribute name="ReferenceParameterName" value="resource-key"/>
@@ -31,21 +31,21 @@
             <include host="129.114.32.10"/>
         </context>
         <context type="AxisJKS" id="Unicore-Sierra">
-            <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
+            <!-- <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/> -->
             <job type="bes"/>
             <include host="s79r" domain="idp.sdsc.futuregrid.org" port="8080"/>
         </context>
-        <!-- <context type="AxisJKS" id="GenesisII-Sierra">
-            <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
+        <context type="AxisJKS" id="GenesisII-camillus">
+            <!-- <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/> -->
             <job type="bes">
             	<attribute name="ReferenceParameterNS" value="http://edu.virginia.vcgr.genii/ref-params"/>
             	<attribute name="ReferenceParameterName" value="resource-key"/>
-            	<attribute name="ReferenceParameterValue" value="9BC75AB7-41C5-DF7F-905D-90058E35D2FB"/>
+            	<attribute name="ReferenceParameterValue" value="726888AA-7905-7BFD-BDC4-5DF92C9FA4E7"/>
             </job>
-            <include host="s79r" domain="idp.sdsc.futuregrid.org" port="18443"/>
-        </context> -->
+            <include host="camillus" domain="cs.virginia.edu"/>
+        </context>
         <context type="AxisJKS" id="Cream">
-            <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
+            <!-- <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/> -->
             <job type="bes"/>
             <include host="omii002" domain="cnaf.infn.it"/>
         </context>
