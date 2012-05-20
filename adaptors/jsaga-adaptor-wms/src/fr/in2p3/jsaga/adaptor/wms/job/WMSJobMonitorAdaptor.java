@@ -17,7 +17,6 @@ import org.apache.axis.configuration.SimpleProvider;
 import org.glite.wsdl.services.lb.LoggingAndBookkeepingLocator;
 import org.glite.wsdl.services.lb.LoggingAndBookkeepingPortType;
 import org.glite.wsdl.types.lb.GenericFault;
-import org.glite.wsdl.types.lb.JobFlags;
 import org.glite.wsdl.types.lb.JobFlagsValue;
 import org.glite.wsdl.types.lb.QueryAttr;
 import org.glite.wsdl.types.lb.QueryConditions;
@@ -164,8 +163,7 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        // get job Status
 	        JobFlagsValue[] jobFlagsValue = new JobFlagsValue[1];
 	        jobFlagsValue[0] = JobFlagsValue.CLASSADS;
-	        JobFlags jobFlags = new JobFlags(jobFlagsValue);
-	        org.glite.wsdl.types.lb.JobStatus jobInfo = stub.jobStatus(nativeJobId,jobFlags );
+	        org.glite.wsdl.types.lb.JobStatus jobInfo = stub.jobStatus(nativeJobId, jobFlagsValue);
 	        if(jobInfo == null) {
 	            throw new NoSuccessException("Unable to get information about job: "+nativeJobId);
 	        }
@@ -207,7 +205,6 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
             // get list of jobids
             JobFlagsValue[] jobFlagsValue = new JobFlagsValue[1];
             jobFlagsValue[0] = JobFlagsValue.CLASSADS;
-            JobFlags jobFlags = new JobFlags(jobFlagsValue);
 
             JobStatusArrayHolder jobStatusResult = new JobStatusArrayHolder();
             StringArrayHolder jobNativeIdResult = new StringArrayHolder();
@@ -222,7 +219,7 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
             qR[0] = new QueryRecord(QueryOp.UNEQUAL, value1, null );
             queryConditions[0].setRecord(qR);
             // Cannot use stub.userJobs() because not yet implemented (version > 1.8 needed)
-	        stub.queryJobs(queryConditions, jobFlags, jobNativeIdResult, jobStatusResult);
+	        stub.queryJobs(queryConditions, jobFlagsValue, jobNativeIdResult, jobStatusResult);
             return jobNativeIdResult.value;
         } catch (MalformedURLException e) {
             throw new NoSuccessException(e);

@@ -26,9 +26,7 @@ import org.glite.wms.wmproxy.InvalidArgumentFaultType;
 import org.glite.wms.wmproxy.JdlType;
 import org.glite.wms.wmproxy.NoSuitableResourcesFaultType;
 import org.glite.wms.wmproxy.ServerOverloadedFaultType;
-import org.glite.wms.wmproxy.StringAndLongList;
 import org.glite.wms.wmproxy.StringAndLongType;
-import org.glite.wms.wmproxy.StringList;
 import org.glite.wms.wmproxy.WMProxyLocator;
 import org.glite.wms.wmproxy.WMProxy_PortType;
 import org.globus.axis.gsi.GSIConstants;
@@ -64,22 +62,21 @@ import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXS
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
+import java.util.UUID;
 
 
-/* ***************************************************
- * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
- * ***             http://cc.in2p3.fr/             ***
+/*
  * ***************************************************
- * File:   WMSJobControlAdaptor
- * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
- * 		  Jerome Revillard (jrevillard@maatg.com) - MAAT France
- * Date:   18 fev. 2008
- * Updated: 8 Mai  2010 (Jerome)
- * ***************************************************/
+ * *** Centre de Calcul de l'IN2P3 - Lyon (France) *** *** http://cc.in2p3.fr/
+ * *** *************************************************** File:
+ * WMSJobControlAdaptor Author: Nicolas DEMESY (nicolas.demesy@bt.com) Jerome
+ * Revillard (jrevillard@maatg.com) - MAAT France Date: 18 fev. 2008 Updated: 8
+ * Mai 2010 (Jerome) **************************************************
+ */
 /**
- * TODO : Support of jsdl:TotalCPUTime, jsdl:OperatingSystemType, jsdl:TotalCPUCount, jsdl:CPUArchitecture
- * TODO : Support of space in environment value
- * TODO : Test MPI jobs
+ * TODO : Support of jsdl:TotalCPUTime, jsdl:OperatingSystemType,
+ * jsdl:TotalCPUCount, jsdl:CPUArchitecture TODO : Support of space in
+ * environment value TODO : Test MPI jobs
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         implements StagingJobAdaptorTwoPhase, CleanableJobAdaptor {
@@ -87,8 +84,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     private static final String DEFAULT_JDL_FILE = "DefaultJdlFile";
     private WMProxy_PortType m_client;
     private DelegationSoapBindingStub delegationServiceStub;
-    private String m_delegationId = "myId";
-    private boolean m_delegationDone = false;
+    private String delegationId;
+    //private boolean m_delegationDone = false;
     private String m_wmsServerUrl;
     private String m_LBAddress;
 
@@ -114,7 +111,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                     new UOptionalBoolean("AllowZippedISB"),
                     new UOptionalBoolean("PerusalFileEnable"),
                     new UOptional("ListenerStorage"),
-                    new UOptional("MyProxyServer")
+                    new UOptional("MyProxyServer"),
+                    new UOptional("MyProxyDN")
                 });
     }
 
@@ -152,6 +150,13 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         }
 
         try {
+            delegationId = (String) attributes.get("MyProxyDN");
+            if (delegationId != null) {
+                ((Stub) m_client)._setProperty(GSIConstants.GSI_USER_DN, delegationId);
+            } else {
+                delegationId = UUID.randomUUID().toString();
+            }
+
             SimpleProvider provider = new SimpleProvider();
             SimpleTargetedChain c = new SimpleTargetedChain(new HTTPSSender());
             provider.deployTransport("https", c);
@@ -166,6 +171,12 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             ((Stub) m_client)._setProperty(GSIConstants.GSI_TRANSPORT, GSIConstants.ENCRYPTION);
             ((Stub) m_client)._setProperty(GSIConstants.TRUSTED_CERTIFICATES, trustedCertificates);
             ((Stub) m_client)._setProperty(GSIConstants.GSI_AUTHORIZATION, NoAuthorization.getInstance());
+
+            //if(delegationId != null) 
+            //((Stub) m_client)._setProperty(GSIConstants.GSI_AUTH_USERNAME, delegationId);
+            //((Stub) m_client)._setProperty(GSIConstants.GSI_USER_DN, delegationId);
+            //((Stub) m_client)._setProperty(GSIConstants.GSI_USER_DN, delegationId);
+
             ((org.apache.axis.client.Stub) m_client).setTimeout(120 * 1000); //2 mins
 
             delegationServiceStub = (DelegationSoapBindingStub) serviceLocator.getWMProxyDelegation_PortType(new URL(m_wmsServerUrl));
@@ -174,7 +185,11 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             ((Stub) delegationServiceStub)._setProperty(GSIConstants.TRUSTED_CERTIFICATES, trustedCertificates);
             ((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_AUTHORIZATION, NoAuthorization.getInstance());
             ((org.apache.axis.client.Stub) delegationServiceStub).setTimeout(120 * 1000); //2 mins
-            
+
+            //if(delegationId != null)
+            //((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_AUTH_USERNAME, delegationId);
+            //((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_USER_DN, delegationId);  
+            //if(myProxyDN != null) ((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_AUTH_USERNAME, myProxyDN);  
         } catch (Exception exc) {
             disconnect();
             throw new NoSuccessException(exc.getMessage());
@@ -212,16 +227,16 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
         try {
-        	//Credentials delegation
-        	delegateCredentials(false);
-        	
+            //Credentials delegation
+            delegateCredentials(delegationId);
+
             // parse JDL and Check Matching
             if (checkMatch) {
                 checkJDLAndMatch(jobDesc, m_client);
             }
 
             // register job
-            String nativeJobId = m_client.jobRegister(jobDesc, m_delegationId).getId();
+            String nativeJobId = m_client.jobRegister(jobDesc, delegationId).getId();
 
             // set LB from nativeJobId
             if (m_LBAddress == null) {
@@ -250,47 +265,52 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         }
 
         // get available CE
-        StringAndLongList result = m_client.jobListMatch(jobDesc, m_delegationId);
+        StringAndLongType[] result = m_client.jobListMatch(jobDesc, delegationId);
         if (result != null) {
             // list of CE
-            StringAndLongType[] list = (StringAndLongType[]) result.getFile();
-            if (list == null) {
-                throw new BadResource("No Computing Element matching your job requirements has been found!");
-            }
+           /*
+             * StringAndLongType[] list = (StringAndLongType[])
+             * result.getFile(); if (list == null) { throw new BadResource("No
+             * Computing Element matching your job requirements has been
+             * found!"); }
+             */
         } else {
             throw new BadResource("No Computing Element matching your job requirements has been found!");
         }
     }
-    
-    private void delegateCredentials(boolean force) throws AuthenticationFailedException, NoSuccessException{
-    	try{
-    		synchronized (m_delegationId) {
-    			if(!m_delegationDone || force){
-			    	String certReq = delegationServiceStub.getProxyReq(m_delegationId);
-			
-			        //create proxy from certificate request
-			        GlobusCredential globusCred = ((GlobusGSSCredentialImpl) m_credential).getGlobusCredential();
-			
-			        X509Certificate[] userCerts = globusCred.getCertificateChain();
-			        PrivateKey key = globusCred.getPrivateKey();
-			
-			        BouncyCastleCertProcessingFactory factory = BouncyCastleCertProcessingFactory.getDefault();
-			
-			        //FIXME (Jerome): We cannot mix proxy types. If the provided user certificate is not a GSI_2_PROXY, it will fail at some point server side I guess.
-			        // We must detect the user proxy type and then generate the new one accordingly.
-			        X509Certificate certificate = factory.createCertificate(new ByteArrayInputStream(GrDPX509Util.readPEM(
-			                new ByteArrayInputStream(certReq.getBytes()), GrDPConstants.CRH,
-			                GrDPConstants.CRF)), userCerts[0], key, 12 * 3600, GSIConstants.GSI_2_PROXY); //12 hours proxy
-			
-			        X509Certificate[] finalCerts = new X509Certificate[userCerts.length + 1];
-			        finalCerts[0] = certificate;
-			        for (int index = 1; index <= userCerts.length; ++index) {
-			            finalCerts[index] = userCerts[index - 1];
-			        }
-			        m_client.putProxy(m_delegationId, new String(GrDPX509Util.certChainToByte(finalCerts)));
-			        m_delegationDone = true;
-    			}
-    		}
+
+    private void delegateCredentials(String delegationId) throws AuthenticationFailedException, NoSuccessException {
+        try {
+            //synchronized (m_delegationId) {
+            //  if (!m_delegationDone || force) {
+            String certReq = delegationServiceStub.getProxyReq(delegationId);
+
+            //create proxy from certificate request
+            GlobusCredential globusCred = ((GlobusGSSCredentialImpl) m_credential).getGlobusCredential();
+
+            X509Certificate[] userCerts = globusCred.getCertificateChain();
+            PrivateKey key = globusCred.getPrivateKey();
+
+            BouncyCastleCertProcessingFactory factory = BouncyCastleCertProcessingFactory.getDefault();
+
+            //FIXME (Jerome): We cannot mix proxy types. If the provided user certificate is not a GSI_2_PROXY, it will fail at some point server side I guess.
+            // We must detect the user proxy type and then generate the new one accordingly.
+            X509Certificate certificate = factory.createCertificate(new ByteArrayInputStream(GrDPX509Util.readPEM(
+                    new ByteArrayInputStream(certReq.getBytes()), GrDPConstants.CRH,
+                    GrDPConstants.CRF)), userCerts[0], key, 12 * 3600, GSIConstants.GSI_2_PROXY); //12 hours proxy
+
+            X509Certificate[] finalCerts = new X509Certificate[userCerts.length + 1];
+            finalCerts[0] = certificate;
+            for (int index = 1; index <= userCerts.length; ++index) {
+                finalCerts[index] = userCerts[index - 1];
+            }
+            m_client.putProxy(delegationId, new String(GrDPX509Util.certChainToByte(finalCerts)));
+
+            //System.out.println(m_client.getDelegatedProxyInfo(delegationId));
+
+            // m_delegationDone = true;
+            //    }
+            //  }
         } catch (org.glite.wms.wmproxy.AuthenticationFaultType exc) {
             disconnect();
             throw new AuthenticationFailedException(createExceptionMessage(exc));
@@ -317,7 +337,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }
 
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        StringList result = null;
+        String[] result = null;
         try {
             result = m_client.getSandboxDestURI(nativeJobId, "gsiftp");
         } catch (BaseFaultType e) {
@@ -325,10 +345,10 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         } catch (RemoteException e) {
             throw new NoSuccessException(e.getMessage());
         }
-        if (result == null || result.getItem() == null || result.getItem().length < 1) {
+        if (result == null || result.length < 1) {
             throw new NoSuccessException("Unable to find sandbox dest uri");
         }
-        String baseUri = result.getItem(0);
+        String baseUri = result[0];
 
         String jdl = null;
         try {
@@ -343,7 +363,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }
 
     public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        StringAndLongList result = null;
+        StringAndLongType[] result = null;
         try {
             result = m_client.getOutputFileList(nativeJobId, "gsiftp");
         } catch (BaseFaultType e) {
@@ -351,7 +371,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         } catch (RemoteException e) {
             throw new NoSuccessException(e.getMessage());
         }
-        if (result == null || result.getFile() == null || result.getFile().length < 1) {
+        if (result == null || result.length < 1) {
             throw new NoSuccessException("Unable to find output file list");
         }
 
@@ -364,7 +384,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             throw new NoSuccessException(e.getMessage());
         }
         StagingJDL parsedJdl = new StagingJDL(jdl);
-        return parsedJdl.getOutputStagingTransfers(result.getFile());
+        return parsedJdl.getOutputStagingTransfers(result);
     }
 
     public void start(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
@@ -448,14 +468,12 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         //java.text.DateFormat df = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM);
         //hours = calendar.get(Calendar.HOUR_OF_DAY) - (calendar.get(Calendar.ZONE_OFFSET)/ (60*60*1000));
 		/*
-        calendar.set(Calendar.HOUR_OF_DAY, hours);
-        df.setCalendar(calendar);
-        calendar = df.getCalendar( );
-        if (calendar != null){
+         * calendar.set(Calendar.HOUR_OF_DAY, hours); df.setCalendar(calendar);
+         * calendar = df.getCalendar( ); if (calendar != null){
          */
         calendar.setTimeZone(java.util.TimeZone.getTimeZone("GMT"));
         date = dayStr[calendar.get(Calendar.DAY_OF_WEEK) - 1] + " " // Calendar.SUNDAY = 1
-                + monthStr[calendar.get(Calendar.MONTH)] + " "		// Calendar.JANUARY = 0
+                + monthStr[calendar.get(Calendar.MONTH)] + " " // Calendar.JANUARY = 0
                 + twodigits(calendar.get(Calendar.DAY_OF_MONTH)) + " "
                 + calendar.get(Calendar.YEAR) + " ";
         //hours =  - (calendar.get(Calendar.ZONE_OFFSET)/ (60*60*1000));
@@ -472,14 +490,14 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             message += "ErrorCode: " + ec + "\n";
         }
         // fault cause(s)
-        if(cause != null){
-	        for (int i = 0; i < cause.length; i++) {
-	            if (i == 0) {
-	                message += "Cause: " + cause[i] + "\n";
-	            } else {
-	                message += cause[i] + "\n";
-	            }
-	        }
+        if (cause != null) {
+            for (int i = 0; i < cause.length; i++) {
+                if (i == 0) {
+                    message += "Cause: " + cause[i] + "\n";
+                } else {
+                    message += cause[i] + "\n";
+                }
+            }
         }
         return message;
     }

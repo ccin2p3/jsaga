@@ -59,7 +59,7 @@
 		<dependency>
 			<groupId>org.glite</groupId>
 			<artifactId>glite-wms-wmproxy-api-java</artifactId>
-			<version>3.1.3</version>
+			<version>3.3.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glite</groupId>

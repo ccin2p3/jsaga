@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.glite</groupId>
     <artifactId>glite-wms-wmproxy-api-java</artifactId>
-    <version>3.1.3</version>
+    <version>3.3.2</version>
     <name>gLite WMS WMProxy API</name>
     <description>Java API for the Workload Management System (WMS).</description>
     <url>http://www.nikhef.nl/~janjust/wms_jobs_in_java/</url>

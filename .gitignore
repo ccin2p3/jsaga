@@ -7,3 +7,4 @@ build
 *.iws
 target/
 .idea/
+/externals/glite-wms-wmproxy-api-java/.fr-my0hav/

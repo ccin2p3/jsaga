@@ -3,7 +3,6 @@ package fr.in2p3.jsaga.adaptor.wms.job;
 import holders.StringArrayHolder;
 
 import org.glite.wsdl.services.lb.LoggingAndBookkeepingPortType;
-import org.glite.wsdl.types.lb.JobFlags;
 import org.glite.wsdl.types.lb.JobFlagsValue;
 import org.glite.wsdl.types.lb.QueryAttr;
 import org.glite.wsdl.types.lb.QueryConditions;
@@ -31,7 +30,7 @@ public class WMSJobMonitorEnhancedAdaptor extends WMSJobMonitorAdaptor implement
 	        // get Jobs Status
             JobFlagsValue[] jobFlagsValue = new JobFlagsValue[1];
             jobFlagsValue[0] = JobFlagsValue.CLASSADS;
-            JobFlags jobFlags = new JobFlags(jobFlagsValue);
+            //JobFlags jobFlags = new JobFlags(jobFlagsValue);
 	        
             JobStatusArrayHolder jobStatusResult = new JobStatusArrayHolder();
 	        StringArrayHolder jobNativeIdResult = new StringArrayHolder();
@@ -46,7 +45,7 @@ public class WMSJobMonitorEnhancedAdaptor extends WMSJobMonitorAdaptor implement
 	        qR[0] = new QueryRecord(QueryOp.UNEQUAL, value1, null );	        
 	        queryConditions[0].setRecord(qR);	        
 	        // Cannot use stub.userJobs() because not yet implemented (version > 1.8 needed)
-	        stub.queryJobs(queryConditions, jobFlags, jobNativeIdResult, jobStatusResult);
+	        stub.queryJobs(queryConditions, jobFlagsValue, jobNativeIdResult, jobStatusResult);
 	        if(jobNativeIdResult != null && jobNativeIdResult.value != null) {
 	        	JobStatus[] filterJobs = new WMSJobStatus[jobNativeIdResult.value.length];
 	        	for (int i = 0; i < filterJobs.length; i++) {
