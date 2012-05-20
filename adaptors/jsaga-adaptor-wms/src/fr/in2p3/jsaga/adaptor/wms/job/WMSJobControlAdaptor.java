@@ -85,7 +85,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     private WMProxy_PortType m_client;
     private DelegationSoapBindingStub delegationServiceStub;
     private String delegationId;
-    //private boolean m_delegationDone = false;
     private String m_wmsServerUrl;
     private String m_LBAddress;
 
@@ -172,7 +171,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             ((Stub) m_client)._setProperty(GSIConstants.TRUSTED_CERTIFICATES, trustedCertificates);
             ((Stub) m_client)._setProperty(GSIConstants.GSI_AUTHORIZATION, NoAuthorization.getInstance());
 
-            //if(delegationId != null) 
             //((Stub) m_client)._setProperty(GSIConstants.GSI_AUTH_USERNAME, delegationId);
             //((Stub) m_client)._setProperty(GSIConstants.GSI_USER_DN, delegationId);
             //((Stub) m_client)._setProperty(GSIConstants.GSI_USER_DN, delegationId);
@@ -186,10 +184,10 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             ((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_AUTHORIZATION, NoAuthorization.getInstance());
             ((org.apache.axis.client.Stub) delegationServiceStub).setTimeout(120 * 1000); //2 mins
 
-            //if(delegationId != null)
             //((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_AUTH_USERNAME, delegationId);
             //((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_USER_DN, delegationId);  
             //if(myProxyDN != null) ((Stub) delegationServiceStub)._setProperty(GSIConstants.GSI_AUTH_USERNAME, myProxyDN);  
+
         } catch (Exception exc) {
             disconnect();
             throw new NoSuccessException(exc.getMessage());
@@ -278,7 +276,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             throw new BadResource("No Computing Element matching your job requirements has been found!");
         }
     }
-
+    
     private void delegateCredentials(String delegationId) throws AuthenticationFailedException, NoSuccessException {
         try {
             //synchronized (m_delegationId) {
@@ -473,7 +471,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
          */
         calendar.setTimeZone(java.util.TimeZone.getTimeZone("GMT"));
         date = dayStr[calendar.get(Calendar.DAY_OF_WEEK) - 1] + " " // Calendar.SUNDAY = 1
-                + monthStr[calendar.get(Calendar.MONTH)] + " " // Calendar.JANUARY = 0
+                + monthStr[calendar.get(Calendar.MONTH)] + " "		// Calendar.JANUARY = 0
                 + twodigits(calendar.get(Calendar.DAY_OF_MONTH)) + " "
                 + calendar.get(Calendar.YEAR) + " ";
         //hours =  - (calendar.get(Calendar.ZONE_OFFSET)/ (60*60*1000));
