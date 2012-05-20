@@ -85,6 +85,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     private WMProxy_PortType m_client;
     private DelegationSoapBindingStub delegationServiceStub;
     private String delegationId;
+    private String defaultDelegationId = UUID.randomUUID().toString();
     private String m_wmsServerUrl;
     private String m_LBAddress;
 
@@ -111,7 +112,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                     new UOptionalBoolean("PerusalFileEnable"),
                     new UOptional("ListenerStorage"),
                     new UOptional("MyProxyServer"),
-                    new UOptional("MyProxyDN")
+                    new UOptional("DelegationID")
                 });
     }
 
@@ -149,11 +150,11 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         }
 
         try {
-            delegationId = (String) attributes.get("MyProxyDN");
+            delegationId = (String) attributes.get("DelegationID");
             if (delegationId != null) {
                 ((Stub) m_client)._setProperty(GSIConstants.GSI_USER_DN, delegationId);
             } else {
-                delegationId = UUID.randomUUID().toString();
+                delegationId = defaultDelegationId;
             }
 
             SimpleProvider provider = new SimpleProvider();
@@ -211,6 +212,10 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                 throw new NoSuccessException(exc.getMessage());
             }
         }
+        
+        
+        //Credentials delegation
+        delegateCredentials(delegationId);
     }
 
     public void disconnect() throws NoSuccessException {
@@ -225,8 +230,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
         try {
-            //Credentials delegation
-            delegateCredentials(delegationId);
 
             // parse JDL and Check Matching
             if (checkMatch) {
