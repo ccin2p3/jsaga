@@ -20,6 +20,7 @@ import org.ogf.saga.error.*;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.Map;
 
 /*
@@ -37,16 +38,9 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
 
     private static final int USAGE_GET_DELEGATED_MEMORY = 5; // 1 to 4 reserved by super class
     private static final int USAGE_GET_DELEGATED_LOAD = 6;
-<<<<<<< HEAD
     private static final int DEFAULT_STORED_PROXY_LIFETIME = 7 * 24 * 3600;
     private static final int DEFAULT_DELEGATED_PROXY_LIFETIME = 12 * 3600;
 
-=======
-    private static final int DEFAULT_STORED_PROXY_LIFETIME = 7*24*3600;
-    private static final int DEFAULT_DELEGATED_PROXY_LIFETIME = 12*3600;
-    public static final String LOCAL_LIFETIME = "PT12H";
-    
->>>>>>> main
     public String getType() {
         return "VOMSMyProxy";
     }
@@ -71,7 +65,7 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
                                     return (value != null ? super.throwExceptionIfInvalid(value) : null);
                                 }
                             },
-                            new UDuration(VOMSContext.DELEGATIONLIFETIME) {
+                            new UOptional(VOMSContext.DELEGATIONLIFETIME) {
 
                                 protected Object throwExceptionIfInvalid(Object value) throws Exception {
                                     return (value != null ? super.throwExceptionIfInvalid(value) : null);
@@ -131,16 +125,8 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
             switch (usage) {
                 case USAGE_INIT_PKCS12:
                 case USAGE_INIT_PEM: {
-                    // create local temporary proxy
-                    //String tempFile = File.createTempFile("vomsmyproxy", "txt").getAbsolutePath();
-                    //attributes.put(Context.USERPROXY, tempFile);
-<<<<<<< HEAD
-                    //String oldLifeTime = (String) attributes.put(Context.LIFETIME, "PT12H");
-=======
-                    String oldLifeTime = (String) attributes.put(Context.LIFETIME, LOCAL_LIFETIME);
->>>>>>> main
-                    VOMSSecurityCredential adaptor = (VOMSSecurityCredential) super.createSecurityCredential(usage, attributes, contextId);
-                    //attributes.put(Context.LIFETIME, oldLifeTime);
+                    VOMSSecurityCredential adaptor = (VOMSSecurityCredential) super.createSecurityCredential(usage, attributeForVOMS(attributes), contextId);
+
                     GSSCredential cred = adaptor.getGSSCredential();
 
                     // send it to MyProxy server
@@ -187,6 +173,18 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
         } catch (Exception e) {
             throw new NoSuccessException(e);
         }
+    }
+
+    private Map<String, String> attributeForVOMS(Map<String, String> attributes) {
+        Map<String, String> attributeForVOMS = new HashMap<String, String>();
+        for (Map.Entry<String, String> e : attributes.entrySet()) {
+            attributeForVOMS.put(e.getKey(), e.getValue());
+        }
+
+        String lifeTime = attributes.get(VOMSContext.DELEGATIONLIFETIME);
+        attributeForVOMS.put(Context.LIFETIME, lifeTime);
+
+        return attributeForVOMS;
     }
 
     protected SecurityCredential createSecurityAdaptor(GSSCredential cred, Map attributes) {
@@ -257,7 +255,6 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
         if (attributes.get(VOMSContext.MYPROXYPASS) != null) {
             proxyParameters.setPassphrase((String) attributes.get(VOMSContext.MYPROXYPASS));
         }
-
 
         int delegatedLifetime = attributes.containsKey(VOMSContext.DELEGATIONLIFETIME)
                 ? UDuration.toInt(attributes.get(VOMSContext.DELEGATIONLIFETIME))

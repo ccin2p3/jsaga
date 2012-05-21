@@ -19,39 +19,44 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.*;
 
-/* ***************************************************
-* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
-* ***             http://cc.in2p3.fr/             ***
-* ***************************************************
-* File:   VOMSProxyFactory
-* Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   21 sept. 2007
-* ***************************************************
-* Description:                                      */
+/*
+ * ***************************************************
+ * *** Centre de Calcul de l'IN2P3 - Lyon (France) *** *** http://cc.in2p3.fr/
+ * *** *************************************************** File:
+ * VOMSProxyFactory Author: Sylvain Reynaud (sreynaud@in2p3.fr) Date: 21 sept.
+ * 2007 *************************************************** Description:
+ */
 /**
  *
  */
 public class VOMSProxyFactory {
+
     public static final int CERTIFICATE_PEM = 0;
     public static final int CERTIFICATE_PKCS12 = 1;
+    public static final String DEFAULTLIFE_TIME = "PT12H";
     private static final int OID_OLD = 2;           // default
     private static final int OID_GLOBUS = 3;
     private static final int OID_RFC820 = 4;
     private static final int DELEGATION_NONE = 1;
     private static final int DELEGATION_LIMITED = 2;
     private static final int DELEGATION_FULL = 3;   // default
-
     private VOMSProxyInit m_proxyInit;
     private VOMSRequestOptions m_requestOptions;
 
-    /** constructor for creating VOMS proxies */
+    /**
+     * constructor for creating VOMS proxies
+     */
     public VOMSProxyFactory(Map attributes, int certificateFormat) throws BadParameterException, ParseException, URISyntaxException {
         this(attributes, certificateFormat, null);
     }
-    /** constructor for signing VOMS proxies */
+
+    /**
+     * constructor for signing VOMS proxies
+     */
     public VOMSProxyFactory(Map attributes, GSSCredential cred) throws BadParameterException, ParseException, URISyntaxException {
         this(attributes, CERTIFICATE_PEM, cred);
     }
+
     private VOMSProxyFactory(Map attributes, int certificateFormat, GSSCredential cred) throws BadParameterException, ParseException, URISyntaxException {
         // required attributes
         System.setProperty("X509_CERT_DIR", (String) attributes.get(Context.CERTREPOSITORY));
@@ -60,8 +65,8 @@ public class VOMSProxyFactory {
 
         String serverUrl = (String) attributes.get(Context.SERVER);
         URI uri = new URI(serverUrl.replaceAll(" ", "%20"));
-        if (uri.getHost()==null) {
-            throw new BadParameterException("Attribute Server has no host name: "+uri.toString());
+        if (uri.getHost() == null) {
+            throw new BadParameterException("Attribute Server has no host name: " + uri.toString());
         }
         VOMSServerInfo server = new VOMSServerInfo();
         server.setHostName(uri.getHost());
@@ -70,7 +75,7 @@ public class VOMSProxyFactory {
         server.setVoName((String) attributes.get(Context.USERVO));
         if (cred != null) {
             if (cred instanceof GlobusGSSCredentialImpl) {
-                m_proxyInit = VOMSProxyInit.instance(((GlobusGSSCredentialImpl)cred).getGlobusCredential());
+                m_proxyInit = VOMSProxyInit.instance(((GlobusGSSCredentialImpl) cred).getGlobusCredential());
             } else {
                 throw new BadParameterException("Not a globus proxy");
             }
@@ -82,7 +87,7 @@ public class VOMSProxyFactory {
             }
 
             // get certificate
-            switch(certificateFormat) {
+            switch (certificateFormat) {
                 case CERTIFICATE_PEM:
                     String userCert = (String) attributes.get(Context.USERCERT);
                     String userKey = (String) attributes.get(Context.USERKEY);
@@ -105,11 +110,17 @@ public class VOMSProxyFactory {
         if (attributes.containsKey(VOMSContext.USERFQAN)) {
             m_requestOptions.addFQAN((String) attributes.get(VOMSContext.USERFQAN));
         }
+
+        int lifetime;
         if (attributes.containsKey(Context.LIFETIME)) {
-        	int lifetime = UDuration.toInt(attributes.get(Context.LIFETIME));
-            m_proxyInit.setProxyLifetime(lifetime);
-            m_requestOptions.setLifetime(lifetime);
+            lifetime = UDuration.toInt(attributes.get(Context.LIFETIME));
+        } else {
+            lifetime = UDuration.toInt(DEFAULTLIFE_TIME);
         }
+
+        m_proxyInit.setProxyLifetime(lifetime);
+        m_requestOptions.setLifetime(lifetime);
+
         if (attributes.containsKey(VOMSContext.DELEGATION)) {
             String delegation = (String) attributes.get(VOMSContext.DELEGATION);
             if (delegation.equalsIgnoreCase("none")) {
@@ -135,27 +146,26 @@ public class VOMSProxyFactory {
     public GSSCredential createProxy() throws GSSException, BadParameterException, NoSuccessException {
         // create
         GlobusCredential globusProxy;
-        if("NOVO".equals(m_requestOptions.getVoName())) {
-        	// TEST to create gridProxy :
-        	globusProxy = m_proxyInit.getVomsProxy(null);
-        }
-        else {
+        if ("NOVO".equals(m_requestOptions.getVoName())) {
+            // TEST to create gridProxy :
+            globusProxy = m_proxyInit.getVomsProxy(null);
+        } else {
             ArrayList options = new ArrayList();
             options.add(m_requestOptions);
-        	globusProxy = m_proxyInit.getVomsProxy(options);
-        	Util.setFilePermissions(m_proxyInit.getProxyOutputFile(), 600);
-	        // validate
-	        try {
-		        Vector v = VOMSValidator.parse(globusProxy.getCertificateChain());
-		        for (int i=0; i<v.size(); i++) {
-		            VOMSAttribute attr = (VOMSAttribute) v.elementAt(i);
-		            if(!attr.getVO().equals(m_requestOptions.getVoName()))
-		            	throw new NoSuccessException("The VO name of the created VOMS proxy ('"+attr.getVO()+"') does not match with the required VO name ('"+m_requestOptions.getVoName()+"').");
-		        }
-	        }
-	        catch (IllegalArgumentException iAE) {
-	        	throw new BadParameterException("The lifetime may be too long", iAE);
-	        }
+            globusProxy = m_proxyInit.getVomsProxy(options);
+            Util.setFilePermissions(m_proxyInit.getProxyOutputFile(), 600);
+            // validate
+            try {
+                Vector v = VOMSValidator.parse(globusProxy.getCertificateChain());
+                for (int i = 0; i < v.size(); i++) {
+                    VOMSAttribute attr = (VOMSAttribute) v.elementAt(i);
+                    if (!attr.getVO().equals(m_requestOptions.getVoName())) {
+                        throw new NoSuccessException("The VO name of the created VOMS proxy ('" + attr.getVO() + "') does not match with the required VO name ('" + m_requestOptions.getVoName() + "').");
+                    }
+                }
+            } catch (IllegalArgumentException iAE) {
+                throw new BadParameterException("The lifetime may be too long", iAE);
+            }
         }
         return new GlobusGSSCredentialImpl(globusProxy, GSSCredential.INITIATE_AND_ACCEPT);
     }
