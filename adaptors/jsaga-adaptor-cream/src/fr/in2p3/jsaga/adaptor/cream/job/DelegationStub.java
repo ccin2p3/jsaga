@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
+import org.glite.ce.creamapi.ws.cream2.types.AuthorizationFault;
 import org.glite.security.delegation.*;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
@@ -101,6 +102,8 @@ public class DelegationStub {
                 // rethrow exception
                 throw new AuthenticationFailedException(e.getMsg(), e);
             }
+        } catch (AuthorizationFault e) {
+        	rethrowAuthorizationException(e);
         } catch (RemoteException e) {
             throw new AuthenticationFailedException(e);
         }
@@ -148,5 +151,15 @@ public class DelegationStub {
         } else {
             return new File(System.getProperty("java.io.tmpdir"), "dlgor_"+host+"_"+System.getProperty("user.name"));
         }
+    }
+    
+    private void rethrowAuthorizationException(AuthorizationFault af) throws AuthenticationFailedException {
+    	try {
+    		throw new AuthenticationFailedException(af.getFaultDetails()[0].getElementsByTagNameNS("http://glite.org/2007/11/ce/cream/types", "Description").item(0).getFirstChild().getNodeValue());
+    	} catch (NullPointerException npe) {
+    		throw new AuthenticationFailedException(af);
+    	} catch (ArrayIndexOutOfBoundsException aioobe) {
+    		throw new AuthenticationFailedException(af);
+    	}
     }
 }

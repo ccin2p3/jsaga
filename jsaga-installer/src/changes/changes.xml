@@ -21,6 +21,7 @@
             <action dev="lschwarz" type="update">Support of recursive getSize() on directories</action>
             <action dev="lschwarz" type="add">New security adaptor for Gnome and KDE desktops</action>
             <action dev="lschwarz" type="update">Upgrade log4j from 1.2.8 to 1.2.16 for all modules</action>
+            <action dev="lschwarz" type="fix">Fix timeleft value for VOMSMyProxy credential</action>
         </release>
         <release version="0.9.14" date="2011-08-01" description="Compatible with SAGA Java Binding v1.1.1">
             <action dev="sreynaud" type="update">Upgrade saga-api to version 1.1.1 (enable simultaneous usage of multiple SAGA implementations)</action>
