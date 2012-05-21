@@ -39,7 +39,8 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
     private static final int USAGE_GET_DELEGATED_LOAD = 6;
     private static final int DEFAULT_STORED_PROXY_LIFETIME = 7*24*3600;
     private static final int DEFAULT_DELEGATED_PROXY_LIFETIME = 12*3600;
-
+    public static final String LOCAL_LIFETIME = "PT12H";
+    
     public String getType() {
         return "VOMSMyProxy";
     }
@@ -122,7 +123,7 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
                     // create local temporary proxy
                     //String tempFile = File.createTempFile("vomsmyproxy", "txt").getAbsolutePath();
                     //attributes.put(Context.USERPROXY, tempFile);
-                    String oldLifeTime = (String) attributes.put(Context.LIFETIME, "PT12H");
+                    String oldLifeTime = (String) attributes.put(Context.LIFETIME, LOCAL_LIFETIME);
                     VOMSSecurityCredential adaptor = (VOMSSecurityCredential) super.createSecurityCredential(usage, attributes, contextId);
                     attributes.put(Context.LIFETIME, oldLifeTime);
                     GSSCredential cred = adaptor.getGSSCredential();
@@ -177,7 +178,7 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
     }
     protected SecurityCredential createSecurityAdaptor(GSSCredential cred, Map attributes) {
         File certRepository = new File((String) attributes.get(Context.CERTREPOSITORY));
-        return new VOMSMyProxySecurityCredential(cred, certRepository);
+        return new VOMSMyProxySecurityCredential(cred, certRepository, attributes);
     }
 
     public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception {
