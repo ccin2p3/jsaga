@@ -40,7 +40,9 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
         super(proxy, certRepository);
         this._genuineLifeTime = (String) attributes.get(Context.LIFETIME);
         this._localLifeTime = (String) attributes.get(VOMSContext.DELEGATIONLIFETIME);
-        if(_localLifeTime == null) _localLifeTime = VOMSProxyFactory.DEFAULTLIFE_TIME;
+        if (_localLifeTime == null) {
+            _localLifeTime = VOMSProxyFactory.DEFAULTLIFE_TIME;
+        }
     }
 
     /**
@@ -48,7 +50,7 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
      */
     public String getAttribute(String key) throws NotImplementedException, NoSuccessException {
         // get attribute
-        if (Context.LIFETIME.equals(key)) {
+        if (Context.LIFETIME.equals(key) || VOMSContext.DELEGATIONLIFETIME.equals(key)) {
             // same as globus
             GlobusCredential globusProxy;
             if (m_proxy instanceof GlobusGSSCredentialImpl) {
@@ -60,8 +62,9 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
             VOMSAttribute attr = (VOMSAttribute) v.elementAt(0);
             try {
                 long timeleft = (attr.getNotAfter().getTime() - System.currentTimeMillis()) / 1000;
-                // the genuine lifetime is the one on the server (set by the user config)
-                timeleft = timeleft + UDuration.toInt(this._genuineLifeTime) - UDuration.toInt(_localLifeTime);
+                if (Context.LIFETIME.equals(key)) {
+                    timeleft = timeleft + UDuration.toInt(this._genuineLifeTime) - UDuration.toInt(_localLifeTime);
+                }
                 return "" + (timeleft > 0 ? timeleft : 0);
             } catch (ParseException e) {
                 throw new NoSuccessException(e);
@@ -69,6 +72,7 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
         } else {
             return super.getAttribute(key);
         }
+
     }
 
     /**
