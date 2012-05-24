@@ -182,7 +182,7 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
         }
 
         String lifeTime = attributes.get(VOMSContext.DELEGATIONLIFETIME);
-        attributeForVOMS.put(Context.LIFETIME, lifeTime);
+        if(lifeTime != null) attributeForVOMS.put(Context.LIFETIME, lifeTime);
 
         return attributeForVOMS;
     }
