@@ -1,30 +1,30 @@
-package fr.in2p3.jsaga.adaptor.batchssh.job;
+package fr.in2p3.jsaga.adaptor.batchssh.job
 
-import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
-import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
-import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
-import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
-import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
+import fr.in2p3.jsaga.adaptor.job.monitor.{JobMonitorAdaptor, QueryIndividualJob, QueryListJob, JobInfoAdaptor}
+import org.ogf.saga.error.NoSuccessException
 
-import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.NotImplementedException;
-import org.ogf.saga.error.PermissionDeniedException;
-import org.ogf.saga.error.TimeoutException;
-import java.util.Date;
-import java.util.List;
+class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract
+                                     //with JobMonitorAdaptor
+                                     with QueryIndividualJob
+                                     //with QueryListJob
+                                     //with ListableJobAdaptor
+                                     /*with JobInfoAdaptor*/  {
 
-/******************************************************
- * File:   BatchSSHMonitorAdaptor
- * Author: Taha BENYEZZA & Yassine BACHAR
- * Author: Lionel Schwarz
- * Date:   07 December 2010
- * ***************************************************/
+  def getStatus(nativeJobId: String) = {
+    val ssh = connection.openSession
+    try BatchSSHJob.status(nativeJobId, ssh)
+    finally ssh.close
+  }
+  
+  /*def list = allJobs.map{_.id}.toArray
 
+  def getSatusList =
+    allJobs.map{_.jobStatus}.toArray
 
-//
-// public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements JobMonitorAdaptor, QueryIndividualJob,
-//	QueryListJob, ListableJobAdaptor, JobInfoAdaptor  {
+  def getSatusList(nativeJobId: Array[String]) =
+    jobs(nativeJobId).map{_.jobStatus}.toArray*/
+  //def getExitCode(nativeJobId: String) = jobs(Seq(nativeJobId)).head.
+}
 //
 //	 QueryIndividualJob
 //    public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
@@ -88,3 +88,4 @@ import java.util.List;
 //	}
 //
 //}
+

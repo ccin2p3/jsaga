@@ -28,32 +28,40 @@ import org.ogf.saga.file.Directory;
 import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
+import org.ogf.saga.namespace.Flags;
 
 import java.io.*;
 import java.util.Date;
+import org.ogf.saga.task.TaskMode;
 
-/* ***************************************************
-* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
-* ***             http://cc.in2p3.fr/             ***
-* ***************************************************
-* File:   AbstractSyncJobImpl
-* Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   26 oct. 2007
-* ***************************************************
-* Description:                                      */
+/*
+ * ***************************************************
+ * *** Centre de Calcul de l'IN2P3 - Lyon (France) *** *** http://cc.in2p3.fr/
+ * *** *************************************************** File:
+ * AbstractSyncJobImpl Author: Sylvain Reynaud (sreynaud@in2p3.fr) Date: 26 oct.
+ * 2007 *************************************************** Description:
+ */
 /**
  *
  */
 public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl implements SyncJob, JobMonitorCallback {
-    /** Job state detail engine model */
-    private static final String MODEL = "JSAGA";
-    /** Job attribute (deviation from SAGA specification) */
-    public static final String NATIVEJOBDESCRIPTION = "NativeJobDescription";
-    /** Job vector attribute (deviation from SAGA specification) */
-    public static final String OUTPUTURL = "OutputURL";
-    /** logger */
-    private static Logger s_logger = Logger.getLogger(AbstractSyncJobImpl.class);
 
+    /**
+     * Job state detail engine model
+     */
+    private static final String MODEL = "JSAGA";
+    /**
+     * Job attribute (deviation from SAGA specification)
+     */
+    public static final String NATIVEJOBDESCRIPTION = "NativeJobDescription";
+    /**
+     * Job vector attribute (deviation from SAGA specification)
+     */
+    public static final String OUTPUTURL = "OutputURL";
+    /**
+     * logger
+     */
+    private static Logger s_logger = Logger.getLogger(AbstractSyncJobImpl.class);
     private JobControlAdaptor m_controlAdaptor;
     private GenericStreamableJobAdaptor m_genericStreamableJobAdaptor;
     private JobMonitorService m_monitorService;
@@ -69,8 +77,10 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     private Stdout m_stderr;
     private boolean m_willStartListening;
     private String m_currentModelState;
-    
-    /** constructor for submission */
+
+    /**
+     * constructor for submission
+     */
     protected AbstractSyncJobImpl(Session session, String nativeJobDesc, JobDescription jobDesc, DataStagingManager stagingMgr, String uniqId, AbstractSyncJobServiceImpl service) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         this(session, service, true);
         m_attributes.m_NativeJobDescription.setObject(nativeJobDesc);
@@ -82,7 +92,9 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         m_genericStreamableJobAdaptor = null;
     }
 
-    /** constructor for control and monitoring only */
+    /**
+     * constructor for control and monitoring only
+     */
     protected AbstractSyncJobImpl(Session session, String nativeJobId, DataStagingManager stagingMgr, AbstractSyncJobServiceImpl service) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         this(session, service, false);
         m_attributes.m_NativeJobDescription.setObject(null);
@@ -94,7 +106,9 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         m_genericStreamableJobAdaptor = null;
     }
 
-    /** common to all contructors */
+    /**
+     * common to all contructors
+     */
     private AbstractSyncJobImpl(Session session, AbstractSyncJobServiceImpl service, boolean create) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(session, create);
         m_attributes = new JobAttributes(this);
@@ -111,7 +125,9 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         m_genericStreamableJobAdaptor = null;
     }
 
-    /** clone */
+    /**
+     * clone
+     */
     public SagaObject clone() throws CloneNotSupportedException {
         AbstractSyncJobImpl clone = (AbstractSyncJobImpl) super.clone();
         clone.m_attributes = m_attributes.clone();
@@ -129,31 +145,30 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         clone.m_genericStreamableJobAdaptor = m_genericStreamableJobAdaptor;
         return clone;
     }
-
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
-
     private static boolean s_checkMatch = EngineProperties.getBoolean(EngineProperties.JOB_CONTROL_CHECK_MATCH);
+
     protected void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_monitorService.checkState();
         try {
             // get native job description
             String nativeJobDesc = m_attributes.m_NativeJobDescription.getObject();
-            
+
             // pre-staging (before job submit)
-            m_metrics.m_StateDetail.setValue(MODEL+":" + SubState.RUNNING_PRE_STAGING.toString());
+            m_metrics.m_StateDetail.setValue(MODEL + ":" + SubState.RUNNING_PRE_STAGING.toString());
             if (m_stagingMgr instanceof DataStagingManagerThroughStream) {
-                ((DataStagingManagerThroughStream)m_stagingMgr).preStaging(this);
+                ((DataStagingManagerThroughStream) m_stagingMgr).preStaging(this);
             } else if (m_stagingMgr instanceof DataStagingManagerThroughSandboxOnePhase) {
-                ((DataStagingManagerThroughSandboxOnePhase)m_stagingMgr).preStaging(this, nativeJobDesc, m_uniqId);
+                ((DataStagingManagerThroughSandboxOnePhase) m_stagingMgr).preStaging(this, nativeJobDesc, m_uniqId);
             }
 
             // submit
             if (this.isInteractive()) {
                 if (m_controlAdaptor instanceof StreamableJobInteractiveGet) {
                     // submit
-                    JobIOGetterInteractive ioHandler = ((StreamableJobInteractiveGet)m_controlAdaptor).submitInteractive(nativeJobDesc, s_checkMatch);
+                    JobIOGetterInteractive ioHandler = ((StreamableJobInteractiveGet) m_controlAdaptor).submitInteractive(nativeJobDesc, s_checkMatch);
                     if (ioHandler == null) {
-                        throw new NotImplementedException("ADAPTOR ERROR: Method submitInteractive() must not return null: "+m_controlAdaptor.getClass().getName());
+                        throw new NotImplementedException("ADAPTOR ERROR: Method submitInteractive() must not return null: " + m_controlAdaptor.getClass().getName());
                     }
 
                     // set stdin
@@ -176,47 +191,47 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
                     // set stdin
                     InputStream stdin = null;
                     if (m_stdin != null) {
-                        stdin = ((PostconnectedStdinOutputStream)m_stdin).getInputStreamContainer();
+                        stdin = ((PostconnectedStdinOutputStream) m_stdin).getInputStreamContainer();
                     }
 
                     // set stdout and stderr
                     if (m_stdout == null) {
                         m_stdout = new PreconnectedStdoutInputStream(this);
                     }
-                    OutputStream stdout = ((PreconnectedStdoutInputStream)m_stdout).getOutputStreamContainer();
+                    OutputStream stdout = ((PreconnectedStdoutInputStream) m_stdout).getOutputStreamContainer();
                     if (m_stderr == null) {
                         m_stderr = new PreconnectedStderrInputStream(this);
                     }
-                    OutputStream stderr = ((PreconnectedStderrInputStream)m_stderr).getOutputStreamContainer();
+                    OutputStream stderr = ((PreconnectedStderrInputStream) m_stderr).getOutputStreamContainer();
 
                     // submit
-                    m_nativeJobId = ((StreamableJobInteractiveSet)m_controlAdaptor).submitInteractive(
+                    m_nativeJobId = ((StreamableJobInteractiveSet) m_controlAdaptor).submitInteractive(
                             nativeJobDesc, s_checkMatch,
                             stdin, stdout, stderr);
                 } else if (m_controlAdaptor instanceof StreamableJobBatch) {
                     // set stdin
                     InputStream stdin;
-                    if (m_stdin!=null && m_stdin.getBuffer().length>0) {
+                    if (m_stdin != null && m_stdin.getBuffer().length > 0) {
                         stdin = new ByteArrayInputStream(m_stdin.getBuffer());
                     } else {
                         stdin = null;
                     }
 
                     // submit
-                    m_IOHandler = ((StreamableJobBatch)m_controlAdaptor).submit(nativeJobDesc, s_checkMatch, m_uniqId, stdin);
+                    m_IOHandler = ((StreamableJobBatch) m_controlAdaptor).submit(nativeJobDesc, s_checkMatch, m_uniqId, stdin);
                     if (m_IOHandler == null) {
-                        throw new NotImplementedException("ADAPTOR ERROR: Method submit() must not return null: "+m_controlAdaptor.getClass().getName());
+                        throw new NotImplementedException("ADAPTOR ERROR: Method submit() must not return null: " + m_controlAdaptor.getClass().getName());
                     }
                     m_nativeJobId = m_IOHandler.getJobId();
                 } else {
-                    throw new NotImplementedException("Interactive jobs are not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
+                    throw new NotImplementedException("Interactive jobs are not supported by this adaptor: " + m_controlAdaptor.getClass().getName());
                 }
             } else {
-            	if (m_stagingMgr instanceof StreamingManagerThroughSandboxTwoPhase) {
-                	m_genericStreamableJobAdaptor = new GenericStreamableJobAdaptor((StagingJobAdaptor) m_controlAdaptor);
+                if (m_stagingMgr instanceof StreamingManagerThroughSandboxTwoPhase) {
+                    m_genericStreamableJobAdaptor = new GenericStreamableJobAdaptor((StagingJobAdaptor) m_controlAdaptor);
                     // set stdin
                     InputStream stdin;
-                    if (m_stdin!=null && m_stdin.getBuffer().length>0) {
+                    if (m_stdin != null && m_stdin.getBuffer().length > 0) {
                         stdin = new ByteArrayInputStream(m_stdin.getBuffer());
                     } else {
                         stdin = null;
@@ -225,15 +240,15 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
                     // submit
                     m_IOHandler = m_genericStreamableJobAdaptor.submit(nativeJobDesc, s_checkMatch, m_uniqId, stdin);
                     if (m_IOHandler == null) {
-                        throw new NotImplementedException("ADAPTOR ERROR: Method submit() must not return null: "+m_genericStreamableJobAdaptor.getClass().getName());
+                        throw new NotImplementedException("ADAPTOR ERROR: Method submit() must not return null: " + m_genericStreamableJobAdaptor.getClass().getName());
                     }
                     m_nativeJobId = m_IOHandler.getJobId();
-            	} else {
-            		m_nativeJobId = m_controlAdaptor.submit(nativeJobDesc, s_checkMatch, m_uniqId);
-            	}
+                } else {
+                    m_nativeJobId = m_controlAdaptor.submit(nativeJobDesc, s_checkMatch, m_uniqId);
+                }
             }
             String monitorUrl = m_monitorService.getURL().getString();
-            String sagaJobId = "["+monitorUrl+"]-["+m_nativeJobId+"]";
+            String sagaJobId = "[" + monitorUrl + "]-[" + m_nativeJobId + "]";
             m_attributes.m_JobId.setObject(sagaJobId);
 
             // start listening if a callback was registered
@@ -244,12 +259,12 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
 
             // pre-staging (after job register)
             if (m_stagingMgr instanceof DataStagingManagerThroughSandboxTwoPhase) {
-                ((DataStagingManagerThroughSandboxTwoPhase)m_stagingMgr).preStaging(this, m_nativeJobId);
+                ((DataStagingManagerThroughSandboxTwoPhase) m_stagingMgr).preStaging(this, m_nativeJobId);
             }
 
             // start job
             if (m_controlAdaptor instanceof StagingJobAdaptorTwoPhase) {
-                ((StagingJobAdaptorTwoPhase)m_controlAdaptor).start(m_nativeJobId);
+                ((StagingJobAdaptorTwoPhase) m_controlAdaptor).start(m_nativeJobId);
             }
         } catch (AuthorizationFailedException e) {
             throw new NoSuccessException(e);
@@ -265,7 +280,11 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     protected void doCancel() {
-        try{m_monitorService.checkState();} catch(SagaException e){throw new RuntimeException(e);}
+        try {
+            m_monitorService.checkState();
+        } catch (SagaException e) {
+            throw new RuntimeException(e);
+        }
         if (m_nativeJobId == null) {
             throw new RuntimeException("INTERNAL ERROR: JobID not initialized");
         }
@@ -309,17 +328,17 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         m_monitorService.stopListening(m_nativeJobId);
 
         if (!(m_stagingMgr instanceof StreamingManagerThroughSandbox)) {
-        	// close job output and error streams
-        	this.closeStreamsIfDoneAndInteractive();
+            // close job output and error streams
+            this.closeStreamsIfDoneAndInteractive();
         }
-        
+
         if (this.isFinalState()) {
             // post-staging
             try {
                 this.postStaging();
                 if (m_stagingMgr instanceof StreamingManagerThroughSandbox) {
-                	// close job output and error streams after data staging
-                	this.closeStreamsIfDoneAndInteractive();
+                    // close job output and error streams after data staging
+                    this.closeStreamsIfDoneAndInteractive();
                 }
             } catch (PermissionDeniedException e) {
                 throw new NoSuccessException(e);
@@ -330,13 +349,13 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             try {
                 this.cleanUp();
             } catch (SagaException e) {
-                s_logger.warn("Failed to cleanup job: "+m_nativeJobId, e);
+                s_logger.warn("Failed to cleanup job: " + m_nativeJobId, e);
             }
         }
     }
 
     private void closeStreamsIfDoneAndInteractive() {
-        if (this.isFinalState() && m_IOHandler!=null) {  //if job is done and interactive
+        if (this.isFinalState() && m_IOHandler != null) {  //if job is done and interactive
             if (m_controlAdaptor instanceof StreamableJobInteractiveGet || m_controlAdaptor instanceof StreamableJobBatch || m_stagingMgr instanceof StreamingManagerThroughSandbox) {
                 try {
                     if (m_stdout == null) {
@@ -344,15 +363,15 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
                     }
                     m_stdout.closeJobIOHandler();
                 } catch (Exception e) {
-                    s_logger.warn("Failed to get job output stream: "+m_nativeJobId, e);
+                    s_logger.warn("Failed to get job output stream: " + m_nativeJobId, e);
                 }
                 try {
-	                if (m_stderr == null) {
-	                    m_stderr = new JobStderrInputStream(this, m_IOHandler);
-	                }
+                    if (m_stderr == null) {
+                        m_stderr = new JobStderrInputStream(this, m_IOHandler);
+                    }
                     m_stderr.closeJobIOHandler();
                 } catch (Exception e) {
-                    s_logger.warn("Failed to get job error stream: "+m_nativeJobId, e);
+                    s_logger.warn("Failed to get job error stream: " + m_nativeJobId, e);
                 }
             }
         }
@@ -367,7 +386,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             // cleanup
             this.cleanUp();
         } else {
-            throw new IncorrectStateException("Can not cleanup unfinished job: "+state, this);
+            throw new IncorrectStateException("Can not cleanup unfinished job: " + state, this);
         }
     }
 
@@ -387,11 +406,12 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             }
         }
     }
+
     private void cleanUp() throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         // cleanup staged files
-    	Directory dir = null;
-    	
-    	// remove staging files
+        Directory dir = null;
+
+        // remove staging files
         try {
             dir = m_stagingMgr.cleanup(this, m_nativeJobId);
         } catch (AuthenticationFailedException e) {
@@ -403,66 +423,58 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         } catch (DoesNotExistException e) {
             throw new NoSuccessException(e);
         }
-        
+
         // adaptor's cleanup
         if (m_controlAdaptor instanceof CleanableJobAdaptor) {
             try {
-            	JobInfoAdaptor jia = getJobInfoAdaptor();
-            	try {
-            		setStaticValue(m_attributes.m_Created, jia.getCreated(m_nativeJobId));
-            	} catch (Exception e) {
+                JobInfoAdaptor jia = getJobInfoAdaptor();
+                try {
+                    setStaticValue(m_attributes.m_Created, jia.getCreated(m_nativeJobId));
+                } catch (Exception e) {
                     s_logger.warn(e.getMessage());
-            	}
-            	try {
-            		setStaticValue(m_attributes.m_Started, jia.getStarted(m_nativeJobId));
-            	} catch (Exception e) {
+                }
+                try {
+                    setStaticValue(m_attributes.m_Started, jia.getStarted(m_nativeJobId));
+                } catch (Exception e) {
                     s_logger.warn(e.getMessage());
-            	}
-            	try {
-            		setStaticValue(m_attributes.m_Finished, jia.getFinished(m_nativeJobId));
-            	} catch (Exception e) {
+                }
+                try {
+                    setStaticValue(m_attributes.m_Finished, jia.getFinished(m_nativeJobId));
+                } catch (Exception e) {
                     s_logger.warn(e.getMessage());
-            	}
-            	try {
-            		setStaticValue(m_attributes.m_ExitCode, jia.getExitCode(m_nativeJobId));
-            	} catch (Exception e) {
+                }
+                try {
+                    setStaticValue(m_attributes.m_ExitCode, jia.getExitCode(m_nativeJobId));
+                } catch (Exception e) {
                     s_logger.warn(e.getMessage());
-            	}
-            	try {
-            		setStaticValues(m_attributes.m_ExecutionHosts, jia.getExecutionHosts(m_nativeJobId));
-            	} catch (Exception e) {
+                }
+                try {
+                    setStaticValues(m_attributes.m_ExecutionHosts, jia.getExecutionHosts(m_nativeJobId));
+                } catch (Exception e) {
                     s_logger.warn(e.getMessage());
-            	}
+                }
             } catch (NotImplementedException nie) {
-            	// Do not cache
+                // Do not cache
             }
-            
-            ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
+
+            ((CleanableJobAdaptor) m_controlAdaptor).clean(m_nativeJobId);
         }
-        
+
         // remove staging directory
         if (dir != null) {
-            try {
-				dir.remove();
-				dir.close();
-			} catch (AuthenticationFailedException e) {
-				throw new NoSuccessException(e);
-			} catch (AuthorizationFailedException e) {
-				throw new NoSuccessException(e);
-			} catch (BadParameterException e) {
-				throw new NoSuccessException(e);
-			}
+
+            dir.remove(TaskMode.SYNC, Flags.RECURSIVE.getValue());
+            dir.close();
+
         }
 
         // throw NotImplementedException if adaptor not instance of CleanableJobAdaptor
-        if (! (m_controlAdaptor instanceof CleanableJobAdaptor)) {
-            throw new NotImplementedException("Cleanup is not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
+        if (!(m_controlAdaptor instanceof CleanableJobAdaptor)) {
+            throw new NotImplementedException("Cleanup is not supported by this adaptor: " + m_controlAdaptor.getClass().getName());
         }
     }
 
-    
     ////////////////////////////////////// implementation of Job //////////////////////////////////////
-
     public JobDescription getJobDescriptionSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return m_jobDescription;
     }
@@ -513,33 +525,33 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             throw new IncorrectStateException("Can not suspend job in 'New' state", this);
         }
         if (m_controlAdaptor instanceof HoldableJobAdaptor && m_controlAdaptor instanceof SuspendableJobAdaptor) {
-            if (! ((HoldableJobAdaptor)m_controlAdaptor).hold(m_nativeJobId)) {
-                if (! ((SuspendableJobAdaptor)m_controlAdaptor).suspend(m_nativeJobId)) {
-                	if (getJobState().equals(State.NEW) || getJobState().equals(State.RUNNING)) {
-                		throw new NoSuccessException("Failed to hold/suspend job, the plugin returned False: "+m_nativeJobId);
-                	} else {
-                		throw new IncorrectStateException("Failed to hold/suspend job because it is neither queued nor active: "+m_nativeJobId);
-                	}
+            if (!((HoldableJobAdaptor) m_controlAdaptor).hold(m_nativeJobId)) {
+                if (!((SuspendableJobAdaptor) m_controlAdaptor).suspend(m_nativeJobId)) {
+                    if (getJobState().equals(State.NEW) || getJobState().equals(State.RUNNING)) {
+                        throw new NoSuccessException("Failed to hold/suspend job, the plugin returned False: " + m_nativeJobId);
+                    } else {
+                        throw new IncorrectStateException("Failed to hold/suspend job because it is neither queued nor active: " + m_nativeJobId);
+                    }
                 }
             }
         } else if (m_controlAdaptor instanceof HoldableJobAdaptor) {
-            if (! ((HoldableJobAdaptor)m_controlAdaptor).hold(m_nativeJobId)) {
-            	if (!getJobState().equals(State.NEW)) {
-            		throw new IncorrectStateException("Failed to hold job because it is not queued: "+m_nativeJobId);
-            	} else {
-            		throw new NoSuccessException("Failed to hold job; the plugin returned False");
-            	}
+            if (!((HoldableJobAdaptor) m_controlAdaptor).hold(m_nativeJobId)) {
+                if (!getJobState().equals(State.NEW)) {
+                    throw new IncorrectStateException("Failed to hold job because it is not queued: " + m_nativeJobId);
+                } else {
+                    throw new NoSuccessException("Failed to hold job; the plugin returned False");
+                }
             }
         } else if (m_controlAdaptor instanceof SuspendableJobAdaptor) {
-            if (! ((SuspendableJobAdaptor)m_controlAdaptor).suspend(m_nativeJobId)) {
-            	if (!getJobState().equals(State.RUNNING)) {
-            		throw new IncorrectStateException("Failed to suspend job because if is not active: "+m_nativeJobId);
-            	} else {
-            		throw new NoSuccessException("Failed to suspend job; the plugin returned False");
-            	}
+            if (!((SuspendableJobAdaptor) m_controlAdaptor).suspend(m_nativeJobId)) {
+                if (!getJobState().equals(State.RUNNING)) {
+                    throw new IncorrectStateException("Failed to suspend job because if is not active: " + m_nativeJobId);
+                } else {
+                    throw new NoSuccessException("Failed to suspend job; the plugin returned False");
+                }
             }
         } else {
-            throw new NotImplementedException("Suspend is not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
+            throw new NotImplementedException("Suspend is not supported by this adaptor: " + m_controlAdaptor.getClass().getName());
         }
     }
 
@@ -549,33 +561,33 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             throw new IncorrectStateException("Can not resume job in 'New' state", this);
         }
         if (m_controlAdaptor instanceof HoldableJobAdaptor && m_controlAdaptor instanceof SuspendableJobAdaptor) {
-            if (! ((HoldableJobAdaptor)m_controlAdaptor).release(m_nativeJobId)) {
-                if (! ((SuspendableJobAdaptor)m_controlAdaptor).resume(m_nativeJobId)) {
-                	if (!getState().equals(State.SUSPENDED)) {
-                		throw new IncorrectStateException("Failed to release/resume job because it is neither held nor suspended: "+m_nativeJobId);
-                	} else {
-                		throw new NoSuccessException("Failed to release/resume job; the plugin returned False");
-                	}
+            if (!((HoldableJobAdaptor) m_controlAdaptor).release(m_nativeJobId)) {
+                if (!((SuspendableJobAdaptor) m_controlAdaptor).resume(m_nativeJobId)) {
+                    if (!getState().equals(State.SUSPENDED)) {
+                        throw new IncorrectStateException("Failed to release/resume job because it is neither held nor suspended: " + m_nativeJobId);
+                    } else {
+                        throw new NoSuccessException("Failed to release/resume job; the plugin returned False");
+                    }
                 }
             }
         } else if (m_controlAdaptor instanceof HoldableJobAdaptor) {
-            if (! ((HoldableJobAdaptor)m_controlAdaptor).release(m_nativeJobId)) {
-            	if (!getState().equals(State.SUSPENDED)) {
-            		throw new IncorrectStateException("Failed to release job because it is not held: "+m_nativeJobId);
-            	} else {
-            		throw new NoSuccessException("Failed to release job; the plugin returned False");
-            	}
+            if (!((HoldableJobAdaptor) m_controlAdaptor).release(m_nativeJobId)) {
+                if (!getState().equals(State.SUSPENDED)) {
+                    throw new IncorrectStateException("Failed to release job because it is not held: " + m_nativeJobId);
+                } else {
+                    throw new NoSuccessException("Failed to release job; the plugin returned False");
+                }
             }
         } else if (m_controlAdaptor instanceof SuspendableJobAdaptor) {
-            if (! ((SuspendableJobAdaptor)m_controlAdaptor).resume(m_nativeJobId)) {
-            	if (!getState().equals(State.SUSPENDED)) {
-            		throw new IncorrectStateException("Failed to resume job because if is not suspended: "+m_nativeJobId);
-            	} else {
-            		throw new NoSuccessException("Failed to resume job; the plugin returned False");
-            	}
+            if (!((SuspendableJobAdaptor) m_controlAdaptor).resume(m_nativeJobId)) {
+                if (!getState().equals(State.SUSPENDED)) {
+                    throw new IncorrectStateException("Failed to resume job because if is not suspended: " + m_nativeJobId);
+                } else {
+                    throw new NoSuccessException("Failed to resume job; the plugin returned False");
+                }
             }
         } else {
-            throw new NotImplementedException("Resume is not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
+            throw new NotImplementedException("Resume is not supported by this adaptor: " + m_controlAdaptor.getClass().getName());
         }
     }
 
@@ -585,11 +597,11 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             throw new IncorrectStateException("Can not checkpoint job in 'New' state", this);
         }
         if (m_controlAdaptor instanceof CheckpointableJobAdaptor) {
-            if (! ((CheckpointableJobAdaptor)m_controlAdaptor).checkpoint(m_nativeJobId)) {
-                throw new NoSuccessException("Failed to checkpoint job: "+m_nativeJobId);
+            if (!((CheckpointableJobAdaptor) m_controlAdaptor).checkpoint(m_nativeJobId)) {
+                throw new NoSuccessException("Failed to checkpoint job: " + m_nativeJobId);
             }
         } else {
-            throw new NotImplementedException("Checkpoint is not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
+            throw new NotImplementedException("Checkpoint is not supported by this adaptor: " + m_controlAdaptor.getClass().getName());
         }
     }
 
@@ -608,30 +620,28 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             throw new IncorrectStateException("Can not send signal to job in 'New' state", this);
         }
         if (m_controlAdaptor instanceof SignalableJobAdaptor) {
-            if (! ((SignalableJobAdaptor)m_controlAdaptor).signal(m_nativeJobId, signum)) {
-                throw new NoSuccessException("Failed to signal job: "+m_nativeJobId);
+            if (!((SignalableJobAdaptor) m_controlAdaptor).signal(m_nativeJobId, signum)) {
+                throw new NoSuccessException("Failed to signal job: " + m_nativeJobId);
             }
         } else {
-            throw new NotImplementedException("Signal is not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
+            throw new NotImplementedException("Signal is not supported by this adaptor: " + m_controlAdaptor.getClass().getName());
         }
     }
 
     /////////////////////////////////////////// implementation of AbstractSyncJobImpl ////////////////////////////////////////////
-
     public State getJobState() {
         return m_metrics.m_State.getValue();
     }
 
     ////////////////////////////////////// implementation of JobMonitorCallback //////////////////////////////////////
-
     /**
      * Set job and task state (may finish task)
      */
     public void setState(State state, String stateDetail, SubState subState, SagaException cause) {
         // log
-    	if (m_currentModelState == null || !m_currentModelState.equals(stateDetail)) {
-    		m_currentModelState = stateDetail;
-            m_monitorService.getStateLogger().debug("State changed to "+stateDetail+" for job "+m_attributes.m_JobId.getObject());
+        if (m_currentModelState == null || !m_currentModelState.equals(stateDetail)) {
+            m_currentModelState = stateDetail;
+            m_monitorService.getStateLogger().debug("State changed to " + stateDetail + " for job " + m_attributes.m_JobId.getObject());
         }
         // set job state
         this.setJobState(state, stateDetail, subState, cause);
@@ -644,7 +654,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
      */
     private synchronized void setJobState(State state, String stateDetail, SubState subState, SagaException cause) {
         // if not already in a final state
-        if (! this.isFinalState()) {
+        if (!this.isFinalState()) {
             // update cause
             if (cause != null) {
                 super.setException(cause);
@@ -652,12 +662,11 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             // update metrics
             m_metrics.m_State.setValue(state);
             m_metrics.m_StateDetail.setValue(stateDetail);
-            m_metrics.m_StateDetail.setValue(MODEL+":" + subState.toString());
+            m_metrics.m_StateDetail.setValue(MODEL + ":" + subState.toString());
         }
     }
 
     /////////////////////////////////////// friend methods //////////////////////////////////////
-
     String getNativeJobId() {
         return m_nativeJobId;
     }
@@ -667,27 +676,27 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         if (monitorAdaptor instanceof JobInfoAdaptor) {
             return (JobInfoAdaptor) monitorAdaptor;
         } else {
-            throw new NotImplementedException("Job attribute not supported by this adaptor: "+monitorAdaptor.getClass());
+            throw new NotImplementedException("Job attribute not supported by this adaptor: " + monitorAdaptor.getClass());
         }
     }
-    
+
     StagingTransfer[] getOutputStagingTransfer() throws PermissionDeniedException, TimeoutException, NoSuccessException {
-    	if (m_stagingMgr instanceof DataStagingManagerThroughSandbox) {
-    		return ((DataStagingManagerThroughSandbox)m_stagingMgr).getOutputStagingTransfer(m_nativeJobId);
-    	}
-    	return null;
+        if (m_stagingMgr instanceof DataStagingManagerThroughSandbox) {
+            return ((DataStagingManagerThroughSandbox) m_stagingMgr).getOutputStagingTransfer(m_nativeJobId);
+        }
+        return null;
     }
 
     ////////////////////////////////////// private methods //////////////////////////////////////
-
     private boolean isFinalState() {
         // do not use getState_fromCache() because it may lead to infinite recursion
         State state = m_metrics.m_State.getValue();
-        if (state == null)
+        if (state == null) {
             state = State.RUNNING;
+        }
 
         // if state is terminal
-        switch(state) {
+        switch (state) {
             case DONE:
             case CANCELED:
             case FAILED:
@@ -706,27 +715,29 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     private void setStaticValue(ScalarAttributeImpl<Date> attr, final Date value) {
-    	attr = _addAttribute(new ScalarAttributeImpl<Date> (attr.getKey(), null, attr.getMode(), attr.getType(), new Date()) {
-                public String getValue() {
-                	return value.toString();
-                }
-            });
+        attr = _addAttribute(new ScalarAttributeImpl<Date>(attr.getKey(), null, attr.getMode(), attr.getType(), new Date()) {
+
+            public String getValue() {
+                return value.toString();
+            }
+        });
     }
 
     private void setStaticValue(ScalarAttributeImpl<Integer> attr, final Integer value) {
-    	attr = _addAttribute(new ScalarAttributeImpl<Integer> (attr.getKey(), null, attr.getMode(), attr.getType(), null) {
-                public String getValue() {
-                	return value.toString();
-                }
-            });
+        attr = _addAttribute(new ScalarAttributeImpl<Integer>(attr.getKey(), null, attr.getMode(), attr.getType(), null) {
+
+            public String getValue() {
+                return value.toString();
+            }
+        });
     }
-    
+
     private void setStaticValues(VectorAttributeImpl<String> attr, final String[] values) {
-    	attr = _addVectorAttribute(new VectorAttributeImpl<String> (attr.getKey(), null, attr.getMode(), attr.getType(), null) {
-                public String[] getValues() {
-                	return values;
-                }
-            });
+        attr = _addVectorAttribute(new VectorAttributeImpl<String>(attr.getKey(), null, attr.getMode(), attr.getType(), null) {
+
+            public String[] getValues() {
+                return values;
+            }
+        });
     }
-    
 }

@@ -132,9 +132,14 @@ object SFTPDataAdaptor {
         (buffer, nbRead, pos + nbRead)
       }
       
-      Iterator.iterate(fillBuffer(0)){case (buffer, nbRead, pos) => fillBuffer(pos)}.takeWhile{case (buffer, nbRead, pos) => nbRead != -1}.foreach{ 
+      Iterator.iterate(fillBuffer(0)) {
+        case (buffer, nbRead, pos) => fillBuffer(pos)
+      }.takeWhile {
+        case (buffer, nbRead, pos) => nbRead != -1
+      }.foreach { 
         case(buffer, nbRead, pos) => stream.write(buffer, 0, nbRead)
       }
+      
     } finally sftpClient.closeFile(fileHandler)
   }
   
