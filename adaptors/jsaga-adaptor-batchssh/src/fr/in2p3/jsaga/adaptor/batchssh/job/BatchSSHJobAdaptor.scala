@@ -87,9 +87,12 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     
       val dir = 
         if(basePath.isEmpty) stagingDir
-      else basePath + "/" + stagingDir
+        else basePath + "/" + stagingDir
       
-      dir.split("/").foldLeft("") {
+      val root = 
+        if(dir.startsWith("/")) "/" else ""
+      
+      dir.split("/").foldLeft(root) {
         (base, d) => 
         if(!d.isEmpty) {
           val dir = if(base.isEmpty) d else base + "/" + d
@@ -97,8 +100,8 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
           dir
         } else base
       }
-           
-      m_stagingDirectory = 
+      
+      m_stagingDirectory =
         try sftp.canonicalPath(dir)
       catch {
         case e: IOException => throw new NoSuccessException("Unable to build staging root directory", e)
@@ -109,9 +112,7 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     } finally sftp.close
   }
   
-  
-  
-  def submit(jobDesc: String, checkMatch: Boolean, uniqId: String) = {
+  override def submit(jobDesc: String, checkMatch: Boolean, uniqId: String) = {
     
     val jobScript = new StringBuilder("#!/bin/bash\n")
     val x = XML.loadString(jobDesc)
@@ -203,12 +204,17 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     
   }
 
-  def clean(nativeJobId: String) {
+  override def clean(nativeJobId: String) {
     val sftp = connection.openSFTPClient
     try {
+      val uniqId = this.uniqId(nativeJobId, sftp)
       sftp.tryRm(descriptionFile(nativeJobId))
       sftp.tryRm(uniqIdFile(nativeJobId))
-      //sftp.tryRmDir(stagingDirectoryFile(uniqId(nativeJobId, sftp)))
+      sftp.tryRmDir(stagingDirectoryFile(uniqId), true)
+    } catch {
+      case e =>
+        e.printStackTrace
+        throw e
     } finally sftp.close
   }
 

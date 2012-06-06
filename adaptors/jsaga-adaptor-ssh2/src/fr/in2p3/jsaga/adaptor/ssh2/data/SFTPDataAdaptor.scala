@@ -204,6 +204,7 @@ class SFTPDataAdaptor extends SSHAdaptor with FileReaderGetter with FileWriterPu
   override def removeFile(parentAbsolutePath: String, fileName: String, additionalArgs: String) = mapExceptions {
     val fullPath = parentAbsolutePath + "/" +  fileName
     //try 
+    //println("rm "+ fullPath)
     withSftpClient(_.rm(fullPath))
     //catch {
     //  case e: SFTPException =>

@@ -26,6 +26,7 @@ import collection.JavaConversions._
 import org.ogf.saga.error.NoSuccessException
 import fr.in2p3.jsaga.adaptor.ssh2.data.SFTPDataAdaptor._
 import ch.ethz.ssh2._
+import collection.JavaConversions._
 
 object BatchSSHAdaptorAbstract {
   val KNOWN_HOSTS = "KnownHosts"
@@ -63,12 +64,20 @@ object BatchSSHAdaptorAbstract {
         true
       } catch {
         case e: SFTPException => 
-          Logger.getLogger(classOf[BatchSSHAdaptorAbstract].getName).log(Level.FINE, "Directory creation failed", e)
+          //Logger.getLogger(classOf[BatchSSHAdaptorAbstract].getName).log(Level.FINE, "Directory creation failed", e)
           false
       }
     
-    def tryRmDir(dir: String) = 
+    def tryRmDir(dir: String, recursive: Boolean = false): Boolean = 
       try {
+        if(recursive)
+          sftp.ls(dir).filterNot(e => {e.filename == "." || e.filename == ".."}).foreach {
+            f => 
+            val file = dir + "/" + f.filename
+            if(f.attributes.isDirectory) tryRmDir(file)
+            else tryRm(file)
+          }
+
         sftp.rmdir(dir)
         true
       } catch {
@@ -136,7 +145,6 @@ abstract class BatchSSHAdaptorAbstract extends ClientAdaptor {
    */
   protected var m_stagingDirectory: String = _
   protected var connection: Connection = _
-  protected var homeDir: String = _
   private var credential: SecurityCredential = _
 
   def getUsage =
@@ -172,6 +180,7 @@ abstract class BatchSSHAdaptorAbstract extends ClientAdaptor {
     basePath: String,
     attributes: java.util.Map[_, _]) = {
 
+    
     try {
       // Creating a connection instance
       connection = new Connection(host, port)
@@ -188,7 +197,7 @@ abstract class BatchSSHAdaptorAbstract extends ClientAdaptor {
           this.knownHosts.addHostkeys(knownHost)
         case None =>
       }
-
+      
       credential match {
         case credential: UserPassSecurityCredential =>
           val userId = credential.getUserID
@@ -214,7 +223,7 @@ abstract class BatchSSHAdaptorAbstract extends ClientAdaptor {
         case _ => throw new AuthenticationFailedException("Invalid security instance.")
       }
 
-      homeDir = withSFTP(connection, _.canonicalPath("."))
+      //homeDir = withSFTP(connection, _.canonicalPath("."))
     } catch {
       case ex: IOException => throw new AuthenticationFailedException(ex)
     }

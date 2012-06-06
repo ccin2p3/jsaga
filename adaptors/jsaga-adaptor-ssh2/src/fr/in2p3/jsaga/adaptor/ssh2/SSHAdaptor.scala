@@ -89,12 +89,13 @@ abstract class SSHAdaptor extends ClientAdaptor {
         val info = connection.getConnectionInfo
         if(knownHosts.verifyHostkey(host + ':' + port, info.serverHostKeyAlgorithm, info.serverHostKey) ==  KnownHosts.HOSTKEY_HAS_CHANGED) throw new AuthenticationFailedException("Remote host key has changed.")
       }
-      
+            
       val isAuthenticated = credential match {
         case credential: UserPassSecurityCredential =>
           val userId = credential.getUserID
           val password = credential.getUserPass
-          connection.authenticateWithPassword(userId, password)
+          if(password == "") connection.authenticateWithNone(userId)
+          else connection.authenticateWithPassword(userId, password)
         case credential: UserPassStoreSecurityCredential =>
           val userId = credential.getUserID(host)
 	  val password = credential.getUserPass(host)

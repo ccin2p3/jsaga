@@ -174,7 +174,7 @@ class SSHJobControlAdaptor extends SSHAdaptor with JobControlAdaptor with Cleana
         " > " + absolute(sjp.getOutfile) + " 2> " + absolute(sjp.getErrfile) +" ; " +
         " echo $? > " + absolute(sjp.getEndCodeFile) + ") & " +
         "echo $! > " + absolute(sjp.getPidFile) + " )"
-
+      
       exec(connection, "bash -c '" + command.toString + "'")
     } catch {
       case e: Exception => throw new NoSuccessException(e)
