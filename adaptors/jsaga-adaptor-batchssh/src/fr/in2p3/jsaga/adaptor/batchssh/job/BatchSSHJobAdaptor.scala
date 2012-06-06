@@ -160,7 +160,7 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
         }
       } catch {
         case e =>
-          sftp.tryRmDir(stagingDir)
+          sftp.tryRmDir(stagingDir, true)
           throw e
       }
 
@@ -188,6 +188,7 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
           } catch {
             case e => 
               clean(jobId)
+              sftp.tryRmDir(stagingDir, true)
               throw e
           }
 
@@ -210,7 +211,7 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
       val uniqId = this.uniqId(nativeJobId, sftp)
       sftp.tryRm(descriptionFile(nativeJobId))
       sftp.tryRm(uniqIdFile(nativeJobId))
-      sftp.tryRmDir(stagingDirectoryFile(uniqId), true)
+      //sftp.tryRmDir(stagingDirectoryFile(uniqId), true)
     } catch {
       case e =>
         e.printStackTrace
