@@ -187,44 +187,49 @@ abstract class BatchSSHAdaptorAbstract extends ClientAdaptor {
       java.util.logging.Logger.getLogger("ch.ethz.ssh2").setLevel(java.util.logging.Level.WARNING)
       // Now connect
       connection.connect
-
-      // Load known_hosts file into in-memory KnownHosts
-      mapAsScalaMap(attributes).asInstanceOf[collection.mutable.Map[String, String]].get(KNOWN_HOSTS) match {
-        case Some(knownHostPath) => 
-          val knownHost = new File(knownHostPath)
-          if (!knownHost.exists) throw new BadParameterException("Unable to find the selected known host file.")
-          this.knownHosts.addHostkeys(knownHost)
-        case None =>
-      }
+      try {
+        // Load known_hosts file into in-memory KnownHosts
+        mapAsScalaMap(attributes).asInstanceOf[collection.mutable.Map[String, String]].get(KNOWN_HOSTS) match {
+          case Some(knownHostPath) => 
+            val knownHost = new File(knownHostPath)
+            if (!knownHost.exists) throw new BadParameterException("Unable to find the selected known host file.")
+            this.knownHosts.addHostkeys(knownHost)
+          case None =>
+        }
       
-      credential match {
-        case credential: UserPassSecurityCredential =>
-          val userId = credential.getUserID
-          val password = credential.getUserPass
-          if(!connection.authenticateWithPassword(userId, password))
-            throw new AuthenticationFailedException("Authentication failed.")
-        case credential: UserPassStoreSecurityCredential =>
-          try {
-            val userId = credential.getUserID(host)
-            val password = credential.getUserPass(host)
-            if(connection.authenticateWithPassword(userId, password))
+        credential match {
+          case credential: UserPassSecurityCredential =>
+            val userId = credential.getUserID
+            val password = credential.getUserPass
+            if(!connection.authenticateWithPassword(userId, password))
               throw new AuthenticationFailedException("Authentication failed.")
-          } catch {
-            case e => throw new AuthenticationFailedException(e);
-          }
-        case credential: SSHSecurityCredential =>
-          val userId = credential.getUserID
-          val passPhrase = credential.getUserPass
-          val key = credential.getPrivateKeyFile
+          case credential: UserPassStoreSecurityCredential =>
+            try {
+              val userId = credential.getUserID(host)
+              val password = credential.getUserPass(host)
+              if(connection.authenticateWithPassword(userId, password))
+                throw new AuthenticationFailedException("Authentication failed.")
+            } catch {
+              case e => throw new AuthenticationFailedException(e);
+            }
+          case credential: SSHSecurityCredential =>
+            val userId = credential.getUserID
+            val passPhrase = credential.getUserPass
+            val key = credential.getPrivateKeyFile
 
-          if (!connection.authenticateWithPublicKey(userId, key, passPhrase))
-            throw new AuthenticationFailedException("Authentication failed.")
-        case _ => throw new AuthenticationFailedException("Invalid security instance.")
+            if (!connection.authenticateWithPublicKey(userId, key, passPhrase))
+              throw new AuthenticationFailedException("Authentication failed.")
+          case _ => throw new AuthenticationFailedException("Invalid security instance.")
+        }
+
+        //homeDir = withSFTP(connection, _.canonicalPath("."))
+      } catch {
+        case ex: IOException => throw new AuthenticationFailedException(ex)
       }
-
-      //homeDir = withSFTP(connection, _.canonicalPath("."))
     } catch {
-      case ex: IOException => throw new AuthenticationFailedException(ex)
+      case e =>
+        disconnect
+        throw e
     }
   }
 

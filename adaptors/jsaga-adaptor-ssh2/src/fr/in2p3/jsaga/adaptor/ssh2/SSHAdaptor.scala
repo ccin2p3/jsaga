@@ -75,42 +75,48 @@ abstract class SSHAdaptor extends ClientAdaptor {
       // Now connect
       connection.connect
       
-      val ignoreKnowHosts =  if (attributes.containsKey(IGNORE_KNOWN_HOSTS)) attributes.get(IGNORE_KNOWN_HOSTS).asInstanceOf[String].equalsIgnoreCase("true") else false
+      try {
+        val ignoreKnowHosts =  if (attributes.containsKey(IGNORE_KNOWN_HOSTS)) attributes.get(IGNORE_KNOWN_HOSTS).asInstanceOf[String].equalsIgnoreCase("true") else false
       
-      if(!ignoreKnowHosts) {
-        val knownHosts = new KnownHosts
-        // Load known_hosts file into in-memory KnownHosts
-        if (attributes.containsKey(KNOWN_HOSTS)) {
-          val knownHostsFile = new File(attributes.get(KNOWN_HOSTS).asInstanceOf[String])
-          if (!knownHostsFile.exists) throw new BadParameterException("Unable to find the selected known host file.")
-          knownHosts.addHostkeys(knownHostsFile)
+        if(!ignoreKnowHosts) {
+          val knownHosts = new KnownHosts
+          // Load known_hosts file into in-memory KnownHosts
+          if (attributes.containsKey(KNOWN_HOSTS)) {
+            val knownHostsFile = new File(attributes.get(KNOWN_HOSTS).asInstanceOf[String])
+            if (!knownHostsFile.exists) throw new BadParameterException("Unable to find the selected known host file.")
+            knownHosts.addHostkeys(knownHostsFile)
+          }
+      
+          val info = connection.getConnectionInfo
+          if(knownHosts.verifyHostkey(host + ':' + port, info.serverHostKeyAlgorithm, info.serverHostKey) ==  KnownHosts.HOSTKEY_HAS_CHANGED) throw new AuthenticationFailedException("Remote host key has changed.")
         }
-      
-        val info = connection.getConnectionInfo
-        if(knownHosts.verifyHostkey(host + ':' + port, info.serverHostKeyAlgorithm, info.serverHostKey) ==  KnownHosts.HOSTKEY_HAS_CHANGED) throw new AuthenticationFailedException("Remote host key has changed.")
-      }
             
-      val isAuthenticated = credential match {
-        case credential: UserPassSecurityCredential =>
-          val userId = credential.getUserID
-          val password = credential.getUserPass
-          if(password == "") connection.authenticateWithNone(userId)
-          else connection.authenticateWithPassword(userId, password)
-        case credential: UserPassStoreSecurityCredential =>
-          val userId = credential.getUserID(host)
-	  val password = credential.getUserPass(host)
-	  connection.authenticateWithPassword(userId, password)
-        case credential: SSHSecurityCredential =>
-          val userId = credential.getUserID
-          val passPhrase = credential.getUserPass
-          val key = credential.getPrivateKeyFile
-          connection.authenticateWithPublicKey(userId, key, passPhrase)
-        case _ => throw new AuthenticationFailedException("Invalid security instance.")
-      }
-      if (isAuthenticated == false) throw new AuthenticationFailedException("Authentication failed.")
+        val isAuthenticated = credential match {
+          case credential: UserPassSecurityCredential =>
+            val userId = credential.getUserID
+            val password = credential.getUserPass
+            if(password == "") connection.authenticateWithNone(userId)
+            else connection.authenticateWithPassword(userId, password)
+          case credential: UserPassStoreSecurityCredential =>
+            val userId = credential.getUserID(host)
+            val password = credential.getUserPass(host)
+            connection.authenticateWithPassword(userId, password)
+          case credential: SSHSecurityCredential =>
+            val userId = credential.getUserID
+            val passPhrase = credential.getUserPass
+            val key = credential.getPrivateKeyFile
+            connection.authenticateWithPublicKey(userId, key, passPhrase)
+          case _ => throw new AuthenticationFailedException("Invalid security instance.")
+        }
+        if (isAuthenticated == false) throw new AuthenticationFailedException("Authentication failed.")
    
+      } catch {
+        case e: Exception => throw new AuthenticationFailedException("Authentication failed.", e)
+      }
     } catch {
-      case e: Exception => throw new AuthenticationFailedException("Authentication failed.", e)
+      case e => 
+        disconnect
+        throw e
     }
   }
 
