@@ -158,8 +158,6 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     
     jobScript append "\n"
     
-    println(jobScript.toString)
-    
     val stagingDir = stagingDirectoryFile(uniqId)
     val scriptFileName = stagingDir + "/" + scriptName
 
