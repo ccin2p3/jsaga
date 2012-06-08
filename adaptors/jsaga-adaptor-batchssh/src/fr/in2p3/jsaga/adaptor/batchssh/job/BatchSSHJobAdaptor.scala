@@ -112,8 +112,7 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     } finally sftp.close
   }
   
-  override def submit(jobDesc: String, checkMatch: Boolean, uniqId: String) = {
-    
+  override def submit(jobDesc: String, checkMatch: Boolean, uniqId: String) = {    
     val jobScript = new StringBuilder("#!/bin/bash\n")
     val x = XML.loadString(jobDesc)
 
@@ -129,6 +128,23 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
       jobScript append "\n"
     }
     
+    val queue = (x \ "JobDescription" \ "JobIdentification" \ "JobAnnotation" text)
+    if(!(queue isEmpty)) {
+      jobScript append ("#PBS -q " + queue)
+      jobScript append "\n"
+    }
+    
+    val resources = x \ "JobDescription" \ "Resources"
+    val cpuTime = resources \ "TotalCPUTime" \ "UpperBoundedRange" text
+    val memory = resources \ "TotalPhysicalMemory" \ "UpperBoundedRange" text
+    
+    if(!cpuTime.isEmpty || !memory.isEmpty) {
+      jobScript append "#PBS -l "
+      if(!cpuTime.isEmpty) jobScript append ("cput=" + cpuTime + ":00,")
+      if(!memory.isEmpty) jobScript append ("mem=" + memory + "MB")
+      jobScript append "\n"
+    }
+    
     if(!(application \ "WorkingDirectory" isEmpty)) {
       val workDir = (application \ "WorkingDirectory" text)
       jobScript append ("mkdir -p " + workDir + '\n')
@@ -141,6 +157,8 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     jobScript append executable
     
     jobScript append "\n"
+    
+    println(jobScript.toString)
     
     val stagingDir = stagingDirectoryFile(uniqId)
     val scriptFileName = stagingDir + "/" + scriptName

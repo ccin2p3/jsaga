@@ -179,7 +179,6 @@ abstract class BatchSSHAdaptorAbstract extends ClientAdaptor {
     port: Int,
     basePath: String,
     attributes: java.util.Map[_, _]) = {
-
     
     try {
       // Creating a connection instance
