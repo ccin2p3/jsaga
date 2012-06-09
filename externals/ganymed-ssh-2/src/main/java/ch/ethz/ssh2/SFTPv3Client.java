@@ -93,16 +93,24 @@ public class SFTPv3Client {
 
         log.debug("Opening session and starting SFTP subsystem.");
         sess = conn.openSession();
-        sess.startSubSystem("sftp");
+        try {
+            sess.startSubSystem("sftp");
 
-        is = sess.getStdout();
-        os = new BufferedOutputStream(sess.getStdin(), 2048);
+            is = sess.getStdout();
+            os = new BufferedOutputStream(sess.getStdin(), 2048);
 
-        if (is == null) {
-            throw new IOException("There is a problem with the streams of the underlying channel.");
+            if (is == null) {
+                throw new IOException("There is a problem with the streams of the underlying channel.");
+            }
+
+            init();
+        } catch (IOException t) {
+            close();
+            throw t;
+        } catch (RuntimeException e) {
+            close();
+            throw e;
         }
-
-        init();
     }
 
     /**
@@ -1341,10 +1349,10 @@ public class SFTPv3Client {
      * A read is divided into multiple requests sent sequentially before reading
      * any status from the server
      */
-    /*private static class OutstandingStatusRequest {
-        int req_id;
-    }*/
-
+    /*
+     * private static class OutstandingStatusRequest { int req_id;
+    }
+     */
     /**
      * Write bytes to a file. If
      * <code>len</code> &gt; 32768, then the write operation will be split into
@@ -1365,7 +1373,6 @@ public class SFTPv3Client {
             recieveAndProcessWriteMessage();
         }
     }
-    
     private int concurentWriteRequests = 32;
     private Set<Integer> writeRequests = new TreeSet<Integer>();
 

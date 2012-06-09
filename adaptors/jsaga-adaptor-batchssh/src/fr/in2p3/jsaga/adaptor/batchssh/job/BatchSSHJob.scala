@@ -54,7 +54,7 @@ object BatchSSHJob {
       }
     } catch {
       case e => throw new NoSuccessException("Unable to query job status", e)
-    } finally session.close
+    } 
 
   }
   

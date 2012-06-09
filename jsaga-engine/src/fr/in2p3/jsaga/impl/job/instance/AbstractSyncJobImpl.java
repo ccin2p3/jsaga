@@ -423,51 +423,51 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         } catch (DoesNotExistException e) {
             throw new NoSuccessException(e);
         }
+        try {
+            // adaptor's cleanup
+            if (m_controlAdaptor instanceof CleanableJobAdaptor) {
+                try {
+                    JobInfoAdaptor jia = getJobInfoAdaptor();
+                    try {
+                        setStaticValue(m_attributes.m_Created, jia.getCreated(m_nativeJobId));
+                    } catch (Exception e) {
+                        s_logger.warn(e.getMessage());
+                    }
+                    try {
+                        setStaticValue(m_attributes.m_Started, jia.getStarted(m_nativeJobId));
+                    } catch (Exception e) {
+                        s_logger.warn(e.getMessage());
+                    }
+                    try {
+                        setStaticValue(m_attributes.m_Finished, jia.getFinished(m_nativeJobId));
+                    } catch (Exception e) {
+                        s_logger.warn(e.getMessage());
+                    }
+                    try {
+                        setStaticValue(m_attributes.m_ExitCode, jia.getExitCode(m_nativeJobId));
+                    } catch (Exception e) {
+                        s_logger.warn(e.getMessage());
+                    }
+                    try {
+                        setStaticValues(m_attributes.m_ExecutionHosts, jia.getExecutionHosts(m_nativeJobId));
+                    } catch (Exception e) {
+                        s_logger.warn(e.getMessage());
+                    }
+                } catch (NotImplementedException nie) {
+                    // Do not cache
+                }
 
-        // adaptor's cleanup
-        if (m_controlAdaptor instanceof CleanableJobAdaptor) {
-            try {
-                JobInfoAdaptor jia = getJobInfoAdaptor();
-                try {
-                    setStaticValue(m_attributes.m_Created, jia.getCreated(m_nativeJobId));
-                } catch (Exception e) {
-                    s_logger.warn(e.getMessage());
-                }
-                try {
-                    setStaticValue(m_attributes.m_Started, jia.getStarted(m_nativeJobId));
-                } catch (Exception e) {
-                    s_logger.warn(e.getMessage());
-                }
-                try {
-                    setStaticValue(m_attributes.m_Finished, jia.getFinished(m_nativeJobId));
-                } catch (Exception e) {
-                    s_logger.warn(e.getMessage());
-                }
-                try {
-                    setStaticValue(m_attributes.m_ExitCode, jia.getExitCode(m_nativeJobId));
-                } catch (Exception e) {
-                    s_logger.warn(e.getMessage());
-                }
-                try {
-                    setStaticValues(m_attributes.m_ExecutionHosts, jia.getExecutionHosts(m_nativeJobId));
-                } catch (Exception e) {
-                    s_logger.warn(e.getMessage());
-                }
-            } catch (NotImplementedException nie) {
-                // Do not cache
+                ((CleanableJobAdaptor) m_controlAdaptor).clean(m_nativeJobId);
             }
 
-            ((CleanableJobAdaptor) m_controlAdaptor).clean(m_nativeJobId);
-        }
+            // remove staging directory
+            if (dir != null) {
+                dir.remove(TaskMode.SYNC, Flags.RECURSIVE.getValue());
+            }
 
-        // remove staging directory
-        if (dir != null) {
-
-            dir.remove(TaskMode.SYNC, Flags.RECURSIVE.getValue());
+        } finally {
             dir.close();
-
         }
-
         // throw NotImplementedException if adaptor not instance of CleanableJobAdaptor
         if (!(m_controlAdaptor instanceof CleanableJobAdaptor)) {
             throw new NotImplementedException("Cleanup is not supported by this adaptor: " + m_controlAdaptor.getClass().getName());
