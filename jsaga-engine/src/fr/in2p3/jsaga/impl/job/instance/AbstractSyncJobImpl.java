@@ -466,7 +466,9 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             }
 
         } finally {
-            dir.close();
+            if (dir != null) {
+                dir.close();
+            }
         }
         // throw NotImplementedException if adaptor not instance of CleanableJobAdaptor
         if (!(m_controlAdaptor instanceof CleanableJobAdaptor)) {
