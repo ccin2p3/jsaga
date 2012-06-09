@@ -54,15 +54,15 @@ object SFTPDataAdaptor {
   
   private def mapExceptions[T](f: => T) = 
     try f
-    catch {
-      case e: SFTPException => 
-        throw e.getServerErrorCode match {
-          case ErrorCodes.SSH_FX_NO_SUCH_FILE => new DoesNotExistException(e)
-          case ErrorCodes.SSH_FX_PERMISSION_DENIED => new PermissionDeniedException(e)
-          case _ => new NoSuccessException(e)
-        }
-      case e: Exception => throw new NoSuccessException(e)
-    }
+  catch {
+    case e: SFTPException => 
+      throw e.getServerErrorCode match {
+        case ErrorCodes.SSH_FX_NO_SUCH_FILE => new DoesNotExistException(e)
+        case ErrorCodes.SSH_FX_PERMISSION_DENIED => new PermissionDeniedException(e)
+        case _ => new NoSuccessException(e)
+      }
+    case e: Exception => throw new NoSuccessException(e)
+  }
   
   
   def makeDir(sftpClient: SFTPv3Client, parentPath: String, directoryName: String, additionalArgs: String = "") = mapExceptions {
@@ -152,7 +152,8 @@ class SFTPDataAdaptor extends SSHAdaptor with FileReaderGetter with FileWriterPu
   import SSHAdaptor._
   
   //private var sftpClient: SFTPv3Client = _
-  private def withSftpClient[A](f: SFTPv3Client => A): A = {
+  private def withSftpClient[A](f: SFTPv3Client => A): A = withConnection {
+    connection =>
     val sftpClient = new SFTPv3Client(connection)
     try f(sftpClient) finally sftpClient.close
   }

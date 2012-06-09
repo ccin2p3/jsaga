@@ -495,7 +495,7 @@ public class TransportManager
 				{
 					close(e, false);
 
-					log.warning("Receive thread: error in receiveLoop: " + e.getMessage());
+					log.debug("Receive thread: error in receiveLoop: " + e.getMessage());
 				}
 
 				if (log.isDebugEnabled())

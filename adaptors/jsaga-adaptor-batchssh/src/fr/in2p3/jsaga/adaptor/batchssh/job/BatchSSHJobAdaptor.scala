@@ -78,41 +78,47 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     
     val attributes = _attributes.asInstanceOf[java.util.Map[String, String]]
     super.connect(userInfo, host, port, basePath, _attributes)
-    // create SFTP connection
-    val sftp = connection.openSFTPClient
     
-    try {        
-      val stagingDir = 
-        attributes.getOrElse(STAGING_DIRECTORY, DEFAULT_STAGING_DIRECTORY)
+    withConnection {
+      connection =>
+
+// create SFTP connection
+      val sftp = connection.openSFTPClient
     
-      val dir = 
-        if(basePath.isEmpty) stagingDir
+      try {        
+        val stagingDir = 
+          attributes.getOrElse(STAGING_DIRECTORY, DEFAULT_STAGING_DIRECTORY)
+    
+        val dir = 
+          if(basePath.isEmpty) stagingDir
         else basePath + "/" + stagingDir
       
-      val root = 
-        if(dir.startsWith("/")) "/" else ""
+        val root = 
+          if(dir.startsWith("/")) "/" else ""
       
-      dir.split("/").foldLeft(root) {
-        (base, d) => 
-        if(!d.isEmpty) {
-          val dir = if(base.isEmpty) d else base + "/" + d
-          sftp.tryCreateDir(dir, 0700)
-          dir
-        } else base
-      }
+        dir.split("/").foldLeft(root) {
+          (base, d) => 
+          if(!d.isEmpty) {
+            val dir = if(base.isEmpty) d else base + "/" + d
+            sftp.tryCreateDir(dir, 0700)
+            dir
+          } else base
+        }
       
-      m_stagingDirectory =
-        try sftp.canonicalPath(dir)
-      catch {
-        case e: IOException => throw new NoSuccessException("Unable to build staging root directory", e)
-      }
+        m_stagingDirectory =
+          try sftp.canonicalPath(dir)
+        catch {
+          case e: IOException => throw new NoSuccessException("Unable to build staging root directory", e)
+        }
       
-      sftp.tryCreateDir(idDir, 0700)
+        sftp.tryCreateDir(idDir, 0700)
       
-    } finally sftp.close
+      } finally sftp.close
+    }
   }
   
-  override def submit(jobDesc: String, checkMatch: Boolean, uniqId: String) = {    
+  override def submit(jobDesc: String, checkMatch: Boolean, uniqId: String) = withConnection {
+    connection =>    
     val jobScript = new StringBuilder("#!/bin/bash\n")
     val x = XML.loadString(jobDesc)
 
@@ -160,7 +166,7 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     
     val stagingDir = stagingDirectoryFile(uniqId)
     val scriptFileName = stagingDir + "/" + scriptName
-
+    
     val sftp = connection.openSFTPClient
     try {
       
@@ -221,21 +227,19 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     
   }
 
-  override def clean(nativeJobId: String) {
+  override def clean(nativeJobId: String) = withConnection {
+    connection =>
     val sftp = connection.openSFTPClient
     try {
       val uniqId = this.uniqId(nativeJobId, sftp)
       sftp.tryRm(descriptionFile(nativeJobId))
       sftp.tryRm(uniqIdFile(nativeJobId))
       //sftp.tryRmDir(stagingDirectoryFile(uniqId), true)
-    } catch {
-      case e =>
-        e.printStackTrace
-        throw e
     } finally sftp.close
   }
 
-  def cancel(nativeJobId: String) {
+  def cancel(nativeJobId: String) = withConnection {
+    connection =>
     val session = connection.openSession
 
     try sendCommand("qdel " + nativeJobId, session)
@@ -245,7 +249,8 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     } finally session.close
   }
 
-  def suspend(nativeJobId: String) = {
+  def suspend(nativeJobId: String) = withConnection {
+    connection =>
     val session = connection.openSession
 
     try {
@@ -259,7 +264,8 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     } finally session.close
   }
 
-  def resume(nativeJobId: String) = {
+  def resume(nativeJobId: String) = withConnection {
+    connection =>
     val session = connection.openSession
     
     try {
@@ -316,13 +322,15 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
   } 
   
 
-  override def getStagingDirectory(nativeJobId: String):  String = {
+  override def getStagingDirectory(nativeJobId: String):  String = withConnection {
+    connection =>
     val sftp = connection.openSFTPClient
     try "sftp2://" + host + ":" + port + stagingDirectoryFile(uniqId(nativeJobId, sftp))
     finally sftp.close
   }
   
-  override def getInputStagingTransfer(nativeJobId: String): Array[StagingTransfer] = {
+  override def getInputStagingTransfer(nativeJobId: String): Array[StagingTransfer] = withConnection {
+    connection =>
     val sftp = connection.openSFTPClient
     try { 
       val desc = description(nativeJobId, sftp)
@@ -330,7 +338,8 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     } finally sftp.close
   }
     
-  override def getOutputStagingTransfer(nativeJobId: String): Array[StagingTransfer] = {
+  override def getOutputStagingTransfer(nativeJobId: String): Array[StagingTransfer] = withConnection {
+    connection =>
     val sftp = connection.openSFTPClient
     try { 
       val desc = description(nativeJobId, sftp)

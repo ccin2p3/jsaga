@@ -30,20 +30,21 @@ class SSHJobMonitorAdaptor extends SSHAdaptor with QueryIndividualJob {
   override def getType = "ssh2"
     
   override def  getStatus(jobId: String) = 
-    try  
-  {
-    val sftpClient = new SFTPv3Client(connection)
-    try {
-      val stream = new ByteArrayOutputStream
-      SFTPDataAdaptor.getToStream(sftpClient, SSHJobProcess.getEndCodeFile(jobId), "", stream)
-      SSHJobStatus(jobId, new String(stream.toByteArray).replaceAll("[\\r\\n]", "").toInt)
-    } catch {
-      case e => 
-        if(SFTPDataAdaptor.exists(sftpClient, SSHJobProcess.getPidFile(jobId), "")) SSHJobStatus.running(jobId)
-        else throw e
-    } finally sftpClient.close
-  } catch {
-    case e => throw new NoSuccessException(e)
-  }
-  
+    withConnection {
+      connection =>
+      try {
+        val sftpClient = new SFTPv3Client(connection)
+        try {
+          val stream = new ByteArrayOutputStream
+          SFTPDataAdaptor.getToStream(sftpClient, SSHJobProcess.getEndCodeFile(jobId), "", stream)
+          SSHJobStatus(jobId, new String(stream.toByteArray).replaceAll("[\\r\\n]", "").toInt)
+        } catch {
+          case e => 
+            if(SFTPDataAdaptor.exists(sftpClient, SSHJobProcess.getPidFile(jobId), "")) SSHJobStatus.running(jobId)
+            else throw e
+        } finally sftpClient.close
+      } catch {
+        case e => throw new NoSuccessException(e)
+      }
+    }
 }

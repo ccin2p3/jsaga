@@ -130,15 +130,19 @@ class SSHJobControlAdaptor extends SSHAdaptor with JobControlAdaptor with Cleana
   override def connect(userInfo: String, host: String, port: Int, basePath: String, attributes: java.util.Map[_, _]) {
     super.connect(userInfo, host, port, basePath, attributes)
     
-    val sftpClient = new SFTPv3Client(connection)
-    try {
-      (SFTPDataAdaptor.getHomeDir(sftpClient) + "/" + SSHJobProcess.rootDir).split("/").tail.foldLeft("") {
-        (c, r) => 
-        val dir = c + "/" + r
-        if(!SFTPDataAdaptor.exists(sftpClient, dir, "")) SFTPDataAdaptor.makeDir(sftpClient, c, r)
-        dir
-      }
-    } finally sftpClient.close
+    withConnection {
+      connection =>
+    
+      val sftpClient = new SFTPv3Client(connection)
+      try {
+        (SFTPDataAdaptor.getHomeDir(sftpClient) + "/" + SSHJobProcess.rootDir).split("/").tail.foldLeft("") {
+          (c, r) => 
+          val dir = c + "/" + r
+          if(!SFTPDataAdaptor.exists(sftpClient, dir, "")) SFTPDataAdaptor.makeDir(sftpClient, c, r)
+          dir
+        }
+      } finally sftpClient.close
+    }
   }
     
   override def getType = "ssh2"
@@ -148,7 +152,8 @@ class SSHJobControlAdaptor extends SSHAdaptor with JobControlAdaptor with Cleana
   override def getJobDescriptionTranslator = new JobDescriptionTranslatorJSDL
   
   //TODO implement stagging
-  override def submit(jobDesc: String, checkMath: Boolean, uniqId: String) = {
+  override def submit(jobDesc: String, checkMath: Boolean, uniqId: String) = withConnection {
+    connection =>
     try {
       val sjp = new SSHJobProcess(uniqId)
       sjp.setCreated(new Date)
@@ -170,10 +175,10 @@ class SSHJobControlAdaptor extends SSHAdaptor with JobControlAdaptor with Cleana
       def absolute(path: String) = "$HOME/" + path
       
       command += "((" +
-        executable +
-        " > " + absolute(sjp.getOutfile) + " 2> " + absolute(sjp.getErrfile) +" ; " +
-        " echo $? > " + absolute(sjp.getEndCodeFile) + ") & " +
-        "echo $! > " + absolute(sjp.getPidFile) + " )"
+      executable +
+      " > " + absolute(sjp.getOutfile) + " 2> " + absolute(sjp.getErrfile) +" ; " +
+      " echo $? > " + absolute(sjp.getEndCodeFile) + ") & " +
+      "echo $! > " + absolute(sjp.getPidFile) + " )"
       
       exec(connection, "bash -c '" + command.toString + "'")
     } catch {
@@ -183,12 +188,14 @@ class SSHJobControlAdaptor extends SSHAdaptor with JobControlAdaptor with Cleana
     uniqId
   }
 
-  override def cancel(nativeJobId: String) {
+  override def cancel(nativeJobId: String) = withConnection {
+    connection =>
     val cde = "kill `cat " + SSHJobProcess.rootDir + "/" + nativeJobId+".pid`;"
     exec(connection, cde)
   }
 
-  override def clean(nativeJobId: String) {
+  override def clean(nativeJobId: String) = withConnection {
+    connection =>
     val cde = "rm -rf " + SSHJobProcess.rootDir + "/" + nativeJobId + "*"
     exec(connection, cde)
   }

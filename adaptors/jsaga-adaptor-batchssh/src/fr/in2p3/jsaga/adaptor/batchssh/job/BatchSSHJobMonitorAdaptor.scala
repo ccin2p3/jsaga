@@ -4,13 +4,14 @@ import fr.in2p3.jsaga.adaptor.job.monitor.{JobMonitorAdaptor, QueryIndividualJob
 import org.ogf.saga.error.NoSuccessException
 
 class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract
-                                     //with JobMonitorAdaptor
-                                     with QueryIndividualJob
-                                     //with QueryListJob
-                                     //with ListableJobAdaptor
-                                     /*with JobInfoAdaptor*/  {
+//with JobMonitorAdaptor
+                                with QueryIndividualJob
+//with QueryListJob
+//with ListableJobAdaptor
+/*with JobInfoAdaptor*/  {
 
-  def getStatus(nativeJobId: String) = {
+  def getStatus(nativeJobId: String) = withConnection {
+    connection =>
     val ssh = connection.openSession
     try BatchSSHJob.status(nativeJobId, ssh)
     finally ssh.close
@@ -18,11 +19,11 @@ class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract
   
   /*def list = allJobs.map{_.id}.toArray
 
-  def getSatusList =
-    allJobs.map{_.jobStatus}.toArray
+   def getSatusList =
+   allJobs.map{_.jobStatus}.toArray
 
-  def getSatusList(nativeJobId: Array[String]) =
-    jobs(nativeJobId).map{_.jobStatus}.toArray*/
+   def getSatusList(nativeJobId: Array[String]) =
+   jobs(nativeJobId).map{_.jobStatus}.toArray*/
   //def getExitCode(nativeJobId: String) = jobs(Seq(nativeJobId)).head.
 }
 //

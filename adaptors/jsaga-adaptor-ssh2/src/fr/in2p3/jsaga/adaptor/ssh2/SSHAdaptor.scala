@@ -29,25 +29,71 @@ import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential
 import java.io.File
-import java.util.logging.Level
-import java.util.logging.Logger
+import java.io.IOException
 import org.ogf.saga.error.AuthenticationFailedException
 import org.ogf.saga.error.BadParameterException
+import collection.JavaConversions._
 
 object SSHAdaptor {
   val COMPRESSION_LEVEL = "CompressionLevel"
   val KNOWN_HOSTS = "KnownHosts"
   val IGNORE_KNOWN_HOSTS = "IgnoreKnownHosts"
   
-  Logger.getLogger(classOf[ch.ethz.ssh2.transport.TransportManager].getName).setLevel(Level.SEVERE)
+  //Logger.getLogger(classOf[ch.ethz.ssh2.transport.TransportManager].getName).setLevel(Level.SEVERE)
+  
 }
 
 abstract class SSHAdaptor extends ClientAdaptor {
   import SSHAdaptor._
-	
-  protected var credential: SecurityCredential = _
-  protected var connection: Connection = _
   
+  private var credential: SecurityCredential = _
+  private var host: String = _
+  private var port: Int = _
+  private var knownHosts: KnownHosts = _
+  
+  
+  def withConnection[T](f: Connection => T) = {
+    val c = new Connection(host, port)
+    c.connect
+    try {
+      authenticate(c)
+      f(c)
+    } finally c.close
+  }
+  
+  private def authenticate(connection: Connection) = 
+    try{
+      credential match {
+        case credential: UserPassSecurityCredential =>
+          val userId = credential.getUserID
+          val password = credential.getUserPass
+          if(!connection.authenticateWithPassword(userId, password))
+            throw new AuthenticationFailedException("Authentication failed.")
+        case credential: UserPassStoreSecurityCredential =>
+          try {
+            val userId = credential.getUserID(host)
+            val password = credential.getUserPass(host)
+            if(connection.authenticateWithPassword(userId, password))
+              throw new AuthenticationFailedException("Authentication failed.")
+          } catch {
+            case e => throw new AuthenticationFailedException(e);
+          }
+        case credential: SSHSecurityCredential =>
+          val userId = credential.getUserID
+          val passPhrase = credential.getUserPass
+          val key = credential.getPrivateKeyFile
+
+          if (!connection.authenticateWithPublicKey(userId, key, passPhrase))
+            throw new AuthenticationFailedException("Authentication failed.")
+        case _ => throw new AuthenticationFailedException("Invalid security instance.")
+      }
+
+      //homeDir = withSFTP(connection, _.canonicalPath("."))
+    } catch {
+      case ex: IOException => throw new AuthenticationFailedException(ex)
+    } 
+  
+	
   override def getSupportedSecurityCredentialClasses = Array(classOf[UserPassSecurityCredential], classOf[UserPassStoreSecurityCredential], classOf[SSHSecurityCredential])
    
   override def setSecurityCredential(credential: SecurityCredential) = this.credential = credential;
@@ -65,61 +111,22 @@ abstract class SSHAdaptor extends ClientAdaptor {
 
 
   override def connect(userInfo: String, host: String, port: Int, basePath: String, attributes: java.util.Map[_, _]) = {
-    try {
-      // Disable some INFO message from ganymed
-      java.util.logging.Logger.getLogger("ch.ethz.ssh2").setLevel(java.util.logging.Level.WARNING)
       
-      // Creating a connection instance
-      connection = new Connection(host, port)
-      
-      // Now connect
-      connection.connect
-      
-      try {
-        val ignoreKnowHosts =  if (attributes.containsKey(IGNORE_KNOWN_HOSTS)) attributes.get(IGNORE_KNOWN_HOSTS).asInstanceOf[String].equalsIgnoreCase("true") else false
-      
-        if(!ignoreKnowHosts) {
-          val knownHosts = new KnownHosts
-          // Load known_hosts file into in-memory KnownHosts
-          if (attributes.containsKey(KNOWN_HOSTS)) {
-            val knownHostsFile = new File(attributes.get(KNOWN_HOSTS).asInstanceOf[String])
-            if (!knownHostsFile.exists) throw new BadParameterException("Unable to find the selected known host file.")
-            knownHosts.addHostkeys(knownHostsFile)
-          }
-      
-          val info = connection.getConnectionInfo
-          if(knownHosts.verifyHostkey(host + ':' + port, info.serverHostKeyAlgorithm, info.serverHostKey) ==  KnownHosts.HOSTKEY_HAS_CHANGED) throw new AuthenticationFailedException("Remote host key has changed.")
-        }
-            
-        val isAuthenticated = credential match {
-          case credential: UserPassSecurityCredential =>
-            val userId = credential.getUserID
-            val password = credential.getUserPass
-            if(password == "") connection.authenticateWithNone(userId)
-            else connection.authenticateWithPassword(userId, password)
-          case credential: UserPassStoreSecurityCredential =>
-            val userId = credential.getUserID(host)
-            val password = credential.getUserPass(host)
-            connection.authenticateWithPassword(userId, password)
-          case credential: SSHSecurityCredential =>
-            val userId = credential.getUserID
-            val passPhrase = credential.getUserPass
-            val key = credential.getPrivateKeyFile
-            connection.authenticateWithPublicKey(userId, key, passPhrase)
-          case _ => throw new AuthenticationFailedException("Invalid security instance.")
-        }
-        if (isAuthenticated == false) throw new AuthenticationFailedException("Authentication failed.")
-   
-      } catch {
-        case e: Exception => throw new AuthenticationFailedException("Authentication failed.", e)
-      }
-    } catch {
-      case e => 
-        disconnect
-        throw e
+    this.host = host
+    this.port = port
+    
+    this.knownHosts = new KnownHosts
+    
+    // Load known_hosts file into in-memory KnownHosts
+    mapAsScalaMap(attributes).asInstanceOf[collection.mutable.Map[String, String]].get(KNOWN_HOSTS) match {
+      case Some(knownHostPath) => 
+        val knownHost = new File(knownHostPath)
+        if (!knownHost.exists) throw new BadParameterException("Unable to find the selected known host file.")
+        this.knownHosts.addHostkeys(knownHost)
+      case None =>
     }
   }
 
-  override def disconnect = connection.close
+  override def disconnect = {}
 
 }

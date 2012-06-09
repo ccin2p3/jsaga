@@ -194,10 +194,10 @@ public class TransportConnection
 
 		cos.flush();
 
-		if (log.isDebugEnabled())
+                /*if (log.isDebugEnabled())
 		{
 			log.debug("Sent " + Packets.getMessageName(message[off] & 0xff) + " " + len + " bytes payload");
-		}
+		}*/
 
 		send_seq_number++;
 	}
@@ -275,11 +275,11 @@ public class TransportConnection
 
 		recv_seq_number++;
 
-		if (log.isDebugEnabled())
+		/*if (log.isDebugEnabled())
 		{
 			log.debug("Received " + Packets.getMessageName(buffer[off] & 0xff) + " " + payload_length
 					+ " bytes payload");
-		}
+		}*/
 
 		return payload_length;
 	}

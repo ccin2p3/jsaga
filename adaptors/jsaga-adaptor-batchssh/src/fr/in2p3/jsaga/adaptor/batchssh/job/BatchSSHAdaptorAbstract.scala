@@ -24,6 +24,7 @@ import org.ogf.saga.error.AuthenticationFailedException
 import org.ogf.saga.error.BadParameterException
 import collection.JavaConversions._
 import org.ogf.saga.error.NoSuccessException
+import fr.in2p3.jsaga.adaptor.ssh2.SSHAdaptor
 import fr.in2p3.jsaga.adaptor.ssh2.data.SFTPDataAdaptor._
 import ch.ethz.ssh2._
 import collection.JavaConversions._
@@ -127,13 +128,10 @@ object BatchSSHAdaptorAbstract {
 
 import BatchSSHAdaptorAbstract._
 
-abstract class BatchSSHAdaptorAbstract extends ClientAdaptor {
+abstract class BatchSSHAdaptorAbstract extends SSHAdaptor with ClientAdaptor {
 
   def getType = BatchSSHAdaptorAbstract.getType
     
-  def getDefaultPort = 22
-    
-  val knownHosts = new KnownHosts
  
   /**
    * the staging root directory, either absolute path defined in the
@@ -144,10 +142,10 @@ abstract class BatchSSHAdaptorAbstract extends ClientAdaptor {
    * PBS_O_WORKDIR
    */
   protected var m_stagingDirectory: String = _
-  protected var connection: Connection = _
-  private var credential: SecurityCredential = _
-
-  def getUsage =
+  //protected var connection: Connection = _  
+  
+  
+  override def getUsage =
     new UAnd(
       Array(
         new UOptional(KNOWN_HOSTS),
@@ -157,84 +155,12 @@ abstract class BatchSSHAdaptorAbstract extends ClientAdaptor {
     )
     
 
-  def getDefaults(attributes: java.util.Map[_, _]) =
-    Array (
-      new Default(KNOWN_HOSTS, Array(new File(System.getProperty("user.home") + "/.ssh/known_hosts"))),
+  override def getDefaults(attributes: java.util.Map[_, _]) =
+    super.getDefaults(attributes) ++ Array (
       new Default(Context.USERID, System.getProperty("user.name")),
       new Default(STAGING_DIRECTORY, DEFAULT_STAGING_DIRECTORY)
       //new Default(DIRECTORY_CREATION_MODE, DEFAULT_DIRECTORY_CREATION_MODE)
     )
-
-  def getSupportedSecurityCredentialClasses = 
-    Array(classOf[UserPassSecurityCredential], classOf[UserPassStoreSecurityCredential], classOf[SSHSecurityCredential])
-    
-
-  def setSecurityCredential(credential: SecurityCredential) {
-    this.credential = credential
-  }
-
-  override def connect(  
-    userInfo: String,
-    host: String,
-    port: Int,
-    basePath: String,
-    attributes: java.util.Map[_, _]) = {
-    
-    try {
-      // Creating a connection instance
-      connection = new Connection(host, port)
-      // Disable some INFO message from ganymed
-      java.util.logging.Logger.getLogger("ch.ethz.ssh2").setLevel(java.util.logging.Level.WARNING)
-      // Now connect
-      connection.connect
-      try {
-        // Load known_hosts file into in-memory KnownHosts
-        mapAsScalaMap(attributes).asInstanceOf[collection.mutable.Map[String, String]].get(KNOWN_HOSTS) match {
-          case Some(knownHostPath) => 
-            val knownHost = new File(knownHostPath)
-            if (!knownHost.exists) throw new BadParameterException("Unable to find the selected known host file.")
-            this.knownHosts.addHostkeys(knownHost)
-          case None =>
-        }
-      
-        credential match {
-          case credential: UserPassSecurityCredential =>
-            val userId = credential.getUserID
-            val password = credential.getUserPass
-            if(!connection.authenticateWithPassword(userId, password))
-              throw new AuthenticationFailedException("Authentication failed.")
-          case credential: UserPassStoreSecurityCredential =>
-            try {
-              val userId = credential.getUserID(host)
-              val password = credential.getUserPass(host)
-              if(connection.authenticateWithPassword(userId, password))
-                throw new AuthenticationFailedException("Authentication failed.")
-            } catch {
-              case e => throw new AuthenticationFailedException(e);
-            }
-          case credential: SSHSecurityCredential =>
-            val userId = credential.getUserID
-            val passPhrase = credential.getUserPass
-            val key = credential.getPrivateKeyFile
-
-            if (!connection.authenticateWithPublicKey(userId, key, passPhrase))
-              throw new AuthenticationFailedException("Authentication failed.")
-          case _ => throw new AuthenticationFailedException("Invalid security instance.")
-        }
-
-        //homeDir = withSFTP(connection, _.canonicalPath("."))
-      } catch {
-        case ex: IOException => throw new AuthenticationFailedException(ex)
-      }
-    } catch {
-      case e =>
-        disconnect
-        throw e
-    }
-  }
-
-  def disconnect { connection.close }
-  
 
   protected def idDir = m_stagingDirectory + "/id"
   
