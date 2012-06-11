@@ -462,7 +462,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
 
             // remove staging directory
             if (dir != null) {
-                dir.remove(TaskMode.SYNC, Flags.RECURSIVE.getValue());
+                dir.remove();
             }
 
         } finally {
