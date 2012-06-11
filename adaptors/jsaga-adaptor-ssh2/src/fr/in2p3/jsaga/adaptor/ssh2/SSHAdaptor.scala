@@ -30,6 +30,8 @@ import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential
 import java.io.File
 import java.io.IOException
+import java.util.logging.Level
+import java.util.logging.Logger
 import org.ogf.saga.error.AuthenticationFailedException
 import org.ogf.saga.error.BadParameterException
 import collection.JavaConversions._
@@ -38,12 +40,12 @@ object SSHAdaptor {
   val COMPRESSION_LEVEL = "CompressionLevel"
   val KNOWN_HOSTS = "KnownHosts"
   val IGNORE_KNOWN_HOSTS = "IgnoreKnownHosts"
-  
-  //Logger.getLogger(classOf[ch.ethz.ssh2.transport.TransportManager].getName).setLevel(Level.SEVERE)
-  
 }
 
 abstract class SSHAdaptor extends ClientAdaptor {
+  
+  Logger.getLogger("ch.ethz.ssh2").setLevel(Level.INFO)
+
   import SSHAdaptor._
   
   private var credential: SecurityCredential = _
