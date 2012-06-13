@@ -234,6 +234,7 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
       val uniqId = this.uniqId(nativeJobId, sftp)
       sftp.tryRm(descriptionFile(nativeJobId))
       sftp.tryRm(uniqIdFile(nativeJobId))
+      sftp.tryRmDirContent(stagingDirectoryFile(uniqId))
       //sftp.tryRmDir(stagingDirectoryFile(uniqId), true)
     } finally sftp.close
   }

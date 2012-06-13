@@ -462,7 +462,15 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
 
             // remove staging directory
             if (dir != null) {
-                dir.remove();
+                try {
+                    dir.remove();
+                } catch (AuthenticationFailedException e) {
+                    throw new NoSuccessException(e);
+                } catch (AuthorizationFailedException e) {
+                    throw new NoSuccessException(e);
+                } catch (BadParameterException e) {
+                    throw new NoSuccessException(e);
+                }
             }
 
         } finally {

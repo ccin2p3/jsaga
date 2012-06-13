@@ -71,14 +71,7 @@ object BatchSSHAdaptorAbstract {
     
     def tryRmDir(dir: String, recursive: Boolean = false): Boolean = 
       try {
-        if(recursive)
-          sftp.ls(dir).filterNot(e => {e.filename == "." || e.filename == ".."}).foreach {
-            f => 
-            val file = dir + "/" + f.filename
-            if(f.attributes.isDirectory) tryRmDir(file)
-            else tryRm(file)
-          }
-
+        if(recursive) tryRmDirContent(dir)
         sftp.rmdir(dir)
         true
       } catch {
@@ -97,6 +90,13 @@ object BatchSSHAdaptorAbstract {
           false
       }
     
+    def tryRmDirContent(dir: String) = 
+      sftp.ls(dir).filterNot(e => {e.filename == "." || e.filename == ".."}).foreach {
+        f => 
+        val file = dir + "/" + f.filename
+        if(f.attributes.isDirectory) tryRmDir(file)
+        else tryRm(file)
+      }
   }
   
   
