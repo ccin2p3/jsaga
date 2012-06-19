@@ -55,9 +55,6 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
                             with SuspendableJobAdaptor
                             with HoldableJobAdaptor
                             with StagingJobAdaptorOnePhase {
-
-  var host: String = _
-  var port: Int = _
   
   def getDefaultJobMonitor = new BatchSSHMonitorAdaptor
 
@@ -72,9 +69,6 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     port: Int, 
     basePath: String,
     _attributes: java.util.Map[_, _]) = {
-
-    this.host = host
-    this.port = port
     
     val attributes = _attributes.asInstanceOf[java.util.Map[String, String]]
     super.connect(userInfo, host, port, basePath, _attributes)

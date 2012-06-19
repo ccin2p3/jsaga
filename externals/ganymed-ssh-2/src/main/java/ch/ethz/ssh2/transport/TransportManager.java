@@ -34,6 +34,9 @@ import ch.ethz.ssh2.packets.Packets;
 import ch.ethz.ssh2.packets.TypesReader;
 import ch.ethz.ssh2.util.StringEncoder;
 import ch.ethz.ssh2.util.Tokenizer;
+import java.net.*;
+import java.util.Arrays;
+import java.util.Iterator;
 
 /*
  * Yes, the "standard" is a big mess. On one side, the say that arbitary channel
@@ -130,7 +133,7 @@ public class TransportManager
 
 	private String hostname;
 	private int port;
-	private final Socket sock = new Socket();
+	private Socket sock = new Socket();
 
 	private final Object connectionSemaphore = new Object();
 
@@ -159,7 +162,7 @@ public class TransportManager
 	 * @return the InetAddress
 	 * @throws UnknownHostException
 	 */
-	private InetAddress createInetAddress(String host) throws UnknownHostException
+	private InetAddress[] createInetAddress(String host) throws UnknownHostException
 	{
 		/* Check if it is a dotted IP4 address */
 
@@ -167,10 +170,10 @@ public class TransportManager
 
 		if (addr != null)
 		{
-			return addr;
+			return new InetAddress[]{addr};
 		}
 
-		return InetAddress.getByName(host);
+		return InetAddress.getAllByName(host);
 	}
 
 	private InetAddress parseIPv4Address(String host) throws UnknownHostException
@@ -347,14 +350,33 @@ public class TransportManager
 		}
 	}
 
+        
+        private void socketConnect(String hostname, int port, int connectTimeout) throws UnknownHostException, ConnectException, IOException {
+            InetAddress[] addr = createInetAddress(hostname);
+            Iterator<InetAddress> addrIt = Arrays.asList(addr).iterator();
+            
+            while(addrIt.hasNext()) {
+                InetAddress a = addrIt.next();
+                try {
+                    sock.connect(new InetSocketAddress(a, port), connectTimeout);
+                    return;
+                } catch(ConnectException e) {
+                    if(!addrIt.hasNext()) throw e;
+                    else {
+                        sock = new Socket();
+                        log.debug(e.getLocalizedMessage());
+                    }
+                }
+            }
+        }
+        
+        
 	private void establishConnection(ProxyData proxyData, int connectTimeout) throws IOException
 	{
 		/* See the comment for createInetAddress() */
-
 		if (proxyData == null)
 		{
-			InetAddress addr = createInetAddress(hostname);
-			sock.connect(new InetSocketAddress(addr, port), connectTimeout);
+			socketConnect(hostname, port, connectTimeout);
 			return;
 		}
 
@@ -363,10 +385,8 @@ public class TransportManager
 			HTTPProxyData pd = (HTTPProxyData) proxyData;
 
 			/* At the moment, we only support HTTP proxies */
-
-			InetAddress addr = createInetAddress(pd.proxyHost);
-			sock.connect(new InetSocketAddress(addr, pd.proxyPort), connectTimeout);
-
+                        socketConnect(pd.proxyHost, pd.proxyPort, connectTimeout);
+                        
 			/* OK, now tell the proxy where we actually want to connect to */
 
 			StringBuilder sb = new StringBuilder();

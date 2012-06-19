@@ -49,8 +49,8 @@ abstract class SSHAdaptor extends ClientAdaptor {
   import SSHAdaptor._
   
   private var credential: SecurityCredential = _
-  private var host: String = _
-  private var port: Int = _
+  protected var host: String = _
+  protected var port: Int = _
   private var knownHosts: KnownHosts = _
   
   
@@ -113,7 +113,6 @@ abstract class SSHAdaptor extends ClientAdaptor {
 
 
   override def connect(userInfo: String, host: String, port: Int, basePath: String, attributes: java.util.Map[_, _]) = {
-      
     this.host = host
     this.port = port
     
