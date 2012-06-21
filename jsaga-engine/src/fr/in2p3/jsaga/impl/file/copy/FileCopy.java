@@ -98,7 +98,7 @@ public class FileCopy {
     }
 
     private void putToPhysicalFile(URL target, int flags, AbstractCopyTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
-        IOException closingException = null;
+//        IOException closingException = null;
 
         // open source file if it exists
         FileInputStream in;
@@ -144,7 +144,11 @@ public class FileCopy {
                     readlen = in.read(data,0, data.length);
                 }
                 // close stream
-                out.close();
+                try{
+                	out.close();
+                }catch (Exception e) {
+                	// Ignore it: A problem during the close should not be a problem.
+				}
             } catch (IOException e) {
                 throw new TimeoutException(e);
             } finally {
@@ -152,19 +156,21 @@ public class FileCopy {
                     // close connection
                     targetFile.close();
                 } catch (Exception e) {
-                    closingException = new IOException(e.getClass().getName()+": "+e.getMessage());
+                	//Ignore it: A problem during the close should not be a problem.
+                   // closingException = new IOException(e.getClass().getName()+": "+e.getMessage());
                 }
             }
         } finally {
             try {
                 in.close();
             } catch (IOException e) {
-                closingException = e;
+            	//Ignore it: A problem during the close should not be a problem.
+                //closingException = e;
             }
         }
-        if (closingException != null) {
-            throw new IncorrectStateException(closingException);
-        }
+//        if (closingException != null) {
+//            throw new IncorrectStateException(closingException);
+//        }
     }
 
     private AbstractSyncFileImpl createTargetFile(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
