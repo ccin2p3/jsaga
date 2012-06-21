@@ -133,6 +133,7 @@ public class TransportManager
 
 	private String hostname;
 	private int port;
+        
 	private Socket sock = new Socket();
 
 	private final Object connectionSemaphore = new Object();
@@ -363,7 +364,10 @@ public class TransportManager
                 } catch(ConnectException e) {
                     if(!addrIt.hasNext()) throw e;
                     else {
-                        sock = new Socket();
+                        Socket newSock = new Socket();
+                        newSock.setTcpNoDelay(sock.getTcpNoDelay());
+                        newSock.setSoTimeout(sock.getSoTimeout());
+                        sock = newSock;
                         log.debug(e.getLocalizedMessage());
                     }
                 }
