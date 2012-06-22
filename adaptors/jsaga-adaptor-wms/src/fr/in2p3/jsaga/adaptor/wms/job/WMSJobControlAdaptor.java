@@ -63,6 +63,7 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /*
@@ -86,6 +87,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     private DelegationSoapBindingStub delegationServiceStub;
     private String delegationId;
     private String defaultDelegationId = UUID.randomUUID().toString();
+    private final AtomicBoolean delegated = new AtomicBoolean(false);
     private String m_wmsServerUrl;
     private String m_LBAddress;
 
@@ -212,10 +214,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                 throw new NoSuccessException(exc.getMessage());
             }
         }
-        
-        
-        //Credentials delegation
-        delegateCredentials(delegationId);
+
+        delegated.set(false);
     }
 
     public void disconnect() throws NoSuccessException {
@@ -229,7 +229,10 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
+
         try {
+            //Credentials delegation
+            delegateCredentials(delegationId);
 
             // parse JDL and Check Matching
             if (checkMatch) {
@@ -279,57 +282,62 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             throw new BadResource("No Computing Element matching your job requirements has been found!");
         }
     }
-    
+
     private void delegateCredentials(String delegationId) throws AuthenticationFailedException, NoSuccessException {
-        try {
-            //synchronized (m_delegationId) {
-            //  if (!m_delegationDone || force) {
-            String certReq = delegationServiceStub.getProxyReq(delegationId);
+        synchronized (delegated) {
+            if (!delegated.get()) {
+                try {
+                    //synchronized (m_delegationId) {
+                    //  if (!m_delegationDone || force) {
+                    String certReq = delegationServiceStub.getProxyReq(delegationId);
 
-            //create proxy from certificate request
-            GlobusCredential globusCred = ((GlobusGSSCredentialImpl) m_credential).getGlobusCredential();
+                    //create proxy from certificate request
+                    GlobusCredential globusCred = ((GlobusGSSCredentialImpl) m_credential).getGlobusCredential();
 
-            X509Certificate[] userCerts = globusCred.getCertificateChain();
-            PrivateKey key = globusCred.getPrivateKey();
+                    X509Certificate[] userCerts = globusCred.getCertificateChain();
+                    PrivateKey key = globusCred.getPrivateKey();
 
-            BouncyCastleCertProcessingFactory factory = BouncyCastleCertProcessingFactory.getDefault();
+                    BouncyCastleCertProcessingFactory factory = BouncyCastleCertProcessingFactory.getDefault();
 
-            //FIXME (Jerome): We cannot mix proxy types. If the provided user certificate is not a GSI_2_PROXY, it will fail at some point server side I guess.
-            // We must detect the user proxy type and then generate the new one accordingly.
-            X509Certificate certificate = factory.createCertificate(new ByteArrayInputStream(GrDPX509Util.readPEM(
-                    new ByteArrayInputStream(certReq.getBytes()), GrDPConstants.CRH,
-                    GrDPConstants.CRF)), userCerts[0], key, 12 * 3600, GSIConstants.GSI_2_PROXY); //12 hours proxy
+                    //FIXME (Jerome): We cannot mix proxy types. If the provided user certificate is not a GSI_2_PROXY, it will fail at some point server side I guess.
+                    // We must detect the user proxy type and then generate the new one accordingly.
+                    X509Certificate certificate = factory.createCertificate(new ByteArrayInputStream(GrDPX509Util.readPEM(
+                            new ByteArrayInputStream(certReq.getBytes()), GrDPConstants.CRH,
+                            GrDPConstants.CRF)), userCerts[0], key, 12 * 3600, GSIConstants.GSI_2_PROXY); //12 hours proxy
 
-            X509Certificate[] finalCerts = new X509Certificate[userCerts.length + 1];
-            finalCerts[0] = certificate;
-            for (int index = 1; index <= userCerts.length; ++index) {
-                finalCerts[index] = userCerts[index - 1];
+                    X509Certificate[] finalCerts = new X509Certificate[userCerts.length + 1];
+                    finalCerts[0] = certificate;
+                    for (int index = 1; index <= userCerts.length; ++index) {
+                        finalCerts[index] = userCerts[index - 1];
+                    }
+                    m_client.putProxy(delegationId, new String(GrDPX509Util.certChainToByte(finalCerts)));
+
+                    //System.out.println(m_client.getDelegatedProxyInfo(delegationId));
+
+                    // m_delegationDone = true;
+                    //    }
+                    //  }
+                } catch (org.glite.wms.wmproxy.AuthenticationFaultType exc) {
+                    disconnect();
+                    throw new AuthenticationFailedException(createExceptionMessage(exc));
+                } catch (org.glite.wms.wmproxy.AuthorizationFaultType exc) {
+                    disconnect();
+                    throw new AuthenticationFailedException(createExceptionMessage(exc));
+                } catch (org.glite.wms.wmproxy.ServerOverloadedFaultType exc) {
+                    disconnect();
+                    throw new NoSuccessException(createExceptionMessage(exc));
+                } catch (org.glite.wms.wmproxy.GenericFaultType exc) {
+                    disconnect();
+                    throw new NoSuccessException(createExceptionMessage(exc));
+                } catch (java.rmi.RemoteException exc) {
+                    disconnect();
+                    throw new NoSuccessException(exc.getMessage());
+                } catch (Exception exc) {
+                    disconnect();
+                    throw new NoSuccessException(exc.getMessage());
+                }
             }
-            m_client.putProxy(delegationId, new String(GrDPX509Util.certChainToByte(finalCerts)));
-
-            //System.out.println(m_client.getDelegatedProxyInfo(delegationId));
-
-            // m_delegationDone = true;
-            //    }
-            //  }
-        } catch (org.glite.wms.wmproxy.AuthenticationFaultType exc) {
-            disconnect();
-            throw new AuthenticationFailedException(createExceptionMessage(exc));
-        } catch (org.glite.wms.wmproxy.AuthorizationFaultType exc) {
-            disconnect();
-            throw new AuthenticationFailedException(createExceptionMessage(exc));
-        } catch (org.glite.wms.wmproxy.ServerOverloadedFaultType exc) {
-            disconnect();
-            throw new NoSuccessException(createExceptionMessage(exc));
-        } catch (org.glite.wms.wmproxy.GenericFaultType exc) {
-            disconnect();
-            throw new NoSuccessException(createExceptionMessage(exc));
-        } catch (java.rmi.RemoteException exc) {
-            disconnect();
-            throw new NoSuccessException(exc.getMessage());
-        } catch (Exception exc) {
-            disconnect();
-            throw new NoSuccessException(exc.getMessage());
+            delegated.set(true);
         }
     }
 
@@ -474,7 +482,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
          */
         calendar.setTimeZone(java.util.TimeZone.getTimeZone("GMT"));
         date = dayStr[calendar.get(Calendar.DAY_OF_WEEK) - 1] + " " // Calendar.SUNDAY = 1
-                + monthStr[calendar.get(Calendar.MONTH)] + " "		// Calendar.JANUARY = 0
+                + monthStr[calendar.get(Calendar.MONTH)] + " " // Calendar.JANUARY = 0
                 + twodigits(calendar.get(Calendar.DAY_OF_MONTH)) + " "
                 + calendar.get(Calendar.YEAR) + " ";
         //hours =  - (calendar.get(Calendar.ZONE_OFFSET)/ (60*60*1000));
