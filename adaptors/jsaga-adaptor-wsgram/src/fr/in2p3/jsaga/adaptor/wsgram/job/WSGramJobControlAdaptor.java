@@ -96,7 +96,10 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
     		// set protection
     		//gramJob.setMessageProtectionType(GSIConstants.ENCRYPTION);
     		//gramJob.setMessageProtectionType(GSIConstants.SIGNATURE);
-    		
+
+    		// TODO: alternative service name
+    		// Authorization authorization = new org.globus.wsrf.impl.security.authorization.HostAuthorization("/DC=IN/DC=GARUDAINDIA/O=C-DAC/OU=CTSF/CN=xn03.ctsf.cdacb.in");
+
     		Authorization authorization = org.globus.wsrf.impl.security.authorization.HostAuthorization.getInstance();
     		gramJob.setAuthorization(authorization);
     		

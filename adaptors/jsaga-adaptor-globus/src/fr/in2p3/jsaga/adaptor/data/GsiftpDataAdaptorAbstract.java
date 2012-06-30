@@ -290,6 +290,8 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
             GsiftpClient client = new GsiftpClient(host, port);
     		Logger.getLogger(GsiftpDataAdaptorAbstract.class).info(client.getWelcome());
             
+    		// TODO: alternative service name
+    		// Authorization authorization = new org.globus.wsrf.impl.security.authorization.HostAuthorization("/DC=IN/DC=GARUDAINDIA/O=C-DAC/OU=CTSF/CN=xn03.ctsf.cdacb.in");
             client.setAuthorization(HostAuthorization.getInstance());
             client.authenticate(cred);
 
