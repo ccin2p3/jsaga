@@ -137,13 +137,9 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     val resources = x \ "JobDescription" \ "Resources"
     val cpuTime = resources \ "TotalCPUTime" \ "UpperBoundedRange" text
     val memory = resources \ "TotalPhysicalMemory" \ "UpperBoundedRange" text
-    
-    if(!cpuTime.isEmpty || !memory.isEmpty) {
-      jobScript append "#PBS -l "
-      if(!cpuTime.isEmpty) jobScript append ("cput=" + cpuTime + ":00,")
-      if(!memory.isEmpty) jobScript append ("mem=" + memory + "MB")
-      jobScript append "\n"
-    }
+   
+    if(!memory.isEmpty) jobScript append ("#PBS -lmem=" + memory + "mb\n")
+    if(!cpuTime.isEmpty) jobScript append ("#PBS -lwalltime=" + cpuTime + ":00\n") 
     
     if(!(application \ "WorkingDirectory" isEmpty)) {
       val workDir = (application \ "WorkingDirectory" text)
