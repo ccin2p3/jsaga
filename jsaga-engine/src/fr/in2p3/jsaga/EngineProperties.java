@@ -49,7 +49,7 @@ public class EngineProperties {
             //s_prop.setProperty(LOG4J_CONFIGURATION, "etc/log4j.properties");
             s_prop.setProperty(JSAGA_DEFAULT_CONTEXTS_CHECK_CONFLICTS, "true");
             //s_prop.setProperty(DATA_IMPLICIT_CLOSE_TIMEOUT, "-1");
-            s_prop.setProperty(DATA_COPY_BUFFER_SIZE, "16384");
+            s_prop.setProperty(DATA_COPY_BUFFER_SIZE, "1048576");
             s_prop.setProperty(DATA_ATTRIBUTES_CACHE_LIFETIME, "60000");
             s_prop.setProperty(JOB_MONITOR_POLL_PERIOD, "60000");
             s_prop.setProperty(JOB_MONITOR_ERROR_THRESHOLD, "3");

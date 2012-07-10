@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.file.copy;
 
 import fr.in2p3.jsaga.Base;
+import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
@@ -34,7 +35,7 @@ import java.io.IOException;
 public class FileCopy {
     private static final String JSAGA_FACTORY = Base.getSagaFactory();
 
-    private static final int DEFAULT_BUFFER_SIZE = 16384;
+    //private static final int DEFAULT_BUFFER_SIZE = 16384;
     private Session m_session;
     private AbstractSyncFileImpl m_sourceFile;
     private DataAdaptor m_adaptor;
@@ -109,7 +110,8 @@ public class FileCopy {
         }
 
         // start to read if it exists
-        byte[] data = new byte[DEFAULT_BUFFER_SIZE];
+        int bufferSize = EngineProperties.getInteger(EngineProperties.DATA_COPY_BUFFER_SIZE);
+        byte[] data = new byte[bufferSize];
         int readlen;
         try {
             readlen = in.read(data, 0, data.length);
