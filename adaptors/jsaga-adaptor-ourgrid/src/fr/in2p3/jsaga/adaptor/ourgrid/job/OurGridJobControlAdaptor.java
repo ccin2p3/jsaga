@@ -233,8 +233,8 @@ public class OurGridJobControlAdaptor extends OurGridAbstract implements
 
 		for (int i = 1; i <= qtPostStaging; i++) {
 			nList = document.getElementsByTagName("Staging"+i);
-			String from = getValue(document, "Staging"+i, "From");
-			String to = getValue(document, "Staging"+i, "To");
+			String from = getValue(document, "StagingOut"+i, "From");
+			String to = getValue(document, "StagingOut"+i, "To");
 			transfers.add(new StagingTransfer(from, to, false));
 		}	
 
