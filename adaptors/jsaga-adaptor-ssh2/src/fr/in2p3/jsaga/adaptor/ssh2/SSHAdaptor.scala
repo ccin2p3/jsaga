@@ -22,6 +22,7 @@ import ch.ethz.ssh2.KnownHosts
 import fr.in2p3.jsaga.adaptor.ClientAdaptor
 import fr.in2p3.jsaga.adaptor.base.defaults.Default
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd
+import fr.in2p3.jsaga.adaptor.base.usage.UDuration
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional
 import fr.in2p3.jsaga.adaptor.base.usage.Usage
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential
@@ -30,62 +31,73 @@ import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential
 import java.io.File
 import java.io.IOException
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 import java.util.logging.Logger
 import org.ogf.saga.error.AuthenticationFailedException
 import org.ogf.saga.error.BadParameterException
 import collection.JavaConversions._
+import scala.actors.threadpool.locks.ReentrantReadWriteLock
+import scala.collection.mutable.ConcurrentMap
+import scala.collection.mutable.HashMap
 
 object SSHAdaptor {
   val COMPRESSION_LEVEL = "CompressionLevel"
   val KNOWN_HOSTS = "KnownHosts"
   val IGNORE_KNOWN_HOSTS = "IgnoreKnownHosts"
+  
+  val connectionKeepAlive = UDuration.toInt("PT2M") * 1000
+  val connectionCache = new ConnectionCache(connectionKeepAlive)
 }
 
-abstract class SSHAdaptor extends ClientAdaptor {
+abstract class SSHAdaptor extends ClientAdaptor { adaptor =>
   
   Logger.getLogger("ch.ethz.ssh2").setLevel(Level.INFO)
 
   import SSHAdaptor._
   
   private var credential: SecurityCredential = _
-  protected var host: String = _
-  protected var port: Int = _
   private var knownHosts: KnownHosts = _
   
+  var user: String = _
+  var host: String = _
+  var port: Int = _
   
   def withConnection[T](f: Connection => T) = {
+    val connection = connectionCache.cached(this)
+    try f(connection)
+    finally connectionCache.release(this)
+  }
+  
+  def openConnection = {
     val c = new Connection(host, port)
     c.connect
-    try {
-      authenticate(c)
-      f(c)
-    } finally c.close
+    authenticate(c)
+    c
   }
   
   private def authenticate(connection: Connection) = 
     try{
       credential match {
         case credential: UserPassSecurityCredential =>
-          val userId = credential.getUserID
+          user = credential.getUserID
           val password = credential.getUserPass
-          if(!connection.authenticateWithPassword(userId, password))
+          if(!connection.authenticateWithPassword(user, password))
             throw new AuthenticationFailedException("Authentication failed.")
         case credential: UserPassStoreSecurityCredential =>
           try {
-            val userId = credential.getUserID(host)
             val password = credential.getUserPass(host)
-            if(connection.authenticateWithPassword(userId, password))
+            if(connection.authenticateWithPassword(user, password))
               throw new AuthenticationFailedException("Authentication failed.")
           } catch {
             case e => throw new AuthenticationFailedException(e);
           }
         case credential: SSHSecurityCredential =>
-          val userId = credential.getUserID
           val passPhrase = credential.getUserPass
           val key = credential.getPrivateKeyFile
 
-          if (!connection.authenticateWithPublicKey(userId, key, passPhrase))
+          if (!connection.authenticateWithPublicKey(user, key, passPhrase))
             throw new AuthenticationFailedException("Authentication failed.")
         case _ => throw new AuthenticationFailedException("Invalid security instance.")
       }
@@ -109,7 +121,10 @@ abstract class SSHAdaptor extends ClientAdaptor {
 
 
   override def getDefaults(map: java.util.Map[_,_]) = 
-    Array[Default](new Default(KNOWN_HOSTS, Array[File](new File(System.getProperty("user.home")+"/.ssh/known_hosts"))), new Default(IGNORE_KNOWN_HOSTS, "false"))
+    Array[Default](
+      new Default(KNOWN_HOSTS, Array[File](new File(System.getProperty("user.home")+"/.ssh/known_hosts"))), 
+      new Default(IGNORE_KNOWN_HOSTS, "false")
+    )
 
 
   override def connect(userInfo: String, host: String, port: Int, basePath: String, attributes: java.util.Map[_, _]) = {
@@ -118,14 +133,18 @@ abstract class SSHAdaptor extends ClientAdaptor {
     
     this.knownHosts = new KnownHosts
     
+    val attributesMap = mapAsScalaMap(attributes).asInstanceOf[collection.mutable.Map[String, String]]
+    
     // Load known_hosts file into in-memory KnownHosts
-    mapAsScalaMap(attributes).asInstanceOf[collection.mutable.Map[String, String]].get(KNOWN_HOSTS) match {
+    attributesMap.get(KNOWN_HOSTS) match {
       case Some(knownHostPath) => 
         val knownHost = new File(knownHostPath)
         if (!knownHost.exists) throw new BadParameterException("Unable to find the selected known host file.")
         this.knownHosts.addHostkeys(knownHost)
       case None =>
-    }
+    }   
+    
+    user = credential.getUserID
   }
 
   override def disconnect = {}
