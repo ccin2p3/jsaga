@@ -37,6 +37,7 @@
 
     <xsl:template match="jsdl:JobDescription">[
 Type = "Job";<xsl:text/>
+JobType = "Normal";<xsl:text/>
         <!-- executable and arguments -->
 Executable = "<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/>";<xsl:text/>
         <xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
@@ -102,25 +103,34 @@ Requirements = true <xsl:text/>
 		<xsl:for-each select="jsdl:Resources/jsdl:OperatingSystem/jsdl:OperatingSystemType/jsdl:OperatingSystemName/text()">
 &amp;&amp;  other.GlueHostOperatingSystemName == "<xsl:value-of select="."/>" <xsl:text/>
 		</xsl:for-each>
+        <xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:SPMDVariation/text()[not(. = 'None')]">
+            <xsl:choose>
+                <xsl:when test=". = 'OPENMPI'">
+&amp;&amp;  Member("MPI-START", other.GlueHostApplicationSoftwareRunTimeEnvironment)
+&amp;&amp;  Member("<xsl:value-of select="."/>", other.GlueHostApplicationSoftwareRunTimeEnvironment) <xsl:text/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:message terminate="yes">Unsupported SPMDVariation : <xsl:value-of select="."/></xsl:message>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:for-each>
 <xsl:text/>;
 
         <xsl:if test="$rank">
 Rank = <xsl:value-of select="$rank"/>;<xsl:text/>
         </xsl:if>
 
-        <!-- TODO : To test when input sandbox will work -->
-        <xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:SPMDVariation/text()[not(. = 'None')]">        
-            <xsl:choose>
-	            <xsl:when test=". = 'MPI' or . = 'MPICH1' or . = 'MPICH2'">
-JobType = "MPICH";<xsl:text/>
-		        <xsl:for-each select="../../spmd:NumberOfProcesses/text()">
-NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
-	    	    </xsl:for-each>
-	            </xsl:when>
-    	        <xsl:otherwise>
-	    	        <xsl:message terminate="yes">Unsupported SPMDVariation : <xsl:value-of select="."/></xsl:message>
-            	</xsl:otherwise>
-        	</xsl:choose>
+        <xsl:for-each select="jsdl:Application/spmd:SPMDApplication[not(spmd:SPMDVariation/text() = 'None')]">
+            <xsl:if test="spmd:ProcessesPerHost/text()">
+SMPGranularity = <xsl:value-of select="spmd:ProcessesPerHost/text()"/>;<xsl:text/>
+                <xsl:if test="spmd:NumberOfProcesses/text()">
+WholeNodes = true;
+HostNumber = <xsl:value-of select="number(spmd:NumberOfProcesses/text()) div number(spmd:ProcessesPerHost/text())"/>;<xsl:text/>
+                </xsl:if>
+            </xsl:if>
+            <xsl:if test="spmd:NumberOfProcesses/text() and not(../../jsdl:Resources/jsdl:TotalCPUCount/jsdl:Exact/text())">
+CPUNumber = <xsl:value-of select="spmd:NumberOfProcesses/text()"/>;<xsl:text/>
+            </xsl:if>
         </xsl:for-each>
         <xsl:for-each select="jsdl:Resources/jsdl:TotalCPUCount/jsdl:Exact/text()">
 CPUNumber = <xsl:value-of select="."/>;<xsl:text/>
