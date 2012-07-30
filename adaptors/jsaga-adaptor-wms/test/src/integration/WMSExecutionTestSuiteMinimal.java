@@ -1,6 +1,8 @@
 package integration;
 
 import junit.framework.Test;
+
+import org.ogf.saga.job.JobListTest;
 import org.ogf.saga.job.JobRunMinimalTest;
 
 /* ***************************************************
@@ -22,7 +24,11 @@ public class WMSExecutionTestSuiteMinimal extends JSAGATestSuite {
     public static class index extends IndexTest {public index(){super(WMSExecutionTestSuiteMinimal.class);}}
 
     /** test cases */
+    public static class WMSJobListTest extends JobListTest {
+        public WMSJobListTest() throws Exception {super("wms");}
+    }
     public static class WMSJobRunMinimalTest extends JobRunMinimalTest {
         public WMSJobRunMinimalTest() throws Exception {super("wms");}
     }
+
 }
