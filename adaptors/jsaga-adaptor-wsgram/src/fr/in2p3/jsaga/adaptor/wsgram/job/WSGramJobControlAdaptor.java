@@ -26,6 +26,7 @@ import org.ogf.saga.error.*;
 import javax.xml.namespace.QName;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.Map;
 
 
 /* ***************************************************
@@ -46,12 +47,29 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
     private static final int POST_STAGE_OUT = 2;
     private static final int _NB_EXTENSIONS_ = 3;
 
+    // parameters extracted from URI
+    private static final String BATCH_SYSTEM = "BatchSystem";
+    private String m_batchSystem;
+
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new WSGramJobMonitorAdaptor();
     }
 
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+        // invoke parent
+        super.connect(userInfo, host, port, basePath, attributes);
+
+        // extract parameters from basePath
+        m_batchSystem = basePath.replaceFirst("/+", "");
+        if (m_batchSystem.equals("")) {
+            throw new BadParameterException("Path must be on the form: /<lrms>");
+        }
+    }
+
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
-        return new JobDescriptionTranslatorXSLT("xsl/job/rsl-2.0.xsl");
+        JobDescriptionTranslator translator = new JobDescriptionTranslatorXSLT("xsl/job/rsl-2.0.xsl");
+        translator.setAttribute(BATCH_SYSTEM, m_batchSystem);
+        return translator;
     }
 
     private String m_stagingPrefix;

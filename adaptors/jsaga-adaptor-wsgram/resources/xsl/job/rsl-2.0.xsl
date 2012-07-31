@@ -11,6 +11,9 @@
     <xsl:param name="HostName">host</xsl:param>
     <xsl:param name="UniqId">staging</xsl:param>
 
+    <!-- Adaptor-specific parameters -->
+    <xsl:param name="BatchSystem"/>
+
     <!-- constants -->
     <xsl:variable name="SupportedProtocols">/gsiftp/</xsl:variable>
     <xsl:variable name="IntermediaryURL">
@@ -20,6 +23,12 @@
     <!-- entry point (MUST BE RELATIVE) -->
     <xsl:template match="jsdl:JobDefinition">
         <job>
+            <factoryEndpoint xmlns:gram="http://www.globus.org/namespaces/2004/10/gram/job" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/03/addressing">
+                <wsa:Address>https://<xsl:value-of select="$HostName"/>:8443/wsrf/services/ManagedJobFactoryService</wsa:Address>
+                <wsa:ReferenceProperties>
+                    <gram:ResourceID><xsl:value-of select="$BatchSystem"/></gram:ResourceID>
+                </wsa:ReferenceProperties>
+            </factoryEndpoint>
             <xsl:apply-templates select="jsdl:JobDescription"/>
         </job>
     </xsl:template>
