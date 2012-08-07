@@ -31,7 +31,8 @@ public class NSLogicalMetaData extends AbstractCommand {
     private static final String OPT_SET = "s", LONGOPT_SET = "set";
     private static final String OPT_REMOVE = "r", LONGOPT_REMOVE = "remove";
     private static final String OPT_LIST = "l", LONGOPT_LIST = "list";
-    private static final String OPT_LIST_ALL_KEYS = "a", LONGOPT_LIST_ALL_KEYS = "list-all-keys";
+    private static final String OPT_LIST_ALL_KEYS = "k", LONGOPT_LIST_ALL_KEYS = "list-all-keys";
+    private static final String OPT_LIST_ALL_VALUES = "v", LONGOPT_LIST_ALL_VALUES = "list-all-values";
 
     public NSLogicalMetaData() {
         super("jsaga-logical-metadata", new String[]{"URL"}, new String[]{OPT_HELP, LONGOPT_HELP});
@@ -108,6 +109,15 @@ public class NSLogicalMetaData extends AbstractCommand {
                 for (int i=0; i<keys.length; i++) {
                     System.out.println(keys[i]);
                 }
+            } else if (line.hasOption(OPT_LIST_ALL_VALUES)) {
+                String key = line.getOptionValue(OPT_LIST_ALL_VALUES);
+                if (entry instanceof LogicalFile) {
+                    throw new BadParameterException("Option -"+OPT_LIST_ALL_VALUES+" requires path to end with a '/'");
+                }
+                String[] values = ((LogicalDirectoryImpl)entry).listAttributeValuesRecursive(key);
+                for (int i=0; i<values.length; i++) {
+                    System.out.println(values[i]);
+                }
             }
 
             // close connection
@@ -154,6 +164,11 @@ public class NSLogicalMetaData extends AbstractCommand {
             group.addOption(OptionBuilder.withDescription("List all meta-data keys")
                     .withLongOpt(LONGOPT_LIST_ALL_KEYS)
                     .create(OPT_LIST_ALL_KEYS));
+            group.addOption(OptionBuilder.withDescription("List all meta-data values for <key>")
+                    .hasArg()
+                    .withArgName("key")
+                    .withLongOpt(LONGOPT_LIST_ALL_VALUES)
+                    .create(OPT_LIST_ALL_VALUES));
         }
         opt.addOptionGroup(group);
         

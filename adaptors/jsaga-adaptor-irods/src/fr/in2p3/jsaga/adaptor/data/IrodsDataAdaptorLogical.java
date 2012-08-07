@@ -171,6 +171,10 @@ public class IrodsDataAdaptorLogical extends IrodsDataAdaptor implements Logical
         }
     }
 
+    public String[] listMetadataValues(String baseLogicalDir, String key, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        return new String[]{};  //todo
+    }
+
     public void create(String logicalEntry, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         //todo
     }

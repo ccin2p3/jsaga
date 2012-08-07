@@ -156,4 +156,15 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
             throw new NotImplementedException("Method listAttributesRecursive() is not supported for this protocol: "+m_url.getScheme());
         }
     }
+
+    public String[] listAttributeValuesRecursive(String key) throws NotImplementedException, PermissionDeniedException, TimeoutException, NoSuccessException {
+        if (m_adaptor instanceof LogicalReaderMetaDataExtended) {
+            return ((LogicalReaderMetaDataExtended) m_adaptor).listMetadataValues(
+                    MetaDataAttributesImpl.getNormalizedPath(m_url),
+                    key,
+                    m_url.getQuery());
+        } else {
+            throw new NotImplementedException("Method listAttributeValuesRecursive() is not supported for this protocol: "+m_url.getScheme());
+        }
+    }
 }

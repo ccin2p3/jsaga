@@ -25,4 +25,15 @@ public interface LogicalReaderMetaDataExtended extends LogicalReaderMetaData {
      */
     public String[] listMetadataNames(String baseLogicalDir, String additionalArgs)
         throws PermissionDeniedException, TimeoutException, NoSuccessException;
+
+    /**
+     * Recursively list the values of metadata <code>key</code> from baseLogicalDir.
+     * @param baseLogicalDir absolute path to the base directory.
+     * @param key the metadata key.
+     * @param additionalArgs adaptor specific arguments
+     * @return a list of metadata values
+     * @throws NoSuccessException if baseLogicalDir does not exist.
+     */
+    public String[] listMetadataValues(String baseLogicalDir, String key, String additionalArgs)
+        throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

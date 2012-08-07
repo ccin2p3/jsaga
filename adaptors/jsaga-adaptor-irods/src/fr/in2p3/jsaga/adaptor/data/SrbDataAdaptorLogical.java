@@ -170,11 +170,14 @@ public class SrbDataAdaptorLogical extends SrbDataAdaptor implements LogicalRead
     }
 
     public String[] listMetadataNames(String baseLogicalDir, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        return null;
+        return new String[]{};  //todo
     }
-	
-	
-	public void setMetaData(String logicalEntry, String name, String[] values, String additionalArgs) throws PermissionDeniedException, 		TimeoutException, NoSuccessException {
+
+    public String[] listMetadataValues(String baseLogicalDir, String key, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        return new String[]{};  //todo
+    }
+
+    public void setMetaData(String logicalEntry, String name, String[] values, String additionalArgs) throws PermissionDeniedException, 		TimeoutException, NoSuccessException {
 		
 		try {
 			SRBFile file = (SRBFile)FileFactory.newFile(fileSystem, logicalEntry);
