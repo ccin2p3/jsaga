@@ -12,6 +12,8 @@ import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.url.URL;
 
+import java.util.Map;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -147,21 +149,23 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
 
     ////////////////////////////////////// LogicialDirectoryImpl //////////////////////////////////////
 
-    public String[] listAttributesRecursive() throws NotImplementedException, PermissionDeniedException, TimeoutException, NoSuccessException {
+    public String[] listAttributesRecursive(Map<String, String> keyValuePatterns) throws NotImplementedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LogicalReaderMetaDataExtended) {
             return ((LogicalReaderMetaDataExtended) m_adaptor).listMetadataNames(
                     MetaDataAttributesImpl.getNormalizedPath(m_url),
+                    keyValuePatterns,
                     m_url.getQuery());
         } else {
             throw new NotImplementedException("Method listAttributesRecursive() is not supported for this protocol: "+m_url.getScheme());
         }
     }
 
-    public String[] listAttributeValuesRecursive(String key) throws NotImplementedException, PermissionDeniedException, TimeoutException, NoSuccessException {
+    public String[] listAttributeValuesRecursive(String key, Map<String, String> keyValuePatterns) throws NotImplementedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LogicalReaderMetaDataExtended) {
             return ((LogicalReaderMetaDataExtended) m_adaptor).listMetadataValues(
                     MetaDataAttributesImpl.getNormalizedPath(m_url),
                     key,
+                    keyValuePatterns,
                     m_url.getQuery());
         } else {
             throw new NotImplementedException("Method listAttributeValuesRecursive() is not supported for this protocol: "+m_url.getScheme());

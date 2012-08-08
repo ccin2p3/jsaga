@@ -13,6 +13,8 @@ import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
+import java.util.HashMap;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -105,7 +107,7 @@ public class NSLogicalMetaData extends AbstractCommand {
                 if (entry instanceof LogicalFile) {
                     throw new BadParameterException("Option -"+OPT_LIST_ALL_KEYS+" requires path to end with a '/'");
                 }
-                String[] keys = ((LogicalDirectoryImpl)entry).listAttributesRecursive();
+                String[] keys = ((LogicalDirectoryImpl)entry).listAttributesRecursive(new HashMap<String,String>());
                 for (int i=0; i<keys.length; i++) {
                     System.out.println(keys[i]);
                 }
@@ -114,7 +116,7 @@ public class NSLogicalMetaData extends AbstractCommand {
                 if (entry instanceof LogicalFile) {
                     throw new BadParameterException("Option -"+OPT_LIST_ALL_VALUES+" requires path to end with a '/'");
                 }
-                String[] values = ((LogicalDirectoryImpl)entry).listAttributeValuesRecursive(key);
+                String[] values = ((LogicalDirectoryImpl)entry).listAttributeValuesRecursive(key, new HashMap<String,String>());
                 for (int i=0; i<values.length; i++) {
                     System.out.println(values[i]);
                 }

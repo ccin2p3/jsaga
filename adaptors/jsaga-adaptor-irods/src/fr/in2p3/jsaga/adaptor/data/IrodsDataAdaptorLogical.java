@@ -146,7 +146,7 @@ public class IrodsDataAdaptorLogical extends IrodsDataAdaptor implements Logical
 
     }
 
-    public String[] listMetadataNames(String baseLogicalDir, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    public String[] listMetadataNames(String baseLogicalDir, Map<String, String> keyValuePatterns, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
 			// Search directories matching with the key valu metadata attributes
 			MetaDataCondition[] conditions = new MetaDataCondition[]{
@@ -171,7 +171,7 @@ public class IrodsDataAdaptorLogical extends IrodsDataAdaptor implements Logical
         }
     }
 
-    public String[] listMetadataValues(String baseLogicalDir, String key, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    public String[] listMetadataValues(String baseLogicalDir, String key, Map<String, String> keyValuePatterns, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         return new String[]{};  //todo
     }
 
