@@ -6,7 +6,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jsaga-adaptor-ssh</artifactId>
-    <name>Adaptors for SSH</name>
+    <name>Adaptors for SSH (based on jsch library)</name>
     <description>This module provides support for SSH components;
 security mecanism (SSH asymmetric keys),
 data management protocol (SFTP),
