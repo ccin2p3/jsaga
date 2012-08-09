@@ -48,18 +48,15 @@ public class HttpDataAdaptorSocketBased extends HttpDataAdaptorAbstract implemen
         }
 
         // get path
-        String path = absolutePath + (additionalArgs!=null ? "?"+additionalArgs : "");
+        String path = fr.in2p3.jsaga.impl.url.URLEncoder.encodePathOnly(absolutePath) + (additionalArgs!=null ? "?"+additionalArgs : "");
 
         // get request
         HttpRequest request;
-        try {
-            Socket socket = new Socket(m_baseUrl.getHost(), m_baseUrl.getPort());
-            request = new HttpRequest(requestType, path, socket);
-        } catch (UnknownHostException e) {
-            throw new DoesNotExistException("Unknown host: "+m_baseUrl.getHost(), e);
-        } catch (IOException e) {
-            throw new NoSuccessException(e);
-        }
+            try {
+				request = new HttpRequest(requestType, path, this.createSocket());
+			} catch (IOException e) {
+	            throw new NoSuccessException(e);
+			}
 
         // check status
         String status = request.getStatus();
@@ -72,5 +69,13 @@ public class HttpDataAdaptorSocketBased extends HttpDataAdaptorAbstract implemen
         } else {
             throw new NoSuccessException(status);
         }
+    }
+    
+    protected Socket createSocket() throws DoesNotExistException, PermissionDeniedException, IOException {
+    	try {
+			return new Socket(m_baseUrl.getHost(), m_baseUrl.getPort());
+		} catch (UnknownHostException e) {
+            throw new DoesNotExistException("Unknown host: "+m_baseUrl.getHost(), e);
+		}
     }
 }
