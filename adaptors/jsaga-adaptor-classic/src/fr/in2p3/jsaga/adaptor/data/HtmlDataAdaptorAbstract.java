@@ -38,44 +38,5 @@ public abstract class HtmlDataAdaptorAbstract implements FileReaderStreamFactory
         m_baseUrl = null;
     }
 
-    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        try {
-            // get web page
-            InputStream rawStream = this.getInputStream(absolutePath, additionalArgs);
-            String raw = toString(rawStream);
-            if (raw.contains("403 Forbidden")) {
-                throw new PermissionDeniedException("Not allowed to list this directory");
-            }
-
-            // extract href
-            List list = new ArrayList();
-            String[] array = raw.split("href=\"");
-            for (int i=1; i<array.length; i++) {
-                String entryName = array[i].substring(0, array[i].indexOf('"'));
-                boolean isDir = false;
-                while (entryName.endsWith("/")) {
-                    isDir = true;
-                    entryName = entryName.substring(0, entryName.length() - 1);
-                }
-                if (!entryName.contains("/") && !entryName.contains("?") && !entryName.contains("#")) {
-                    list.add(new HtmlFileAttributes(entryName, isDir));
-                }
-            }
-            return (FileAttributes[]) list.toArray(new FileAttributes[list.size()]);
-        } catch (BadParameterException e) {
-            throw new NoSuccessException(e);
-        } catch (Exception e) {
-            throw new NoSuccessException(e);
-        }
-    }
-    private String toString(InputStream in) throws IOException {
-        int len;
-        byte[] buffer = new byte[1024];
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        while ((len=in.read(buffer)) > -1) {
-            bytes.write(buffer, 0, len);
-        }
-        return bytes.toString();
-    }
     public abstract String getNativeScheme();
 }
