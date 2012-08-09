@@ -12,6 +12,7 @@ import org.ogf.saga.error.*;
 
 import javax.net.ssl.*;
 import java.io.IOException;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -102,38 +103,49 @@ public class HttpsDataAdaptorSocketBased extends HttpDataAdaptorSocketBased impl
         m_socketFactory = null;
     }
 
-    protected HttpRequest getRequest(String absolutePath, String additionalArgs, String requestType) throws PermissionDeniedException, DoesNotExistException, NoSuccessException {
-        if (m_baseUrl == null) {
-            throw new NoSuccessException("Connection is closed");
-        }
+//    protected HttpRequest getRequest(String absolutePath, String additionalArgs, String requestType) throws PermissionDeniedException, DoesNotExistException, NoSuccessException {
+//        if (m_baseUrl == null) {
+//            throw new NoSuccessException("Connection is closed");
+//        }
+//
+//        // get path
+//        String path = absolutePath + (additionalArgs!=null ? "?"+additionalArgs : "");
+//
+//        // get request
+//        HttpRequest request;
+//        try {
+//            SSLSocket socket = (SSLSocket) m_socketFactory.createSocket(m_baseUrl.getHost(), m_baseUrl.getPort());
+//            socket.startHandshake();
+//            request = new HttpRequest(requestType, path, socket);
+//        } catch (UnknownHostException e) {
+//            throw new DoesNotExistException("Unknown host: "+m_baseUrl.getHost(), e);
+//        } catch (SSLHandshakeException e) {
+//            throw new PermissionDeniedException("User not allowed: "+m_userID, e);
+//        } catch (IOException e) {
+//            throw new NoSuccessException(e);
+//        }
+//
+//        // check status
+//        String status = request.getStatus();
+//        if (status.endsWith("200 OK")) {
+//            return request;
+//        } else if (status.endsWith("404 Not Found")) {
+//            throw new DoesNotExistException(status);
+//        } else if (status.endsWith("403 Forbidden")) {
+//            throw new PermissionDeniedException(status);
+//        } else {
+//            throw new NoSuccessException(status);
+//        }
+//    }
 
-        // get path
-        String path = absolutePath + (additionalArgs!=null ? "?"+additionalArgs : "");
-
-        // get request
-        HttpRequest request;
-        try {
+    @Override
+    protected Socket createSocket() throws DoesNotExistException, PermissionDeniedException, IOException {
+    	try {
             SSLSocket socket = (SSLSocket) m_socketFactory.createSocket(m_baseUrl.getHost(), m_baseUrl.getPort());
             socket.startHandshake();
-            request = new HttpRequest(requestType, path, socket);
-        } catch (UnknownHostException e) {
+            return socket;
+		} catch (UnknownHostException e) {
             throw new DoesNotExistException("Unknown host: "+m_baseUrl.getHost(), e);
-        } catch (SSLHandshakeException e) {
-            throw new PermissionDeniedException("User not allowed: "+m_userID, e);
-        } catch (IOException e) {
-            throw new NoSuccessException(e);
-        }
-
-        // check status
-        String status = request.getStatus();
-        if (status.endsWith("200 OK")) {
-            return request;
-        } else if (status.endsWith("404 Not Found")) {
-            throw new DoesNotExistException(status);
-        } else if (status.endsWith("403 Forbidden")) {
-            throw new PermissionDeniedException(status);
-        } else {
-            throw new NoSuccessException(status);
-        }
+		}
     }
 }
