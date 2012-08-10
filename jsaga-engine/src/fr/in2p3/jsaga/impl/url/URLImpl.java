@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.url;
 
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.helpers.URLEncoder;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.BadParameterException;

@@ -1,17 +1,14 @@
 package fr.in2p3.jsaga.adaptor.data.http;
 
-import fr.in2p3.jsaga.adaptor.data.HtmlFileAttributes;
 import fr.in2p3.jsaga.adaptor.data.HttpDataAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
+import fr.in2p3.jsaga.helpers.URLEncoder;
 
-import org.apache.commons.codec.EncoderException;
 import org.ogf.saga.error.*;
 
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -59,7 +56,7 @@ public class HttpDataAdaptorDefault extends HttpDataAdaptorAbstract implements F
         // get URL
         URL url;
         try {
-            String fullPath = fr.in2p3.jsaga.impl.url.URLEncoder.encodePathOnly(absolutePath) + (additionalArgs!=null ? "?"+additionalArgs : "");
+            String fullPath = URLEncoder.encodePathOnly(absolutePath) + (additionalArgs!=null ? "?"+additionalArgs : "");
             url = new URL(m_baseUrl.getProtocol(), m_baseUrl.getHost(), m_baseUrl.getPort(), fullPath);
         } catch (MalformedURLException e) {
             throw new NoSuccessException(e);

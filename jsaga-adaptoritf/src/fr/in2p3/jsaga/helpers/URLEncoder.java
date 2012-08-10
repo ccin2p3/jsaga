@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.impl.url;
+package fr.in2p3.jsaga.helpers;
 
 import java.net.URI;
 
@@ -20,7 +20,7 @@ public class URLEncoder {
 	 * Only the part before ? (query separator) or # (fragment separator) is encoded
 	 * 
 	 */
-    static String encode(String url) {
+    public static String encode(String url) {
         int query, fragment;
         if ((query=url.lastIndexOf('?')) > -1) {
             return encodeUrlNoQueryNoFragment(url.substring(0,query)) + url.substring(query);
@@ -34,7 +34,7 @@ public class URLEncoder {
     /* This method encodes a URL with no query and no fragment
      * Thus ? and # are encoded
      */
-    static String encodeUrlNoQueryNoFragment(String url) {
+    public static String encodeUrlNoQueryNoFragment(String url) {
         StringBuffer buffer = new StringBuffer();
         char[] array = url.toCharArray();
         for (int i=0; i<array.length; i++) {
@@ -138,7 +138,7 @@ public class URLEncoder {
     }
 
     // [scheme://][[user-info@]host[:port]][path][?query][#fragment]
-    static String decode(URI url, boolean mustRemoveSlash) {
+    public static String decode(URI url, boolean mustRemoveSlash) {
         StringBuffer buffer = new StringBuffer();
         if (url.getScheme() != null) {
             buffer.append(url.getScheme());

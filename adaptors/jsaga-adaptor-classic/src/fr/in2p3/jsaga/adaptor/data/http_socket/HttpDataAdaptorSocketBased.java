@@ -3,6 +3,8 @@ package fr.in2p3.jsaga.adaptor.data.http_socket;
 import fr.in2p3.jsaga.adaptor.data.HttpDataAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
+import fr.in2p3.jsaga.helpers.URLEncoder;
+
 import org.ogf.saga.error.*;
 
 import java.io.IOException;
@@ -48,7 +50,7 @@ public class HttpDataAdaptorSocketBased extends HttpDataAdaptorAbstract implemen
         }
 
         // get path
-        String path = fr.in2p3.jsaga.impl.url.URLEncoder.encodePathOnly(absolutePath) + (additionalArgs!=null ? "?"+additionalArgs : "");
+        String path = URLEncoder.encodePathOnly(absolutePath) + (additionalArgs!=null ? "?"+additionalArgs : "");
 
         // get request
         HttpRequest request;
