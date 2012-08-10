@@ -59,7 +59,9 @@ public class HttpDataAdaptorDefault extends HttpDataAdaptorAbstract implements F
         // get URL
         URL url;
         try {
+//        	System.out.println(absolutePath);
             String fullPath = fr.in2p3.jsaga.impl.url.URLEncoder.encodePathOnly(absolutePath) + (additionalArgs!=null ? "?"+additionalArgs : "");
+//            System.out.println(fullPath);
             url = new URL(m_baseUrl.getProtocol(), m_baseUrl.getHost(), m_baseUrl.getPort(), fullPath);
         } catch (MalformedURLException e) {
             throw new NoSuccessException(e);
