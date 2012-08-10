@@ -84,7 +84,7 @@ public abstract class HttpDataAdaptorAbstract extends HtmlDataAdaptorAbstract im
                     isDir = true;
                     entryName = entryName.substring(0, entryName.length() - 1);
                 }
-                if (!entryName.contains("/") && !entryName.contains("?") && !entryName.contains("#")) {
+                if (!entryName.isEmpty() && !entryName.contains("/") && !entryName.contains("?") && !entryName.contains("#")) {
                 	// replace "&amp;" by "%26"
                 	entryName = entryName.replaceAll("&amp;","%26");
                 	// decode URL
