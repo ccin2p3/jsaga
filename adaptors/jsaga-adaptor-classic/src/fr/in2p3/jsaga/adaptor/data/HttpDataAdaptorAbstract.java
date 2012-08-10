@@ -71,13 +71,11 @@ public abstract class HttpDataAdaptorAbstract extends HtmlDataAdaptorAbstract im
             // get web page
             InputStream rawStream = this.getInputStream(absolutePath, additionalArgs);
             String raw = toString(rawStream);
-            // LS commented this as this exception is already sent by getInputStream()
-//            if (raw.contains("403 Forbidden")) {
-//                throw new PermissionDeniedException("Not allowed to list this directory");
-//            }
 
             // extract href
             List list = new ArrayList();
+            // lowercase "HREF"
+            raw = raw.replaceAll("HREF=","href=");
             String[] array = raw.split("href=\"");
             for (int i=1; i<array.length; i++) {
                 String entryName = array[i].substring(0, array[i].indexOf('"'));
@@ -87,6 +85,9 @@ public abstract class HttpDataAdaptorAbstract extends HtmlDataAdaptorAbstract im
                     entryName = entryName.substring(0, entryName.length() - 1);
                 }
                 if (!entryName.contains("/") && !entryName.contains("?") && !entryName.contains("#")) {
+                	// replace "&amp;" by "%26"
+                	entryName = entryName.replaceAll("&amp;","%26");
+                	// decode URL
                 	entryName = java.net.URLDecoder.decode(entryName, "utf-8");
                 	entryName = new java.io.File(entryName).getPath();
                     list.add(new HtmlFileAttributes(entryName, isDir));
