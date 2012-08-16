@@ -43,7 +43,7 @@ public class OurGridTestSuite extends TestSuite {
     // test cases
     public static class OurGridJobRunRequiredTest extends JobRunRequiredTest {
         public OurGridJobRunRequiredTest() throws Exception {super("ourgrid");}
-//        public void test_run_error() { super.ignore("return code not supported"); }
+        public void test_run_error() { super.ignore("disabled because server sends RUNNING when command does not exists"); }
     }
     
     // test cases
@@ -73,9 +73,12 @@ public class OurGridTestSuite extends TestSuite {
     
     }
     // test cases
-//    public static class OurGridJobRunInfoTest extends JobRunInfoTest {
-//    	public OurGridJobRunInfoTest() throws Exception {super("ourgrid");}
-//    }
+    public static class OurGridJobRunInfoTest extends JobRunInfoTest {
+    	public OurGridJobRunInfoTest() throws Exception {super("ourgrid");}
+    	public void test_exitcode() throws Exception { super.ignore("Not supported"); }
+    	public void test_created() throws Exception { super.ignore("Not supported"); }
+    	public void test_dates() throws Exception { super.ignore("Not supported"); }
+    }
 //    
 //    public static class OurGridJobRunInteractiveTest extends JobRunInteractiveTest {
 //    	public OurGridJobRunInteractiveTest() throws Exception {super("ourgrid");}
