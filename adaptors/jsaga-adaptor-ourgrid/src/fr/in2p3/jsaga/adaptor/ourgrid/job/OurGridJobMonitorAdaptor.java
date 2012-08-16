@@ -113,8 +113,12 @@ public class OurGridJobMonitorAdaptor extends OurGridAbstract implements JobMoni
 		setPath(STATUS_JOB_ID + nativeJobId);
 		String authorization = OurGridConstants.BASIC + " " + getAuthentication();
 		
-		nativeStatus=getWebResource().path(getPath()).
-		header(OurGridConstants.AUTHORIZATION, authorization).get(String.class);
+		try {
+			nativeStatus=getWebResource().path(getPath()).
+			header(OurGridConstants.AUTHORIZATION, authorization).get(String.class);
+		} catch (com.sun.jersey.api.client.UniformInterfaceException uie) {
+			throw new TimeoutException(uie);
+		}
 		OurGridJobStatus jobStatus = new OurGridJobStatus(nativeJobId,nativeStatus);
 
 		return jobStatus;
@@ -137,27 +141,19 @@ public class OurGridJobMonitorAdaptor extends OurGridAbstract implements JobMoni
 	}
 	
 
-	
 	public Date getCreated(String nativeJobId) throws NotImplementedException,NoSuccessException {
-
-		return null;
+		throw new NotImplementedException();
 	}
-
 
 	public Integer getExitCode(String nativeJobId) throws NotImplementedException,	NoSuccessException {
-
-		return null;
-		
+		throw new NotImplementedException();
 	}
-	public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException {
 
-		return null;
-		
+	public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException {
+		throw new NotImplementedException();
 	}
 	
 	public Date getStarted(String nativeJobId) throws NotImplementedException,	NoSuccessException {
-
-		return null;
-		
+		throw new NotImplementedException();
 	}
 }
