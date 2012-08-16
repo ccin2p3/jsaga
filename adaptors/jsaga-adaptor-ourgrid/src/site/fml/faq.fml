@@ -7,27 +7,8 @@
             <answer>The command "jsaga-help" provides some useful information about the usage
                 and the current configuration of the plug-ins.
                 <pre>jsaga-help -help</pre>
-                If this command does not provide the answer to your question, then
+                If this command does not provides the answer to your question, then
                 please contact us so that we can fill out this FAQ.
-            </answer>
-        </faq>
-        <faq id="url">
-            <question>What is the URL syntax understood by this plug-in ?</question>
-            <answer>The URL must be:
-                <pre><![CDATA[arex://<HOSTNAME>[:<PORT>]/<PATH>
-Where:
-    <HOSTNAME> is the name of the host running the BES A-REX service,
-    <PORT> is 2010 by default,
-    <PATH> is the path of the A-REX service (probably "arex-x509").
-]]></pre>
-            </answer>
-        </faq>
-    </part>
-    <part id="security">
-        <title>Security</title>
-        <faq id="context">
-            <question>What security context should I use ?</question>
-            <answer>The context must be of type <a href="../jsaga-adaptor-classic/faq.html#axisjks_adaptor">"AxisJKS"</a>.
             </answer>
         </faq>
     </part>
