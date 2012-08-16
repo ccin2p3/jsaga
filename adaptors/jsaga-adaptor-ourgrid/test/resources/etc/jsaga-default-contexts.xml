@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+   <session>
+       <context type="ourgrid">
+           <attribute name="UserID" value="schwarz"/>
+           <attribute name="UserPass" value="schwarz"/>
+           <data type="ourgrid"/>
+           <job type="ourgrid"/>
+       </context>
+   </session>
+</jsaga-default>

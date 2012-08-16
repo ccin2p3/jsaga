@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>adaptors</artifactId>
+    <groupId>fr.in2p3.jsaga.adaptor</groupId>
+    <version>0.9.15-SNAPSHOT</version>
+  </parent>
+  <artifactId>jsaga-adaptor-ourgrid</artifactId>
+  <name>Adaptor for OurGrid middleware</name>
+  <description>This module provides support for the OurGrid Job Adaptor.</description>
+  <developers>
+        <developer>
+            <name>Patricia Alanis</name>
+            <email>patriciaam@lsd.ufcg.edu.br</email>
+            <organization>Distributed Systems Lab(LSD)-UFCG</organization>
+            <organizationUrl>http://www.lsd.ufcg.edu.br</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://www.dsc.ufcg.edu.br/~opi/images/lsd-ufcg.jpg</organizationLogoUrl>
+                <project>OurGrid Middleware</project>
+                <projectUrl>http://www.ourgrid.org</projectUrl>
+                <projectLogoUrl>http://code.google.com/p/worker5/logo?cct=1308679013</projectLogoUrl>
+            </properties>
+        </developer>
+            <developer>
+            <name>Abmar Barros</name>
+            <email>abmar@lsd.ufcg.edu.br</email>
+            <organization>Distributed Systems Lab(LSD)-UFCG</organization>
+            <organizationUrl>http://www.lsd.ufcg.edu.br</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://www.dsc.ufcg.edu.br/~opi/images/lsd-ufcg.jpg</organizationLogoUrl>
+                <project>OurGrid Middleware</project>
+                <projectUrl>http://www.ourgrid.org</projectUrl>
+                <projectLogoUrl>http://code.google.com/p/worker5/logo?cct=1308679013</projectLogoUrl>
+            </properties>
+        </developer>
+    </developers>
+
+  <build>
+        <sourceDirectory>src</sourceDirectory>
+        <testSourceDirectory>test/src</testSourceDirectory>
+        <resources>
+            <resource>
+                <directory>resources</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>test/resources</directory>
+            </testResource>
+        </testResources>
+    </build>
+    
+  <dependencies>
+		<dependency><!-- for data staging (scope runtime) and for class LocalJobProcess (scope compile) -->
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-classic</artifactId>
+            <version>0.9.15-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+<!--     	<dependency>
+    		<groupId>com.sun.jersey</groupId>
+    		<artifactId>jersey-json</artifactId>
+    		<version>1.12</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.sun.jersey</groupId>
+		    <artifactId>jersey-server</artifactId>
+		    <version>1.12</version>
+		</dependency>
+ -->		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>1.8</version>
+		</dependency>
+<!-- 		<dependency>
+	      <groupId>com.google.code.gson</groupId>
+	      <artifactId>gson</artifactId>
+	      <version>2.2.2</version>
+	      <scope>compile</scope>
+	    </dependency>
+ -->        
+<!-- 		<dependency>
+		    <groupId>com.sun.jersey.contribs</groupId>
+		    <artifactId>jersey-multipart</artifactId>
+		    <version>1.12</version>
+		</dependency>
+ -->		
+<!-- 		<dependency>
+			<groupId>org.jvnet</groupId>
+			<artifactId>mimepull</artifactId>
+			<version>1.3</version>
+		</dependency>
+ -->            
+        <dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient</artifactId>
+		    <version>4.2.1</version>
+		    <scope>compile</scope>
+		</dependency>
+  
+		  <dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpmime</artifactId>
+		    <version>4.2.1</version>
+		    <scope>compile</scope>
+		  </dependency>
+		  
+<!-- 		  <dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient-cache</artifactId>
+		    <version>4.2.1</version>
+		    <scope>compile</scope>
+		  </dependency>
+ -->		            
+		<!-- <dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>hc-fluent</artifactId>
+		    <version>4.2.1</version>
+		    <scope>compile</scope>
+		  </dependency>
+		 -->  
+<!-- 		  <dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.2.1</version>
+		</dependency>
+ -->            
+<!--          <dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+			<version>2.0.2</version>
+		</dependency>
+ -->            
+<!--             <dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.9.1</version>
+		</dependency>
+ -->            
+ <!--        <dependency>
+	      <groupId>asm</groupId>
+	      <artifactId>asm</artifactId>
+	      <version>3.3.1</version>
+	    </dependency>            
+ -->
+<!-- 		 <dependency>
+			<groupId>org.codehaus.castor</groupId>
+			<artifactId>castor-xml</artifactId>
+			<version>1.0</version>
+		</dependency>
+ -->    </dependencies>
+</project>
