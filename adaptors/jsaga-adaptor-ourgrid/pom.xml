@@ -7,11 +7,10 @@
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <version>0.9.15-SNAPSHOT</version>
   </parent>
-  <groupId>fr.in2p3.jsaga.adaptor</groupId>
-    <artifactId>jsaga-adaptor-ourgrid</artifactId>
-    <name>Adaptor for OurGrid middleware</name>
-     <description>This module provides support for the OurGrid Job Adaptor.</description>
-    <developers>
+  <artifactId>jsaga-adaptor-ourgrid</artifactId>
+  <name>Adaptor for OurGrid middleware</name>
+  <description>This module provides support for the OurGrid Job Adaptor.</description>
+  <developers>
         <developer>
             <name>Patricia Alanis</name>
             <email>patriciaam@lsd.ufcg.edu.br</email>
@@ -38,7 +37,7 @@
         </developer>
     </developers>
 
-    <build>
+  <build>
         <sourceDirectory>src</sourceDirectory>
         <testSourceDirectory>test/src</testSourceDirectory>
         <resources>
@@ -53,7 +52,7 @@
         </testResources>
     </build>
     
-    <dependencies>
+  <dependencies>
 		<dependency><!-- for data staging (scope runtime) and for class LocalJobProcess (scope compile) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-classic</artifactId>
