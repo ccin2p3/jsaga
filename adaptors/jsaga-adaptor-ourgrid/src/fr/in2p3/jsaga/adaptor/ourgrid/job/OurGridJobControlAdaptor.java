@@ -27,6 +27,7 @@ import org.xml.sax.SAXException;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.util.Base64;
 
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
@@ -37,25 +38,61 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
+/* ***************************************************
+ * ***  Distributed Systems Lab(LSD)-UFCG) ***
+ * ***   http://www.lsd.ufcg.edu.br        ***
+ * ***************************************************
+ * File:   OurGridDataAdaptor
+ * Author: Patricia Alanis (patriciaam@lsd.ufcg.edu.br)
+ * Date:   August 2012
+ * ***************************************************/
+
 /**
+ * This class handles the submission, cancel and clean of a job 
  * @author patriciaam
+ *
  */
 public class OurGridJobControlAdaptor extends OurGridAbstract implements
-		JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
+JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 
-	private Client client = Client.create();
+	private final String CLEAN = "/clean/";
+	private final String CANCEL = "/cancel/";
+	private final String SUBMIT = "/addjob/";
+	private final String JOB_TYPE= "job";
+	private final String SUBMIT_ERROR = "Failed: HTTP error code:";
+	private final String TAG_TYPE = "transferFiles";
+	private final String TAG_ELEMENT = "TransferFiles";
+	private final String TAG_VALUE = "UploadURL";
+	private final String SPLIT = "#";
+
+	private final String FROM = "From";
+	private final String TO = "To";
+
+
+	private final String PRE_STAGING = "PreStaging";
+	private final String STAGING_IN = "StagingIn";
+
+	private final String POST_STAGING = "PostStaging";
+	private final String STAGING_OUT = "StagingOut";
+
+	private final String PRE_STAGING_OUT = "PreStagingOut";
+	private final String STAGING_IN_OUT = "StagingInOut";
+
 	private WebResource webResource;
 	private String host;
 	private String path;
-	private Document document;
+	private static Document document;
+	private String authentication;
+	private Client client;
 
-	public Document getDocument() {
-		return document;
+	public Client getClient() {
+		return client;
 	}
 
-	public void setDocument(Document document) {
-		this.document = document;
+	public void setClient(Client client) {
+		this.client = client;
 	}
+
 
 	public String getPath() {
 		return path;
@@ -73,69 +110,50 @@ public class OurGridJobControlAdaptor extends OurGridAbstract implements
 		this.host = host;
 	}
 
-	public void connect(String userInfo, String host, int port,
-			String basePath, @SuppressWarnings("rawtypes") Map attributes)
-			throws NotImplementedException, AuthenticationFailedException,
-			AuthorizationFailedException, IncorrectURLException,
-			BadParameterException, TimeoutException, NoSuccessException {
+	public WebResource getWebResource() {
+		return webResource;
+	}
+
+	public void setWebResource(WebResource webResource) {
+		this.webResource = webResource;
+	}
+
+	public String getAuthentication() {
+		return authentication;
+	}
+
+	public void setAuthentication(String authentication) {
+		this.authentication = authentication;
+	}
+
+	public  Document getDocument() {
+		return document;
+	}
+
+	public static  void setDocument(Document document) {
+
+		OurGridJobControlAdaptor.document = document;
+	}
+
+	public void connect(String userInfo, String host, int port, String basePath,  Map attributes)
+			throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException,BadParameterException, TimeoutException, NoSuccessException {
+
+		setClient(Client.create());
 		setHost(host);
-		webResource = client.resource("http://" + getHost());
+		String resource = OurGridConstants.HTTP + getHost();
+		setWebResource(getClient().resource(resource));
+		setAuthentication(new String(Base64.encode(m_account + ":" + m_passPhrase)));
 	}
 
-	/**
-	 * Cleans an ended job filtered by job id
-	 * 
-	 * @param nativeJobId
-	 *            Identifier of the job
-	 */
-	public void clean(String nativeJobId) throws PermissionDeniedException,
+	public JobMonitorAdaptor getDefaultJobMonitor() {
 
-	TimeoutException, NoSuccessException {
-		try {
-			ClientResponse response = webResource.path("/clean/" + nativeJobId)
-					.get(ClientResponse.class);
-			if (response.getStatus() != 200) {
-				throw new RuntimeException("Failed: HTTP error code: "
-						+ response.getStatus());
-			} else {
-				String output = response.getEntity(String.class);
-				System.out.println("Server response: " + output);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
+		return new OurGridJobMonitorAdaptor();
 	}
 
-	/**
-	 * Cancels a job filtered by job id
-	 * 
-	 * @param nativeJobId
-	 *            Identifier of the job
-	 */
-	public void cancel(String nativeJobId) throws PermissionDeniedException,
-			TimeoutException, NoSuccessException {
+	public JobDescriptionTranslator getJobDescriptionTranslator()throws NoSuccessException {
 
-		try {
-			ClientResponse response = webResource
-					.path("/cancel/" + nativeJobId)
-					.delete(ClientResponse.class);
-			if (response.getStatus() != 200) {
-				throw new RuntimeException("Failed: HTTP error code: "
-						+ response.getStatus());
-
-			} else {
-				String output = response.getEntity(String.class);
-				System.out.println("Server response: " + output);
-			}
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-
-		}
-
+		JobDescriptionTranslator translator = new JobDescriptionTranslatorXSLT("xsl/job/jsdltranslatorsandbox.xsl");
+		return translator;
 	}
 
 	/**
@@ -152,141 +170,113 @@ public class OurGridJobControlAdaptor extends OurGridAbstract implements
 	 * @return nativeJobId Returns the identifier of the job in the grid
 	 */
 	public String submit(String jobDesc, boolean checkMatch, String uniqId)
-			throws PermissionDeniedException, TimeoutException,
-			NoSuccessException, BadResource {
-		String type = "job";
-		
-		String job = getInput(jobDesc, type);
-		System.out.println(job);
+			throws PermissionDeniedException, TimeoutException,NoSuccessException, BadResource {
+
+		String job = getInput(jobDesc, JOB_TYPE);
 		String jobId = null;
-		try {
+		setPath(SUBMIT);
+		String authorization = OurGridConstants.BASIC + " " + getAuthentication();
 
-			ClientResponse response = webResource.path("/addjob")
-					.type("text/plain").post(ClientResponse.class, job);
-			if (response.getStatus() != 200) {
-				throw new RuntimeException("Failed: HTTP error code: "
-						+ response.getStatus());
-			} else {
-				response.getClass();
-				System.out.println("Job added with success....");
-				jobId = response.getEntity(String.class);
-				System.out.println("JobId: " + jobId);
-			}
+		ClientResponse response = getWebResource().path(getPath()).header(OurGridConstants.AUTHORIZATION, authorization).
+				type("text/plain").post(ClientResponse.class, job);
 
-		} catch (Exception e) {
+		if (response.getStatus() == 401) {
+			throw new PermissionDeniedException(SUBMIT_ERROR + response);
+		} else if (response.getStatus() != 200) {
 
-			e.printStackTrace();
+			throw new NoSuccessException(SUBMIT_ERROR + response.getStatus());
+		} else {
 
+			response.getClass();
+			jobId = response.getEntity(String.class);
+			jobId.toString();
 		}
-		return jobId;
+		return jobId.trim().toString();
 	}
 
-	public JobMonitorAdaptor getDefaultJobMonitor() {
+	/**
+	 * Cleans an ended job filtered by job id
+	 * 
+	 * @param nativeJobId Identifier of the job
+	 */
+	public void clean(String nativeJobId) throws PermissionDeniedException,TimeoutException, NoSuccessException {
 
-		return new OurGridJobMonitorAdaptor();
+		setPath(CLEAN + nativeJobId);
+		String authorization = OurGridConstants.BASIC + " " + getAuthentication();
+		getWebResource().path(getPath()).
+		header(OurGridConstants.AUTHORIZATION, authorization).delete(ClientResponse.class);
+
 	}
 
-	public JobDescriptionTranslator getJobDescriptionTranslator()
-			throws NoSuccessException {
+	/**
+	 * Cancels a job filtered by job id 
+	 * @param nativeJobId Identifier of the job
+	 */
+	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 
-		JobDescriptionTranslator translator = new JobDescriptionTranslatorXSLT(
-				"xsl/job/jsdltranslatorsandbox.xsl");
-		return translator;
+		setPath(CANCEL + nativeJobId);
+		String authorization = OurGridConstants.BASIC + " " + getAuthentication();
+
+		getWebResource().path(getPath()).
+		header(OurGridConstants.AUTHORIZATION, authorization).delete(ClientResponse.class);
 	}
 
 	/*
 	 * StagingJobAdaptorOnePhase interface
 	 */
 
-	public StagingTransfer[] getInputStagingTransfer(String nativeJobId)
-			throws PermissionDeniedException, TimeoutException,
-			NoSuccessException {
-		
-		StagingTransfer[] preStagingTransfers = new StagingTransfer[]{};
-		ArrayList<StagingTransfer> transfers = new ArrayList<StagingTransfer> ();
-		String preStaging = "PreStaging";
-		NodeList nList = document.getElementsByTagName(preStaging);
-		int qtPreStaging = nList.getLength();
-		System.out.println(qtPreStaging);
 
-		for (int i = 1; i <= qtPreStaging; i++) {
-			nList = document.getElementsByTagName("Staging"+i);
-			String from = getValue(document, "Staging"+i, "From");
-			String to = getValue(document, "Staging"+i, "To");
-			transfers.add(new StagingTransfer(from, to, false));
-		}	
+	public String getStagingDirectory(String nativeJobId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
 
-		return (StagingTransfer[])transfers.toArray(preStagingTransfers);
-			}
-
-	public StagingTransfer[] getOutputStagingTransfer(String nativeJobId)
-			throws PermissionDeniedException, TimeoutException,
-			NoSuccessException {
-		StagingTransfer[] postStagingTransfers = new StagingTransfer[]{};
-
-		
-		ArrayList<StagingTransfer> transfers = new ArrayList<StagingTransfer> ();
-		String postStaging = "PostStaging";
-		NodeList nList = document.getElementsByTagName(postStaging);
-		int qtPostStaging = nList.getLength();
-		System.out.println(qtPostStaging);
-
-		for (int i = 1; i <= qtPostStaging; i++) {
-			nList = document.getElementsByTagName("Staging"+i);
-			String from = getValue(document, "StagingOut"+i, "From");
-			String to = getValue(document, "StagingOut"+i, "To");
-			transfers.add(new StagingTransfer(from, to, false));
-		}	
-
-		return (StagingTransfer[])transfers.toArray(postStagingTransfers);
-		}
-
-	public String getStagingDirectory(String nativeJobId)
-			throws PermissionDeniedException, TimeoutException,
-			NoSuccessException {
 		String stagingDirectory = null;
-
 		return stagingDirectory;
 	}
 
-	public StagingTransfer[] getInputStagingTransfer(
-			String nativeJobDescription, String uniqId)
-			throws PermissionDeniedException, TimeoutException,
-			NoSuccessException {
+	public StagingTransfer[] getInputStagingTransfer(String nativeJobId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
 
-		StagingTransfer[] preStagingTransfers = new StagingTransfer[]{};
-		ArrayList<StagingTransfer> transfers = new ArrayList<StagingTransfer> ();
-		String preStaging = "PreStaging";
-		NodeList nList = document.getElementsByTagName(preStaging);
-		int qtPreStaging = nList.getLength();
-		System.out.println(qtPreStaging);
+		return getTransfers(PRE_STAGING_OUT, STAGING_IN_OUT);
+	}
 
-		for (int i = 1; i <= qtPreStaging; i++) {
-			nList = document.getElementsByTagName("Staging"+i);
-			String from = getValue(document, "Staging"+i, "From");
-			String to = getValue(document, "Staging"+i, "To");
-			transfers.add(new StagingTransfer(from, to, false));
-		}	
+	public StagingTransfer[] getInputStagingTransfer(String nativeJobDescription, String uniqId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
 
-		return (StagingTransfer[])transfers.toArray(preStagingTransfers);
+		return getTransfers(PRE_STAGING, STAGING_IN);
+	}
+
+	public StagingTransfer[] getOutputStagingTransfer(String nativeJobId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
+
+		return getTransfers(POST_STAGING, STAGING_OUT);
 	}
 
 
-	public String getStagingDirectory(String nativeJobDescription, String uniqId)
-			throws PermissionDeniedException, TimeoutException,
-			NoSuccessException {
-		@SuppressWarnings("unused")
-		String stagingDirectory = null;
-		String type = "transferFiles";
-		String tagElement = "TransferFiles";
-		String tagValue = "UploadURL";
-		System.out.println(nativeJobDescription);
-		String TransferFiles = getInput(nativeJobDescription, type);
-		try {
-			Document doc = convertToXml(TransferFiles);
-			setDocument(doc);
+	public StagingTransfer[] getTransfers(String tagingType, String stagingType){
 
-			stagingDirectory = getValue(document, tagElement, tagValue);
+		StagingTransfer[] stagingTransfers = new StagingTransfer[] {};
+		ArrayList<StagingTransfer> transfers = new ArrayList<StagingTransfer>();
+		NodeList nList = getDocument().getElementsByTagName(tagingType);
+		int qt = nList.getLength();
+
+		for (int i = 1; i <= qt; i++) {
+
+			nList = getDocument().getElementsByTagName(stagingType + i);
+			String from = getValue(getDocument(), stagingType + i, FROM);
+			String to = getValue(getDocument(), stagingType + i, TO);
+			transfers.add(new StagingTransfer(from, to, false));
+		}
+
+		return (StagingTransfer[]) transfers.toArray(stagingTransfers);
+	}
+
+
+	public String getStagingDirectory(String nativeJobDescription, String uniqId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
+
+		String stagingDirectory = null;
+		String TransferFiles = getInput(nativeJobDescription, TAG_TYPE);
+
+		try {
+
+
+			setDocument(convertToXml(TransferFiles));
+			stagingDirectory = getValue(getDocument(), TAG_ELEMENT, TAG_VALUE);
 
 		} catch (ParserConfigurationException e) {
 
@@ -302,17 +292,22 @@ public class OurGridJobControlAdaptor extends OurGridAbstract implements
 
 	}
 
-	private static String getInput(String jobDesc, String type) {
-		String[] jobParts = jobDesc.split("#");
+
+
+	private String getInput(String jobDesc, String type) {
+
+		String[] jobParts = jobDesc.split(SPLIT);
 		String job = "";
 
-		if (type.equals("job")) {
-			job = jobParts[0];
+		if (type.equals(JOB_TYPE)) {
 
+			job = jobParts[0];
 			return job;
 
 		} else {
+
 			for (int i = 1; i < jobParts.length; i++) {
+
 				job += jobParts[i];
 			}
 
@@ -321,20 +316,21 @@ public class OurGridJobControlAdaptor extends OurGridAbstract implements
 
 	}
 
-	public static Document convertToXml(String xmlString)
+	public  Document convertToXml(String xmlString)
 			throws ParserConfigurationException, SAXException, IOException {
-		Document document;
+
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		InputSource is = new InputSource(new StringReader(xmlString));
-		document = builder.parse(is);
+		setDocument(builder.parse(is));
 
 		return document;
 
 	}
 
 	public String getValue(Document document, String tagElement, String tagValue) {
+
 		String value = null;
 		document.getDocumentElement().normalize();
 		NodeList nList = document.getElementsByTagName(tagElement);
@@ -342,10 +338,10 @@ public class OurGridJobControlAdaptor extends OurGridAbstract implements
 		for (int temp = 0; temp < nList.getLength(); temp++) {
 
 			Node nNode = nList.item(temp);
+
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
 				Element eElement = (Element) nNode;
-
 				value = getTagValue(tagValue, eElement);
 			}
 
@@ -354,15 +350,12 @@ public class OurGridJobControlAdaptor extends OurGridAbstract implements
 
 	}
 
-	private static String getTagValue(String sTag, Element eElement) {
-		NodeList nlList = eElement.getElementsByTagName(sTag).item(0)
-				.getChildNodes();
+	private String getTagValue(String sTag, Element eElement) {
 
+		NodeList nlList = eElement.getElementsByTagName(sTag).item(0).getChildNodes();
 		Node nValue = (Node) nlList.item(0);
 
 		return nValue.getNodeValue();
 	}
-
-	
 
 }
