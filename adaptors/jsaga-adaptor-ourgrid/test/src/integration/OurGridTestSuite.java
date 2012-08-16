@@ -32,8 +32,8 @@ public class OurGridTestSuite extends TestSuite {
     public static class index extends IndexTest {public index(){super(OurGridTestSuite.class);}}
 
     // test cases
-    public static class OurgridJobDescriptionTest extends JobDescriptionTest {
-        public OurgridJobDescriptionTest() throws Exception {super("ourgrid");}
+    public static class OurGridJobDescriptionTest extends JobDescriptionTest {
+        public OurGridJobDescriptionTest() throws Exception {super("ourgrid");}
      }
     
     public static class OurGridJobRunMinimalTest extends JobRunMinimalTest {
@@ -41,14 +41,14 @@ public class OurGridTestSuite extends TestSuite {
     }
 
     // test cases
-    public static class OurgridJobRunRequiredTest extends JobRunRequiredTest {
-        public OurgridJobRunRequiredTest() throws Exception {super("ourgrid");}
+    public static class OurGridJobRunRequiredTest extends JobRunRequiredTest {
+        public OurGridJobRunRequiredTest() throws Exception {super("ourgrid");}
 //        public void test_run_error() { super.ignore("return code not supported"); }
     }
     
     // test cases
-    public static class OurgridJobRunOptionalTest extends JobRunOptionalTest {
-        public OurgridJobRunOptionalTest() throws Exception {super("ourgrid");}
+    public static class OurGridJobRunOptionalTest extends JobRunOptionalTest {
+        public OurGridJobRunOptionalTest() throws Exception {super("ourgrid");}
 //        public void test_resume_done() { super.ignore("not supported"); }
 //        public void test_resume_running() { super.ignore("not supported"); }
 //        public void test_suspend_done() { super.ignore("not supported"); }
@@ -56,8 +56,8 @@ public class OurGridTestSuite extends TestSuite {
     }
 
     // test cases
-    public static class OurgridJobRunDescriptionTest extends JobRunDescriptionTest {
-        public OurgridJobRunDescriptionTest() throws Exception {super("ourgrid");}
+    public static class OurGridJobRunDescriptionTest extends JobRunDescriptionTest {
+        public OurGridJobRunDescriptionTest() throws Exception {super("ourgrid");}
         //public void test_run_inWorkingDirectory() { super.ignore("WorkingDirectory is not supported"); }
 //        public void test_run_cpuTimeRequirement() throws Exception { super.ignore("TotalCPUTime is ignored");}
     }
@@ -73,12 +73,12 @@ public class OurGridTestSuite extends TestSuite {
     
     }
     // test cases
-//    public static class OurgridJobRunInfoTest extends JobRunInfoTest {
-//    	public OurgridJobRunInfoTest() throws Exception {super("ourgrid");}
+//    public static class OurGridJobRunInfoTest extends JobRunInfoTest {
+//    	public OurGridJobRunInfoTest() throws Exception {super("ourgrid");}
 //    }
 //    
-//    public static class OurgridJobRunInteractiveTest extends JobRunInteractiveTest {
-//    	public OurgridJobRunInteractiveTest() throws Exception {super("ourgrid");}
+//    public static class OurGridJobRunInteractiveTest extends JobRunInteractiveTest {
+//    	public OurGridJobRunInteractiveTest() throws Exception {super("ourgrid");}
 //    }
 
     
