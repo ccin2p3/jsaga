@@ -43,17 +43,17 @@ public class OurGridTestSuite extends TestSuite {
     // test cases
     public static class OurGridJobRunRequiredTest extends JobRunRequiredTest {
         public OurGridJobRunRequiredTest() throws Exception {super("ourgrid");}
-        public void test_run_error() { super.ignore("disabled because server sends RUNNING when command does not exists"); }
+//        public void test_run_error() { super.ignore("disabled because server sends RUNNING when command does not exists"); }
     }
     
     // test cases
-    public static class OurGridJobRunOptionalTest extends JobRunOptionalTest {
-        public OurGridJobRunOptionalTest() throws Exception {super("ourgrid");}
+//    public static class OurGridJobRunOptionalTest extends JobRunOptionalTest {
+//        public OurGridJobRunOptionalTest() throws Exception {super("ourgrid");}
 //        public void test_resume_done() { super.ignore("not supported"); }
 //        public void test_resume_running() { super.ignore("not supported"); }
 //        public void test_suspend_done() { super.ignore("not supported"); }
 //        public void test_suspend_running() { super.ignore("not supported"); }
-    }
+//    }
 
     // test cases
     public static class OurGridJobRunDescriptionTest extends JobRunDescriptionTest {
@@ -65,10 +65,10 @@ public class OurGridTestSuite extends TestSuite {
       /** test cases */
     public static class OurGridJobRunSandboxTest extends JobRunSandboxTest {
         public OurGridJobRunSandboxTest() throws Exception {super("ourgrid");}
-//        public void test_remote_input_explicit() throws Exception { super.ignore("Not supported yet."); }
-//        public void test_remote_output_explicit() throws Exception { super.ignore("Not supported yet."); }
-//        public void test_input_output_explicit() throws Exception { super.ignore("Not supported yet."); }
-//        public void test_input_output_implicit() throws Exception { super.ignore("Not supported yet."); }
+        public void test_remote_input_explicit() throws Exception { super.ignore("DISABLED: stay RUNNING"); }
+        public void test_remote_output_explicit() throws Exception { super.ignore("DISABLED: stay RUNNING"); }
+        public void test_input_output_explicit() throws Exception { super.ignore("Not supported"); }
+        public void test_input_output_implicit() throws Exception { super.ignore("Not supported"); }
 //        public void test_output_only_implicit() throws Exception { super.ignore("Not supported yet."); }
     
     }
