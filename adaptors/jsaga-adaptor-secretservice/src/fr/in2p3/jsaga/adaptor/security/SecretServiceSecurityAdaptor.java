@@ -144,7 +144,7 @@ public abstract class SecretServiceSecurityAdaptor implements SecurityAdaptor {
 					secret = item.GetSecret(dbusSession);
 				} catch (DBusExecutionException dbee) {
 					if (dbee.getType().equals(org.freedesktop.Secret.Error.IsLocked.class.getCanonicalName())) {
-//						List<DBusInterface> itemsToUnlock = new ArrayList<DBusInterface>(1);
+//						List<DBusInterface> itemsToUnlock = new java.util.ArrayList<DBusInterface>(1);
 //						itemsToUnlock.add(item);
 //						Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(itemsToUnlock);
 						throw new NoSuccessException("The item is locked. Please unlock before using it.");
@@ -209,19 +209,20 @@ public abstract class SecretServiceSecurityAdaptor implements SecurityAdaptor {
 								// not working
 								// FIXME: unlock item: error NotConnected
 //								objectPath = prop.toString().split(":")[2];
-//								List<DBusInterface> itemsToUnlock = new ArrayList<DBusInterface>(1);
+//								List<DBusInterface> itemsToUnlock = new java.util.ArrayList<DBusInterface>(1);
 //								itemsToUnlock.add(getItem(conn,prop));
 //								Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(itemsToUnlock);
 								// FIXME: unlock all items: error NotConnected
-								Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(lockedItems);
+//								Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(lockedItems);
 								// FIXME: unlock collection: error NotConnected
-//								List<DBusInterface> collToUnlock = new ArrayList<DBusInterface>(1);
+//								List<DBusInterface> collToUnlock = new java.util.ArrayList<DBusInterface>(1);
 //								collToUnlock.add(collection);
+//								Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(collToUnlock);
 								// FIXME: Wrong return type: failed to create proxy object for / exported by 1.5
 //								Pair<List<DBusInterface>,DBusInterface> usr = serv.Unlock(new ArrayList<DBusInterface>());
 
 //								unlockedItems = usr.a;
-//								Logger.getLogger(FreedesktopSecretsSecurityAdaptor.class).debug(unlockedItems.size());
+								Logger.getLogger(SecretServiceSecurityAdaptor.class).debug(unlockedItems.size());
 								throw new NoSuccessException("The item is locked. Please unlock before using it.");
 							}
 						}
