@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.freedesktop</groupId>
     <artifactId>secret-service-api-java</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
     <name>Secret Service Java API</name>
     <description>Secret Service Java API</description>
     <url>http://specs.freedesktop.org/secret-service/</url>

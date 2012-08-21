@@ -25,7 +25,7 @@
         <dependency>
             <groupId>org.freedesktop</groupId>
 		    <artifactId>secret-service-api-java</artifactId>
-    		<version>0.1</version>
+    		<version>0.2</version>
     		<scope>compile</scope>
         </dependency>
     </dependencies>
