@@ -30,21 +30,44 @@ public class OurGridSecurityAdaptor implements SecurityAdaptor {
 	private final String USER_NAME = "user.name";
 	private final String USER_PASS = "UserPass";
 
+	/**
+	 *  Gets the defaults values for (some of the) attributes supported by this adaptor. 
+	 *  These values can be static or dynamically created from the information available on local host
+	 *  (environment variables, files, ...) and from the attributes map.
+	 *  @param attributes the attributes set by the user
+	 *  @return Returns an array of default values
+	 */
 	public Default[] getDefaults(Map attributes) throws IncorrectStateException {
 
 		return new Default[]{new Default(USER_ID, System.getProperty(USER_NAME))};
 	}
 
+	/**
+	 * @return Returns the adaptor type
+	 */
 	public String getType() {
 
 		return OurGridConstants.TYPE_ADAPTOR;
 	}
 
+	/**
+	 * Gets a data structure that describes how to use this adaptor. This data
+	 * structure contains attribute names with usage constraints (and/or,
+	 * required/optional, hidden...)
+	 * @return Returns the usage data structure
+	 * */
 	public Usage getUsage() {
 
 		return new UAnd(new Usage[] {  new U(USER_ID), new U(USER_PASS) });
 	}
 
+	/**
+	 * Creates a security credential and initialize it with the provided attributes
+	 * @param usage the identifier of the usage
+	 * @param attributes  the provided attributes
+	 * @param contextId the identifier of the context instance
+	 * @return Returns the security credential
+	 */
 	public SecurityCredential createSecurityCredential(int usage, Map attributes,String contextId) 
 			throws IncorrectStateException, TimeoutException,NoSuccessException {
 
@@ -54,11 +77,13 @@ public class OurGridSecurityAdaptor implements SecurityAdaptor {
 
 			userPass = (String)attributes.get(USER_PASS);
 		}
-		
+
 		return new OurGridSecurityCredencial( (String)attributes.get(USER_ID),userPass);	  
 	}
 
-
+	/**
+	 * Returns the security credential class supported by this adaptor
+	 */
 	public Class getSecurityCredentialClass() {
 
 		return OurGridSecurityCredencial.class;
