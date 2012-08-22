@@ -81,70 +81,144 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 	private WebResource webResource;
 	private String host;
 	private String path;
+	private String resource;
 	private static Document document;
 	private String authentication;
 	private Client client;
 
+	/**
+	 * Gets a client for the the RESTful API 
+	 * @return client 
+	 */
 	public Client getClient() {
 		return client;
 	}
 
+	/**
+	 * Client is used to interoperate with the RESTful API
+	 * @param client
+	 */
 	public void setClient(Client client) {
 		this.client = client;
 	}
 
-
+	/**
+	 * Gets the relative path of the API's resource 
+	 * @return path
+	 */
 	public String getPath() {
 		return path;
 	}
 
+	/**
+	 * Path is a relative path which is used to access the API's resources 
+	 * @param path relative path
+	 */
 	public void setPath(String path) {
 		this.path = path;
 	}
 
+	/**
+	 * Returns the name of the host 
+	 * @return host server address
+	 */
 	public String getHost() {
 		return host;
 	}
 
+	/**
+	 * Sets the host name
+	 * @param host server address
+	 */
 	public void setHost(String host) {
 		this.host = host;
 	}
 
+	/**
+	 * Returns the webResource used to make requests and proccess responses
+	 * @return webResource
+	 */
 	public WebResource getWebResource() {
 		return webResource;
 	}
 
+	/**
+	 * WebResource used to build requests and process responses from the API
+	 * @param webResource
+	 */
 	public void setWebResource(WebResource webResource) {
 		this.webResource = webResource;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	public String getResource() {
+		return resource;
+	}
+
+	/**
+	 * Sets the base URL of the service
+	 * @param resource 
+	 */
+	public void setResource(String resource) {
+		this.resource = resource;
+	}
+
+	/**
+	 * Gets the authentication to the server
+	 * @return aurhenticathion username and a password encoded
+	 */
 	public String getAuthentication() {
 		return authentication;
 	}
 
+	/**
+	 * Authentication consists of a encoded string used to authenticate to the server
+	 * @param authentication username and a password encoded
+	 */
 	public void setAuthentication(String authentication) {
 		this.authentication = authentication;
 	}
-
+	/**
+	 * 
+	 * @return
+	 */
 	public  Document getDocument() {
 		return document;
 	}
-
+	/**
+	 * Document used to 
+	 * @param document
+	 */
 	public static  void setDocument(Document document) {
 
 		OurGridJobControlAdaptor.document = document;
 	}
 
+	/**
+	 *  Connects to the server and initializes the connection with the provided attributes
+	 *  @param userInfo the user login
+	 *  @param host the server
+	 *  @param port the port 
+	 *  @param basePath the base path
+	 *  @param attributes the provided attributes
+	 */
 	public void connect(String userInfo, String host, int port, String basePath,  Map attributes)
 			throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException,BadParameterException, TimeoutException, NoSuccessException {
 
 		setClient(Client.create());
 		setHost(host);
-		String resource = OurGridConstants.HTTP + getHost();
-		setWebResource(getClient().resource(resource));
+		setResource(OurGridConstants.HTTP + getHost());
+		setWebResource(getClient().resource(getResource()));
 		setAuthentication(new String(Base64.encode(m_account + ":" + m_passPhrase)));
 	}
 
+	/**
+	 * Creates an instance of the default job monitor adaptor
+	 * @return {@link OurGridJobMonitorAdaptor} Returns a job monitor adaptor instance
+	 */
 	public JobMonitorAdaptor getDefaultJobMonitor() {
 
 		return new OurGridJobMonitorAdaptor();
@@ -176,18 +250,15 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 		String jobId = null;
 		setPath(SUBMIT);
 		String authorization = OurGridConstants.BASIC + " " + getAuthentication();
-
 		ClientResponse response = getWebResource().path(getPath()).header(OurGridConstants.AUTHORIZATION, authorization).
 				type("text/plain").post(ClientResponse.class, job);
 
 		if (response.getStatus() == 401) {
-			throw new PermissionDeniedException(SUBMIT_ERROR + response);
-		} else if (response.getStatus() != 200) {
-
-			throw new NoSuccessException(SUBMIT_ERROR + response.getStatus());
+		
+			throw new PermissionDeniedException(response.getClientResponseStatus().getReasonPhrase());
 		} else {
 
-			response.getClass();
+			response.getClass();	
 			jobId = response.getEntity(String.class);
 			jobId.toString();
 		}
@@ -203,9 +274,13 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 
 		setPath(CLEAN + nativeJobId);
 		String authorization = OurGridConstants.BASIC + " " + getAuthentication();
-		getWebResource().path(getPath()).
-		header(OurGridConstants.AUTHORIZATION, authorization).delete(ClientResponse.class);
-
+		
+			ClientResponse response =getWebResource().path(getPath()).
+					header(OurGridConstants.AUTHORIZATION, authorization).delete(ClientResponse.class);
+		
+		
+       
+		
 	}
 
 	/**

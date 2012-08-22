@@ -49,11 +49,17 @@ public class OurGridJobStatus extends JobStatus {
 				else {
 					if (jobState.equals(OurGridJobState.UNSTARTED.getStateDescription())){
 
-						return SubState.RUNNING_SUBMITTED;
-					}else {
-
-						System.out.println("Invalid state: " + jobState);
+						return SubState.RUNNING_PRE_STAGING;
+					}else { 
+						
+						if (jobState.equals(OurGridJobState.FAILED.getStateDescription())){
+						
+						return SubState.FAILED_ERROR;
+					}else{
 						return null;
+					}
+
+
 					}
 				}
 			}
