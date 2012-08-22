@@ -82,10 +82,12 @@ git ls-remote ssh://git.in2p3.fr/jsaga-contrib
 
 # create your own branch
 git checkout -b myBranch
+# modify your code
 ...
-git push jsaga-contrib</pre>
-                Then send a mail to JSAGA developers to get your contribution included
-                in future JSAGA releases.
+# commit your modifications
+git commit ...
+# push your commits to your remote branch in the jsaga-contrib repository
+git push jsaga-contrib HEAD:myBranch</pre>
             </answer>
         </faq>
         <faq id="eclipse">
