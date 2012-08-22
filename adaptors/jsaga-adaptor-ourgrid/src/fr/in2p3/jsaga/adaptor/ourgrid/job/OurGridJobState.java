@@ -24,8 +24,7 @@ public enum OurGridJobState {
 	private String stateDescription;
 
 	/**
-	 * @param stateDescription
-	 *            Describes the status of the job
+	 * @param stateDescription Describes the status of the job
 	 * */
 	private OurGridJobState(String stateDescription) {
 		

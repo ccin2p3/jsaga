@@ -91,6 +91,14 @@ public class OurGridJobMonitorAdaptor extends OurGridAbstract implements JobMoni
 		this.webResource = webResource;
 	}
 
+	/**
+	 *  Connects to the server and initializes the connection with the provided attributes
+	 *  @param userInfo the user login
+	 *  @param host the server
+	 *  @param port the port 
+	 *  @param basePath the base path
+	 *  @param attributes the provided attributes
+	 */
 	public void connect(String userInfo, String host, int port,String basePath, Map attributes) 
 			throws NotImplementedException,AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException,
 			NoSuccessException {
@@ -105,7 +113,7 @@ public class OurGridJobMonitorAdaptor extends OurGridAbstract implements JobMoni
 
 
 	/**
-	 * Gets the status of the job matching a job id.
+	 * Gets the status of the job matching a job id
 	 * 
 	 * @param nativeJobId Identifier of the job
 	 * @return jobStatus Returns the status of the job
@@ -138,6 +146,13 @@ public class OurGridJobMonitorAdaptor extends OurGridAbstract implements JobMoni
 
 	}
 
+	/**
+	 * Gets the execution host. Several hosts may be returned if the job is a parallel job
+	 * @param nativeJobId Identifier of the job
+	 * @return executionHosts Returns the array of execution hosts
+	 * @throws NotImplementedException
+	 * @throws NoSuccessException
+	 */
 	public String[] getExecutionHosts(String nativeJobId)
 			throws NotImplementedException, NoSuccessException{
 
@@ -165,24 +180,50 @@ public class OurGridJobMonitorAdaptor extends OurGridAbstract implements JobMoni
 	}
 	
 
-	
+	/**
+	 * Returns the job creation time
+	 * @param nativeJobId  the identifier of the job in the grid
+	 * @return
+	 * @throws NotImplementedException
+	 * @throws NoSuccessException
+	 */
 	public Date getCreated(String nativeJobId) throws NotImplementedException,NoSuccessException {
 
 		return null;
 	}
 
-
+	/**
+	 * Returns the exit code of the job
+	 * @param nativeJobId  the identifier of the job in the grid
+	 * @return
+	 * @throws NotImplementedException
+	 * @throws NoSuccessException
+	 */
 	public Integer getExitCode(String nativeJobId) throws NotImplementedException,	NoSuccessException {
 
 		return null;
 		
 	}
+	/**
+	 * Returns the job end time
+	 * @param nativeJobId  the identifier of the job in the grid
+	 * @return
+	 * @throws NotImplementedException
+	 * @throws NoSuccessException
+	 */
 	public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException {
 
 		return null;
 		
 	}
 	
+	/**
+	 * Returns the job statup time
+	 * @param nativeJobId  the identifier of the job in the grid
+	 * @return
+	 * @throws NotImplementedException
+	 * @throws NoSuccessException
+	 */
 	public Date getStarted(String nativeJobId) throws NotImplementedException,	NoSuccessException {
 
 		return null;

@@ -14,6 +14,11 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
 public class OurGridJobStatus extends JobStatus {
 
+	/**
+	 * Constructor of the OurGridJobStatus of the class
+	 * @param jobId
+	 * @param nativeStateString
+	 */
 	public OurGridJobStatus(String jobId, String nativeStateString) {
 
 		super(jobId, nativeStateString, nativeStateString);
@@ -26,6 +31,10 @@ public class OurGridJobStatus extends JobStatus {
 	}
 
 	/**
+	 * Get the implementation-specific but middleware-independant state of the job
+	 * In addition to SAGA states, this methods 
+	 * may return states such as 
+	 * PRE_STAGING, POST_STAGING, QUEUED, FAILED_ERROR and FAILED_ABORTED
 	 * @return Returns the JSAGA state of the job
 	 */
 	public SubState getSubState() {
@@ -51,13 +60,13 @@ public class OurGridJobStatus extends JobStatus {
 
 						return SubState.RUNNING_PRE_STAGING;
 					}else { 
-						
+
 						if (jobState.equals(OurGridJobState.FAILED.getStateDescription())){
-						
-						return SubState.FAILED_ERROR;
-					}else{
-						return null;
-					}
+
+							return SubState.FAILED_ERROR;
+						}else{
+							return null;
+						}
 
 
 					}

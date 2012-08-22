@@ -224,6 +224,11 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 		return new OurGridJobMonitorAdaptor();
 	}
 
+	/**
+	 * Returns a job description translator
+	 * @return translator xsl translator from jsdl to jdf
+	 * @throws NoSuccessException
+	 */
 	public JobDescriptionTranslator getJobDescriptionTranslator()throws NoSuccessException {
 
 		JobDescriptionTranslator translator = new JobDescriptionTranslatorXSLT("xsl/job/jsdltranslatorsandbox.xsl");
@@ -233,14 +238,11 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 	/**
 	 * Submit a job to execute it
 	 * 
-	 * @param uniqID
-	 *            a identifier unique to this job (not the job identifier, which
-	 *            is not generated yet)
-	 * @param jobDesc
-	 *            job description in the language supported by the targeted grid
-	 * @param checkMatch
-	 *            if true then explicitly checks if job description matches job
-	 *            service before submitting job
+	 * @param uniqID a identifier unique to this job (not the job identifier
+	 * which is not generated yet)
+	 * @param jobDesc job description in the language supported by the targeted grid
+	 * @param checkMatch if true then explicitly checks if job description matches job
+	 * service before submitting job
 	 * @return nativeJobId Returns the identifier of the job in the grid
 	 */
 	public String submit(String jobDesc, boolean checkMatch, String uniqId)
@@ -254,7 +256,7 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 				type("text/plain").post(ClientResponse.class, job);
 
 		if (response.getStatus() == 401) {
-		
+
 			throw new PermissionDeniedException(response.getClientResponseStatus().getReasonPhrase());
 		} else {
 
@@ -267,20 +269,16 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 
 	/**
 	 * Cleans an ended job filtered by job id
-	 * 
 	 * @param nativeJobId Identifier of the job
 	 */
 	public void clean(String nativeJobId) throws PermissionDeniedException,TimeoutException, NoSuccessException {
 
 		setPath(CLEAN + nativeJobId);
 		String authorization = OurGridConstants.BASIC + " " + getAuthentication();
-		
-			ClientResponse response =getWebResource().path(getPath()).
-					header(OurGridConstants.AUTHORIZATION, authorization).delete(ClientResponse.class);
-		
-		
-       
-		
+
+		ClientResponse response =getWebResource().path(getPath()).
+				header(OurGridConstants.AUTHORIZATION, authorization).delete(ClientResponse.class);   
+
 	}
 
 	/**
@@ -300,48 +298,17 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 	 * StagingJobAdaptorOnePhase interface
 	 */
 
-
-	public String getStagingDirectory(String nativeJobId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
-
-		String stagingDirectory = null;
-		return stagingDirectory;
-	}
-
-	public StagingTransfer[] getInputStagingTransfer(String nativeJobId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
-
-		return getTransfers(PRE_STAGING_OUT, STAGING_IN_OUT);
-	}
-
-	public StagingTransfer[] getInputStagingTransfer(String nativeJobDescription, String uniqId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
-
-		return getTransfers(PRE_STAGING, STAGING_IN);
-	}
-
-	public StagingTransfer[] getOutputStagingTransfer(String nativeJobId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
-
-		return getTransfers(POST_STAGING, STAGING_OUT);
-	}
-
-
-	public StagingTransfer[] getTransfers(String tagingType, String stagingType){
-
-		StagingTransfer[] stagingTransfers = new StagingTransfer[] {};
-		ArrayList<StagingTransfer> transfers = new ArrayList<StagingTransfer>();
-		NodeList nList = getDocument().getElementsByTagName(tagingType);
-		int qt = nList.getLength();
-
-		for (int i = 1; i <= qt; i++) {
-
-			nList = getDocument().getElementsByTagName(stagingType + i);
-			String from = getValue(getDocument(), stagingType + i, FROM);
-			String to = getValue(getDocument(), stagingType + i, TO);
-			transfers.add(new StagingTransfer(from, to, false));
-		}
-
-		return (StagingTransfer[]) transfers.toArray(stagingTransfers);
-	}
-
-
+	/**
+	 * Gets the URL of the directory where to copy job input/output files
+	 * Protocol must be one of the supported protocols
+	 * @param nativeJobDescription  the job description in native language
+	 * @param uniqId  a identifier unique to this job
+	 * (not the job identifier, which is not generated yet)
+	 * @return
+	 * @throws PermissionDeniedException
+	 * @throws TimeoutException
+	 * @throws NoSuccessException
+	 */
 	public String getStagingDirectory(String nativeJobDescription, String uniqId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
 
 		String stagingDirectory = null;
@@ -367,8 +334,95 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 
 	}
 
+	/**
+	 * Gets the URL of the directory where to copy job input/output files
+	 * Protocol must be one of the supported protocols
+	 * @param nativeJobId the identifier of the job in the grid
+	 * @return Returns the staging directory URL,
+	 * or null if the staging directory is managed by the job service
+	 * @throws PermissionDeniedException
+	 * @throws TimeoutException
+	 * @throws NoSuccessException
+	 */
+	public String getStagingDirectory(String nativeJobId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
+
+		String stagingDirectory = null;
+		return stagingDirectory;
+	}
+
+	/**
+	 * Gets pre-staging operations to perform before starting the job
+	 * @param nativeJobId the identifier of the job in the grid
+	 * @return Returns list of transfers that are not managed by the adaptor
+	 * @throws PermissionDeniedException
+	 * @throws TimeoutException
+	 * @throws NoSuccessException
+	 */
+	public StagingTransfer[] getInputStagingTransfer(String nativeJobId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
+
+		return getTransfers(PRE_STAGING_OUT, STAGING_IN_OUT);
+	}
+
+	/**
+	 * Gets pre-staging operations to perform before submitting the job
+	 * @param nativeJobDescription  the job description in native language
+	 * @param uniqId  a identifier unique to this job
+	 * (not the job identifier, which is not generated yet)
+	 * @return Returns list of transfers that are not managed by the adaptor
+	 * @throws PermissionDeniedException
+	 * @throws TimeoutException
+	 * @throws NoSuccessException
+	 */
+	public StagingTransfer[] getInputStagingTransfer(String nativeJobDescription, String uniqId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
+
+		return getTransfers(PRE_STAGING, STAGING_IN);
+	}
+
+	/**
+	 * Gets post-staging operations to perform after the job is done
+	 * @param nativeJobId  the identifier of the job in the grid
+	 * @return Returns list of transfers that are not managed by the adaptor
+	 * @throws PermissionDeniedException
+	 * @throws TimeoutException
+	 * @throws NoSuccessException
+	 */
+	public StagingTransfer[] getOutputStagingTransfer(String nativeJobId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
+
+		return getTransfers(POST_STAGING, STAGING_OUT);
+	}
 
 
+
+	/**
+	 * Gets the pre and post staging files to be transferred 
+	 * @param stagingType type of staging
+	 * @param stagingValue type of staging value
+	 * @return
+	 */
+	public StagingTransfer[] getTransfers(String stagingType, String stagingValue){
+
+		StagingTransfer[] stagingTransfers = new StagingTransfer[] {};
+		ArrayList<StagingTransfer> transfers = new ArrayList<StagingTransfer>();
+		NodeList nList = getDocument().getElementsByTagName(stagingType);
+		int qt = nList.getLength();
+
+		for (int i = 1; i <= qt; i++) {
+
+			nList = getDocument().getElementsByTagName(stagingValue + i);
+			String from = getValue(getDocument(), stagingValue + i, FROM);
+			String to = getValue(getDocument(), stagingValue + i, TO);
+			transfers.add(new StagingTransfer(from, to, false));
+		}
+
+		return (StagingTransfer[]) transfers.toArray(stagingTransfers);
+	}
+
+	/**
+	 * Gets the input to the submit or the staging operations
+	 * @param jobDesc the job description in native language
+	 * @param type  the type of input 
+	 * @return Returns the input to the submit or transfer methods
+	 */
 	private String getInput(String jobDesc, String type) {
 
 		String[] jobParts = jobDesc.split(SPLIT);
@@ -390,7 +444,15 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 		}
 
 	}
-
+	
+	/**
+	 * Gets a XML document with the files to be transferred 
+	 * @param xmlString transfer files 
+	 * @return document XML document
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
 	public  Document convertToXml(String xmlString)
 			throws ParserConfigurationException, SAXException, IOException {
 
@@ -403,7 +465,13 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 		return document;
 
 	}
-
+    /**
+     * Gets the value of XML tag
+     * @param document
+     * @param tagElement
+     * @param tagValue
+     * @return Returns the value of the tag
+     */
 	public String getValue(Document document, String tagElement, String tagValue) {
 
 		String value = null;
