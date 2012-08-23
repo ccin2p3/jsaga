@@ -46,7 +46,7 @@ import fr.in2p3.jsaga.adaptor.ourgrid.job.OurGridConstants;
  * ***************************************************/
 /**
  * This class manages the data of the job such as input (required for the job execution)
- *  and output (errors and job outputs) files.
+ *  and output (errors and job outputs) files
  * @author patriciaam
  * @since 1.1, 08/01/2012
  */
@@ -182,7 +182,7 @@ FileReaderGetter, FileWriterPutter{
 	}
 
 	/**
-	 * Gets the file attributes of the entry absolutePath.
+	 * Gets the file attributes of the entry absolutePath
 	 * @param absolutePath  the absolute path of the entry
 	 * @param additionalArgs adaptor specific arguments
 	 * @return Returns the file attributes
