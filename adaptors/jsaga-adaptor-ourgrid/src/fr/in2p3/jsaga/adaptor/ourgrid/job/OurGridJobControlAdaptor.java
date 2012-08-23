@@ -48,7 +48,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
  * ***************************************************/
 
 /**
- * This class handles the submission, cancel and clean of a job 
+ * The OurGridJobControlAdaptor class handles the submission, cancellation and cleaning of a job
  * @author patriciaam
  *
  */

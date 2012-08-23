@@ -12,6 +12,12 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
  * Date:   August 2012
  * ***************************************************/
 
+/**
+ * The OurGridJobStatus class defines the status that a job can be and 
+ * it's used by the monitor class to provide the job status
+ * @author patriciaam
+ *
+ */
 public class OurGridJobStatus extends JobStatus {
 
 	/**

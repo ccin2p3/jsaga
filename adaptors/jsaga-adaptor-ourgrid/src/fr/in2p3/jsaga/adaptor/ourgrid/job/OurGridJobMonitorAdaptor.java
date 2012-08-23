@@ -30,7 +30,10 @@ import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
  * Author: Patricia Alanis (patriciaam@lsd.ufcg.edu.br)
  * Date:   August 2012
  * ***************************************************/
-
+/**
+ * The OurGridJobMonitorAdaptor class is responsible for retrieving the job status
+ * also remains monitoring the job until its completion
+ */
 public class OurGridJobMonitorAdaptor extends OurGridAbstract implements JobMonitorAdaptor, QueryIndividualJob, JobInfoAdaptor {
 
 	private String authentication;
@@ -41,53 +44,84 @@ public class OurGridJobMonitorAdaptor extends OurGridAbstract implements JobMoni
 	private final String STATUS_JOB_ID = "/status/job_id/";
 	private final String STATUS_WORKERNAME = "/status/workername/";
 	
+	/**
+	 * Gets the relative path of the API's resource 
+	 * @return path
+	 */
 	public String getPath() {
 		return path;
 	}
 
+	/**
+	 * Path is a relative path which is used to access the API's resources 
+	 * @param path relative path
+	 */
 	public void setPath(String path) {
 		this.path = path;
 	}
-
 	
 	
+	/**
+	 * Returns the name of the host 
+	 * @return host server address
+	 */
 	public String getHost() {
-		
 		return host;
 	}
 
+	/**
+	 * Sets the host name
+	 * @param host server address
+	 */
 	public void setHost(String host) {
-		
 		this.host = host;
 	}
 
+	/**
+	 * Gets the authentication to the server
+	 * @return aurhenticathion username and a password encoded
+	 */
 	public String getAuthentication() {
-		
 		return authentication;
 	}
 
+	/**
+	 * Authentication consists of a encoded string used to authenticate to the server
+	 * @param authentication username and a password encoded
+	 */
 	public void setAuthentication(String authentication) {
-		
 		this.authentication = authentication;
 	}
 
+	/**
+	 * Gets a client for the the RESTful API 
+	 * @return client 
+	 */
 	public Client getClient() {
-		
 		return client;
 	}
 
+	/**
+	 * Client is used to interoperate with the RESTful API
+	 * @param client
+	 */
 	public void setClient(Client client) {
-		
 		this.client = client;
 	}
 
+	/**
+	 * Returns the webResource used to make requests and proccess responses
+	 * @return webResource
+	 */
 	public WebResource getWebResource() {
-		
 		return webResource;
 	}
 
+	/**
+	 * WebResource used to build requests and process responses from the API
+	 * @param webResource
+	 */
 	public void setWebResource(WebResource webResource) {
-		
 		this.webResource = webResource;
 	}
 
@@ -114,7 +148,6 @@ public class OurGridJobMonitorAdaptor extends OurGridAbstract implements JobMoni
 
 	/**
 	 * Gets the status of the job matching a job id
-	 * 
 	 * @param nativeJobId Identifier of the job
 	 * @return jobStatus Returns the status of the job
 	 */
