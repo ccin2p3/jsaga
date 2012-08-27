@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.glite</groupId>
   <artifactId>glite-lb-api-java</artifactId>
-  <version>3.2</version>
+  <version>3.2-p1</version>
   <name>gLite-LB API</name>
   <description>Java API for the Logging and Bookkeeping (LB).</description>
   <organization>
