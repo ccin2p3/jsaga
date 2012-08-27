@@ -64,7 +64,7 @@
 		<dependency>
 			<groupId>org.glite</groupId>
 			<artifactId>glite-lb-api-java</artifactId>
-			<version>3.2</version>
+			<version>3.2-p1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.condor</groupId>
