@@ -22,11 +22,11 @@
     <!-- Beginning of the jdf job -->
      <!-- label job description tag-->
 
-<xsl:template match="jsdl:JobDescription">job:
-label: <xsl:text/>
- <xsl:variable name="lf"><xsl:text>
-</xsl:text></xsl:variable>
-    <xsl:choose>
+<xsl:template match="jsdl:JobDescription">
+<xsl:text>job:</xsl:text> 
+<xsl:text>&#xa;</xsl:text>
+<xsl:text>label: </xsl:text>
+<xsl:choose>
     <xsl:when test="(jsdl:JobIdentification/jsdl:JobName != '') or (jsdl:Application/jsdl:ApplicationName != '')">
         <xsl:choose>
         <xsl:when test="jsdl:JobIdentification/jsdl:JobName">
@@ -37,11 +37,7 @@ label: <xsl:text/>
     	</xsl:when>
     </xsl:choose>
     </xsl:when>
-    <xsl:otherwise>
-     <xsl:variable name="jobLabel" select="java:java.lang.Math.random()" xmlns:java="http://xml.apache.org/xalan/java"></xsl:variable> 
-<xsl:text>DefaultJob</xsl:text>
-<xsl:decimal-format name="output" decimal-separator="_" />
-<xsl:value-of select="format-number($jobLabel, 'A_#####', 'output')"/>
+    <xsl:otherwise><xsl:text>DefaultJob</xsl:text><xsl:value-of select="$UniqId"></xsl:value-of>
     </xsl:otherwise>
     </xsl:choose>
     
@@ -142,12 +138,12 @@ label: <xsl:text/>
            </xsl:choose>
  </xsl:when>        
 </xsl:choose>
-<xsl:text>&#xa;</xsl:text>
 
- <xsl:template match="jsdl:JobDescription">
+
+
 
 <xsl:for-each select="jsdl:Application/jsdl-posix:POSIXApplication">
-
+<xsl:text>&#xa;</xsl:text>
 <xsl:text>&#xa;</xsl:text>
 <xsl:text>task:</xsl:text>
 <xsl:text>&#xa;</xsl:text>
@@ -157,13 +153,13 @@ label: <xsl:text/>
  
 
 <xsl:if test="jsdl-posix:Error">
-<xsl:text>remote: /bin/bash </xsl:text><xsl:value-of select="$UniqId"/><xsl:text>-</xsl:text> <xsl:value-of select="position()"/><xsl:text>.sh 1> </xsl:text><xsl:text disable-output-escaping="yes"><xsl:value-of select="jsdl-posix:Output/text()"/></xsl:text> 2> <xsl:value-of select="jsdl-posix:Error"></xsl:value-of>
+<xsl:text>remote: /bin/bash </xsl:text><xsl:value-of select="$UniqId"/><xsl:text>-</xsl:text> <xsl:value-of select="position()"/><xsl:text>.sh 1> </xsl:text><xsl:text disable-output-escaping="yes"></xsl:text><xsl:value-of select="jsdl-posix:Output/text()"/> <xsl:text> 2> </xsl:text>   <xsl:value-of select="jsdl-posix:Error"></xsl:value-of>
 <xsl:text>&#xa;</xsl:text>
 <xsl:text>final: </xsl:text>			  
 </xsl:if>
 			  
 			  <xsl:if test="not(jsdl-posix:Error)">
-			  <xsl:text>remote: /bin/bash </xsl:text><xsl:value-of select="$UniqId"/><xsl:text>-</xsl:text> <xsl:value-of select="position()"/><xsl:text>.sh 1> </xsl:text><xsl:text disable-output-escaping="yes"><xsl:value-of select="jsdl-posix:Output/text()"/></xsl:text> 2> stderr<xsl:value-of select="position()"/>
+			  <xsl:text>remote: /bin/bash </xsl:text><xsl:value-of select="$UniqId"/><xsl:text>-</xsl:text> <xsl:value-of select="position()"/><xsl:text>.sh 1> </xsl:text><xsl:text disable-output-escaping="yes"></xsl:text><xsl:value-of select="jsdl-posix:Output/text()"/> <xsl:text> 2> stderr</xsl:text><xsl:value-of select="position()"/>
  <xsl:text>&#xa;</xsl:text>
 <xsl:text>final: get stderr</xsl:text><xsl:value-of select="position()"/> <xsl:text> stderr</xsl:text><xsl:value-of select="position()"/>
 			  <xsl:text>&#xa;</xsl:text>
@@ -180,7 +176,7 @@ label: <xsl:text/>
 			  <xsl:if test="jsdl-posix:Error">
 			  <xsl:text>¢</xsl:text><xsl:value-of select="jsdl-posix:Error"></xsl:value-of></xsl:if>
 			  <xsl:if test="not(jsdl-posix:Error)">
-			  <xsl:text>¢stderr<xsl:value-of select="position()"/></xsl:text></xsl:if>
+			  <xsl:text>¢stderr</xsl:text><xsl:value-of select="position()"/></xsl:if>
 			  <xsl:text>&#xa;</xsl:text>	
 			 <xsl:if test="jsdl-posix:Executable">
 			  <xsl:text>¢</xsl:text><xsl:value-of select="$UniqId"/><xsl:text>-</xsl:text><xsl:value-of select="position()"/><xsl:text>.sh,</xsl:text> <xsl:value-of select="jsdl-posix:Executable"></xsl:value-of><xsl:text> </xsl:text>
@@ -231,17 +227,14 @@ label: <xsl:text/>
 <![CDATA[</]]>StagingOut<xsl:value-of select="position()"/><![CDATA[>]]>
 <![CDATA[</]]>PostStaging<![CDATA[>]]></xsl:for-each>
 <![CDATA[</]]>OutputSandboxPostStaging<![CDATA[>]]></xsl:if>		
+
+<xsl:if test="jsdl:DataStaging"><xsl:text>&#xa;</xsl:text><![CDATA[</]]>TransferFiles<![CDATA[>]]></xsl:if>
 </xsl:template>  
 
-<xsl:for-each select="jsdl:Application">
-            <xsl:for-each select="posix:POSIXApplication">
-            	
-                <xsl:for-each select="posix:WorkingDirectory">
-<![CDATA[<]]>WorkingDirectory<![CDATA[>]]><xsl:value-of select="text()"/><xsl:value-of select="$lf"/><![CDATA[</]]>WorkingDirectory<![CDATA[>]]></xsl:for-each></xsl:for-each></xsl:for-each>
-  <xsl:text>&#xa;</xsl:text>
-<xsl:if test="jsdl:DataStaging"><![CDATA[</]]>TransferFiles<![CDATA[>]]></xsl:if>
 
 
-    </xsl:template>
+
+
+
     
        </xsl:stylesheet>

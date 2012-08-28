@@ -59,7 +59,6 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 	private final String CANCEL = "/cancel/";
 	private final String SUBMIT = "/addjob/";
 	private final String JOB_TYPE= "job";
-	private final String SUBMIT_ERROR = "Failed: HTTP error code:";
 	private final String TAG_TYPE = "transferFiles";
 	private final String TAG_ELEMENT = "TransferFiles";
 	private final String TAG_VALUE = "UploadURL";
@@ -183,13 +182,13 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 	}
 	/**
 	 * 
-	 * @return
+	 * @return document
 	 */
 	public  Document getDocument() {
 		return document;
 	}
 	/**
-	 * Document used to 
+	 * Document used to handle the transfer files 
 	 * @param document
 	 */
 	public static  void setDocument(Document document) {
@@ -247,7 +246,7 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 	 */
 	public String submit(String jobDesc, boolean checkMatch, String uniqId)
 			throws PermissionDeniedException, TimeoutException,NoSuccessException, BadResource {
-
+	
 		String job = getInput(jobDesc, JOB_TYPE);
 		String jobId = null;
 		setPath(SUBMIT);
@@ -311,11 +310,11 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 	 */
 	public String getStagingDirectory(String nativeJobDescription, String uniqId)throws PermissionDeniedException, TimeoutException,NoSuccessException {
 
+			
 		String stagingDirectory = null;
 		String TransferFiles = getInput(nativeJobDescription, TAG_TYPE);
 
 		try {
-
 
 			setDocument(convertToXml(TransferFiles));
 			stagingDirectory = getValue(getDocument(), TAG_ELEMENT, TAG_VALUE);
@@ -444,7 +443,7 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 		}
 
 	}
-	
+
 	/**
 	 * Gets a XML document with the files to be transferred 
 	 * @param xmlString transfer files 
@@ -456,22 +455,21 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 	public  Document convertToXml(String xmlString)
 			throws ParserConfigurationException, SAXException, IOException {
 
-
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		InputSource is = new InputSource(new StringReader(xmlString));
-		setDocument(builder.parse(is));
+	    setDocument(builder.parse(is));
 
-		return document;
+		return getDocument();
 
 	}
-    /**
-     * Gets the value of XML tag
-     * @param document
-     * @param tagElement
-     * @param tagValue
-     * @return Returns the value of the tag
-     */
+	/**
+	 * Gets the value of XML tag
+	 * @param document
+	 * @param tagElement
+	 * @param tagValue
+	 * @return Returns the value of the tag
+	 */
 	public String getValue(Document document, String tagElement, String tagValue) {
 
 		String value = null;
