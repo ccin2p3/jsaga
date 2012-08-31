@@ -229,10 +229,10 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     } finally sftp.close
   }
 
-  def cancel(nativeJobId: String) = withConnection {
+  override def cancel(nativeJobId: String) = withConnection {
     connection =>
     val session = connection.openSession
-
+    
     try sendCommand("qdel " + nativeJobId, session)
     catch {
       case ex: IOException => throw new NoSuccessException("Unable to cancel job", ex);
@@ -240,7 +240,7 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     } finally session.close
   }
 
-  def suspend(nativeJobId: String) = withConnection {
+  override def suspend(nativeJobId: String) = withConnection {
     connection =>
     val session = connection.openSession
 
@@ -255,7 +255,7 @@ class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract
     } finally session.close
   }
 
-  def resume(nativeJobId: String) = withConnection {
+  override def resume(nativeJobId: String) = withConnection {
     connection =>
     val session = connection.openSession
     
