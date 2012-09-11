@@ -38,7 +38,6 @@ import java.util.logging.Logger
 import org.ogf.saga.error.AuthenticationFailedException
 import org.ogf.saga.error.BadParameterException
 import collection.JavaConversions._
-import scala.actors.threadpool.locks.ReentrantReadWriteLock
 import scala.collection.mutable.ConcurrentMap
 import scala.collection.mutable.HashMap
 
