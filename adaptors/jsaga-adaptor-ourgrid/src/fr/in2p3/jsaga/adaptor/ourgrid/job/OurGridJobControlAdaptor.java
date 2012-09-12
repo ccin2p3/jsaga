@@ -248,7 +248,6 @@ JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase {
 			throws PermissionDeniedException, TimeoutException,NoSuccessException, BadResource {
 	
 		String job = getInput(jobDesc, JOB_TYPE);
-		System.out.println(job);
 		String jobId = null;
 		setPath(SUBMIT);
 		String authorization = OurGridConstants.BASIC + " " + getAuthentication();
