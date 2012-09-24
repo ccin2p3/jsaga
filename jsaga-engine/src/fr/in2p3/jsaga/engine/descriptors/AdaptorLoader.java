@@ -22,6 +22,7 @@ public class AdaptorLoader {
     private Class[] m_adaptorClasses;
 
     public AdaptorLoader() throws ConfigurationException {
+    	String clazzName=null;
         try {
             List list = new ArrayList();
             Enumeration e = AdaptorLoader.class.getClassLoader().getResources(ADAPTOR_PROPERTIES);
@@ -30,14 +31,14 @@ public class AdaptorLoader {
                 Properties prop = new Properties();
                 prop.load(url.openStream());
                 for (Enumeration e2=prop.propertyNames(); e2.hasMoreElements(); ) {
-                    String clazzName = (String) e2.nextElement();
+                    clazzName = (String) e2.nextElement();
                     Class clazz = Class.forName(clazzName);
                     list.add(clazz);
                 }
             }
             m_adaptorClasses = (Class[]) list.toArray(new Class[list.size()]);
         } catch(Exception e) {
-            throw new ConfigurationException(e);
+            throw new ConfigurationException("Failed to load class " + clazzName, e);
         }
     }
 
