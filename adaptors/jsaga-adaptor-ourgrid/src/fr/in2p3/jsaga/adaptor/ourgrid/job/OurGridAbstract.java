@@ -36,7 +36,7 @@ public abstract class OurGridAbstract implements ClientAdaptor {
 	protected String m_passPhrase;
 
 	/**
-	 *  Gets the defaults values for (some of the) attributes supported by this adaptor. 
+	 *  Gets the defaults values for (some of the) attributes supported by this adaptor 
 	 *  These values can be static or dynamically created from the information available on local host
 	 *  (environment variables, files, ...) and from the attributes map.
 	 *  @param attributes the attributes set by the user
@@ -88,9 +88,9 @@ public abstract class OurGridAbstract implements ClientAdaptor {
 	}
 
 	/**
-	 * Gets a data structure that describes how to use this adaptor. This data
-	 * structure contains attribute names with usage constraints (and/or,
-	 * required/optional, hidden...)
+	 * Gets a data structure that describes how to use this adaptor
+	 * This data structure contains attribute names with usage constraints 
+	 * (and/or,required/optional, hidden...)
 	 * @return Returns the usage data structure
 	 * */
 	public Usage getUsage() {

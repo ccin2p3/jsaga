@@ -46,7 +46,7 @@ import fr.in2p3.jsaga.adaptor.ourgrid.job.OurGridConstants;
  * ***************************************************/
 /**
  * This class manages the data of the job such as input (required for the job execution)
- *  and output (errors and job outputs) files.
+ *  and output (errors and job outputs) files
  * @author patriciaam
  * @since 1.1, 08/01/2012
  */
@@ -182,7 +182,7 @@ FileReaderGetter, FileWriterPutter{
 	}
 
 	/**
-	 * Gets the file attributes of the entry absolutePath.
+	 * Gets the file attributes of the entry absolutePath
 	 * @param absolutePath  the absolute path of the entry
 	 * @param additionalArgs adaptor specific arguments
 	 * @return Returns the file attributes
@@ -222,13 +222,13 @@ FileReaderGetter, FileWriterPutter{
 			HttpClient httpclient = new DefaultHttpClient();
 			HttpResponse response = httpclient.execute(method);
 
-			if (response.getStatusLine().getStatusCode() != 200) { 
+			if (response.getStatusLine().getStatusCode()== 401) { 
 
-				throw new TimeoutException(response.getStatusLine().getReasonPhrase());
+				throw new PermissionDeniedException(response.getStatusLine().getReasonPhrase());
 			}
 
 		} catch (Exception e) {
-			throw new TimeoutException(e);
+			throw new NoSuccessException(e);
 		}
 	}
 	
@@ -243,30 +243,30 @@ FileReaderGetter, FileWriterPutter{
 	public void putFromStream(String absolutePath, boolean append, String additionalArgs, InputStream stream)
 			throws PermissionDeniedException, BadParameterException,AlreadyExistsException, ParentDoesNotExist, TimeoutException,NoSuccessException {
 
+		InputStreamBody isb = new InputStreamBody(stream, new File(absolutePath).getName());
+
+		MultipartEntity reqEntity = new MultipartEntity();
+		reqEntity.addPart(FILE, isb);
+		String authentication = OurGridConstants.BASIC + " " + getAuthentication();
+		HttpPost method = new HttpPost(OurGridConstants.HTTP + getHost()+ UPLOAD_SERVICE);
+		method.addHeader(OurGridConstants.AUTHORIZATION, authentication);
+		method.setEntity(reqEntity);
+
+		HttpClient httpclient = new DefaultHttpClient();
+		HttpResponse response;
 		try {
+			response = httpclient.execute(method);
+		
 
-			InputStreamBody isb = new InputStreamBody(stream, new File(absolutePath).getName());
+		if (response.getStatusLine().getStatusCode() == 401) {
 
-			MultipartEntity reqEntity = new MultipartEntity();
-			reqEntity.addPart(FILE, isb);
-			String authentication = OurGridConstants.BASIC + " " + getAuthentication();
-			HttpPost method = new HttpPost(OurGridConstants.HTTP + getHost()+ UPLOAD_SERVICE);
-			method.addHeader(OurGridConstants.AUTHORIZATION, authentication);
-			method.setEntity(reqEntity);
-
-			HttpClient httpclient = new DefaultHttpClient();
-			HttpResponse response = httpclient.execute(method);
-
-			if (response.getStatusLine().getStatusCode() != 200) {
-
-				throw new TimeoutException(response.getStatusLine().getReasonPhrase());
-			}
-
-		} catch (Exception e) {
-
-			throw new TimeoutException(e);
+			throw new PermissionDeniedException(response.getStatusLine().getReasonPhrase());
 		}
-
+		} catch (ClientProtocolException e) {
+			
+		} catch (IOException e) {
+			
+		}
 	}
 
 	/**
@@ -302,11 +302,15 @@ FileReaderGetter, FileWriterPutter{
 				stream.flush();
 				stream.close();
 			}
+			
+			if (response .getStatusLine().getStatusCode()==401){
+				throw new PermissionDeniedException(response.getStatusLine().getReasonPhrase());
+			}
 
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
+			throw new NoSuccessException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new NoSuccessException(e);
 		}
 
 	}
