@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>fr.in2p3.jsaga</groupId>
+        <artifactId>glite</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.glite</groupId>
+    <artifactId>glite-wms-wmproxy-api-java</artifactId>
+    <version>3.3.2</version>
+    <name>gLite WMS WMProxy API</name>
+    <description>Java API for the Workload Management System (WMS).</description>
+    <url>http://www.nikhef.nl/~janjust/wms_jobs_in_java/</url>
+    <organization>
+        <name>INFN</name>
+        <url>http://www.infn.it/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>axistools-maven-plugin</artifactId>
+                <!--<version>1.0</version>--><!-- axis 1.2.1 -->
+                <version>1.4</version><!-- axis 1.4 -->
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${basedir}/src/main/wsdl</sourceDirectory>
+                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                            <timestampDirectory>${project.build.directory}</timestampDirectory>
+                            <wsdlFiles>
+                                <wsdlFile>WMProxy.wsdl</wsdlFile>
+                            </wsdlFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
+    
+    <dependencies>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4-patched</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glite</groupId>
+            <artifactId>glite-security-delegation-java</artifactId>
+            <version>1.4.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glite</groupId>
+            <artifactId>glite-security-trustmanager</artifactId>
+            <version>1.8.16</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glite</groupId>
+            <artifactId>glite-security-util-java</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>cog-axis</artifactId>
+            <version>gt4</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+</project>

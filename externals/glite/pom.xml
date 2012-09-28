@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <!-- declaration -->
+    <parent>
+        <groupId>fr.in2p3.jsaga</groupId>
+        <artifactId>externals</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fr.in2p3.jsaga</groupId>
+    <artifactId>glite</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>gLite</name>
+
+    <!-- aggregation -->
+    <modules>
+        <module>glite-ce-common-java</module>     
+        <module>glite-lb-api-java</module>
+        <module>glite-security-trustmanager</module>
+        <module>glite-wms-wmproxy-api-java</module>
+        <module>glite-ce-cream-api-java</module>
+        <module>glite-security-authz-framework-java</module>
+        <module>glite-security-trustmanager-axis</module>
+        <module>glite-ce-delegation</module>
+        <module>glite-security-delegation-java</module>
+        <module>glite-security-util-java</module>
+        <module>glite-jdl-api-java</module>
+        <module>glite-security-voms-java</module>
+    </modules>
+</project>

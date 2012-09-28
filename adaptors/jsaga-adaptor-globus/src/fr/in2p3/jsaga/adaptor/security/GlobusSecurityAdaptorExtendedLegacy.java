@@ -2,7 +2,9 @@ package fr.in2p3.jsaga.adaptor.security;
 
 import org.globus.gsi.CertUtil;
 import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.X509Credential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
+import org.globus.gsi.util.ProxyCertificateUtil;
 import org.ietf.jgss.GSSCredential;
 
 /* ***************************************************
@@ -28,8 +30,8 @@ public class GlobusSecurityAdaptorExtendedLegacy extends GlobusSecurityAdaptor i
 
     protected boolean checkType(GSSCredential proxy) {
         if (proxy instanceof GlobusGSSCredentialImpl) {
-            GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)proxy).getGlobusCredential();
-            return CertUtil.isGsi2Proxy(globusProxy.getProxyType());
+            X509Credential globusProxy = ((GlobusGSSCredentialImpl)proxy).getX509Credential();
+            return ProxyCertificateUtil.isGsi2Proxy(globusProxy.getProxyType());
         } else {
             return false;
         }

@@ -27,8 +27,6 @@ import org.globus.wsrf.impl.security.authorization.exceptions.InitializeExceptio
 import org.globus.wsrf.impl.security.authorization.exceptions.InvalidPolicyException;
 import org.globus.wsrf.impl.security.authorization.exceptions.AuthorizationException;
 
-import org.globus.gsi.jaas.PasswordCredential;
-
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.Callback;
@@ -39,6 +37,7 @@ import java.security.Principal;
 
 import java.util.Set;
 import java.io.IOException;
+import org.globus.gsi.gssapi.jaas.PasswordCredential;
 
 /**
  * Uses Java Login module to authorize based on user name and password

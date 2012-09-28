@@ -54,13 +54,29 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     /** constructor for NSDirectory.open() */
     protected AbstractSyncNSDirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(dir, URLHelper.toDirectoryURL(relativeUrl), flags);
-        this.init(flags);
+        boolean initOK = false;
+	try {
+           this.init(flags);
+           initOK = true;
+        } finally {
+            if (!initOK) {
+                this.close();
+            }
+        }
     }
 
     /** constructor for NSEntry.openAbsolute() */
     protected AbstractSyncNSDirectoryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(entry, URLHelper.toDirectoryPath(absolutePath), flags);
-        this.init(flags);
+        boolean initOK = false;
+	try {
+           this.init(flags);
+           initOK = true;
+        } finally {
+            if (!initOK) {
+                this.close();
+            }
+        }
     }
 
     private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {

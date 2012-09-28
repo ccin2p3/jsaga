@@ -70,15 +70,17 @@ public class FileOutputStreamImpl extends AbstractAsyncFileOutputStreamImpl {
 
     public void close() throws IOException {
         // close stream
-        m_outStream.close();
-
-        // close connection
-        if (m_connection != null) {
-            try {
-                m_connection.disconnect();
-            } catch (NoSuccessException e) {
-                throw new IOException(e.getMessage());
-            }
+        try { 
+           m_outStream.close();
+        } finally {
+           // close connection
+           if (m_connection != null) {
+               try {
+                   m_connection.disconnect();
+               } catch (NoSuccessException e) {
+                   throw new IOException(e.getMessage());
+               }
+           }
         }
     }
 

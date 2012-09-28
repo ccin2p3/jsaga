@@ -15,10 +15,13 @@ import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
+import org.globus.gsi.X509Credential;
+import org.globus.gsi.util.ProxyCertificateUtil;
 
 /*
  * ***************************************************
@@ -52,9 +55,9 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
         // get attribute
         if (Context.LIFETIME.equals(key) || VOMSContext.DELEGATIONLIFETIME.equals(key)) {
             // same as globus
-            GlobusCredential globusProxy;
+            X509Credential globusProxy;
             if (m_proxy instanceof GlobusGSSCredentialImpl) {
-                globusProxy = ((GlobusGSSCredentialImpl) m_proxy).getGlobusCredential();
+                globusProxy = ((GlobusGSSCredentialImpl) m_proxy).getX509Credential();
             } else {
                 throw new NoSuccessException("Not a globus proxy");
             }
@@ -80,16 +83,16 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
      */
     public void dump(PrintStream out) throws Exception {
         // same as globus
-        GlobusCredential globusProxy;
+        X509Credential globusProxy;
         if (m_proxy instanceof GlobusGSSCredentialImpl) {
-            globusProxy = ((GlobusGSSCredentialImpl) m_proxy).getGlobusCredential();
+            globusProxy = ((GlobusGSSCredentialImpl) m_proxy).getX509Credential();
         } else {
             throw new Exception("Not a globus proxy");
         }
         out.println("  subject  : " + globusProxy.getCertificateChain()[0].getSubjectDN());
         out.println("  issuer   : " + globusProxy.getCertificateChain()[0].getIssuerDN());
         out.println("  identity : " + globusProxy.getIdentity());
-        out.println("  type     : " + CertUtil.getProxyTypeAsString(globusProxy.getProxyType()));
+        out.println("  type     : " + ProxyCertificateUtil.getProxyTypeAsString(globusProxy.getProxyType()));
         out.println("  strength : " + globusProxy.getStrength() + " bits");
         // the genuine lifetime is the one on the server (set by the user config)
         out.println("  timeleft : " + Util.formatTimeSec(globusProxy.getTimeLeft() + UDuration.toInt(this._genuineLifeTime) - UDuration.toInt(_localLifeTime)));

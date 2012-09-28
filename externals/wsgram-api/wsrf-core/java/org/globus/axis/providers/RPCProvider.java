@@ -27,7 +27,7 @@ import java.lang.reflect.Method;
 
 import javax.security.auth.Subject;
 
-import org.globus.gsi.jaas.JaasSubject;
+import org.globus.gsi.gssapi.jaas.JaasSubject;
 
 import org.globus.axis.description.ServiceDescUtil;
 

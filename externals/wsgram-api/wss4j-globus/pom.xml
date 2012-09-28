@@ -5,12 +5,12 @@
     <artifactId>wss4j-globus</artifactId>
     <version>4.0.0</version>
     <name>WSS For java patched by Globus</name>
-	<build>
+    <build>
         <directory>build</directory>
         <outputDirectory>build/classes</outputDirectory>
         <sourceDirectory>java</sourceDirectory>
     </build>
-	<dependencies>
+    <dependencies>
         <!-- adaptor specific -->
         <dependency>
             <groupId>axis</groupId>
@@ -18,29 +18,29 @@
             <version>1.4-patched</version>
             <scope>compile</scope>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
             <version>0.2</version>
             <scope>compile</scope>
         </dependency>
-		<dependency>
-		    <groupId>bouncycastle</groupId>
-		    <artifactId>bcprov-jdk13</artifactId>
-		    <version>140</version>
-		</dependency>
-		<dependency>
-			<groupId>xalan</groupId>
-			<artifactId>xalan</artifactId>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15</artifactId>
+            <version>1.45</version>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
             <version>2.6.0</version>
             <scope>compile</scope>
         </dependency>
-		<dependency>
-		    <groupId>org.globus</groupId>
-			<artifactId>opensaml</artifactId>
-			<version>3.9</version>
-		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>opensaml</artifactId>
+            <version>3.9</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache</groupId>
             <artifactId>addressing-1.0</artifactId>
             <version>0.9</version>
@@ -52,5 +52,5 @@
             <version>1.4.5</version>
             <scope>compile</scope>
         </dependency>
-	</dependencies>
+    </dependencies>
 </project>

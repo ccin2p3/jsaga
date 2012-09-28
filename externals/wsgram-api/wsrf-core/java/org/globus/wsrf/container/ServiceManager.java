@@ -34,11 +34,11 @@ import org.globus.wsrf.utils.Resources;
 import org.globus.wsrf.security.SecurityManager;
 import org.globus.wsrf.impl.security.descriptor.ServiceSecurityConfig;
 import org.globus.axis.description.ServiceDescUtil;
-import org.globus.gsi.jaas.JaasSubject;
 import org.globus.util.I18n;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.globus.gsi.gssapi.jaas.JaasSubject;
 
 /**
  * This class manages a set of services. It it used to startup, intialize

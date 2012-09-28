@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+ * Copyright (c) 2004 on behalf of the EU EGEE Project:
+ * The European Organization for Nuclear Research (CERN),
+ * Istituto Nazionale di Fisica Nucleare (INFN), Italy
+ * Datamat Spa, Italy
+ * Centre National de la Recherche Scientifique (CNRS), France
+ * CS Systeme d'Information (CSSI), France
+ * Royal Institute of Technology, Center for Parallel Computers (KTH-PDC), Sweden
+ * Universiteit van Amsterdam (UvA), Netherlands
+ * University of Helsinki (UH.HIP), Finland
+ * University of Bergen (UiB), Norway
+ * Council for the Central Laboratory of the Research Councils (CCLRC), United Kingdom
+ *
+ * Authors: Luigi Zangrando (zangrando@pd.infn.it)
+-->
+
+<wsdl:definitions name="CECommon"
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+   xmlns:tns="http://glite.org/ce/commonj/dummy"
+   xmlns:common="http://glite.org/ce/faults"
+   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+   targetNamespace="http://glite.org/ce/commonj/dummy">
+
+<wsdl:types>
+
+<xsd:schema
+         xmlns="http://glite.org/ce/commonj/dummy"
+         targetNamespace="http://glite.org/ce/commonj/dummy"
+         elementFormDefault="qualified"
+         attributeFormDefault="unqualified">
+
+         <xsd:include schemaLocation="org.glite.ce-common_types-local.xsd"/>
+
+</xsd:schema>
+
+</wsdl:types>
+
+
+<wsdl:message name="dummyInput">
+      <wsdl:part name="dummyInputRequest" type="xsd:string">
+             <wsdl:documentation>a dummy input for a dummy operation</wsdl:documentation>
+      </wsdl:part>
+</wsdl:message>
+<wsdl:message name="dummyOutput">
+      <wsdl:part name="dummyOutputResponse" type="xsd:string">
+             <wsdl:documentation>a dummy result for a dummy operation</wsdl:documentation>
+      </wsdl:part>
+</wsdl:message>
+<wsdl:message name="Generic_Fault">
+      <wsdl:part name="fault" element="common:GenericFault">
+             <wsdl:documentation>Fault thrown when something goes wrong</wsdl:documentation>
+      </wsdl:part>
+</wsdl:message>
+
+<wsdl:portType name="DummyPort">
+  <wsdl:operation name="dummy">
+      <wsdl:documentation>Dummy operation that does nothing</wsdl:documentation>
+      <wsdl:input  message="tns:dummyInput"/>
+      <wsdl:output message="tns:dummyOutput"/>
+      <wsdl:fault message="tns:Generic_Fault" name="genericFault"/>
+  </wsdl:operation>
+</wsdl:portType>
+
+<wsdl:binding name="DummyBinding" type="tns:DummyPort">
+  <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+  <wsdl:operation name="dummy">
+    <soap:operation soapAction="urn:dummy"/>
+    <wsdl:input>
+       <soap:body use="literal" namespace="http://glite.org/ce/commonj/dummy"/>
+    </wsdl:input>
+    <wsdl:output>
+       <soap:body use="literal" namespace="http://glite.org/ce/commonj/dummy"/>
+    </wsdl:output>
+    <wsdl:fault name="genericFault">
+       <soap:fault name="fault" use="literal"/>
+    </wsdl:fault>
+  </wsdl:operation>
+</wsdl:binding>
+
+</wsdl:definitions>

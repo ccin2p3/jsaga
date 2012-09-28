@@ -72,7 +72,7 @@ public class SagaOutputStream extends OutputStream {
                 m_callback = null;
             }
         } catch (Exception e) {
-            throw new IOException(e.getMessage());
+            throw new IOException(e);
         }
     }
 }

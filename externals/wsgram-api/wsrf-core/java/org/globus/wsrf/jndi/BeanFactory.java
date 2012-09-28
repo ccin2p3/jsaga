@@ -24,12 +24,12 @@ import org.globus.wsrf.security.SecurityManager;
 import org.globus.wsrf.impl.security.descriptor.ServiceSecurityConfig;
 
 import org.globus.wsrf.container.ServiceManager;
-import org.globus.gsi.jaas.JaasSubject;
 
 import java.security.PrivilegedExceptionAction;
 import java.security.PrivilegedActionException;
  
 import javax.security.auth.Subject;
+import org.globus.gsi.gssapi.jaas.JaasSubject;
 
 public class BeanFactory extends BasicBeanFactory {
 

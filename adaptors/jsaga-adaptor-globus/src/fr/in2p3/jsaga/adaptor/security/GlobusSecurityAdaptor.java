@@ -20,6 +20,7 @@ import java.io.*;
 import java.lang.Exception;
 import java.security.cert.X509Certificate;
 import java.util.Map;
+import org.globus.gsi.X509Credential;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -184,7 +185,7 @@ public abstract class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor 
 
     private static boolean hasNonCriticalExtensions(GSSCredential proxy) {
         if (proxy instanceof GlobusGSSCredentialImpl) {
-            GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)proxy).getGlobusCredential();
+            X509Credential globusProxy = ((GlobusGSSCredentialImpl)proxy).getX509Credential();
             X509Certificate cert = globusProxy.getCertificateChain()[0];
             if (cert instanceof X509CertificateObject) {
                 X509CertificateObject bouncyCert = (X509CertificateObject) cert;

@@ -26,9 +26,9 @@ import org.ietf.jgss.GSSManager;
 
 import org.globus.axis.gsi.GSIConstants;
 import org.globus.gsi.gssapi.GSSConstants;
+import org.globus.gsi.gssapi.jaas.GlobusPrincipal;
 import org.globus.gsi.gssapi.net.GssSocket;
 import org.globus.gsi.gssapi.net.GssSocketFactory;
-import org.globus.gsi.jaas.GlobusPrincipal;
 import org.globus.wsrf.impl.security.authentication.Constants;
 import org.globus.wsrf.utils.Resources;
 import org.globus.util.I18n;

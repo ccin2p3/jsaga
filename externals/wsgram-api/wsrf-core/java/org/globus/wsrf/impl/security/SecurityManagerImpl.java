@@ -22,11 +22,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.axis.MessageContext;
+import org.globus.gsi.gridmap.GridMap;
+import org.globus.gsi.gssapi.jaas.GlobusPrincipal;
+import org.globus.gsi.gssapi.jaas.JaasSubject;
+import org.globus.gsi.gssapi.jaas.UserNamePrincipal;
 
-import org.globus.gsi.jaas.GlobusPrincipal;
-import org.globus.gsi.jaas.JaasSubject;
-import org.globus.gsi.jaas.UserNamePrincipal;
-import org.globus.security.gridmap.GridMap;
 import org.globus.util.I18n;
 import org.globus.wsrf.Resource;
 import org.globus.wsrf.config.ConfigException;

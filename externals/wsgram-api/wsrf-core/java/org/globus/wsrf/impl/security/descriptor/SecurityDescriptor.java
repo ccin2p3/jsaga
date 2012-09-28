@@ -27,7 +27,7 @@ import javax.xml.namespace.QName;
 
 import javax.security.auth.Subject;
 
-import org.globus.security.gridmap.GridMap;
+import org.globus.gsi.gridmap.GridMap;
 
 /**
  * Base class for security descriptor. Stores credential parameters,

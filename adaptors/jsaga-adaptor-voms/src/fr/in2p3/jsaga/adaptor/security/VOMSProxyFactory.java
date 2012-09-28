@@ -4,7 +4,6 @@ import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
 import org.glite.voms.VOMSAttribute;
 import org.glite.voms.VOMSValidator;
 import org.glite.voms.contact.*;
-import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.util.Util;
 import org.ietf.jgss.GSSCredential;
@@ -18,6 +17,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.*;
+import org.globus.gsi.GSIConstants;
+import org.globus.gsi.X509Credential;
 
 /*
  * ***************************************************
@@ -73,9 +74,10 @@ public class VOMSProxyFactory {
         server.setPort(uri.getPort());
         server.setHostDn(uri.getPath());
         server.setVoName((String) attributes.get(Context.USERVO));
+
         if (cred != null) {
             if (cred instanceof GlobusGSSCredentialImpl) {
-                m_proxyInit = VOMSProxyInit.instance(((GlobusGSSCredentialImpl) cred).getGlobusCredential());
+                m_proxyInit = VOMSProxyInit.instance(((GlobusGSSCredentialImpl) cred).getX509Credential());
             } else {
                 throw new BadParameterException("Not a globus proxy");
             }
@@ -120,32 +122,66 @@ public class VOMSProxyFactory {
 
         m_proxyInit.setProxyLifetime(lifetime);
         m_requestOptions.setLifetime(lifetime);
+        GSIConstants.DelegationType delegationType = GSIConstants.DelegationType.NONE;
 
         if (attributes.containsKey(VOMSContext.DELEGATION)) {
             String delegation = (String) attributes.get(VOMSContext.DELEGATION);
             if (delegation.equalsIgnoreCase("none")) {
-                m_proxyInit.setDelegationType(DELEGATION_NONE);
+                delegationType = GSIConstants.DelegationType.NONE;
+                m_proxyInit.setDelegationType(GSIConstants.DelegationType.NONE);
             } else if (delegation.equalsIgnoreCase("limited")) {
-                m_proxyInit.setDelegationType(DELEGATION_LIMITED);
+                delegationType = GSIConstants.DelegationType.LIMITED;
+                m_proxyInit.setDelegationType(GSIConstants.DelegationType.LIMITED);
             } else if (delegation.equalsIgnoreCase("full")) {
-                m_proxyInit.setDelegationType(DELEGATION_FULL);
+                delegationType = GSIConstants.DelegationType.FULL;
+                m_proxyInit.setDelegationType(GSIConstants.DelegationType.FULL);
             }
         }
+
         if (attributes.containsKey(VOMSContext.PROXYTYPE)) {
             String proxyType = (String) attributes.get(VOMSContext.PROXYTYPE);
+
             if (proxyType.equalsIgnoreCase("old")) {
-                m_proxyInit.setProxyType(OID_OLD);
+                switch (delegationType) {
+                    case LIMITED:
+                        m_proxyInit.setProxyType(GSIConstants.CertificateType.GSI_2_LIMITED_PROXY);
+                        break;
+                    case FULL:
+                    case NONE:
+                        m_proxyInit.setProxyType(GSIConstants.CertificateType.GSI_2_PROXY);
+                        break;
+                }
             } else if (proxyType.equalsIgnoreCase("globus")) {
-                m_proxyInit.setProxyType(OID_GLOBUS);
+                switch (delegationType) {
+                    case LIMITED:
+                        m_proxyInit.setProxyType(GSIConstants.CertificateType.GSI_3_LIMITED_PROXY);
+                        break;
+                    case FULL:
+                        m_proxyInit.setProxyType(GSIConstants.CertificateType.GSI_3_IMPERSONATION_PROXY);
+                        break;
+                    case NONE:
+                        m_proxyInit.setProxyType(GSIConstants.CertificateType.GSI_3_INDEPENDENT_PROXY);
+                        break;
+                }
             } else if (proxyType.equalsIgnoreCase("RFC820")) {
-                m_proxyInit.setProxyType(OID_RFC820);
+                switch (delegationType) {
+                    case LIMITED:
+                        m_proxyInit.setProxyType(GSIConstants.CertificateType.GSI_4_LIMITED_PROXY);
+                        break;
+                    case FULL:
+                        m_proxyInit.setProxyType(GSIConstants.CertificateType.GSI_4_IMPERSONATION_PROXY);
+                        break;
+                    case NONE:
+                        m_proxyInit.setProxyType(GSIConstants.CertificateType.GSI_4_INDEPENDENT_PROXY);
+                        break;
+                }
             }
         }
     }
 
     public GSSCredential createProxy() throws GSSException, BadParameterException, NoSuccessException {
         // create
-        GlobusCredential globusProxy;
+        X509Credential globusProxy;
         if ("NOVO".equals(m_requestOptions.getVoName())) {
             // TEST to create gridProxy :
             globusProxy = m_proxyInit.getVomsProxy(null);

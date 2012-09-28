@@ -41,6 +41,7 @@ import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
+import org.glite.wsdl.types.lb.JobFlags;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -158,7 +159,8 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        // get job Status
 	        JobFlagsValue[] jobFlagsValue = new JobFlagsValue[1];
 	        jobFlagsValue[0] = JobFlagsValue.CLASSADS;
-	        org.glite.wsdl.types.lb.JobStatus jobInfo = stub.jobStatus(nativeJobId, jobFlagsValue);
+                
+	        org.glite.wsdl.types.lb.JobStatus jobInfo = stub.jobStatus(nativeJobId, new JobFlags(jobFlagsValue));
 	        if(jobInfo == null) {
 	            throw new NoSuccessException("Unable to get information about job: "+nativeJobId);
 	        }

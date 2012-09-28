@@ -23,8 +23,8 @@
                     </execution>
                 </executions>
             </plugin>
-		</plugins>
-	</build>
+        </plugins>
+    </build>
     <reporting>
         <plugins>
             <plugin>
@@ -50,9 +50,14 @@
             <version>1.1.1</version>
         </dependency>
         <dependency>
-    		<groupId>org.apache.directory.studio</groupId>
-    		<artifactId>org.apache.commons.codec</artifactId>
-    		<version>1.6</version>
-		</dependency>
+            <groupId>org.apache.directory.studio</groupId>
+            <artifactId>org.apache.commons.codec</artifactId>
+            <version>1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.3</version>
+        </dependency>             
     </dependencies>
 </project>

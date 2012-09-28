@@ -9,6 +9,9 @@ import org.ietf.jgss.GSSCredential;
 
 import java.io.File;
 import java.io.PrintStream;
+import org.globus.gsi.X509Credential;
+import org.globus.gsi.util.CertificateUtil;
+import org.globus.gsi.util.ProxyCertificateUtil;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -29,16 +32,16 @@ public class GlobusSecurityCredential extends GSSCredentialSecurityCredential im
 
     /** override super.dump() */
     public void dump(PrintStream out) throws Exception {
-        GlobusCredential globusProxy;
+        X509Credential globusProxy;
         if (m_proxy instanceof GlobusGSSCredentialImpl) {
-            globusProxy = ((GlobusGSSCredentialImpl)m_proxy).getGlobusCredential();
+            globusProxy = ((GlobusGSSCredentialImpl)m_proxy).getX509Credential();
         } else {
             throw new Exception("Not a globus proxy");
         }
         out.println("  subject  : "+globusProxy.getCertificateChain()[0].getSubjectDN());
         out.println("  issuer   : "+globusProxy.getCertificateChain()[0].getIssuerDN());
         out.println("  identity : "+globusProxy.getIdentity());
-        out.println("  type     : "+CertUtil.getProxyTypeAsString(globusProxy.getProxyType()));
+        out.println("  type     : "+ProxyCertificateUtil.getProxyTypeAsString(globusProxy.getProxyType()));
         out.println("  strength : "+globusProxy.getStrength()+" bits");
         out.println("  timeleft : "+Util.formatTimeSec(globusProxy.getTimeLeft()));
     }

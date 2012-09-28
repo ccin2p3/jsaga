@@ -43,7 +43,7 @@ import org.globus.delegation.DelegationException;
 import org.globus.delegation.DelegationListener;
 import org.globus.delegation.DelegationUtil;
 import org.globus.gsi.GlobusCredential;
-import org.globus.security.gridmap.GridMap;
+import org.globus.gsi.gridmap.GridMap;
 import org.globus.util.I18n;
 import org.globus.util.Util;
 import org.globus.wsrf.InvalidResourceKeyException;

@@ -17,6 +17,9 @@ import java.io.PrintStream;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.Vector;
+import org.globus.gsi.X509Credential;
+import org.globus.gsi.util.CertificateUtil;
+import org.globus.gsi.util.ProxyCertificateUtil;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -38,9 +41,9 @@ public class VOMSSecurityCredential extends GSSCredentialSecurityCredential impl
     /** override super.getAttribute() */
     public String getAttribute(String key) throws NotImplementedException, NoSuccessException {
         // same as globus
-        GlobusCredential globusProxy;
+        X509Credential globusProxy;
         if (m_proxy instanceof GlobusGSSCredentialImpl) {
-            globusProxy = ((GlobusGSSCredentialImpl)m_proxy).getGlobusCredential();
+            globusProxy = ((GlobusGSSCredentialImpl)m_proxy).getX509Credential();
         } else {
             throw new NoSuccessException("Not a globus proxy");
         }
@@ -70,16 +73,16 @@ public class VOMSSecurityCredential extends GSSCredentialSecurityCredential impl
     /** override super.dump() */
     public void dump(PrintStream out) throws Exception {
         // same as globus
-        GlobusCredential globusProxy;
+        X509Credential globusProxy;
         if (m_proxy instanceof GlobusGSSCredentialImpl) {
-            globusProxy = ((GlobusGSSCredentialImpl)m_proxy).getGlobusCredential();
+            globusProxy = ((GlobusGSSCredentialImpl)m_proxy).getX509Credential();
         } else {
             throw new Exception("Not a globus proxy");
         }
         out.println("  subject  : "+globusProxy.getCertificateChain()[0].getSubjectDN());
         out.println("  issuer   : "+globusProxy.getCertificateChain()[0].getIssuerDN());
         out.println("  identity : "+globusProxy.getIdentity());
-        out.println("  type     : "+CertUtil.getProxyTypeAsString(globusProxy.getProxyType()));
+        out.println("  type     : "+ProxyCertificateUtil.getProxyTypeAsString(globusProxy.getProxyType()));
         out.println("  strength : "+globusProxy.getStrength()+" bits");
         out.println("  timeleft : "+Util.formatTimeSec(globusProxy.getTimeLeft()));
 

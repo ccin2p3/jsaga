@@ -23,8 +23,6 @@ import org.globus.wsrf.impl.security.descriptor.util.ElementParserException;
 import org.globus.wsrf.config.ContainerConfig;
 import org.globus.wsrf.config.ConfigException;
 
-import org.globus.gsi.jaas.JaasGssUtil;
-import org.globus.security.gridmap.GridMap;
 import org.globus.util.I18n;
 
 import org.apache.commons.logging.Log;
@@ -38,6 +36,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.apache.axis.MessageContext;
+import org.globus.gsi.gridmap.GridMap;
+import org.globus.gsi.gssapi.JaasGssUtil;
 
 /**
  * Helper class for initialization of container security descriptor. All

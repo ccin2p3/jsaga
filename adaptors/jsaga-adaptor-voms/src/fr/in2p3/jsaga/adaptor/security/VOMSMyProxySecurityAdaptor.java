@@ -275,6 +275,6 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
     private static String getUserName(GSSCredential cred, Map attributes) {
         return attributes.get(VOMSContext.MYPROXYUSERID) != null
                 ? (String) attributes.get(VOMSContext.MYPROXYUSERID)
-                : ((GlobusGSSCredentialImpl) cred).getGlobusCredential().getIdentity();
+                : ((GlobusGSSCredentialImpl) cred).getX509Credential().getIdentity();
     }
 }
