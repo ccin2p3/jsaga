@@ -30,7 +30,7 @@ import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSManager;
 
 import org.globus.gsi.gssapi.GSSConstants;
-import org.globus.gsi.jaas.JaasGssUtil;
+import org.globus.gsi.gssapi.JaasGssUtil;
 
 import org.globus.util.I18n;
 import org.globus.util.Base64;

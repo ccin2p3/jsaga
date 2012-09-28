@@ -15,6 +15,7 @@ import org.ogf.saga.error.TimeoutException;
 
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryFilteredJob;
+import org.glite.wsdl.types.lb.JobFlags;
 
 public class WMSJobMonitorEnhancedAdaptor extends WMSJobMonitorAdaptor implements QueryFilteredJob{
 
@@ -45,7 +46,7 @@ public class WMSJobMonitorEnhancedAdaptor extends WMSJobMonitorAdaptor implement
 	        qR[0] = new QueryRecord(QueryOp.UNEQUAL, value1, null );	        
 	        queryConditions[0].setRecord(qR);	        
 	        // Cannot use stub.userJobs() because not yet implemented (version > 1.8 needed)
-	        stub.queryJobs(queryConditions, jobFlagsValue, jobNativeIdResult, jobStatusResult);
+	        stub.queryJobs(queryConditions, new JobFlags(jobFlagsValue), jobNativeIdResult, jobStatusResult);
 	        if(jobNativeIdResult != null && jobNativeIdResult.value != null) {
 	        	JobStatus[] filterJobs = new WMSJobStatus[jobNativeIdResult.value.length];
 	        	for (int i = 0; i < filterJobs.length; i++) {

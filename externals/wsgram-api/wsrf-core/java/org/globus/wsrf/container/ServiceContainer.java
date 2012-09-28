@@ -43,9 +43,9 @@ import org.globus.wsrf.encoding.ObjectDeserializer;
 import org.globus.wsrf.utils.FaultHelper;
 import org.globus.wsrf.utils.Resources;
 
-import org.globus.gsi.jaas.JaasGssUtil;
 
 import javax.security.auth.Subject;
+import org.globus.gsi.gssapi.JaasGssUtil;
 
 import org.globus.wsrf.impl.security.descriptor.ContainerSecurityConfig;
 

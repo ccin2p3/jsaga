@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+	* Copyright (c) 2004 on behalf of the EU EGEE Project:
+	* The European Organization for Nuclear Research (CERN),
+	* Istituto Nazionale di Fisica Nucleare (INFN), Italy
+	* Datamat Spa, Italy
+	* Centre National de la Recherche Scientifique (CNRS), France
+	* CS Systeme d'Information (CSSI), France
+	* Royal Institute of Technology, Center for Parallel Computers (KTH-PDC), Sweden
+	* Universiteit van Amsterdam (UvA), Netherlands
+	* University of Helsinki (UH.HIP), Finland
+	* University of Bergen (UiB), Norway
+	* Council for the Central Laboratory of the Research Councils (CCLRC), United Kingdom
+	*
+	* Authors: Luigi Zangrando (zangrando@pd.infn.it)
+-->
+
+<xsd:schema targetNamespace="http://glite.org/ce/faults"
+	xmlns="http://glite.org/ce/faults" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<xsd:complexType name="BaseFaultType">
+		<xsd:sequence>
+			<xsd:element name="MethodName" type="xsd:string" />
+			<xsd:element name="Timestamp" type="xsd:dateTime" />
+			<xsd:element name="ErrorCode" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="Description" type="xsd:string" minOccurs="0" maxOccurs="1" />
+  			<xsd:element name="FaultCause" type="xsd:string" minOccurs="0" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+	<xsd:element name="GenericFault">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="BaseFaultType" />
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+
+	<xsd:element name="AuthenticationFault">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="BaseFaultType" />
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="AuthorizationFault">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="BaseFaultType" />
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>

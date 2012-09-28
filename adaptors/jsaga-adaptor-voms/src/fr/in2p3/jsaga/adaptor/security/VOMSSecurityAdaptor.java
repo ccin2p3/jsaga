@@ -20,6 +20,7 @@ import org.ogf.saga.error.*;
 import java.io.*;
 import java.security.cert.X509Certificate;
 import java.util.Map;
+import org.globus.gsi.X509Credential;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -143,7 +144,8 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                 case USAGE_INIT_PKCS12:
                 {
                     GSSCredential cred = new VOMSProxyFactory(attributes, VOMSProxyFactory.CERTIFICATE_PKCS12).createProxy();
-                    return this.createSecurityAdaptor(cred, attributes);
+                    SecurityCredential s = this.createSecurityAdaptor(cred, attributes);
+                    return s;
                 }
                 case USAGE_INIT_PEM:
                 {
@@ -257,7 +259,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
 
     private static boolean hasNonCriticalExtensions(GSSCredential proxy) {
     	 if (proxy instanceof GlobusGSSCredentialImpl) {
-            GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)proxy).getGlobusCredential();
+            X509Credential globusProxy = ((GlobusGSSCredentialImpl)proxy).getX509Credential();
             X509Certificate cert = globusProxy.getCertificateChain()[0];
             if (cert instanceof X509CertificateObject) {
                 X509CertificateObject bouncyCert = (X509CertificateObject) cert;

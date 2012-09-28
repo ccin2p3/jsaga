@@ -292,6 +292,6 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
     private static String getUserName(GSSCredential cred, Map attributes) {
         return attributes.get(Context.USERID) != null 
         			? (String) attributes.get(Context.USERID) 
-        			: ((GlobusGSSCredentialImpl)cred).getGlobusCredential().getIdentity();
+        			: ((GlobusGSSCredentialImpl)cred).getX509Credential().getIdentity();
     }
 }

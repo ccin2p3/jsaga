@@ -13,7 +13,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
+import java.security.cert.CertificateEncodingException;
 import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.globus.gsi.X509Credential;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -66,13 +70,15 @@ public class DelegationStub {
      */
     public String renewDelegation(String delegationId, GSSCredential cred) throws AuthenticationFailedException {
         // save proxy to file (dlgor does not support in-memory proxy)
-        GlobusCredential globusProxy;
+        X509Credential globusProxy;
         if (cred instanceof GlobusGSSCredentialImpl) {
-            globusProxy = ((GlobusGSSCredentialImpl)cred).getGlobusCredential();
+            globusProxy = ((GlobusGSSCredentialImpl)cred).getX509Credential();
             try {
                 OutputStream out = new FileOutputStream(m_proxyFile);
                 globusProxy.save(out);
                 out.close();
+            } catch (CertificateEncodingException e) {
+                throw new AuthenticationFailedException(e);
             } catch (IOException e) {
                 throw new AuthenticationFailedException(e);
             }

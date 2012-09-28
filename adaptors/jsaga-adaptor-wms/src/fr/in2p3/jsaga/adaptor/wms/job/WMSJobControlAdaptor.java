@@ -31,8 +31,6 @@ import org.glite.wms.wmproxy.WMProxyLocator;
 import org.glite.wms.wmproxy.WMProxy_PortType;
 import org.globus.axis.gsi.GSIConstants;
 import org.globus.axis.transport.HTTPSSender;
-import org.globus.gsi.GlobusCredential;
-import org.globus.gsi.TrustedCertificates;
 import org.globus.gsi.bc.BouncyCastleCertProcessingFactory;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.gsi.gssapi.auth.NoAuthorization;
@@ -64,6 +62,8 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.globus.gsi.TrustedCertificates;
+import org.globus.gsi.X509Credential;
 
 
 /*
@@ -292,7 +292,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                     String certReq = delegationServiceStub.getProxyReq(delegationId);
 
                     //create proxy from certificate request
-                    GlobusCredential globusCred = ((GlobusGSSCredentialImpl) m_credential).getGlobusCredential();
+                    X509Credential globusCred = ((GlobusGSSCredentialImpl) m_credential).getX509Credential();
 
                     X509Certificate[] userCerts = globusCred.getCertificateChain();
                     PrivateKey key = globusCred.getPrivateKey();
@@ -303,7 +303,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                     // We must detect the user proxy type and then generate the new one accordingly.
                     X509Certificate certificate = factory.createCertificate(new ByteArrayInputStream(GrDPX509Util.readPEM(
                             new ByteArrayInputStream(certReq.getBytes()), GrDPConstants.CRH,
-                            GrDPConstants.CRF)), userCerts[0], key, 12 * 3600, GSIConstants.GSI_2_PROXY); //12 hours proxy
+                            GrDPConstants.CRF)), userCerts[0], key, 12 * 3600, GSIConstants.CertificateType.GSI_2_PROXY); //12 hours proxy
 
                     X509Certificate[] finalCerts = new X509Certificate[userCerts.length + 1];
                     finalCerts[0] = certificate;
@@ -331,7 +331,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                     throw new NoSuccessException(createExceptionMessage(exc));
                 } catch (java.rmi.RemoteException exc) {
                     disconnect();
-                    throw new NoSuccessException(exc.getMessage());
+                    throw new NoSuccessException(exc);
                 } catch (Exception exc) {
                     disconnect();
                     throw new NoSuccessException(exc.getMessage());

@@ -14,6 +14,8 @@ import org.ogf.saga.error.*;
 
 import java.text.ParseException;
 import java.util.Map;
+import org.globus.gsi.util.CertificateUtil;
+import org.globus.gsi.util.ProxyCertificateUtil;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -66,33 +68,33 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
         switch(oid) {
             case OID_OLD:
                 proxyType = (limited) ?
-                        GSIConstants.GSI_2_LIMITED_PROXY :
-                        GSIConstants.GSI_2_PROXY;
+                        GSIConstants.CertificateType.GSI_2_LIMITED_PROXY :
+                        GSIConstants.CertificateType.GSI_2_PROXY;
                 break;
             case OID_GLOBUS:
                 proxyType = (limited) ?
-                        GSIConstants.GSI_3_LIMITED_PROXY :
-                        GSIConstants.GSI_3_IMPERSONATION_PROXY;
+                        GSIConstants.CertificateType.GSI_3_LIMITED_PROXY :
+                        GSIConstants.CertificateType.GSI_3_IMPERSONATION_PROXY;
                 break;
             case OID_RFC820:
                 proxyType = (limited) ?
-                        GSIConstants.GSI_4_LIMITED_PROXY :
-                        GSIConstants.GSI_4_IMPERSONATION_PROXY;
+                        GSIConstants.CertificateType.GSI_4_LIMITED_PROXY :
+                        GSIConstants.CertificateType.GSI_4_IMPERSONATION_PROXY;
                 break;
         }
     }
 
     public GSSCredential createProxy() throws IncorrectStateException, NoSuccessException {
-        CertUtil.init();
+        CertificateUtil.init();
 
         ProxyCertInfo proxyCertInfo = null;
-        if ((CertUtil.isGsi3Proxy(proxyType)) || (CertUtil.isGsi4Proxy(proxyType))) {
+        if ((ProxyCertificateUtil.isGsi3Proxy(proxyType)) || (ProxyCertificateUtil.isGsi4Proxy(proxyType))) {
             ProxyPolicy policy;
-            if (CertUtil.isLimitedProxy(proxyType)) {
+            if (ProxyCertificateUtil.isLimitedProxy(proxyType)) {
                 policy = new ProxyPolicy(ProxyPolicy.LIMITED);
-            } else if (CertUtil.isIndependentProxy(proxyType)) {
+            } else if (ProxyCertificateUtil.isIndependentProxy(proxyType)) {
                 policy = new ProxyPolicy(ProxyPolicy.INDEPENDENT);
-            } else if (CertUtil.isImpersonationProxy(proxyType)) {
+            } else if (ProxyCertificateUtil.isImpersonationProxy(proxyType)) {
                 policy = new ProxyPolicy(ProxyPolicy.IMPERSONATION);
             } else {
                 throw new IllegalArgumentException("Invalid proxyType");
@@ -116,13 +118,9 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
         }
         try {
 			proxy.verify();
-		} catch (GlobusCredentialException e) {
-            switch(e.getErrorCode()) {
-                case GlobusCredentialException.EXPIRED:
-                    throw new IncorrectStateException("Your certificate is expired", e);
-                default:
-                    throw new NoSuccessException("Proxy verification failed", e);
-            }
+		} catch (CredentialException e) {
+                    if(proxy.getTimeLeft() < 0)  throw new IncorrectStateException("Your certificate is expired", e);
+                    else throw new NoSuccessException("Proxy verification failed", e);
 		}
         try {
             return new GlobusGSSCredentialImpl(proxy, GSSCredential.INITIATE_ONLY);

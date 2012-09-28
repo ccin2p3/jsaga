@@ -39,15 +39,15 @@
             <version>0.9.15-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
-        <dependency><!-- for saving credential (class DelegationStub) -->
-            <groupId>org.globus</groupId>
-            <artifactId>cog-jglobus</artifactId>
-            <version>1.8</version>
-        </dependency>
         <dependency>
             <groupId>org.glite</groupId>
             <artifactId>glite-ce-cream-api-java</artifactId>
             <version>1.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jglobus</groupId>
+            <artifactId>gridftp</artifactId>
+            <version>2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.glite</groupId>

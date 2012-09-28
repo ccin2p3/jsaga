@@ -17,6 +17,8 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Enumeration;
+import org.globus.gsi.util.CertificateUtil;
+import org.globus.gsi.util.ProxyCertificateUtil;
 
 
 /* ***************************************************
@@ -146,7 +148,7 @@ public abstract class GlobusProxyFactoryAbstract extends ProxyInit {
             X509ExtensionSet extSet = null;
             if (proxyCertInfo != null) {
                 extSet = new X509ExtensionSet();
-                if (CertUtil.isGsi4Proxy(proxyType)) {
+                if (ProxyCertificateUtil.isGsi4Proxy(proxyType)) {
                     // RFC compliant OID
                     extSet.add(new ProxyCertInfoExtension(proxyCertInfo));
                 } else {

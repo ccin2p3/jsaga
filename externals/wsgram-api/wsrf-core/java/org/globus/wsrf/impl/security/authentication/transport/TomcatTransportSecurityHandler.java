@@ -24,7 +24,7 @@ import org.apache.axis.transport.http.HTTPConstants;
 import org.ietf.jgss.GSSContext;
 
 import org.globus.axis.gsi.GSIConstants;
-import org.globus.gsi.jaas.GlobusPrincipal;
+import org.globus.gsi.gssapi.jaas.GlobusPrincipal;
 import org.globus.wsrf.impl.security.authentication.Constants;
 
 public class TomcatTransportSecurityHandler extends BasicHandler

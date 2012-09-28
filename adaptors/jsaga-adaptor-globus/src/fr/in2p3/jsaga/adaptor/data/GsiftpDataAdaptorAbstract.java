@@ -319,7 +319,6 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
     	Logger.getLogger(GsiftpDataAdaptorAbstract.class).info(client.getWelcome());
 
         try {
-            
     		// TODO: alternative service name
     		// Authorization authorization = new org.globus.wsrf.impl.security.authorization.HostAuthorization("/DC=IN/DC=GARUDAINDIA/O=C-DAC/OU=CTSF/CN=xn03.ctsf.cdacb.in");
             client.setAuthorization(HostAuthorization.getInstance());
@@ -343,7 +342,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         } catch (ChainedIOException e) {
             disconnectClient(client);
             try {
-                throw e.getException();
+                throw e.getCause();
             } catch (GlobusGSSException gssException) {
                 throw new AuthenticationFailedException(gssException);
             } catch (Throwable throwable) {
@@ -375,7 +374,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
                 default:
                     throw new NoSuccessException(e);
             }
-        }
+        } 
     }
     
     private static void disconnectClient(GsiftpClient client) {

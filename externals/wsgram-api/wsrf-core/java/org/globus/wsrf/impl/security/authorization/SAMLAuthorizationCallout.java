@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
 import javax.xml.rpc.ServiceException;
@@ -55,7 +57,7 @@ import org.w3c.dom.NodeList;
 import org.globus.axis.gsi.GSIConstants;
 import org.globus.gsi.CertUtil;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
-import org.globus.gsi.jaas.JaasGssUtil;
+import org.globus.gsi.gssapi.JaasGssUtil;
 import org.globus.util.I18n;
 import org.globus.wsrf.impl.security.SecurityMessageElement;
 import org.globus.wsrf.impl.security.authentication.Constants;
@@ -72,6 +74,8 @@ import org.globus.wsrf.security.authorization.PDP;
 import org.globus.wsrf.security.authorization.PDPConfig;
 import org.globus.wsrf.security.authorization.SAMLRequestPortType;
 import org.globus.wsrf.utils.ContextUtils;
+import org.ietf.jgss.GSSException;
+import org.opensaml.SAMLAuthorizationDecisionQuery;
 import protocol._0._1.SAML.tc.names.oasis.Request;
 import protocol._0._1.SAML.tc.names.oasis.Response;
 
@@ -373,7 +377,7 @@ public class SAMLAuthorizationCallout implements PDP {
             throw new AuthorizationException(err, exp);
         }
 
-        ExtendedAuthorizationDecisionQuery extendedQuery = null;
+        SAMLAuthorizationDecisionQuery extendedQuery = null;
         try {
             QName signQName = new QName(null, "SAMLResponse");
             extendedQuery =
@@ -423,12 +427,16 @@ public class SAMLAuthorizationCallout implements PDP {
             Vector certs = getCertificates(credential);
 
             try {
-                request.sign(XMLSignature.ALGO_ID_SIGNATURE_RSA,
-                             credential.getPrivateKey(), certs, false);
+                    request.sign(XMLSignature.ALGO_ID_SIGNATURE_RSA,
+                                 credential.getPrivateKey(), certs, false);
+
             } catch (SAMLException exp) {
                 String err = i18n.getMessage("samlSign");
                 logger.debug(err, exp);
                 throw new AuthorizationException(err, exp);
+            } catch (GSSException e) {                
+                logger.debug(e);
+                throw new AuthorizationException("Error when getting private key.",e);                
             }
         }
 

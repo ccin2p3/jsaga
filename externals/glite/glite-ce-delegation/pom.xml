@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>fr.in2p3.jsaga</groupId>
+        <artifactId>glite</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.glite</groupId>
+    <artifactId>glite-ce-delegation</artifactId>
+    <version>2.0.0</version>
+    <name>CREAM CE Delegation</name>
+    <description>Java API for delegating credentials to gLite Computing Element.</description>
+    <url>http://grid.pd.infn.it/cream/</url>
+    <organization>
+        <name>INFN</name>
+        <url>http://www.infn.it/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+    <!-- dependencies: see glite-ce-cream-api-java -->
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>axistools-maven-plugin</artifactId>
+                <version>1.4</version>
+                <configuration>
+                    <!-- The plugin navigates your source src/main/** tree and finds your WSDLs for you; just name them individually in a <wsdlFiles/> element. -->
+                    <wsdlFiles>
+                        <wsdlFiles>www.gridsite.org-delegation-2.0.0.wsdl</wsdlFiles>
+                    </wsdlFiles>
+                    <!-- This is optional, but lets you explicitly namespace the generated code. -->
+                    <packageSpace>org.glite.security.delegation</packageSpace>
+                </configuration>
+                <dependencies>
+                    <!-- Required for attachment support; you can remove these dependencies if attachment support is not needed. Note that if you do want it, you have to specify the dependencies both here in the plugin and also in the POM dependencies. -->
+                    <dependency>
+                        <groupId>javax.mail</groupId>
+                        <artifactId>mail</artifactId>
+                        <version>1.4.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.activation</groupId>
+                        <artifactId>activation</artifactId>
+                        <version>1.1</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4-patched</version>
+        </dependency>
+    </dependencies>
+
+</project>

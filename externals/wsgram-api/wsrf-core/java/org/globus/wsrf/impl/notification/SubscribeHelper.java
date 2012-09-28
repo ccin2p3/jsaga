@@ -24,6 +24,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.axis.message.addressing.EndpointReferenceType;
+import org.globus.gsi.gridmap.GridMap;
+import org.globus.gsi.gssapi.jaas.JaasSubject;
 
 import org.oasis.wsn.InvalidTopicExpressionFaultType;
 import org.oasis.wsn.SubscribeCreationFailedFaultType;
@@ -33,8 +35,6 @@ import org.oasis.wsn.Subscribe;
 
 import org.ietf.jgss.GSSCredential;
 
-import org.globus.gsi.jaas.JaasSubject;
-import org.globus.security.gridmap.GridMap;
 import org.globus.util.I18n;
 import org.globus.wsrf.Constants;
 import org.globus.wsrf.PersistenceCallback;

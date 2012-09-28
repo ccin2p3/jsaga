@@ -37,6 +37,7 @@ import org.ietf.jgss.GSSCredential;
 import org.w3c.dom.Document;
 
 import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.X509Credential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.util.I18n;
 import org.globus.wsrf.impl.security.authentication.Constants;
@@ -79,8 +80,8 @@ public class X509WSSignedSOAPEnvelopeBuilder
     private GSSCredential getCredential() throws Exception {
 
         if (this.credential == null) {
-            GlobusCredential defaultCredential =
-                GlobusCredential.getDefaultCredential();
+            X509Credential defaultCredential =
+                X509Credential.getDefaultCredential();
             if (defaultCredential != null) {
                 return new GlobusGSSCredentialImpl(defaultCredential,
                                                    GSSCredential

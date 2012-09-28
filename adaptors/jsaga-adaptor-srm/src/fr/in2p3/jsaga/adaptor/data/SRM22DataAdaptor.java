@@ -27,6 +27,7 @@ import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
+import org.globus.gsi.X509Credential;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -695,9 +696,9 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 		if(!userId.equals(id)){
 			throw new BadParameterException("The id is not the actual user");
 		}
-		GlobusCredential globusCred = null;
+		X509Credential globusCred = null;
 		if (m_credential instanceof GlobusGSSCredentialImpl) {
-			globusCred = ((GlobusGSSCredentialImpl)m_credential).getGlobusCredential();
+			globusCred = ((GlobusGSSCredentialImpl)m_credential).getX509Credential();
 		} else {
 			throw new BadParameterException("Not a globus proxy");
 		}

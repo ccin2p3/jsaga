@@ -11,7 +11,6 @@
 package org.globus.wsrf.impl.security.authorization;
 
 import org.globus.wsrf.impl.security.util.AuthUtil;
-import org.globus.gsi.jaas.GlobusPrincipal;
 
 import org.gridforum.jgss.ExtendedGSSManager;
 
@@ -29,6 +28,7 @@ import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
 
 import java.util.Set;
+import org.globus.gsi.gssapi.jaas.GlobusPrincipal;
 
 import org.w3c.dom.Node;
 
