@@ -3,6 +3,8 @@ package fr.in2p3.jsaga.adaptor.job.local;
 import java.io.*;
 import java.util.Date;
 import org.ogf.saga.error.NoSuccessException;
+
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
 /* ***************************************************
@@ -26,16 +28,21 @@ public class LocalJobProcess implements Serializable {
 	protected String m_errfile;
 	protected int m_returnCode;
 	protected Date m_created;
+	protected String m_jobDesc;
 	
 	protected static final String _rootDir = System.getProperty("java.io.tmpdir") + "/jsaga/adaptor/local";
+    public static final String STAGING_IN = "In";
+    public static final String STAGING_OUT = "Out";
+    
 	
 	public static final int PROCESS_DONE_OK = 0;
 	public static final int PROCESS_RUNNING = -1;
 	public static final int PROCESS_STOPPED = -2;
 	public static final int PROCESS_UNKNOWNSTATE = -99;
 
-	public LocalJobProcess(String jobId) {
+	public LocalJobProcess(String jobId, String jobDesc) {
 		m_jobId = jobId;
+		m_jobDesc = jobDesc;
 		m_outfile = getFile("out");
 		m_infile = getFile("in");
 		m_errfile = getFile("err");
@@ -60,7 +67,23 @@ public class LocalJobProcess implements Serializable {
     public String getJobId() {
     	return m_jobId;
     }
+    public String getJobDesc() {
+    	return m_jobDesc;
+    }
 
+	public static StagingTransfer[] getStaging(String nativeJobDescription, String InOrOut) {
+		// TODO: extract data staging from desc
+		return null;
+	}
+	
+    public StagingTransfer[] getInputStaging() {
+    	return getStaging(m_jobDesc, STAGING_IN);
+    }
+    
+    public StagingTransfer[] getoutputStaging() {
+    	return getStaging(m_jobDesc, STAGING_OUT);
+    }
+    
     public String getPid() throws NoSuccessException {
 		if (m_pid != null) return m_pid;
     	File f = new File(getPidfile());

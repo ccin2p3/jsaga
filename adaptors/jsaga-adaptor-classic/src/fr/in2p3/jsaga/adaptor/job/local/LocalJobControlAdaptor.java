@@ -11,6 +11,8 @@ import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
@@ -35,7 +37,7 @@ import java.util.Properties;
  * TODO : Support of pre-requisite
  */
 public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
-        JobControlAdaptor, CleanableJobAdaptor, StreamableJobBatch, SignalableJobAdaptor, SuspendableJobAdaptor  {
+        JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorOnePhase, StreamableJobBatch, SignalableJobAdaptor, SuspendableJobAdaptor  {
 
 	private static Logger s_logger = Logger.getLogger(LocalJobControlAdaptor.class);
 	
@@ -74,7 +76,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
     }
 
     private LocalJobProcess submit(String jobDesc, String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-    	LocalJobProcess ljp = new LocalJobProcess(uniqId);
+    	LocalJobProcess ljp = new LocalJobProcess(uniqId, jobDesc);
 		try {
             File input = new File(ljp.getInfile());
 			try {
@@ -219,6 +221,43 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 		return this.signal(nativeJobId, LocalJobControlAdaptor.SIGNAL_CONT);
 	}
 
+	public String getStagingDirectory(String nativeJobDescription, String uniqId)
+			throws PermissionDeniedException, TimeoutException, NoSuccessException {
+		return getStagingDirectory(uniqId);
+	}
+
+	public String getStagingDirectory(String nativeJobId)
+			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
+		return LocalJobProcess.getRootDir() + "/" + nativeJobId;
+	}
+
+	public StagingTransfer[] getInputStagingTransfer(
+			String nativeJobDescription, String uniqId)
+			throws PermissionDeniedException, TimeoutException,
+			NoSuccessException {
+		return LocalJobProcess.getStaging(nativeJobDescription, LocalJobProcess.STAGING_IN);
+	}
+
+	public StagingTransfer[] getInputStagingTransfer(String nativeJobId)
+			throws PermissionDeniedException, TimeoutException,
+			NoSuccessException {
+		try {
+			LocalJobProcess ljp = LocalAdaptorAbstract.restore(nativeJobId);
+			return ljp.getInputStaging();
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		} catch (ClassNotFoundException e) {
+			throw new NoSuccessException(e);
+		}
+	}
+
+	public StagingTransfer[] getOutputStagingTransfer(String nativeJobId)
+			throws PermissionDeniedException, TimeoutException,
+			NoSuccessException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	private int killProcess(int pid, int signum) throws IOException, InterruptedException {
 		String cde = "kill -" + String.valueOf(signum) + " " + String.valueOf(pid);
 		Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde});
@@ -230,4 +269,5 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 		}
 		return ret;
 	}
+
 }
