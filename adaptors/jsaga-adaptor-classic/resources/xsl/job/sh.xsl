@@ -28,26 +28,62 @@
 _WorkingDirectory=<xsl:value-of select="."/><xsl:text>
 </xsl:text>
 		</xsl:for-each>
-_Executable=eval &apos;<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/><xsl:text/>
+_Interactive=
+                 <xsl:if test="jsdl:DataStaging">
+_DataStaging=<xsl:for-each select="jsdl:DataStaging">
+                        <xsl:if test="jsdl:Source">
+                                <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>
+                                <xsl:text>&gt;</xsl:text>
+                                <xsl:value-of select="jsdl:FileName/text()"/>
+                        </xsl:if>
+                        <xsl:if test="jsdl:Target">
+                            <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>
+                                <xsl:text>&lt;</xsl:text>
+                                <xsl:value-of select="jsdl:FileName/text()"/>
+                        </xsl:if>
+                        <xsl:text>,</xsl:text>
+                </xsl:for-each>
+                </xsl:if>
+
+
+_Executable=cd <xsl:value-of select="$RootDir"/><xsl:text>;</xsl:text>
+		<!-- For BASH -->
+		<xsl:text>export PATH=.:$PATH</xsl:text><xsl:text> 2&gt;/dev/null; </xsl:text>
+		<!-- For CSH -->
+		<xsl:text>setenv PATH .:$PATH</xsl:text><xsl:text> 2&gt;/dev/null; </xsl:text>
+		<!-- Make it executable -->
+		<xsl:text>chmod u+x </xsl:text><xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/><xsl:text> 2&gt;/dev/null; </xsl:text>
+		<!-- Run the program -->
+		<xsl:text>eval &apos;</xsl:text><xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/><xsl:text/>
         <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
              <xsl:text> </xsl:text><xsl:value-of select="."/><xsl:text/>
         </xsl:for-each>
+        
         <!-- needed when job attribute FileTransfer is not set -->
-		<!-- <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Output/text()">
+		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Input/text()">
+            <xsl:text> &lt;</xsl:text><xsl:value-of select="."/><xsl:text/>
+		</xsl:for-each>
+		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Output/text()">
             <xsl:text> &gt;</xsl:text><xsl:value-of select="."/><xsl:text/>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Error/text()">
             <xsl:text> 2&gt;</xsl:text><xsl:value-of select="."/><xsl:text/>
-		</xsl:for-each>-->
-		<xsl:text> &lt;</xsl:text><xsl:value-of select="$RootDir"/><xsl:text>/</xsl:text><xsl:value-of select="$UniqId"/><xsl:text>.in</xsl:text>
+		</xsl:for-each>
+<!-- 		<xsl:text> &lt;</xsl:text><xsl:value-of select="$RootDir"/><xsl:text>/</xsl:text><xsl:value-of select="$UniqId"/><xsl:text>.in</xsl:text>
 		<xsl:text> &gt;</xsl:text><xsl:value-of select="$RootDir"/><xsl:text>/</xsl:text><xsl:value-of select="$UniqId"/><xsl:text>.out</xsl:text>
 		<xsl:text> 2&gt;</xsl:text><xsl:value-of select="$RootDir"/><xsl:text>/</xsl:text><xsl:value-of select="$UniqId"/><xsl:text>.err</xsl:text>
-		<xsl:text> &amp; &apos;; </xsl:text>
+ -->		<xsl:text> &amp; &apos;; </xsl:text>
+ 		<!-- Get the PID -->
 		<xsl:text>MYPID=$!;</xsl:text>
+		<!-- Store the PID -->
 		<xsl:text>echo $MYPID &gt; </xsl:text><xsl:value-of select="$RootDir"/><xsl:text>/</xsl:text><xsl:value-of select="$UniqId"/><xsl:text>.pid ;</xsl:text>
+		<!-- Wait until process has finished -->
 		<xsl:text>wait $MYPID; </xsl:text>
+		<!-- Get return code -->
 		<xsl:text>errcode=$?; </xsl:text>
+		<!-- Store return code -->
 		<xsl:text>echo $errcode &gt; </xsl:text><xsl:value-of select="$RootDir"/><xsl:text>/</xsl:text><xsl:value-of select="$UniqId"/><xsl:text>.endcode ;</xsl:text>
+		<!-- exit -->
 		<xsl:text>exit $errcode; </xsl:text>
 	</xsl:template>
 </xsl:stylesheet>

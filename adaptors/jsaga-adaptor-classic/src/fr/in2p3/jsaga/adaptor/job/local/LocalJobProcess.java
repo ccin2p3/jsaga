@@ -1,7 +1,12 @@
 package fr.in2p3.jsaga.adaptor.job.local;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Properties;
+
 import org.ogf.saga.error.NoSuccessException;
 
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
@@ -71,16 +76,43 @@ public class LocalJobProcess implements Serializable {
     	return m_jobDesc;
     }
 
-	public static StagingTransfer[] getStaging(String nativeJobDescription, String InOrOut) {
-		// TODO: extract data staging from desc
-		return null;
+	public static StagingTransfer[] getStaging(String nativeJobDescription, String InOrOut) throws NoSuccessException {
+        try {
+        	StagingTransfer[] st = new StagingTransfer[]{};
+        	Properties jobProps = new Properties();
+        	jobProps.load(new ByteArrayInputStream(nativeJobDescription.getBytes()));
+        	Enumeration e = jobProps.propertyNames();
+//        	Hashtable _envParams = new Hashtable();
+        	ArrayList transfersArrayList = new ArrayList();
+	        while (e.hasMoreElements()){
+	           String key = (String)e.nextElement();
+	           String val = (String)jobProps.getProperty(key);
+	           if (key.equals("_DataStaging")) {
+	        	   String[] transfers = val.substring(0, val.length()-1).split(",");
+//	        	   StagingTransfer[] st = new StagingTransfer[transfers.length];
+	        	   for (int i=0; i<transfers.length; i++) {
+	        		   String[] fromTo = transfers[i].split("[<>]");
+	        		   if (transfers[i].contains(">") && InOrOut.equals(STAGING_IN)) {
+	        			   transfersArrayList.add(new StagingTransfer(fromTo[0], toURL(fromTo[1]), false));
+//	        			  st[i] = new StagingTransfer(fromTo[0], fromTo[1], false);
+	        		   } else if (transfers[i].contains("<") && InOrOut.equals(STAGING_OUT)) {
+	        			   transfersArrayList.add(new StagingTransfer(toURL(fromTo[1]), fromTo[0], false));
+	        		   }
+	        	   }
+	        	   return (StagingTransfer[]) transfersArrayList.toArray(st);
+	           }
+	        }
+	        return st;
+        } catch (IOException e) {
+            throw new NoSuccessException(e);
+        }
 	}
 	
-    public StagingTransfer[] getInputStaging() {
+    public StagingTransfer[] getInputStaging() throws NoSuccessException {
     	return getStaging(m_jobDesc, STAGING_IN);
     }
     
-    public StagingTransfer[] getoutputStaging() {
+    public StagingTransfer[] getOutputStaging() throws NoSuccessException {
     	return getStaging(m_jobDesc, STAGING_OUT);
     }
     
@@ -238,5 +270,11 @@ public class LocalJobProcess implements Serializable {
 		}
 	}
 	
-
+	private static String toURL(String filename) {
+		if (filename.startsWith("file:")) {
+			return filename;
+		} else {
+			return "file://" + getRootDir() + "/" + filename;
+		}
+	}
 }
