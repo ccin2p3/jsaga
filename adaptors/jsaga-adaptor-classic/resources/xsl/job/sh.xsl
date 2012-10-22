@@ -28,7 +28,6 @@
 _WorkingDirectory=<xsl:value-of select="."/><xsl:text>
 </xsl:text>
 		</xsl:for-each>
-_Interactive=
                  <xsl:if test="jsdl:DataStaging">
 _DataStaging=<xsl:for-each select="jsdl:DataStaging">
                         <xsl:if test="jsdl:Source">

@@ -9,9 +9,6 @@ import fr.in2p3.jsaga.adaptor.job.control.advanced.SignalableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.SuspendableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
-import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -144,19 +141,9 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 		return this.signal(nativeJobId, LocalJobControlAdaptor.SIGNAL_CONT);
 	}
 
-	public String getStagingDirectory(String nativeJobDescription, String uniqId)
-			throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		return getStagingDirectory(uniqId);
-	}
-
 	public String getStagingDirectory(String nativeJobId)
 			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
 		return "file://" + LocalJobProcess.getRootDir(); // + "/" + nativeJobId;
-	}
-
-	public StagingTransfer[] getInputStagingTransfer(String nativeJobDescription, String uniqId)
-			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
-		return LocalJobProcess.getStaging(nativeJobDescription, LocalJobProcess.STAGING_IN);
 	}
 
 	public StagingTransfer[] getInputStagingTransfer(String nativeJobId)
