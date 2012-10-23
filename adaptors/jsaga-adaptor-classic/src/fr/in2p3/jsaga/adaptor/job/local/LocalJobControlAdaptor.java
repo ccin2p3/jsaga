@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.job.local;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.SignalableJobAdaptor;
@@ -73,8 +74,10 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
         return translator;
     }
 
-    private LocalJobProcess submit(String jobDesc, String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    private LocalJobProcess submit(String jobDesc, String uniqId, InputStream stdin) 
+    		throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	LocalJobProcess ljp = new LocalJobProcess(uniqId, jobDesc);
+    	ljp.checkResources();
 		try {
             ljp.setCreated(new Date());
 			LocalAdaptorAbstract.store(ljp);
@@ -86,7 +89,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
     }
 
     public String submit(String commandLine, boolean checkMatch, String uniqId)
-			throws PermissionDeniedException, TimeoutException, NoSuccessException {
+			throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	return this.submit(commandLine, uniqId, null).getJobId();
     	
 	}
@@ -244,5 +247,5 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 			throw new NoSuccessException(e1);
 		}
 	}
-
+	
 }

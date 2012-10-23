@@ -4,10 +4,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 
 import org.ogf.saga.error.NoSuccessException;
 
+import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
@@ -75,32 +77,39 @@ public class LocalJobProcess implements Serializable {
     	return m_jobDesc;
     }
 
-	public StagingTransfer[] getStaging(String InOrOut) throws NoSuccessException {
+    private String getValue(String searchedKey) throws IOException, NoSuchElementException {
+    	Properties jobProps = new Properties();
+    	jobProps.load(new ByteArrayInputStream(m_jobDesc.getBytes()));
+    	Enumeration e = jobProps.propertyNames();
+        while (e.hasMoreElements()){
+           String key = (String)e.nextElement();
+           String val = (String)jobProps.getProperty(key);
+           if (key.equals(searchedKey)) {
+        	   return val;
+           }
+        }
+        throw new NoSuchElementException();
+    }
+
+    public StagingTransfer[] getStaging(String InOrOut) throws NoSuccessException {
+    	StagingTransfer[] st = new StagingTransfer[]{};
         try {
-        	StagingTransfer[] st = new StagingTransfer[]{};
-        	Properties jobProps = new Properties();
-        	jobProps.load(new ByteArrayInputStream(m_jobDesc.getBytes()));
-        	Enumeration e = jobProps.propertyNames();
         	ArrayList transfersArrayList = new ArrayList();
-	        while (e.hasMoreElements()){
-	           String key = (String)e.nextElement();
-	           String val = (String)jobProps.getProperty(key);
-	           if (key.equals("_DataStaging")) {
-	        	   String[] transfers = val.substring(0, val.length()-1).split(",");
-	        	   for (int i=0; i<transfers.length; i++) {
-	        		   String[] fromTo = transfers[i].split("[<>]");
-	        		   if (transfers[i].contains(">") && InOrOut.equals(STAGING_IN)) {
-	        			   transfersArrayList.add(new StagingTransfer(fromTo[0], toURL(fromTo[1]), false));
-	        		   } else if (transfers[i].contains("<") && InOrOut.equals(STAGING_OUT)) {
-	        			   transfersArrayList.add(new StagingTransfer(toURL(fromTo[1]), fromTo[0], false));
-	        		   }
-	        	   }
-	        	   return (StagingTransfer[]) transfersArrayList.toArray(st);
-	           }
-	        }
-	        return st;
+        	String valDS = getValue("_DataStaging");
+        	String [] transfers = valDS.substring(0, valDS.length()-1).split(",");
+     	   	for (int i=0; i<transfers.length; i++) {
+     	   		String[] fromTo = transfers[i].split("[<>]");
+     	   		if (transfers[i].contains(">") && InOrOut.equals(STAGING_IN)) {
+     	   			transfersArrayList.add(new StagingTransfer(fromTo[0], toURL(fromTo[1]), false));
+     	   		} else if (transfers[i].contains("<") && InOrOut.equals(STAGING_OUT)) {
+     	   			transfersArrayList.add(new StagingTransfer(toURL(fromTo[1]), fromTo[0], false));
+     	   		}
+     	   	}
+     	   	return (StagingTransfer[]) transfersArrayList.toArray(st);
         } catch (IOException e) {
             throw new NoSuccessException(e);
+        } catch (NoSuchElementException e) {
+	        return st;
         }
 	}
 	
@@ -266,6 +275,20 @@ public class LocalJobProcess implements Serializable {
 		}
 	}
 	
+	public void checkResources() throws BadResource, NoSuccessException {
+    	// TODO: check if working directory exists and is accessible
+		try {
+			File wd = new File(getValue("_WorkingDirectory"));
+			if (!wd.exists() || !wd.isDirectory()) {
+				throw new BadResource("Directory does not exist:");
+			}
+		} catch (NoSuchElementException e) {
+			// ignore
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		}
+	}
+
 	protected String toURL(String filename) {
 		if (filename.startsWith("file:")) {
 			return filename;
