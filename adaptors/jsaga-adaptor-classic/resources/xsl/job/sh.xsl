@@ -11,7 +11,14 @@
 	<xsl:param name="RootDir"></xsl:param>
 	
 	<xsl:variable name="WorkingDir">
-		    <xsl:value-of select="$RootDir"/><xsl:text>/</xsl:text><xsl:value-of select="$UniqId"/>
+		<xsl:choose>
+			<xsl:when test="//jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory">
+		    	<xsl:value-of select="//jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$RootDir"/><xsl:text>/</xsl:text><xsl:value-of select="$UniqId"/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:variable>
 	
     <!-- entry point (MUST BE RELATIVE) -->
@@ -24,13 +31,12 @@
 <xsl:value-of select="@name"/>=<xsl:value-of select="text()"/><xsl:text>
 </xsl:text>
         </xsl:for-each>
-		<xsl:if test="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()">
-_WorkingDirectory=<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()"/><xsl:text>
+
+		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()">
+_WorkingDirectory=<xsl:value-of select="."/><xsl:text>
 </xsl:text>
-	<xsl:variable name="WorkingDir">
-		    <xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()"/>
-	</xsl:variable>
-		</xsl:if>
+		</xsl:for-each>
+
                  <xsl:if test="jsdl:DataStaging">
 _DataStaging=<xsl:for-each select="jsdl:DataStaging">
                         <xsl:if test="jsdl:Source">
