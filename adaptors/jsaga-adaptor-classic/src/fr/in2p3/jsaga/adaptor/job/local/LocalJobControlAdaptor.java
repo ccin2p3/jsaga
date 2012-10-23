@@ -78,14 +78,13 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
     		throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	LocalJobProcess ljp = new LocalJobProcess(uniqId, jobDesc);
     	ljp.checkResources();
+        ljp.setCreated(new Date());
 		try {
-            ljp.setCreated(new Date());
 			LocalAdaptorAbstract.store(ljp);
-			return ljp;
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
-    	
+		return ljp;
     }
 
     public String submit(String commandLine, boolean checkMatch, String uniqId)
