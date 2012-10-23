@@ -29,9 +29,9 @@ public class LocalJobProcess implements Serializable {
 	private static final long serialVersionUID = 442420832799282097L;
 	protected String m_pid;
 	protected String m_jobId;
-	protected String m_outfile;
-	protected String m_infile;
-	protected String m_errfile;
+//	protected String m_outfile;
+//	protected String m_infile;
+//	protected String m_errfile;
 	protected int m_returnCode;
 	protected Date m_created;
 	protected String m_jobDesc;
@@ -49,9 +49,9 @@ public class LocalJobProcess implements Serializable {
 	public LocalJobProcess(String jobId, String jobDesc) {
 		m_jobId = jobId;
 		m_jobDesc = jobDesc;
-		m_outfile = getFile("out");
-		m_infile = getFile("in");
-		m_errfile = getFile("err");
+//		m_outfile = getFile("out");
+//		m_infile = getFile("in");
+//		m_errfile = getFile("err");
 		m_returnCode = -1;
 		m_pid = null;
 	}
@@ -128,17 +128,17 @@ public class LocalJobProcess implements Serializable {
 		return m_pid;
 	}
 
-	public String getInfile() {
-		return m_infile;
-	}
-
-	public String getOutfile() {
-		return m_outfile;
-	}
-
-	public String getErrfile() {
-		return m_errfile;
-	}
+//	public String getInfile() {
+//		return m_infile;
+//	}
+//
+//	public String getOutfile() {
+//		return m_outfile;
+//	}
+//
+//	public String getErrfile() {
+//		return m_errfile;
+//	}
 	public void setReturnCode(int returnCode) {
 		this.m_returnCode = returnCode;
 	}
@@ -214,21 +214,21 @@ public class LocalJobProcess implements Serializable {
     }
     
     public void clean() {
-    	try {
-    		new File(getInfile()).delete();
-    	} catch (Exception e) {
-    		// ignore
-    	}
-    	try {
-    		new File(getOutfile()).delete();
-    	} catch (Exception e) {
-    		// ignore
-    	}
-    	try {
-    		new File(getErrfile()).delete();
-    	} catch (Exception e) {
-    		// ignore
-    	}
+//    	try {
+//    		new File(getInfile()).delete();
+//    	} catch (Exception e) {
+//    		// ignore
+//    	}
+//    	try {
+//    		new File(getOutfile()).delete();
+//    	} catch (Exception e) {
+//    		// ignore
+//    	}
+//    	try {
+//    		new File(getErrfile()).delete();
+//    	} catch (Exception e) {
+//    		// ignore
+//    	}
     	try {
     		new File(getPidfile()).delete();
     	} catch (Exception e) {

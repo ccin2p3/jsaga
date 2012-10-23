@@ -220,28 +220,28 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 			// If the process has finished with code 255, simulate the IOException
 			Thread.sleep(100);
 			if (p.exitValue() == 255) {
-				throw new IOException("Abnormal termintation");
+				throw new IOException("Abnormal termination");
 			}
 		} catch (IllegalThreadStateException itse) {
 			// ignore: the process is not finished
 		} catch (IOException ioe) {
 			ljp.setReturnCode(2);
 			
-			FileOutputStream error;
-			try {
-				error = new FileOutputStream(new File(ljp.getErrfile()));
-				error.write(ioe.getMessage().getBytes());
-		        error.close();
-			} catch (FileNotFoundException e1) {
-                s_logger.warn("Could not write stderr: ", e1);
-			} catch (IOException e1) {
-                s_logger.warn("Could not write stderr: ", e1);
-			}
+//			FileOutputStream error;
 //			try {
-//				LocalAdaptorAbstract.store(ljp);
-//			} catch (IOException e2) {
-//				throw new NoSuccessException(e2);
+//				error = new FileOutputStream(new File(ljp.getErrfile()));
+//				error.write(ioe.getMessage().getBytes());
+//		        error.close();
+//			} catch (FileNotFoundException e1) {
+//                s_logger.warn("Could not write stderr: ", e1);
+//			} catch (IOException e1) {
+//                s_logger.warn("Could not write stderr: ", e1);
 //			}
+			try {
+				LocalAdaptorAbstract.store(ljp);
+			} catch (IOException e2) {
+				throw new NoSuccessException(e2);
+			}
 		} catch (InterruptedException e1) {
 			throw new NoSuccessException(e1);
 		}
