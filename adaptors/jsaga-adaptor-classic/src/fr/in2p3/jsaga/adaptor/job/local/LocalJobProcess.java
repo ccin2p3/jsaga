@@ -77,20 +77,6 @@ public class LocalJobProcess implements Serializable {
     	return m_jobDesc;
     }
 
-    private String getValue(String searchedKey) throws IOException, NoSuchElementException {
-    	Properties jobProps = new Properties();
-    	jobProps.load(new ByteArrayInputStream(m_jobDesc.getBytes()));
-    	Enumeration e = jobProps.propertyNames();
-        while (e.hasMoreElements()){
-           String key = (String)e.nextElement();
-           String val = (String)jobProps.getProperty(key);
-           if (key.equals(searchedKey)) {
-        	   return val;
-           }
-        }
-        throw new NoSuchElementException();
-    }
-
     public StagingTransfer[] getStaging(String InOrOut) throws NoSuccessException {
     	StagingTransfer[] st = new StagingTransfer[]{};
         try {
@@ -288,6 +274,20 @@ public class LocalJobProcess implements Serializable {
 			throw new NoSuccessException(e);
 		}
 	}
+
+    protected String getValue(String searchedKey) throws IOException, NoSuchElementException {
+    	Properties jobProps = new Properties();
+    	jobProps.load(new ByteArrayInputStream(m_jobDesc.getBytes()));
+    	Enumeration e = jobProps.propertyNames();
+        while (e.hasMoreElements()){
+           String key = (String)e.nextElement();
+           String val = (String)jobProps.getProperty(key);
+           if (key.equals(searchedKey)) {
+        	   return val;
+           }
+        }
+        throw new NoSuchElementException();
+    }
 
 	protected String toURL(String filename) {
 		if (filename.startsWith("file:")) {
