@@ -23,6 +23,7 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -189,8 +190,10 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     }
 
     public SSHJobProcess restore(String nativeJobId) throws IOException, ClassNotFoundException, JSchException, SftpException, InterruptedException {
-		InputStream is = m_sftp.get(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".process");
-    	byte[] buf = new byte[1024];
+    	String processFile = SSHJobProcess.getRootDir() + "/" + nativeJobId + ".process";
+		SftpATTRS attrs = m_sftp.lstat(processFile);
+    	byte[] buf = new byte[(int)attrs.getSize()];
+		InputStream is = m_sftp.get(processFile);
     	int len = is.read(buf);
     	is.close();
 
