@@ -80,6 +80,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
     	ljp.checkResources();
         ljp.setCreated(new Date());
 		try {
+			ljp.createWorkingDirectory();
 			LocalAdaptorAbstract.store(ljp);
 		} catch (Exception e) {
 			throw new NoSuccessException(e);

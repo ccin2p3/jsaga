@@ -10,9 +10,9 @@
 	<xsl:param name="UniqId"></xsl:param>
 	<xsl:param name="RootDir"></xsl:param>
 	
-	<!-- <xsl:variable name="LocalJobDir">
-		    <xsl:value-of select="$RootDir"/><xsl:value-of select="$UniqId"/>
-	</xsl:variable>-->
+	<xsl:variable name="WorkingDir">
+		    <xsl:value-of select="$RootDir"/><xsl:text>/</xsl:text><xsl:value-of select="$UniqId"/>
+	</xsl:variable>
 	
     <!-- entry point (MUST BE RELATIVE) -->
 	 <xsl:template match="jsdl:JobDefinition">
@@ -24,10 +24,13 @@
 <xsl:value-of select="@name"/>=<xsl:value-of select="text()"/><xsl:text>
 </xsl:text>
         </xsl:for-each>
-		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()">
-_WorkingDirectory=<xsl:value-of select="."/><xsl:text>
+		<xsl:if test="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()">
+_WorkingDirectory=<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()"/><xsl:text>
 </xsl:text>
-		</xsl:for-each>
+	<xsl:variable name="WorkingDir">
+		    <xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()"/>
+	</xsl:variable>
+		</xsl:if>
                  <xsl:if test="jsdl:DataStaging">
 _DataStaging=<xsl:for-each select="jsdl:DataStaging">
                         <xsl:if test="jsdl:Source">
@@ -45,7 +48,7 @@ _DataStaging=<xsl:for-each select="jsdl:DataStaging">
                 </xsl:if>
 
 
-_Executable=cd <xsl:value-of select="$RootDir"/><xsl:text>;</xsl:text>
+_Executable=cd <xsl:value-of select="$WorkingDir"/><xsl:text>;</xsl:text>
 		<!-- For BASH -->
 		<xsl:text>export PATH=.:$PATH</xsl:text><xsl:text> 2&gt;/dev/null; </xsl:text>
 		<!-- For CSH -->

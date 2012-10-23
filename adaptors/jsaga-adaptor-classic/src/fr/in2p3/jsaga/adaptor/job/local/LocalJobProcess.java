@@ -67,6 +67,23 @@ public class LocalJobProcess implements Serializable {
     public static String getRootDir() {
     	return _rootDir;
     }
+    public String getWorkingDirectory() throws IOException {
+    	try {
+			return getValue("_WorkingDirectory");
+		} catch (NoSuchElementException e) {
+			return getRootDir() + "/" + m_jobId;
+		}
+    }
+    
+    // Create working directory only if not specified in job description
+	public void createWorkingDirectory() throws IOException {
+		try {
+			getValue("_WorkingDirectory");
+		} catch (NoSuchElementException e) {
+	    	new File(getRootDir() + "/" + m_jobId).mkdirs();
+		}
+	}
+    
     public String getFile(String suffix) {
     	return getRootDir() + "/" + m_jobId + "." + suffix;
     }
@@ -289,11 +306,16 @@ public class LocalJobProcess implements Serializable {
         throw new NoSuchElementException();
     }
 
-	protected String toURL(String filename) {
+	protected String toURL(String filename) throws NoSuccessException {
 		if (filename.startsWith("file:")) {
 			return filename;
 		} else {
-			return "file://" + getRootDir() + "/" + filename;
+			try {
+				return "file://" + getWorkingDirectory() + "/" + filename;
+			} catch (IOException e) {
+				throw new NoSuccessException(e);
+			}
 		}
 	}
+
 }
