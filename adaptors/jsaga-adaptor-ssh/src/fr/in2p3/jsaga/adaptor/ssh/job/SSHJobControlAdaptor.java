@@ -204,16 +204,12 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			Properties jobProps = new Properties();
 			SSHJobProcess sshjp = restore(nativeJobId);
 			jobProps.load(new ByteArrayInputStream(sshjp.getJobDesc().getBytes()));
-//			File _workDir = null;
 			String _exec = null;
 	        Enumeration e = jobProps.propertyNames();
 			Hashtable _envParams = new Hashtable();
 	        while (e.hasMoreElements()){
 	               String key = (String)e.nextElement();
 	               String val = (String)jobProps.getProperty(key);
-//	               if (key.equals("_WorkingDirectory")) { 
-//	            	   _workDir = new File(val);
-//	        	} else if (key.equals("_Executable")) {
 	               if (key.equals("_Executable")) {
 	            	   // The following line does not work -> indexArrayOutOfBoundException
 	            	   // _exec = val.replaceAll("\\$", "\\\\$");
@@ -230,19 +226,6 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 	          Map.Entry me = (Map.Entry)i.next();
 	          command.append(me.getKey() + "=" + me.getValue());
 	        }
-//	    	if (_workDir != null) {
-//			   command.append("if [ ! -d " + _workDir + " ] ");
-//			   command.append("then exit 1");
-//			   command.append("fi");
-//			   command.append("cd "+_workDir);
-//	    	}
-//				command.append("eval '" + _exec + " < " + m_sftp.getHome() + "/" +sshjp.getInfile() + " &' ");
-//	    	command.append("MYPID=\\$!");
-//	    	command.append("echo \\$MYPID > " + m_sftp.getHome() + "/" + SSHJobProcess.getRootDir() + "/" + nativeJobId + ".pid");
-//	    	command.append("wait \\$MYPID");
-//			command.append("errcode=\\$?");
-//	    	command.append("echo \\$errcode > " + m_sftp.getHome() + "/" + SSHJobProcess.getRootDir() + "/" + nativeJobId + ".endcode");
-//	    	command.append("exit \\$errcode");
 
 	        command.append(_exec);
 			String cde = "cat << EOS | bash -s \n" + command.toString() + "EOS\n";
@@ -250,10 +233,6 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 //			System.out.println("NEW command="+cde);
 	        channel.setCommand(cde);
 	
-	//		if (stdout != null) channel.setOutputStream(stdout);
-			//else channel.setOutputStream(System.out);
-	//		if (stderr != null) channel.setErrStream(stderr);
-			//else channel.setErrStream(System.err);
 			channel.connect();
 			
 			Thread.sleep(500);
