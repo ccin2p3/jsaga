@@ -30,6 +30,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -45,6 +46,7 @@ import java.util.regex.Matcher;
 
 /**
  * TODO : Support of pre-requisite
+ * TODO : job directory must be rootDir + jobId
  */
 public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorTwoPhase/*StreamableJobInteractiveSet*/ {
@@ -95,6 +97,24 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			throw new NoSuccessException(sftpe);
 		}
     	sjp.checkResources();
+    	// create user working directory only if not specified
+		try {
+			if (!sjp.isUserWorkingDirectory()) {
+				m_sftp.mkdir(sjp.getWorkingDirectory());
+			}
+		} catch (SftpException e) {
+			if (e.id == ChannelSftp.SSH_FX_FAILURE) { // Already Exists
+				// ignore
+			} else if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED) {
+				m_sftp.disconnect();
+				throw new PermissionDeniedException(e);
+			} else {
+				m_sftp.disconnect();
+				throw new NoSuccessException(e); 
+			}
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		}
         sjp.setCreated(new Date());
 		try {
             store(sjp, uniqId);
@@ -114,6 +134,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		ChannelExec channelCancel=null;
 		try {
 			channelCancel = (ChannelExec) session.openChannel("exec");
+			// TODO: use SSHJobProcess to get pidfile
 			channelCancel.setCommand("kill `cat " + SSHJobProcess.getRootDir() + "/" + nativeJobId+".pid`;");
 			channelCancel.connect();
 			while(!channelCancel.isClosed()) {
@@ -133,6 +154,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
 		try {
+			// TODO: use SSHJobProcess to get filename
 			m_sftp.rm(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".*");
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
@@ -229,7 +251,6 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 
 	        command.append(_exec);
 			String cde = "cat << EOS | bash -s \n" + command.toString() + "EOS\n";
-	        
 //			System.out.println("NEW command="+cde);
 	        channel.setCommand(cde);
 	

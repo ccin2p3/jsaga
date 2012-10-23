@@ -42,6 +42,24 @@ public class SSHJobProcess extends LocalJobProcess {
     	return ".jsaga/var/adaptor/ssh";
     }
 
+    public String getWorkingDirectory() throws IOException {
+    	if (isUserWorkingDirectory()) {
+			return getValue("_WorkingDirectory");
+		} else {
+			return m_home + "/" + getRootDir() + "/" + m_jobId;
+		}
+    }
+    
+    // Cannot create working directory here
+    @Override
+	public void createWorkingDirectory() throws IOException {
+//		try {
+//			getValue("_WorkingDirectory");
+//		} catch (NoSuchElementException e) {
+//	    	new File(getRootDir() + "/" + m_jobId).mkdirs();
+//		}
+	}
+    
 	public int getReturnCode() throws NoSuccessException {
 		return m_returnCode;
 	}
@@ -52,25 +70,23 @@ public class SSHJobProcess extends LocalJobProcess {
 
     @Override
 	public void checkResources() throws BadResource, NoSuccessException {
-    	// TODO: check if working directory exists and is accessible
-		try {
-			String wd = getValue("_WorkingDirectory");
-			if (wd.equals("/dummy")) {
-				throw new BadResource("Directory does not exist:");
-			}
-		} catch (NoSuchElementException e) {
-			// ignore
-		} catch (IOException e) {
-			throw new NoSuccessException(e);
-		}
+//		try {
+//			String wd = getValue("_WorkingDirectory");
+//	    	// TODO: check if working directory exists and is accessible
+//			// This is not possible here we don't have the sftp connection
+//		} catch (NoSuchElementException e) {
+//			// ignore
+//		} catch (IOException e) {
+//			throw new NoSuccessException(e);
+//		}
 	}
 
 
-	protected String toURL(String filename) {
-//		if (filename.startsWith("file:")) {
-//			return filename;
-//		} else {
-			return "sftp://" + m_host + ":" + m_port + "/" + m_home + "/" + getRootDir() + "/" + filename;
-//		}
+	protected String toURL(String filename) throws NoSuccessException {
+		try {
+			return "sftp://" + m_host + ":" + m_port + "/" + getWorkingDirectory() + "/" + filename;
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		}
 	}
 }

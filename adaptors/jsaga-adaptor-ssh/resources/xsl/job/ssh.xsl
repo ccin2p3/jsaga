@@ -10,6 +10,17 @@
 	<xsl:param name="UniqId"></xsl:param>
 	<xsl:param name="RootDir"></xsl:param>
 
+	<xsl:variable name="WorkingDir">
+		<xsl:choose>
+			<xsl:when test="//jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory">
+		    	<xsl:value-of select="//jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$RootDir"/><xsl:text>/</xsl:text><xsl:value-of select="$UniqId"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	
     <!-- entry point (MUST BE RELATIVE) -->
 	 <xsl:template match="jsdl:JobDefinition">
         <xsl:apply-templates select="jsdl:JobDescription"/>
@@ -22,6 +33,11 @@
 <xsl:value-of select="@name"/>='<xsl:value-of select="text()"/><xsl:text>'
 </xsl:text>
         </xsl:for-each>
+
+		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()">
+_WorkingDirectory=<xsl:value-of select="."/><xsl:text>
+</xsl:text>
+		</xsl:for-each>
 
                  <xsl:if test="jsdl:DataStaging">
 _DataStaging=<xsl:for-each select="jsdl:DataStaging">
@@ -39,7 +55,8 @@ _DataStaging=<xsl:for-each select="jsdl:DataStaging">
                 </xsl:for-each>
                 </xsl:if>
 	
-_Executable=cd <xsl:value-of select="$RootDir"/><xsl:text>;</xsl:text>
+_Executable=<xsl:text>[ -d </xsl:text> <xsl:value-of select="$WorkingDir"/><xsl:text> ] || exit 1;</xsl:text> 
+		<xsl:text>cd </xsl:text><xsl:value-of select="$WorkingDir"/><xsl:text>;</xsl:text>
 		<!-- For BASH -->
 		<xsl:text>export PATH=.:$PATH;</xsl:text><!-- <xsl:text> 2&gt;/dev/null; </xsl:text> -->
 		<!-- For CSH -->
@@ -85,10 +102,11 @@ _Executable=<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:
              <xsl:text> </xsl:text><xsl:value-of select="."/><xsl:text/>
         </xsl:for-each>
  -->        
-		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()">
+<!-- 		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()">
 _WorkingDirectory=<xsl:value-of select="."/>
 		</xsl:for-each>
-<!--<xsl:text>" | sh</xsl:text>-->
+ -->
+ <!--<xsl:text>" | sh</xsl:text>-->
 
 	</xsl:template>
 </xsl:stylesheet>
