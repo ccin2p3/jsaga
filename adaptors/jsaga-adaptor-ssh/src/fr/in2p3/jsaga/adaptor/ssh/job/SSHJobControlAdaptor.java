@@ -255,8 +255,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 	        channel.setCommand(cde);
 	
 			channel.connect();
-			
-			Thread.sleep(500);
+			Thread.sleep(1000);
 			if (channel.isClosed()) {
 				int error = channel.getExitStatus();
 				// It is possible that the wrapper script failed without writing any .endcode file
