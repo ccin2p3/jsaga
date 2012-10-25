@@ -88,6 +88,10 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
         throw new NotImplementedException("Not implemented by the SAGA engine", this);
     }
 
+    public void disconnect() throws NoSuccessException {
+    	m_controlAdaptor.disconnect();
+    	m_monitorService.disconnect();
+    }
     ////////////////////////////////////////// private methods //////////////////////////////////////////
 
     public synchronized void resetAdaptors(SecurityCredential security) {
