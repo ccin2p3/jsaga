@@ -146,7 +146,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 
 	public String getStagingDirectory(String nativeJobId)
 			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
-		return "file://" + LocalJobProcess.getRootDir(); // + "/" + nativeJobId;
+		return "file://" + new LocalJobProcess(nativeJobId).getRootDir(); // + "/" + nativeJobId;
 	}
 
 	public StagingTransfer[] getInputStagingTransfer(String nativeJobId)

@@ -56,7 +56,7 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 	public String[] list() throws PermissionDeniedException, TimeoutException,
 			NoSuccessException {
 		try {
-			Vector v = m_sftp.ls(SSHJobProcess.getRootDir() + "/*.process");
+			Vector v = m_sftp.ls(SSHJobProcess.getRootDir() + "/*." + SSHJobProcess.PROCESS_SUFFIX);
 			String[] listOfJobs = new String[v.size()];
 			for (int i=0; i<v.size(); i++) {
 				String file = ((LsEntry)v.elementAt(i)).getFilename();
@@ -72,7 +72,7 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 		throws NotImplementedException, NoSuccessException {
 		Integer rc = getReturnCode(nativeJobId);
 		if (rc == SSHJobProcess.PROCESS_RUNNING)
-			throw new NoSuccessException("Process not finisehd, exit code not available");
+			throw new NoSuccessException("Process not finished, exit code not available");
 		return rc;
 	}
 	
@@ -97,7 +97,7 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 	public Date getStarted(String nativeJobId) throws NotImplementedException,
 			NoSuccessException {
 		try {
-			SftpATTRS attrs = m_sftp.stat(SSHJobProcess.getRootDir() + "/" + nativeJobId+".pid");
+			SftpATTRS attrs = m_sftp.stat(new SSHJobProcess(nativeJobId).getPidFile());
 			return new Date(attrs.getMTime());
 		} catch (SftpException e) {
 			throw new NoSuccessException("Cannot get started time, the job has not started yet");
@@ -107,7 +107,7 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 	public Date getFinished(String nativeJobId) throws NotImplementedException,
 			NoSuccessException {
 		try {
-			SftpATTRS attrs = m_sftp.stat(SSHJobProcess.getRootDir() + "/" + nativeJobId+".endcode");
+			SftpATTRS attrs = m_sftp.stat(new SSHJobProcess(nativeJobId).getEndcodeFile());
 			return new Date(attrs.getMTime());
 		} catch (SftpException e) {
 			throw new NoSuccessException("Cannot get finish time, the job may still be running");
@@ -121,7 +121,7 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 
 	private Integer getReturnCode(String nativeJobId) throws NoSuccessException {
     	try {    	
-			InputStream is = m_sftp.get(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".endcode");
+			InputStream is = m_sftp.get(new SSHJobProcess(nativeJobId).getEndcodeFile());
 	    	byte[] buf = new byte[4];
 	    	int len = is.read(buf);
 	    	is.close();

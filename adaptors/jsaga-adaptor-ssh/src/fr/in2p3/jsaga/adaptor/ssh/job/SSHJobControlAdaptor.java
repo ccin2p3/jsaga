@@ -48,7 +48,7 @@ import java.util.regex.Matcher;
  * TODO : Support of pre-requisite
  */
 public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
-		JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorTwoPhase/*StreamableJobInteractiveSet*/ {
+		JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorTwoPhase {
 
     private static final String ROOTDIR = "RootDir";
 
@@ -133,8 +133,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		ChannelExec channelCancel=null;
 		try {
 			channelCancel = (ChannelExec) session.openChannel("exec");
-			// TODO: use SSHJobProcess to get pidfile
-			channelCancel.setCommand("kill `cat " + SSHJobProcess.getRootDir() + "/" + nativeJobId+".pid`;");
+			channelCancel.setCommand("kill `cat " + new SSHJobProcess(nativeJobId).getPidFile() + "`;");
 			channelCancel.connect();
 			while(!channelCancel.isClosed()) {
 				Thread.sleep(100);
@@ -153,9 +152,13 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
 		try {
-			// TODO: use SSHJobProcess to get filename
-			m_sftp.rm(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".*");
-			m_sftp.rmdir(SSHJobProcess.getRootDir() + "/" + nativeJobId);
+			SSHJobProcess sshjp = new SSHJobProcess(nativeJobId);
+			m_sftp.rm(sshjp.getFile(".*"));
+			try {
+				m_sftp.rmdir(sshjp.getGeneratedWorkingDirectory());
+			} catch (Exception e1) {
+				// ignore: the working directory could be user defined
+			}
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}

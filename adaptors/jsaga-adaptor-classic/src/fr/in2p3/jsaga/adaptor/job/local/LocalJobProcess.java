@@ -29,9 +29,6 @@ public class LocalJobProcess implements Serializable {
 	private static final long serialVersionUID = 442420832799282097L;
 	protected String m_pid;
 	protected String m_jobId;
-//	protected String m_outfile;
-//	protected String m_infile;
-//	protected String m_errfile;
 	protected int m_returnCode;
 	protected Date m_created;
 	protected String m_jobDesc;
@@ -46,14 +43,18 @@ public class LocalJobProcess implements Serializable {
 	public static final int PROCESS_STOPPED = -2;
 	public static final int PROCESS_UNKNOWNSTATE = -99;
 
+	public static final String PID_SUFFIX = "pid";
+	public static final String ENDCODE_SUFFIX = "endcode";
+	public static final String PROCESS_SUFFIX = "process";
+	
 	public LocalJobProcess(String jobId, String jobDesc) {
 		m_jobId = jobId;
 		m_jobDesc = jobDesc;
-//		m_outfile = getFile("out");
-//		m_infile = getFile("in");
-//		m_errfile = getFile("err");
 		m_returnCode = -1;
 		m_pid = null;
+	}
+	public LocalJobProcess(String jobId) {
+		this(jobId, null);
 	}
 	
     public static String getRootDir_Bash() {
@@ -71,8 +72,14 @@ public class LocalJobProcess implements Serializable {
     	if (isUserWorkingDirectory()) {
 			return getValue("_WorkingDirectory");
 		} else {
-			return getRootDir() + "/" + m_jobId;
+			return getGeneratedWorkingDirectory();
 		}
+    }
+    public String getGeneratedWorkingDirectory() {
+		return getRootDir() + "/" + m_jobId;
+    }
+    public String getGeneratedFilename() {
+		return getGeneratedWorkingDirectory();
     }
     
     // Create working directory only if not specified in job description
@@ -92,8 +99,22 @@ public class LocalJobProcess implements Serializable {
 	}
 	
     public String getFile(String suffix) {
-    	return getRootDir() + "/" + m_jobId + "." + suffix;
+    	return getGeneratedFilename() + "." + suffix;
     }
+
+    public String getPidFile() {
+    	return getFile(PID_SUFFIX);
+    }
+    
+    public String getEndcodeFile() {
+    	return getFile(ENDCODE_SUFFIX);
+    }
+
+    public String getSerializeFile() {
+    	return getFile(PROCESS_SUFFIX);
+    }
+    
+
     public String getJobId() {
     	return m_jobId;
     }
@@ -133,7 +154,7 @@ public class LocalJobProcess implements Serializable {
     
     public String getPid() throws NoSuccessException {
 		if (m_pid != null) return m_pid;
-    	File f = new File(getPidfile());
+    	File f = new File(getPidFile());
     	FileInputStream fis;
 		try {
 			fis = new FileInputStream(f);
@@ -152,24 +173,13 @@ public class LocalJobProcess implements Serializable {
 		return m_pid;
 	}
 
-//	public String getInfile() {
-//		return m_infile;
-//	}
-//
-//	public String getOutfile() {
-//		return m_outfile;
-//	}
-//
-//	public String getErrfile() {
-//		return m_errfile;
-//	}
 	public void setReturnCode(int returnCode) {
 		this.m_returnCode = returnCode;
 	}
 
 	public int getReturnCode() throws NoSuccessException {
 		if (m_returnCode >= 0) return m_returnCode; // final state
-    	File f = new File(getEndcodefile());
+    	File f = new File(getEndcodeFile());
     	FileInputStream fis;
 		try {
 			fis = new FileInputStream(f);
@@ -211,7 +221,7 @@ public class LocalJobProcess implements Serializable {
 	}
 
 	public Date getStarted() throws NoSuccessException {
-		long startTime = new File(this.getPidfile()).lastModified();
+		long startTime = new File(this.getPidFile()).lastModified();
 		if (startTime == 0) {
 			return null;
 		}
@@ -219,52 +229,26 @@ public class LocalJobProcess implements Serializable {
 	}
 
 	public Date getFinished() throws NoSuccessException {
-		long endTime = new File(this.getEndcodefile()).lastModified();
+		long endTime = new File(this.getEndcodeFile()).lastModified();
 		if (endTime == 0) {
 			return null;
 		}
 		return new Date(endTime);
 	}
 	
-	public String getPidfile() {
-    	return getFile("pid");
-    }
-    
-    public String getEndcodefile() {
-    	return getFile("endcode");
-    }
-    public String getSerializefile() {
-    	return getFile("process");
-    }
-    
     public void clean() {
-//    	try {
-//    		new File(getInfile()).delete();
-//    	} catch (Exception e) {
-//    		// ignore
-//    	}
-//    	try {
-//    		new File(getOutfile()).delete();
-//    	} catch (Exception e) {
-//    		// ignore
-//    	}
-//    	try {
-//    		new File(getErrfile()).delete();
-//    	} catch (Exception e) {
-//    		// ignore
-//    	}
     	try {
-    		new File(getPidfile()).delete();
+    		new File(getPidFile()).delete();
     	} catch (Exception e) {
     		// ignore
     	}
     	try {
-    		new File(getEndcodefile()).delete();
+    		new File(getEndcodeFile()).delete();
     	} catch (Exception e) {
     		// ignore
     	}
     	try {
-    		new File(getSerializefile()).delete();
+    		new File(getSerializeFile()).delete();
     	} catch (Exception e) {
     		// ignore
     	}
@@ -286,7 +270,6 @@ public class LocalJobProcess implements Serializable {
 	}
 	
 	public void checkResources() throws BadResource, NoSuccessException {
-    	// TODO: check if working directory exists and is accessible
 		try {
 			File wd = new File(getValue("_WorkingDirectory"));
 			if (!wd.exists() || !wd.isDirectory()) {

@@ -35,10 +35,20 @@ public class SSHJobProcess extends LocalJobProcess {
 		m_home = home;
 	}
 
+	public SSHJobProcess(String jobId) {
+		super(jobId);
+	}
+	
     public static String getRootDir() {
     	return ".jsaga/var/adaptor/ssh";
     }
 
+    @Override
+    public String getGeneratedWorkingDirectory() {
+		return SSHJobProcess.getRootDir() + "/" + m_jobId;
+    }
+
+    @Override
     public String getWorkingDirectory() throws IOException {
     	if (isUserWorkingDirectory()) {
 			return getValue("_WorkingDirectory");
@@ -52,19 +62,16 @@ public class SSHJobProcess extends LocalJobProcess {
 	public void createWorkingDirectory() throws IOException {
 	}
     
+    @Override
 	public int getReturnCode() throws NoSuccessException {
 		return m_returnCode;
 	}
-
-    public String getFile(String suffix) {
-    	return getRootDir() + "/" + m_jobId + "." + suffix;
-    }
 
     @Override
 	public void checkResources() throws BadResource, NoSuccessException {
 	}
 
-
+    @Override
 	protected String toURL(String filename) throws NoSuccessException {
 		try {
 			return "sftp://" + m_host + ":" + m_port + "/" + getWorkingDirectory() + "/" + filename;
