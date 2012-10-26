@@ -1,9 +1,6 @@
 package fr.in2p3.jsaga.adaptor.ssh.job;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.NoSuchElementException;
-
 import org.ogf.saga.error.NoSuccessException;
 
 import fr.in2p3.jsaga.adaptor.job.BadResource;
@@ -53,11 +50,6 @@ public class SSHJobProcess extends LocalJobProcess {
     // Cannot create working directory here
     @Override
 	public void createWorkingDirectory() throws IOException {
-//		try {
-//			getValue("_WorkingDirectory");
-//		} catch (NoSuchElementException e) {
-//	    	new File(getRootDir() + "/" + m_jobId).mkdirs();
-//		}
 	}
     
 	public int getReturnCode() throws NoSuccessException {
@@ -70,15 +62,6 @@ public class SSHJobProcess extends LocalJobProcess {
 
     @Override
 	public void checkResources() throws BadResource, NoSuccessException {
-//		try {
-//			String wd = getValue("_WorkingDirectory");
-//	    	// TODO: check if working directory exists and is accessible
-//			// This is not possible here we don't have the sftp connection
-//		} catch (NoSuchElementException e) {
-//			// ignore
-//		} catch (IOException e) {
-//			throw new NoSuccessException(e);
-//		}
 	}
 
 
@@ -89,4 +72,6 @@ public class SSHJobProcess extends LocalJobProcess {
 			throw new NoSuccessException(e);
 		}
 	}
+	
+	
 }
