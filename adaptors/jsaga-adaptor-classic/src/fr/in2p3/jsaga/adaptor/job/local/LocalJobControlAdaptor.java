@@ -3,14 +3,15 @@ package fr.in2p3.jsaga.adaptor.job.local;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.SignalableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.SuspendableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
@@ -35,7 +36,7 @@ import java.util.Properties;
  * TODO : Support of pre-requisite
  */
 public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
-        JobControlAdaptor, CleanableJobAdaptor, StreamableJobBatch, SignalableJobAdaptor, SuspendableJobAdaptor  {
+        JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorTwoPhase, /*StreamableJobBatch,*/ SignalableJobAdaptor, SuspendableJobAdaptor  {
 
 	private static Logger s_logger = Logger.getLogger(LocalJobControlAdaptor.class);
 	
@@ -73,104 +74,31 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
         return translator;
     }
 
-    private LocalJobProcess submit(String jobDesc, String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-    	LocalJobProcess ljp = new LocalJobProcess(uniqId);
+    private LocalJobProcess submit(String jobDesc, String uniqId, InputStream stdin) 
+    		throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
+    	LocalJobProcess ljp = new LocalJobProcess(uniqId, jobDesc);
+    	ljp.checkResources();
+        ljp.setCreated(new Date());
 		try {
-            File input = new File(ljp.getInfile());
-			try {
-				if (stdin == null) {
-					input.createNewFile();
-				} else {
-			        OutputStream out = new FileOutputStream(input);
-					int n;
-					byte[] buffer = new byte[1024];
-					while ((n = stdin.read(buffer)) != -1) {
-						out.write(buffer, 0, n);
-					}
-			        out.close();
-				}
-			} catch (IOException e) {
-				throw new NoSuccessException("Standard input could not be written to local file: " + input);
-			}
-
-			Properties jobProps = new Properties();
-			jobProps.load(new ByteArrayInputStream(jobDesc.getBytes()));
-			File _workDir = null;
-			String cde = null;
-			Enumeration e = jobProps.propertyNames();
-			ArrayList<String> _envParams = new ArrayList<String>();
-            while (e.hasMoreElements()){
-                   String key = (String)e.nextElement();
-                   String val = (String)jobProps.getProperty(key);
-                   if (key.equals("_WorkingDirectory")) { _workDir = new File(val);}
-                   else if (key.equals("_Executable")) { 
-                	   cde = val;
-                   } else {
-                	   _envParams.add(key + "=" + val);
-                   }
-            }
-            ljp.setCreated(new Date());
+			ljp.createWorkingDirectory();
 			LocalAdaptorAbstract.store(ljp);
-			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde}, 
-													(String[])_envParams.toArray(new String[]{}), 
-													_workDir);
-			try {
-				// wait 100ms and try to get exitCode
-				// if the process has not finished yet, IllegalThreadStateException is thrown
-				// If the process has finished with code 255, simulate the IOException
-				Thread.sleep(100);
-				if (p.exitValue() == 255) {
-					throw new IOException("Abnormal termintation");
-				}
-			} catch (IllegalThreadStateException itse) {
-				// ignore: the process is not finished
-			}
-			return ljp;
-		} catch (IOException ioe) {
-			ljp.setReturnCode(2);
-			
-			FileOutputStream error;
-			try {
-				error = new FileOutputStream(new File(ljp.getErrfile()));
-				error.write(ioe.getMessage().getBytes());
-		        error.close();
-			} catch (FileNotFoundException e) {
-                s_logger.warn("Could not write stderr: ", e);
-			} catch (IOException e) {
-                s_logger.warn("Could not write stderr: ", e);
-			}
-			try {
-				LocalAdaptorAbstract.store(ljp);
-			} catch (IOException e) {
-				throw new NoSuccessException(e);
-			}
-			return ljp;
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
-    	
+		return ljp;
     }
 
     public String submit(String commandLine, boolean checkMatch, String uniqId)
-			throws PermissionDeniedException, TimeoutException, NoSuccessException {
+			throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	return this.submit(commandLine, uniqId, null).getJobId();
     	
 	}
 
-	public JobIOHandler submit(String jobDesc, boolean checkMatch,
-			String uniqId, InputStream stdin) throws PermissionDeniedException,
-			TimeoutException, NoSuccessException {
-		LocalJobProcess ljp = this.submit(jobDesc, uniqId, stdin);
-		return new LocalJobIOHandler(ljp);
-	}
-
-	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException,
-            NoSuccessException {
+	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		this.signal(nativeJobId, LocalJobControlAdaptor.SIGNAL_TERM);
 	}
 
-	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
-            NoSuccessException {
+	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		LocalJobProcess ljp;
 		try {
 			ljp = LocalAdaptorAbstract.restore(nativeJobId);
@@ -183,8 +111,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 	}
 
 	public boolean signal(String nativeJobId, int signum)
-			throws PermissionDeniedException, TimeoutException,
-			NoSuccessException {
+			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
 		try {			
 			LocalJobProcess ljp = LocalAdaptorAbstract.restore(nativeJobId);
 			int ret = this.killProcess(Integer.parseInt(ljp.getPid()), signum);
@@ -209,14 +136,41 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 	}
 
 	public boolean suspend(String nativeJobId)
-			throws PermissionDeniedException, TimeoutException,
-			NoSuccessException {
+			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
 		return this.signal(nativeJobId, LocalJobControlAdaptor.SIGNAL_STOP);
 	}
 
-	public boolean resume(String nativeJobId) throws PermissionDeniedException,
-			TimeoutException, NoSuccessException {
+	public boolean resume(String nativeJobId) throws PermissionDeniedException,	TimeoutException, NoSuccessException {
 		return this.signal(nativeJobId, LocalJobControlAdaptor.SIGNAL_CONT);
+	}
+
+	public String getStagingDirectory(String nativeJobId)
+			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
+		return "file://" + new LocalJobProcess(nativeJobId).getRootDir(); // + "/" + nativeJobId;
+	}
+
+	public StagingTransfer[] getInputStagingTransfer(String nativeJobId)
+			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
+		try {
+			LocalJobProcess ljp = LocalAdaptorAbstract.restore(nativeJobId);
+			return ljp.getInputStaging();
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		} catch (ClassNotFoundException e) {
+			throw new NoSuccessException(e);
+		}
+	}
+
+	public StagingTransfer[] getOutputStagingTransfer(String nativeJobId)
+			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
+		try {
+			LocalJobProcess ljp = LocalAdaptorAbstract.restore(nativeJobId);
+			return ljp.getOutputStaging();
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		} catch (ClassNotFoundException e) {
+			throw new NoSuccessException(e);
+		}
 	}
 
 	private int killProcess(int pid, int signum) throws IOException, InterruptedException {
@@ -230,4 +184,68 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 		}
 		return ret;
 	}
+
+	public void start(String nativeJobId) throws PermissionDeniedException,
+			TimeoutException, NoSuccessException {
+		LocalJobProcess ljp;
+		Properties jobProps = new Properties();
+		try {
+			ljp = LocalAdaptorAbstract.restore(nativeJobId);
+			jobProps.load(new ByteArrayInputStream(ljp.getJobDesc().getBytes()));
+		} catch (ClassNotFoundException e1) {
+			throw new NoSuccessException(e1);
+		} catch (IOException e1) {
+			throw new NoSuccessException(e1);
+		}
+		File _workDir = null;
+		String cde = null;
+		Enumeration e = jobProps.propertyNames();
+		ArrayList<String> _envParams = new ArrayList<String>();
+        while (e.hasMoreElements()){
+               String key = (String)e.nextElement();
+               String val = (String)jobProps.getProperty(key);
+               if (key.equals("_WorkingDirectory")) { _workDir = new File(val);}
+               else if (key.equals("_Executable")) { 
+            	   cde = val;
+               } else {
+            	   _envParams.add(key + "=" + val);
+               }
+        }
+
+		try {
+	        Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde}, 
+					(String[])_envParams.toArray(new String[]{}), 
+					_workDir);
+			// wait 100ms and try to get exitCode
+			// if the process has not finished yet, IllegalThreadStateException is thrown
+			// If the process has finished with code 255, simulate the IOException
+			Thread.sleep(100);
+			if (p.exitValue() == 255) {
+				throw new IOException("Abnormal termination");
+			}
+		} catch (IllegalThreadStateException itse) {
+			// ignore: the process is not finished
+		} catch (IOException ioe) {
+			ljp.setReturnCode(2);
+			
+//			FileOutputStream error;
+//			try {
+//				error = new FileOutputStream(new File(ljp.getErrfile()));
+//				error.write(ioe.getMessage().getBytes());
+//		        error.close();
+//			} catch (FileNotFoundException e1) {
+//                s_logger.warn("Could not write stderr: ", e1);
+//			} catch (IOException e1) {
+//                s_logger.warn("Could not write stderr: ", e1);
+//			}
+			try {
+				LocalAdaptorAbstract.store(ljp);
+			} catch (IOException e2) {
+				throw new NoSuccessException(e2);
+			}
+		} catch (InterruptedException e1) {
+			throw new NoSuccessException(e1);
+		}
+	}
+	
 }

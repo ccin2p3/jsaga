@@ -5,6 +5,7 @@ import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.job.abstracts.AbstractJobTest;
+import org.ogf.saga.job.abstracts.Attribute;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.task.State;
 import org.ogf.saga.url.URLFactory;
@@ -78,6 +79,27 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
         // run job
         String outputContent = this.runAndGetOutput(desc, localOutput);
         assertEquals(OUTPUT_CONTENT, outputContent.trim());
+
+        // cleanup
+        this.cleanup(localOutput);
+    }
+
+    public void test_output_workingDirectory() throws Exception {
+        Object localOutput = getLocal("output");
+        Object workerOutput = getWorker("output");
+
+        // create job
+        JobDescription desc = JobFactory.createJobDescription();
+        desc.setAttribute(JobDescription.EXECUTABLE, "/bin/pwd");
+    	desc.setAttribute(JobDescription.WORKINGDIRECTORY, "/tmp");
+        desc.setVectorAttribute(JobDescription.FILETRANSFER, new String[]{
+                localOutput+" < "+workerOutput
+        });
+        desc.setAttribute(JobDescription.OUTPUT, workerOutput.toString());
+
+        // run job
+        String outputContent = this.runAndGetOutput(desc, localOutput);
+        assertEquals("/tmp", outputContent.trim());
 
         // cleanup
         this.cleanup(localOutput);

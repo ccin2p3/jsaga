@@ -87,6 +87,10 @@ public class JobMonitorService {
         m_registry.unsubscribeJob(nativeJobId);
     }
 
+    public void disconnect() throws NoSuccessException {
+    	m_adaptor.disconnect();
+    }
+    
     private boolean m_isReseting = false;
     private SagaException m_exception = null;
     public synchronized void startReset() {m_isReseting = true;}

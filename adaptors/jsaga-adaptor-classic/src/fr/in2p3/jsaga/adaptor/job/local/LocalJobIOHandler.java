@@ -22,7 +22,8 @@ import java.io.OutputStream;
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   29 avril 2008
 * ***************************************************/
-public class LocalJobIOHandler implements JobIOGetterInteractive {
+@Deprecated
+public class LocalJobIOHandler /*implements JobIOGetterInteractive*/ {
 
 	private LocalJobProcess m_ljp;
 
@@ -34,27 +35,27 @@ public class LocalJobIOHandler implements JobIOGetterInteractive {
 		return m_ljp.getJobId();
 	}
 
-	public InputStream getStderr() throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		try {
-			return new FileInputStream(new File(m_ljp.getErrfile()));
-		} catch (FileNotFoundException e) {
-			throw new NoSuccessException(e);
-		}
-	}
-
-	public OutputStream getStdin() throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		try {
-			return new FileOutputStream(new File(m_ljp.getInfile()));
-		} catch (FileNotFoundException e) {
-			throw new NoSuccessException(e);
-		}
-	}
-
-	public InputStream getStdout() throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		try {
-			return new FileInputStream(new File(m_ljp.getOutfile()));
-		} catch (FileNotFoundException e) {
-			throw new NoSuccessException(e);
-		}
-	}
+//	public InputStream getStderr() throws PermissionDeniedException, TimeoutException, NoSuccessException {
+//		try {
+//			return new FileInputStream(new File(m_ljp.getErrfile()));
+//		} catch (FileNotFoundException e) {
+//			throw new NoSuccessException(e);
+//		}
+//	}
+//
+//	public OutputStream getStdin() throws PermissionDeniedException, TimeoutException, NoSuccessException {
+//		try {
+//			return new FileOutputStream(new File(m_ljp.getInfile()));
+//		} catch (FileNotFoundException e) {
+//			throw new NoSuccessException(e);
+//		}
+//	}
+//
+//	public InputStream getStdout() throws PermissionDeniedException, TimeoutException, NoSuccessException {
+//		try {
+//			return new FileInputStream(new File(m_ljp.getOutfile()));
+//		} catch (FileNotFoundException e) {
+//			throw new NoSuccessException(e);
+//		}
+//	}
 }
