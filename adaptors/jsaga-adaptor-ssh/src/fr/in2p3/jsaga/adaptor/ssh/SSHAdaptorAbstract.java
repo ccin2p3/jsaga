@@ -168,10 +168,14 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     }
 
     public void disconnect() throws NoSuccessException {
-    	m_sftp.disconnect();
-    	m_sftp = null;
-    	session.disconnect();
-        session = null;
+    	if (m_sftp != null) {
+    		m_sftp.disconnect();
+        	m_sftp = null;
+    	}
+    	if (session != null) {
+    		session.disconnect();
+    		session = null;
+    	}
     }
     
     public  void store(SSHJobProcess p, String nativeJobId) throws SftpException, IOException, JSchException, InterruptedException {
@@ -212,4 +216,14 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
         }
     }
     
+//    protected void finalize() throws Throwable {
+//    	try {
+//    		System.out.println("finalize" + getClass().toString());
+//			disconnect();
+//		} catch (NoSuccessException e) {
+//			e.printStackTrace();
+//		} finally {
+//			super.finalize();
+//		}
+//    }
 }
