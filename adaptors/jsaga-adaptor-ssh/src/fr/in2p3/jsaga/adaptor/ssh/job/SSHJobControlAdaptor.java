@@ -46,7 +46,6 @@ import java.util.regex.Matcher;
 
 /**
  * TODO : Support of pre-requisite
- * TODO : job directory must be rootDir + jobId
  */
 public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorTwoPhase/*StreamableJobInteractiveSet*/ {
