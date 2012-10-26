@@ -155,6 +155,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		try {
 			// TODO: use SSHJobProcess to get filename
 			m_sftp.rm(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".*");
+			m_sftp.rmdir(SSHJobProcess.getRootDir() + "/" + nativeJobId);
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
