@@ -103,9 +103,34 @@ public class DelegationStub {
                 throw new AuthenticationFailedException(e.getMsg(), e);
             }
         } catch (AuthorizationFault e) {
-        	rethrowAuthorizationException(e);
+        	// If operation getTermintationTime is not allowed
+//        	String exceptionDescription = getDescription(e);
+//        	if (exceptionDescription!= null && exceptionDescription.contains("not authorized for operation")) {
+//                try {
+//                    pkcs10 = m_stub.getProxyReq(delegationId);
+//                } catch (DelegationException e2) {
+//                    throw new AuthenticationFailedException(e2.getMsg(), e2);
+//                } catch (RemoteException e2) {
+//                    throw new AuthenticationFailedException(e2);
+//                }
+//        	} else {
+	        	rethrowAuthorizationException(e);
+//        	}
         } catch (RemoteException e) {
-            throw new AuthenticationFailedException(e);
+        	// New CreamCE sends a RemoteException when delegationId not found
+            if (e.getMessage()!=null && (e.getMessage().contains("not found"))) {
+                // create a new delegation
+                try {
+                    pkcs10 = m_stub.getProxyReq(delegationId);
+                } catch (DelegationException e2) {
+                    throw new AuthenticationFailedException(e2.getMsg(), e2);
+                } catch (RemoteException e2) {
+                    throw new AuthenticationFailedException(e2);
+                }
+            } else {
+                // rethrow exception
+                throw new AuthenticationFailedException(e.getMessage(), e);
+            }
         }
 
         if (pkcs10 != null) {
@@ -161,5 +186,14 @@ public class DelegationStub {
     	} catch (ArrayIndexOutOfBoundsException aioobe) {
     		throw new AuthenticationFailedException(af);
     	}
+    }
+    
+    private String getDescription(AuthorizationFault af) {
+		org.w3c.dom.Element[] details = af.getFaultDetails();
+		if (details != null && details.length>0) {
+			return details[0].getElementsByTagNameNS("http://glite.org/2007/11/ce/cream/types", "Description").item(0).getFirstChild().getNodeValue();
+		} else {
+			return null;
+		}
     }
 }
