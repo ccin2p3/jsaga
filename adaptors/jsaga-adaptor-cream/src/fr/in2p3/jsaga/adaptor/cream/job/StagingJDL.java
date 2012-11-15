@@ -74,7 +74,7 @@ public class StagingJDL {
                 //String from = baseUri + getValue(r,VALUE_FROM).substring(getValue(r,VALUE_FROM).lastIndexOf("/"));
                 String from = getValue(r,VALUE_FROM);
                 if (from.startsWith(SANDBOX_BASE_URI)) {
-                    from = baseUri+"/"+from.replace(SANDBOX_BASE_URI, "");
+                    from = baseUri+from.replace(SANDBOX_BASE_URI, "");
                 }
                 String to = getValue(r,VALUE_TO);
                 boolean append = Boolean.parseBoolean(getValue(r,VALUE_APPEND));

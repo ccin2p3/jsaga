@@ -1,27 +1,21 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.HoldableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
+import org.apache.log4j.Logger;
 import org.glite.ce.creamapi.ws.cream2.CREAMPort;
 import org.glite.ce.creamapi.ws.cream2.types.*;
-import org.globus.ftp.GridFTPClient;
 import org.ogf.saga.error.*;
 
-import java.io.*;
 import java.rmi.RemoteException;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -79,6 +73,16 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         if (m_delegProxy != null) {
             delegationStub.putProxy(m_delegationId, m_delegProxy);
         }
+        try {
+			ServiceInfo service_info = m_creamStub.getStub().getServiceInfo(0);
+			String cream_desc = host + " (interface version=" + 
+								service_info.getInterfaceVersion() + ",service version=" + 
+								service_info.getServiceVersion() + ")";
+    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Connecting to "+cream_desc);
+    		m_creamVersion = service_info.getServiceVersion();
+		} catch (Exception e) {
+    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Could not get service version");
+		}
     }
 
     public void disconnect() throws NoSuccessException {
@@ -146,7 +150,9 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
         String jdl = jobInfo.getJDL();
         StagingJDL parsedJdl = new StagingJDL(jdl);
-        return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI()+"/");
+        // Do not add '/' in case of Cream 1.14
+        return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI()+
+        		(m_creamVersion.contains("1.14")?"":"/"));
     }
     
     private JobInfo getJobInfo(String nativeJobId) throws TimeoutException, NoSuccessException {
