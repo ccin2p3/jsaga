@@ -284,7 +284,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         }
     }
 
-    private static GsiftpClient createConnection(GSSCredential cred, String host, int port, int tcpBufferSize, boolean reqDCAU) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
+    public static GsiftpClient createConnection(GSSCredential cred, String host, int port, int tcpBufferSize, boolean reqDCAU) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
         try {
     		Logger.getLogger(GsiftpDataAdaptorAbstract.class).info("Connecting to Gsiftp service at: " + host + ":" + port + "...");
             GsiftpClient client = new GsiftpClient(host, port);

@@ -1,5 +1,8 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
+import fr.in2p3.jsaga.adaptor.data.GsiftpClient;
+import fr.in2p3.jsaga.adaptor.data.GsiftpDataAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.data.GsiftpInputStream;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.HoldableJobAdaptor;
@@ -12,8 +15,15 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.apache.log4j.Logger;
 import org.glite.ce.creamapi.ws.cream2.CREAMPort;
 import org.glite.ce.creamapi.ws.cream2.types.*;
+import org.globus.ftp.exception.FTPException;
 import org.ogf.saga.error.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -43,7 +53,8 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     private String m_queueName;
 
     private String m_delegProxy;
-
+    private Boolean m_hasOutputSandboxBug = null;
+    
     public JobMonitorAdaptor getDefaultJobMonitor() {
         // use CREAM portType as default monitoring service (instead of CEMon portType)
         return new CreamJobMonitorAdaptor();
@@ -83,6 +94,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 		} catch (Exception e) {
     		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Could not get service version");
 		}
+//		throw new NoSuccessException("END");
     }
 
     public void disconnect() throws NoSuccessException {
@@ -147,12 +159,66 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
     
     public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
+    	StagingTransfer[] st;
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
         String jdl = jobInfo.getJDL();
         StagingJDL parsedJdl = new StagingJDL(jdl);
-        // Do not add '/' in case of Cream 1.14 EMI version 2.4.0-1
-        return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI()+
-        		((m_creamVersion.contains("2.4.0-1"))?"":"/"));
+        
+        // If bug has already been checked build the appropriate list
+        if (m_hasOutputSandboxBug != null) {
+	        if (m_hasOutputSandboxBug) {
+	        	return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI());
+	        } else if (!m_hasOutputSandboxBug) {
+	        	return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI()+"/");
+	        }
+        }
+        
+        // First build list of transfers with OSB/...
+        st = parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI()+"/");
+        
+        // If list is empty return
+        if (st.length == 0) return st;
+        
+        // If old Cream CE, return
+        if (m_creamVersion.contains("1.13")) {
+        	m_hasOutputSandboxBug = false;
+        	return st;
+        }
+        
+        // Otherwise, check if CREAM CE has the bug on OSB
+		try {
+	        // get the job working directory
+	        String outputSandboxURI = jobInfo.getCREAMOutputSandboxURI();
+	        // build the job wrapper URI
+	        URI jobWrapper_uri = new URI(outputSandboxURI.substring(0, outputSandboxURI.length()-4) + "/" + jobInfo.getJobId().getId() + "_jobWrapper.sh");
+	        // connect to GridFTP
+	        GsiftpClient client = GsiftpDataAdaptorAbstract.createConnection(m_credential, jobWrapper_uri.getHost(), 2811, 1024*16, true);
+	        // Read the job wrapper
+	        BufferedReader in = new BufferedReader(new InputStreamReader(new GsiftpInputStream(client, jobWrapper_uri.getPath())));
+	        String line = null;
+
+	        while((line = in.readLine()) != null) {
+	        	// Search for line starting with "__output_file_dest[0]"
+	            if (line.startsWith("__output_file_dest[0]=")) {
+	            	int lastSlashIndex = line.lastIndexOf("/");
+	            	// if there is OSB before last /, return st
+	            	if (line.substring(lastSlashIndex-3, lastSlashIndex).equals("OSB")) {
+	        	        client.close();
+	                	m_hasOutputSandboxBug = false;
+	            		return st;
+	            	} else {
+	        	        client.close();
+	                	m_hasOutputSandboxBug = true;
+	            		return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI());
+	            	}
+	            }
+	        }
+	        client.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Could not check if CREAM CE has the OSB bug");
+		}
+		return st;
     }
     
     private JobInfo getJobInfo(String nativeJobId) throws TimeoutException, NoSuccessException {
