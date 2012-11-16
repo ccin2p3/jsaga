@@ -150,9 +150,9 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
         String jdl = jobInfo.getJDL();
         StagingJDL parsedJdl = new StagingJDL(jdl);
-        // Do not add '/' in case of Cream 1.14 EMI version 2.3.0-1 and 2.4.0-1
+        // Do not add '/' in case of Cream 1.14 EMI version 2.4.0-1
         return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI()+
-        		((m_creamVersion.contains("2.3.0-1") || m_creamVersion.contains("2.4.0-1"))?"":"/"));
+        		((m_creamVersion.contains("2.4.0-1"))?"":"/"));
     }
     
     private JobInfo getJobInfo(String nativeJobId) throws TimeoutException, NoSuccessException {
