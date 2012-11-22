@@ -13,6 +13,7 @@
                 <url>http://grid.in2p3.fr/jsaga/</url>
                 <authors>
                     <author name="Sylvain Reynaud" email="sreynaud@in2p3.fr"/>
+                    <author name="Lionel Schwarz" email="lionel.schwarz@in2p3.fr"/>
                     <author name="See contributors list" email="http://grid.in2p3.fr/software/jsaga-dev/contributors.html"/>
                 </authors>
                 <javaversion>1.5</javaversion>
@@ -43,6 +44,8 @@
                 <panel classname="InfoPanel"/>
                 <panel classname="LicencePanel"/>
                 <panel classname="TargetPanel"/>
+                <!-- Bug with OpenJDK, panel too small. Should be fixed in izpack-4.3.5 but does not work -->
+                <!-- http://jira.codehaus.org/browse/IZPACK-682 -->
                 <panel classname="TreePacksPanel"/>
                 <panel classname="OptionalLicencePanel" id="CDDL" condition="show_CDDL"/>
                 <panel classname="SummaryPanel"/>
