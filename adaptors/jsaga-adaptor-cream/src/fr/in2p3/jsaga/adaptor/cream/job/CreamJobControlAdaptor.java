@@ -180,10 +180,11 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         if (st.length == 0) return st;
         
         // If old Cream CE, return
-        if (m_creamVersion.contains("1.13")) {
-        	m_hasOutputSandboxBug = false;
-        	return st;
-        }
+        // NO NO NO: the bug is on cccreamceli09!!!
+//        if (m_creamVersion.contains("1.13")) {
+//        	m_hasOutputSandboxBug = false;
+//        	return st;
+//        }
         
         // Otherwise, check if CREAM CE has the bug on OSB
 		try {
