@@ -6,14 +6,20 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactCollector;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.*;
+import org.apache.maven.shared.dependency.tree.DefaultDependencyTreeBuilder;
 import org.apache.maven.shared.dependency.tree.DependencyNode;
 import org.apache.maven.shared.dependency.tree.DependencyTree;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
+import org.apache.maven.shared.dependency.tree.traversal.CollectingDependencyNodeVisitor;
 import org.apache.maven.shared.jar.classes.JarClassesAnalysis;
 import org.apache.maven.model.License;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -22,8 +28,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -48,6 +56,11 @@ public class DependencyXmlMojo extends AbstractMojo {
      * @component
      */
     private ArtifactMetadataSource artifactMetadataSource;
+
+//    /**
+//     * @component
+//     */
+//    private ArtifactFilter filter;
 
     /**
      * @component
@@ -106,6 +119,8 @@ public class DependencyXmlMojo extends AbstractMojo {
      */
     private File outputFile;
 
+    private HashMap<String, String> includedArtifacts;
+    
     public void execute() throws MojoExecutionException, MojoFailureException {
         // create output directory
         if (!outputDirectory.exists()) {
@@ -114,10 +129,26 @@ public class DependencyXmlMojo extends AbstractMojo {
 
         // build dependencies tree
         DependencyNode root;
+        // Filter does NOT work
+//        AndArtifactFilter scopeFilter = new AndArtifactFilter();
+//        scopeFilter.add(new ScopeArtifactFilter(Artifact.SCOPE_COMPILE));
+//        scopeFilter.add(new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME));
         try {
-            DependencyTree projectTree = dependencyTreeBuilder.buildDependencyTree(
-                    project, localRepository, factory, artifactMetadataSource, collector);
-            root = projectTree.getRootNode();
+            root = dependencyTreeBuilder.buildDependencyTree(
+                    project, localRepository, factory, artifactMetadataSource, null, collector);
+            CollectingDependencyNodeVisitor visitor = 
+                new CollectingDependencyNodeVisitor();
+
+            root.accept(visitor);
+            List<DependencyNode> nodes = visitor.getNodes();
+            includedArtifacts = new HashMap<String, String>(nodes.size());
+            for (DependencyNode dependencyNode : nodes) {
+                int state = dependencyNode.getState();
+                Artifact artifact = dependencyNode.getArtifact();
+                if(state == DependencyNode.INCLUDED) {                    
+                	includedArtifacts.put(artifact.getArtifactId(), artifact.getVersion());
+                }
+            }
         } catch (DependencyTreeBuilderException e) {
             throw new MojoExecutionException("Unable to build dependency tree", e);
         }
@@ -144,10 +175,13 @@ public class DependencyXmlMojo extends AbstractMojo {
         if ( (artifactId.startsWith("jsaga-") || artifactId.startsWith("saga-"))&& !hasClassifier) {
             MavenProject module = this.getMavenProject(current.getArtifact());
             if (module != null) {
+                // Filter does NOT work
+//                AndArtifactFilter scopeFilter = new AndArtifactFilter();
+//                scopeFilter.add(new ScopeArtifactFilter(Artifact.SCOPE_COMPILE));
+//                scopeFilter.add(new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME));
                 try {
-                    DependencyTree tree = dependencyTreeBuilder.buildDependencyTree(
-                            module, localRepository, factory, artifactMetadataSource, collector);
-                    current = tree.getRootNode();
+                    current = dependencyTreeBuilder.buildDependencyTree(
+                            module, localRepository, factory, artifactMetadataSource, null, collector);
                 } catch (DependencyTreeBuilderException e) {
                     throw new MojoExecutionException("Unable to build dependency tree", e);
                 }
@@ -161,11 +195,20 @@ public class DependencyXmlMojo extends AbstractMojo {
         Artifact artifact = current.getArtifact();
         addAttribute(out, "id", artifact.getArtifactId());
         addAttribute(out, "group", artifact.getGroupId());
+        // Get version from HashMap
+        String v = includedArtifacts.get(artifact.getArtifactId());
+        if (v != null) {
+            artifact.setVersion(v);
+        }
         addAttribute(out, "version", artifact.getVersion());
         addAttribute(out, "type", artifact.getType());
         addAttribute(out, "scope", artifact.getScope());
         addAttribute(out, "classifier", artifact.getClassifier());
-        addAttribute(out, "file", this.getJarFile(artifact).toString());
+        try {
+        	addAttribute(out, "file", this.getJarFile(artifact).toString());
+        } catch (Exception e) {
+            getLog().debug(artifact.getArtifactId()+"Could not find JAR");
+        }
 
         MavenProject proj = this.getMavenProject(artifact);
         if (proj != null) {
