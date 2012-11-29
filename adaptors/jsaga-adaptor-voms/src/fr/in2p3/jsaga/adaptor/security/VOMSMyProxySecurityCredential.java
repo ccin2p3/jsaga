@@ -1,12 +1,10 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import org.glite.voms.VOMSAttribute;
-import org.glite.voms.VOMSValidator;
-import org.globus.gsi.CertUtil;
-import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.util.Util;
 import org.ietf.jgss.GSSCredential;
+import org.italiangrid.voms.VOMSAttribute;
+import org.italiangrid.voms.VOMSValidators;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
@@ -15,11 +13,10 @@ import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import org.globus.gsi.X509Credential;
 import org.globus.gsi.util.ProxyCertificateUtil;
 
@@ -61,8 +58,8 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
             } else {
                 throw new NoSuccessException("Not a globus proxy");
             }
-            Vector v = VOMSValidator.parse(globusProxy.getCertificateChain());
-            VOMSAttribute attr = (VOMSAttribute) v.elementAt(0);
+            List<VOMSAttribute> v = VOMSValidators.newValidator().validate(globusProxy.getCertificateChain());
+            VOMSAttribute attr = (VOMSAttribute) v.get(0);
             try {
                 long timeleft = (attr.getNotAfter().getTime() - System.currentTimeMillis()) / 1000;
                 if (Context.LIFETIME.equals(key)) {
@@ -98,14 +95,14 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
         out.println("  timeleft : " + Util.formatTimeSec(globusProxy.getTimeLeft() + UDuration.toInt(this._genuineLifeTime) - UDuration.toInt(_localLifeTime)));
 
         // VOMS specific
-        Vector v = VOMSValidator.parse(globusProxy.getCertificateChain());
+        List<VOMSAttribute> v = VOMSValidators.newValidator().parse(globusProxy.getCertificateChain());
         for (int i = 0; i < v.size(); i++) {
-            VOMSAttribute attr = (VOMSAttribute) v.elementAt(i);
+            VOMSAttribute attr = (VOMSAttribute) v.get(i);
             out.println("  === VO " + attr.getVO() + " extension information ===");
             out.println("  VO        : " + attr.getVO());
             out.println("  subject   : " + globusProxy.getIdentity());
-            out.println("  issuer    : " + attr.getIssuerX509());
-            for (Iterator it = attr.getFullyQualifiedAttributes().iterator(); it.hasNext();) {
+            out.println("  issuer    : " + attr.getIssuer().getName());
+            for (Iterator<String> it = attr.getFQANs().iterator(); it.hasNext();) {
                 out.println("  attribute : " + it.next());
             }
             long timeleft = (attr.getNotAfter().getTime() - System.currentTimeMillis()) / 1000;
