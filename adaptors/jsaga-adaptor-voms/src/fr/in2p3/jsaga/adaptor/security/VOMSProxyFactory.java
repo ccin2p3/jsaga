@@ -23,7 +23,6 @@ import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSErrorMessage;
 import org.italiangrid.voms.request.VOMSRequestListener;
 import org.italiangrid.voms.request.VOMSServerInfo;
-import org.italiangrid.voms.request.VOMSServerInfoStoreListener;
 import org.italiangrid.voms.request.VOMSWarningMessage;
 import org.italiangrid.voms.request.impl.DefaultVOMSACRequest;
 import org.italiangrid.voms.request.impl.DefaultVOMSServerInfo;
@@ -117,22 +116,7 @@ public class VOMSProxyFactory {
 			}
 		};
 		
-		VOMSServerInfoStoreListener vomsServerInfoStoreListener = new VOMSServerInfoStoreListener() {
-			
-			public void notifyVOMSESlookup(String vomsesPath) {
-				logger.error("VOMSES lookup :" + vomsesPath);
-			}
-			
-			public void notifyVOMSESInformationLoaded(String vomsesPath, VOMSServerInfo info) {
-				logger.info("VOMSES Information Loaded :" + vomsesPath + ", Infos: " + info);
-			}
-			
-			public void notifyNoValidVOMSESError(List<String> searchedPaths) {
-				logger.error("No Valid VOMSES Error :" + Arrays.toString(searchedPaths.toArray()));
-			}
-		};
-        
-        m_jsagaVomsACProxy = new JSAGAVOMSACProxy(cadir, vomsRequestListener, vomsServerInfoStoreListener);
+        m_jsagaVomsACProxy = new JSAGAVOMSACProxy(cadir, vomsRequestListener);
         
         if (cred != null) {
             if (cred instanceof GlobusGSSCredentialImpl) {
@@ -153,7 +137,7 @@ public class VOMSProxyFactory {
                     String userCert = (String) attributes.get(Context.USERCERT);
                     String userKey = (String) attributes.get(Context.USERKEY);
 					try {
-						PEMCredential pemCredential = new PEMCredential(userCert, userKey, passphrase != null ? passphrase.toCharArray() : null);
+						PEMCredential pemCredential = new PEMCredential(userKey, userCert, passphrase != null ? passphrase.toCharArray() : null);
 						m_userCredential =  new X509Credential(pemCredential.getKey(), pemCredential.getCertificateChain());
 					} catch (Exception e) {
 						throw new BadParameterException("Unable to load the provided pems files (cert: '" + userCert + "', key: '" + userKey, e);
@@ -273,18 +257,14 @@ public class VOMSProxyFactory {
 				throw new NoSuccessException("Unable to generate the requested VOMS proxy", e);
 			}
             // validate
-            try {
-            	List<String> vomsdirs = new ArrayList<String>();
-            	vomsdirs.add(vomsdir);
-                List<VOMSAttribute> v = VOMSValidators.newValidator(new DefaultVOMSTrustStore(vomsdirs), CertificateValidatorBuilder.buildCertificateValidator(cadir)).parse(globusProxy.getCertificateChain());
-                for (int i = 0; i < v.size(); i++) {
-                    VOMSAttribute attr = (VOMSAttribute) v.get(i);
-                    if (!attr.getVO().equals(m_vomsACRequest.getVoName())) {
-                        throw new NoSuccessException("The VO name of the created VOMS proxy ('" + attr.getVO() + "') does not match with the required VO name ('" + m_vomsACRequest.getVoName() + "').");
-                    }
+        	List<String> vomsdirs = new ArrayList<String>();
+        	vomsdirs.add(vomsdir);
+            List<VOMSAttribute> v = VOMSValidators.newValidator(new DefaultVOMSTrustStore(vomsdirs), CertificateValidatorBuilder.buildCertificateValidator(cadir)).parse(globusProxy.getCertificateChain());
+            for (int i = 0; i < v.size(); i++) {
+                VOMSAttribute attr = (VOMSAttribute) v.get(i);
+                if (!attr.getVO().equals(m_vomsACRequest.getVoName())) {
+                    throw new NoSuccessException("The VO name of the created VOMS proxy ('" + attr.getVO() + "') does not match with the required VO name ('" + m_vomsACRequest.getVoName() + "').");
                 }
-            } catch (IllegalArgumentException iAE) {
-                throw new BadParameterException("The lifetime may be too long", iAE);
             }
             try {
 	            FileOutputStream fileOutputStream = new FileOutputStream(m_userProxyFile);

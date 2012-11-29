@@ -16,9 +16,8 @@ import org.italiangrid.voms.request.VOMSRequestListener;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.VOMSServerInfoStore;
-import org.italiangrid.voms.request.VOMSServerInfoStoreListener;
+import org.italiangrid.voms.request.impl.BaseVOMSESLookupStrategy;
 import org.italiangrid.voms.request.impl.DefaultVOMSACService;
-import org.italiangrid.voms.request.impl.DefaultVOMSESLookupStrategy;
 import org.italiangrid.voms.request.impl.DefaultVOMSServerInfoStore;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.italiangrid.voms.util.NullListener;
@@ -42,10 +41,10 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
 	private ProxyType proxyType = ProxyType.LEGACY;
 	private ProxyPolicy proxyPolicy = null; //equivalent to: ProxyPolicy.INHERITALL_POLICY_OID
 
-	private final VOMSServerInfoStore serverInfoStore = new DefaultVOMSServerInfoStore();
+	private final VOMSServerInfoStore serverInfoStore = new DefaultVOMSServerInfoStore(new BaseVOMSESLookupStrategy(new String[0]));
 	
-	public JSAGAVOMSACProxy(String caDir, VOMSRequestListener vomsRequestListener, VOMSServerInfoStoreListener serverInfoStoreListener){
-		super(CertificateValidatorBuilder.buildCertificateValidator(caDir), vomsRequestListener, new DefaultVOMSESLookupStrategy(), serverInfoStoreListener, new NullListener());
+	public JSAGAVOMSACProxy(String caDir, VOMSRequestListener vomsRequestListener){
+		super(CertificateValidatorBuilder.buildCertificateValidator(caDir), vomsRequestListener, new BaseVOMSESLookupStrategy(new String[0]), new NullListener(), new NullListener());
 	}
 	
 	public void addVOMSServerInfo(VOMSServerInfo vomsServerInfo) {
@@ -76,7 +75,9 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
 		proxyOptions.setLifetime(proxyLifetime);
 		proxyOptions.setType(proxyType);
 		proxyOptions.setLimited(proxyLimited);
-		proxyOptions.setPolicy(proxyPolicy);
+		if(proxyPolicy != null){
+			proxyOptions.setPolicy(proxyPolicy);
+		}
 		ProxyCertificate proxyCert;
 		try {
 			proxyCert = ProxyGenerator.generate(proxyOptions, emiCred.getKey());

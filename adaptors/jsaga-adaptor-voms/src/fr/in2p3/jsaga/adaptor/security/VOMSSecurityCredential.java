@@ -15,6 +15,7 @@ import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
 import org.globus.gsi.X509Credential;
+import org.globus.gsi.util.CertificateUtil;
 import org.globus.gsi.util.ProxyCertificateUtil;
 
 /* ***************************************************
@@ -71,21 +72,21 @@ public class VOMSSecurityCredential extends GSSCredentialSecurityCredential impl
         } else {
             throw new Exception("Not a globus proxy");
         }
-        out.println("  subject  : "+globusProxy.getCertificateChain()[0].getSubjectX500Principal());
-        out.println("  issuer   : "+globusProxy.getCertificateChain()[0].getSubjectX500Principal());
+        out.println("  subject  : "+globusProxy.getSubject());
+        out.println("  issuer   : "+globusProxy.getIssuer());
         out.println("  identity : "+globusProxy.getIdentity());
         out.println("  type     : "+ProxyCertificateUtil.getProxyTypeAsString(globusProxy.getProxyType()));
         out.println("  strength : "+globusProxy.getStrength()+" bits");
         out.println("  timeleft : "+Util.formatTimeSec(globusProxy.getTimeLeft()));
 
         // VOMS specific
-        List<VOMSAttribute> v = VOMSValidators.newValidator().validate(globusProxy.getCertificateChain());
+        List<VOMSAttribute> v = VOMSValidators.newParser().parse(globusProxy.getCertificateChain());
         for (int i=0; i<v.size(); i++) {
             VOMSAttribute attr = (VOMSAttribute) v.get(i);
             out.println("  === VO "+attr.getVO()+" extension information ===");
             out.println("  VO        : "+attr.getVO());
             out.println("  subject   : "+globusProxy.getIdentity());
-            out.println("  issuer    : "+attr.getIssuer().getName());
+            out.println("  issuer    : "+CertificateUtil.toGlobusID(attr.getIssuer()));
             for (Iterator<String> it=attr.getFQANs().iterator(); it.hasNext(); ) {
                 out.println("  attribute : "+it.next());
             }
