@@ -1,25 +1,42 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
-import fr.in2p3.jsaga.adaptor.base.usage.*;
-import fr.in2p3.jsaga.adaptor.security.JSAGAVOMSACProxy.VOMSException;
-import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
-import org.bouncycastle.jce.provider.X509CertificateObject;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Map;
+
 import org.globus.common.CoGProperties;
+import org.globus.gsi.X509Credential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.util.Util;
 import org.gridforum.jgss.ExtendedGSSCredential;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
+import org.italiangrid.voms.asn1.VOMSACUtils;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.*;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.TimeoutException;
 
-import java.io.*;
-import java.security.cert.X509Certificate;
-import java.util.Map;
-import org.globus.gsi.X509Credential;
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
+import fr.in2p3.jsaga.adaptor.base.usage.UFile;
+import fr.in2p3.jsaga.adaptor.base.usage.UFilePath;
+import fr.in2p3.jsaga.adaptor.base.usage.UHidden;
+import fr.in2p3.jsaga.adaptor.base.usage.UNoPrompt;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
+import fr.in2p3.jsaga.adaptor.base.usage.UOr;
+import fr.in2p3.jsaga.adaptor.base.usage.UProxyValue;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.security.JSAGAVOMSACProxy.VOMSException;
+import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -222,10 +239,19 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
 	    	}
     	}*/
         File certRepository = new File((String) attributes.get(Context.CERTREPOSITORY));
-        if (hasNonCriticalExtensions(cred)) {
-            return new VOMSSecurityCredential(cred, certRepository);
-        } else {
-            throw new IncorrectStateException("Security context is not of type: "+this.getType());
+        if (cred instanceof GlobusGSSCredentialImpl) {
+            X509Credential globusProxy = ((GlobusGSSCredentialImpl)cred).getX509Credential();
+	        try {
+				if (!VOMSACUtils.getACsFromCertificate(globusProxy.getCertificateChain()[0]).isEmpty()) {
+				    return new VOMSSecurityCredential(cred, certRepository);
+				} else {
+				    throw new IncorrectStateException("Security context is not of type: "+this.getType());
+				}
+			} catch (IOException e) {
+				throw new IncorrectStateException("Unable to determine if the provided GSSCredentialis a VOMS certificate or not", e);
+			}
+        }else{
+        	throw new IncorrectStateException("The provided GSSCredential is not instance of GlobusGSSCredentialImpl");
         }
     }
 
@@ -254,17 +280,5 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                 GSSCredential.DEFAULT_LIFETIME,
                 null, // use default mechanism: GSI
                 GSSCredential.INITIATE_AND_ACCEPT);
-    }
-
-    private static boolean hasNonCriticalExtensions(GSSCredential proxy) {
-    	 if (proxy instanceof GlobusGSSCredentialImpl) {
-            X509Credential globusProxy = ((GlobusGSSCredentialImpl)proxy).getX509Credential();
-            X509Certificate cert = globusProxy.getCertificateChain()[0];
-            if (cert instanceof X509CertificateObject) {
-                X509CertificateObject bouncyCert = (X509CertificateObject) cert;
-                return bouncyCert.getNonCriticalExtensionOIDs()!=null && !bouncyCert.getNonCriticalExtensionOIDs().isEmpty();
-            }
-        }
-        return false;
     }
 }
