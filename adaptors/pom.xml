@@ -175,6 +175,50 @@
         	</plugins>
         </pluginManagement>
     </build>
+    <repositories>
+    	<!-- CNAF repos for glite/EMI libs (https://github.com/italiangrid) -->
+    	<repository>
+			<id>cnaf-releases</id>
+			<name>CNAF releases</name>
+			<url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-releases/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>cnaf-snapshots</id>
+			<name>CNAF snapshots</name>
+			<url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>fail</checksumPolicy>
+			</snapshots>
+		</repository>
+		<!-- maatG repos for jglobus version not yet published -->
+		<repository>
+			<id>maatg-fr-releases</id>
+			<name>maatG France Releases</name>
+			<url>http://nexus.maatg.fr/content/repositories/maatg-fr-releases</url>
+		</repository>
+		<repository>
+			<id>maatg-fr-snapshots</id>
+			<name>maatG France Snapshots</name>
+			<url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>fail</checksumPolicy>
+			</snapshots>
+		</repository>
+		
+	</repositories>
     <dependencies>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
