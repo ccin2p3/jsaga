@@ -6,7 +6,6 @@ import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.globus.common.CoGProperties;
-import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.util.Util;
 import org.gridforum.jgss.ExtendedGSSCredential;

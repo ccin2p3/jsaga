@@ -1,7 +1,5 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import org.globus.gsi.CertUtil;
-import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.X509Credential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.gsi.util.ProxyCertificateUtil;
