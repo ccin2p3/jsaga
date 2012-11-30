@@ -4,16 +4,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import org.bouncycastle.openssl.PasswordFinder;
 import org.globus.gsi.CredentialException;
 import org.globus.gsi.GSIConstants;
 import org.globus.gsi.X509Credential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
+import org.globus.gsi.util.CertificateLoadUtil;
 import org.globus.util.Util;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -32,8 +36,6 @@ import org.ogf.saga.context.Context;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 
-import eu.emi.security.authn.x509.impl.KeystoreCredential;
-import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.proxy.ProxyPolicy;
 import eu.emi.security.authn.x509.proxy.ProxyType;
 import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
@@ -130,6 +132,13 @@ public class VOMSProxyFactory {
             if ("".equals(passphrase)) {
                 passphrase = null;
             }
+            
+            final char[] pwd;
+            if(passphrase != null){
+            	pwd = passphrase.toCharArray();
+            }else{
+            	pwd = null;
+            }
 
             // get certificate
             switch (certificateFormat) {
@@ -137,8 +146,13 @@ public class VOMSProxyFactory {
                     String userCert = (String) attributes.get(Context.USERCERT);
                     String userKey = (String) attributes.get(Context.USERKEY);
 					try {
-						PEMCredential pemCredential = new PEMCredential(userKey, userCert, passphrase != null ? passphrase.toCharArray() : null);
-						m_userCredential =  new X509Credential(pemCredential.getKey(), pemCredential.getCertificateChain());
+						X509Certificate[] x509Certificates = CertificateLoadUtil.loadCertificates(userCert);
+						PrivateKey privateKey = CertificateLoadUtil.loadPrivateKey(userKey, new PasswordFinder() {
+							public char[] getPassword() {
+								return pwd;
+							}
+						});
+						m_userCredential =  new X509Credential(privateKey, x509Certificates);
 					} catch (Exception e) {
 						throw new BadParameterException("Unable to load the provided pems files (cert: '" + userCert + "', key: '" + userKey, e);
 					}
@@ -146,8 +160,7 @@ public class VOMSProxyFactory {
                 case CERTIFICATE_PKCS12:
                     String pkcs12 = (String) attributes.get(VOMSContext.USERCERTKEY);
 					try {
-						KeystoreCredential keystoreCredential = new KeystoreCredential(pkcs12, passphrase != null ? passphrase.toCharArray() : null, null, null, "PKCS12");
-						m_userCredential =  new X509Credential(keystoreCredential.getKey(), keystoreCredential.getCertificateChain());
+						m_userCredential =  CertificateLoadUtil.loadKeystore(pkcs12, passphrase != null ? passphrase.toCharArray() : null, null, null, "PKCS12");
 					} catch (Exception e) {
 						throw new BadParameterException("Unable to load the provided pkcs12 file (" + pkcs12 + ")");
 					}
