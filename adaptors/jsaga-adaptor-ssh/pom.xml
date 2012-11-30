@@ -30,7 +30,7 @@ execution management technology (SSH).</description>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-classic</artifactId>
             <version>0.9.16-SNAPSHOT</version>
-            <scope>compile</scope>
+           <scope>compile</scope>
         </dependency>
 		<dependency>
 		    <groupId>com.jcraft</groupId>

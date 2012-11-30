@@ -28,7 +28,6 @@
 			<version>0.9.16-SNAPSHOT</version>
 			<!-- requested for HttpRequest -->
 			<!--  TODO: back to runtime when HttpRequest no more needed at submission -->
-			<scope>compile</scope>
 		</dependency>
 		<!-- incompatibility with 1.2.8 -->
         <dependency>

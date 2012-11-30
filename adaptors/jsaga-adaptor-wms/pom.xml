@@ -23,11 +23,11 @@
         </developer>
 		<developer>
 			<name>Jérôme Revillard</name>
-			<email>jrevillard@maatg.fr</email>
-			<organization>MAAT France</organization>
-			<organizationUrl>http://www.maatg.com/</organizationUrl>
+			<email>jrevillard@gnubila.fr</email>
+			<organization>gnúbila France</organization>
+			<organizationUrl>http://gnubila.fr/</organizationUrl>
 			<properties>
-				<organizationLogoUrl>http://www.maatg.com/ptr/gestion/usuarios/user79048/maatg/files/img/vmaatg20090921224133.png</organizationLogoUrl>
+				<organizationLogoUrl>http://gnubila.fr/documents/10157/96198/Gnubila-Cloud-1000.png</organizationLogoUrl>
 			</properties>
 		</developer>
 	</developers>

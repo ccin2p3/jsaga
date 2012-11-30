@@ -78,7 +78,7 @@
                         <manifestEntries>
                             <Specification-Title>SAGA</Specification-Title>
                             <Specification-Vendor>Open Grid Forum, Copyright 2006</Specification-Vendor>
-                            <Specification-Version>1.0 RC.6</Specification-Version>
+                            <Specification-Version>1.1.1</Specification-Version>
                             <Implementation-Title>JSAGA</Implementation-Title>
                         </manifestEntries>
                         <manifest>
