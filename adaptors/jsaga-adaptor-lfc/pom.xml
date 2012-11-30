@@ -2,7 +2,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
-        <version>0.9.15-SNAPSHOT</version>
+        <version>0.9.16-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>jsaga-adaptor-lfc</artifactId>
@@ -11,11 +11,11 @@
 	<developers>
 		<developer>
 			<name>Jérôme Revillard</name>
-			<email>jrevillard@maatg.fr</email>
-			<organization>MAAT France</organization>
-			<organizationUrl>http://www.maatg.com/</organizationUrl>
+			<email>jrevillard@gnubila.fr</email>
+			<organization>gnúbila France</organization>
+			<organizationUrl>http://gnubila.fr/</organizationUrl>
 			<properties>
-				<organizationLogoUrl>http://www.maatg.com/ptr/gestion/usuarios/user79048/maatg/files/img/vmaatg20090921224133.png</organizationLogoUrl>
+				<organizationLogoUrl>http://gnubila.fr/documents/10157/96198/Gnubila-Cloud-1000.png</organizationLogoUrl>
 			</properties>
 		</developer>
 	</developers>
@@ -40,7 +40,7 @@
 		<dependency><!-- for security context (WARNING: order of dependencies matters) -->
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-voms</artifactId>
-			<version>0.9.15-SNAPSHOT</version>
+			<version>0.9.16-SNAPSHOT</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -62,13 +62,13 @@
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-classic</artifactId>
-			<version>0.9.15-SNAPSHOT</version>
+			<version>0.9.16-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-srm</artifactId>
-			<version>0.9.15-SNAPSHOT</version>
+			<version>0.9.16-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
