@@ -26,6 +26,5 @@
         <module>glite-security-delegation-java</module>
         <module>glite-security-util-java</module>
         <module>glite-jdl-api-java</module>
-        <module>glite-security-voms-java</module>
     </modules>
 </project>
