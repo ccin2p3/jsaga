@@ -1,8 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
-import org.globus.gsi.CertUtil;
-import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.util.Util;
 import org.ietf.jgss.GSSCredential;
@@ -10,7 +8,6 @@ import org.ietf.jgss.GSSCredential;
 import java.io.File;
 import java.io.PrintStream;
 import org.globus.gsi.X509Credential;
-import org.globus.gsi.util.CertificateUtil;
 import org.globus.gsi.util.ProxyCertificateUtil;
 
 /* ***************************************************
@@ -38,8 +35,8 @@ public class GlobusSecurityCredential extends GSSCredentialSecurityCredential im
         } else {
             throw new Exception("Not a globus proxy");
         }
-        out.println("  subject  : "+globusProxy.getCertificateChain()[0].getSubjectDN());
-        out.println("  issuer   : "+globusProxy.getCertificateChain()[0].getIssuerDN());
+        out.println("  subject  : "+globusProxy.getSubject());
+        out.println("  issuer   : "+globusProxy.getIssuer());
         out.println("  identity : "+globusProxy.getIdentity());
         out.println("  type     : "+ProxyCertificateUtil.getProxyTypeAsString(globusProxy.getProxyType()));
         out.println("  strength : "+globusProxy.getStrength()+" bits");

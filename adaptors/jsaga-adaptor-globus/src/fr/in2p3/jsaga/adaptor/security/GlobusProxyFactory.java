@@ -1,21 +1,30 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
-import org.globus.common.CoGProperties;
+import java.io.File;
+import java.io.IOException;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.text.ParseException;
+import java.util.Map;
+
+import org.bouncycastle.openssl.PasswordFinder;
 import org.globus.common.Version;
-import org.globus.gsi.*;
+import org.globus.gsi.CredentialException;
+import org.globus.gsi.GSIConstants;
+import org.globus.gsi.GSIConstants.CertificateType;
+import org.globus.gsi.X509Credential;
+import org.globus.gsi.bc.BouncyCastleCertProcessingFactory;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
-import org.globus.gsi.proxy.ext.ProxyCertInfo;
-import org.globus.gsi.proxy.ext.ProxyPolicy;
+import org.globus.gsi.util.CertificateLoadUtil;
+import org.globus.util.Util;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.*;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
 
-import java.text.ParseException;
-import java.util.Map;
-import org.globus.gsi.util.CertificateUtil;
-import org.globus.gsi.util.ProxyCertificateUtil;
+import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -29,37 +38,72 @@ import org.globus.gsi.util.ProxyCertificateUtil;
 /**
  *
  */
-public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
+public class GlobusProxyFactory {
     public static final int OID_OLD = 2;
     public static final int OID_GLOBUS = 3;    // default
     public static final int OID_RFC820 = 4;
     
-    private String m_certFile = "";
+    private static final int PROXY_BITS = 1024;
+    private static final int DEFAULT_PROXY_LIFETIME = 3600 * 12;
+    
+    protected static final int CERTIFICATE_PEM = 0;
+    protected static final int CERTIFICATE_PKCS12 = 1;
+    
+    private X509Credential m_userCredential = null;
     private String m_proxyFile = "";
-    private String m_keyFile = null;
+    private int m_proxyLifetime = 0;
+    private CertificateType m_proxyType = null;
+    private String m_cadir = null;
 
     public GlobusProxyFactory(Map attributes, int oid, int certificateFormat) throws BadParameterException, ParseException {
         // required attributes
-        super((String) attributes.get(Context.USERPASS)); // UserPass is ignored if key is not encrypted
-        CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
+    	String passphrase = (String) attributes.get(Context.USERPASS);        
+        m_cadir = (String) attributes.get(Context.CERTREPOSITORY);
         m_proxyFile = (String) attributes.get(Context.USERPROXY);
-        super.setCertificateFormat(certificateFormat);
+        
+        if ("".equals(passphrase)) {
+            passphrase = null;
+        }
+        
+        final char[] pwd;
+        if(passphrase != null){
+        	pwd = passphrase.toCharArray();
+        }else{
+        	pwd = null;
+        }
         switch(certificateFormat) {
-            case CERTIFICATE_PEM:
-                m_certFile = (String) attributes.get(Context.USERCERT);
-                m_keyFile = (String) attributes.get(Context.USERKEY);
-                break;
-            case CERTIFICATE_PKCS12:
-                m_certFile = (String) attributes.get(GlobusContext.USERCERTKEY);
-                m_keyFile = (String) attributes.get(GlobusContext.USERCERTKEY);
-                break;
+	        case CERTIFICATE_PEM:
+	            String userCert = (String) attributes.get(Context.USERCERT);
+	            String userKey = (String) attributes.get(Context.USERKEY);
+				try {
+					X509Certificate[] x509Certificates = CertificateLoadUtil.loadCertificates(userCert);
+					PrivateKey privateKey = CertificateLoadUtil.loadPrivateKey(userKey, new PasswordFinder() {
+						public char[] getPassword() {
+							return pwd;
+						}
+					});
+					m_userCredential =  new X509Credential(privateKey, x509Certificates);
+				} catch (Exception e) {
+					throw new BadParameterException("Unable to load the provided pems files (cert: '" + userCert + "', key: '" + userKey, e);
+				}
+	            break;
+	        case CERTIFICATE_PKCS12:
+	            String pkcs12 = (String) attributes.get(GlobusContext.USERCERTKEY);
+				try {
+					m_userCredential =  CertificateLoadUtil.loadKeystore(pkcs12, passphrase != null ? passphrase.toCharArray() : null, null, null, "PKCS12");
+				} catch (Exception e) {
+					throw new BadParameterException("Unable to load the provided pkcs12 file (" + pkcs12 + ")");
+				}
+	            break;
             default:
                 throw new BadParameterException("Invalid case, either PEM or PKCS12 certificates is supported");
         }
         
         // optional attributes
         if (attributes.containsKey(Context.LIFETIME)) {
-            lifetime = UDuration.toInt(attributes.get(Context.LIFETIME));
+        	m_proxyLifetime = UDuration.toInt(attributes.get(Context.LIFETIME));
+        }else{
+        	m_proxyLifetime = DEFAULT_PROXY_LIFETIME;
         }
         boolean limited = false;
         if (attributes.containsKey(GlobusContext.DELEGATION)) {
@@ -67,17 +111,17 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
         }
         switch(oid) {
             case OID_OLD:
-                proxyType = (limited) ?
+            	m_proxyType = (limited) ?
                         GSIConstants.CertificateType.GSI_2_LIMITED_PROXY :
                         GSIConstants.CertificateType.GSI_2_PROXY;
                 break;
             case OID_GLOBUS:
-                proxyType = (limited) ?
+            	m_proxyType = (limited) ?
                         GSIConstants.CertificateType.GSI_3_LIMITED_PROXY :
                         GSIConstants.CertificateType.GSI_3_IMPERSONATION_PROXY;
                 break;
             case OID_RFC820:
-                proxyType = (limited) ?
+            	m_proxyType = (limited) ?
                         GSIConstants.CertificateType.GSI_4_LIMITED_PROXY :
                         GSIConstants.CertificateType.GSI_4_IMPERSONATION_PROXY;
                 break;
@@ -85,48 +129,34 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
     }
 
     public GSSCredential createProxy() throws IncorrectStateException, NoSuccessException {
-        CertificateUtil.init();
-
-        ProxyCertInfo proxyCertInfo = null;
-        if ((ProxyCertificateUtil.isGsi3Proxy(proxyType)) || (ProxyCertificateUtil.isGsi4Proxy(proxyType))) {
-            ProxyPolicy policy;
-            if (ProxyCertificateUtil.isLimitedProxy(proxyType)) {
-                policy = new ProxyPolicy(ProxyPolicy.LIMITED);
-            } else if (ProxyCertificateUtil.isIndependentProxy(proxyType)) {
-                policy = new ProxyPolicy(ProxyPolicy.INDEPENDENT);
-            } else if (ProxyCertificateUtil.isImpersonationProxy(proxyType)) {
-                policy = new ProxyPolicy(ProxyPolicy.IMPERSONATION);
-            } else {
-                throw new IllegalArgumentException("Invalid proxyType");
-            }
-            proxyCertInfo = new ProxyCertInfo(policy);
-        }
-
-        super.setBits(bits);
-        super.setLifetime(lifetime);
-        super.setProxyType(proxyType);
-        super.setProxyCertInfo(proxyCertInfo);
-        super.setDebug(false);
-        super.setQuiet(false);
-        super.setStdin(false);
-        try {
-            final boolean VERIFY = false;
-            final boolean GLOBUS_STYLE = false;
-            super.createProxy(m_certFile, m_keyFile, VERIFY, GLOBUS_STYLE, m_proxyFile);
-        } catch (NullPointerException e) {
-            throw new IncorrectStateException("Bad passphrase", super.m_exception);
-        }
-        try {
-			proxy.verify();
-		} catch (CredentialException e) {
-                    if(proxy.getTimeLeft() < 0)  throw new IncorrectStateException("Your certificate is expired", e);
-                    else throw new NoSuccessException("Proxy verification failed", e);
+    	BouncyCastleCertProcessingFactory bouncyCastleCertProcessingFactory = BouncyCastleCertProcessingFactory.getDefault();    	
+    	X509Credential proxy;
+		try {
+			proxy = bouncyCastleCertProcessingFactory.createCredential(m_userCredential.getCertificateChain(), m_userCredential.getPrivateKey(), PROXY_BITS, m_proxyLifetime, m_proxyType);
+		} catch (Exception e) {
+			throw new NoSuccessException("Unable to generate the user proxy", e);
 		}
         try {
-            return new GlobusGSSCredentialImpl(proxy, GSSCredential.INITIATE_ONLY);
+			proxy.verify(m_cadir);
+		} catch (CredentialException e) {
+			if(proxy.getTimeLeft() < 0){
+				throw new IncorrectStateException("Your certificate is expired", e);
+			}else{
+				throw new NoSuccessException("Proxy verification failed", e);
+			}
+		}
+        try {
+        	GlobusGSSCredentialImpl globusGSSCredentialImpl = new GlobusGSSCredentialImpl(proxy, GSSCredential.INITIATE_ONLY);
+        	proxy.writeToFile(new File(m_proxyFile));
+        	Util.setFilePermissions(m_proxyFile, 600);
+        	return globusGSSCredentialImpl;
         } catch (GSSException e) {
             throw new NoSuccessException("Proxy convertion failed", e);
-        }
+        } catch (CredentialException e) {
+        	throw new NoSuccessException("Unable to save the generated proxy in '" +m_proxyFile + "'", e);
+		} catch (IOException e) {
+			throw new NoSuccessException("Unable to save the generated proxy in '" +m_proxyFile + "'", e);
+		}
     }
     
     public String getVersion() {

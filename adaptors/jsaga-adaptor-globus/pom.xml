@@ -22,6 +22,15 @@ execution management technologies (Gatekeeper).</description>
             </properties>
         </developer>
         <developer>
+			<name>Jérôme Revillard</name>
+			<email>jrevillard@gnubila.fr</email>
+			<organization>gnúbila France</organization>
+			<organizationUrl>http://gnubila.fr/</organizationUrl>
+			<properties>
+				<organizationLogoUrl>http://gnubila.fr/documents/10157/96198/Gnubila-Cloud-1000.png</organizationLogoUrl>
+			</properties>
+		</developer>
+        <developer>
             <name>Aurélien Croc</name>
             <email>aurelien.croc@cea.fr</email>
             <organization>CEA</organization>
@@ -37,23 +46,13 @@ execution management technologies (Gatekeeper).</description>
     <dependencies>
         <dependency>
             <groupId>org.jglobus</groupId>
-            <artifactId>gram</artifactId>
-            <version>2.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jglobus</groupId>
-            <artifactId>gridftp</artifactId>
-            <version>2.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jglobus</groupId>
             <artifactId>io</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <version>2.0-Beta6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.jglobus</groupId>
             <artifactId>myproxy</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <version>2.0-Beta6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
