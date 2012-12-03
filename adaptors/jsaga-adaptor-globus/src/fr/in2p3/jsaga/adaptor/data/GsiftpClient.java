@@ -1,19 +1,11 @@
 package fr.in2p3.jsaga.adaptor.data;
 
+import java.io.EOFException;
 import java.io.IOException;
-import java.util.StringTokenizer;
 
+import org.apache.log4j.Logger;
 import org.globus.ftp.GridFTPClient;
-import org.globus.ftp.MlsxEntry;
-import org.globus.ftp.Session;
-import org.globus.ftp.exception.ClientException;
-import org.globus.ftp.exception.FTPException;
-import org.globus.ftp.exception.FTPReplyParseException;
 import org.globus.ftp.exception.ServerException;
-import org.globus.ftp.exception.UnexpectedReplyCodeException;
-import org.globus.ftp.vanilla.Command;
-import org.globus.ftp.vanilla.FTPServerFacade;
-import org.globus.ftp.vanilla.Reply;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -29,7 +21,7 @@ import org.globus.ftp.vanilla.Reply;
  */
 
 public class GsiftpClient extends GridFTPClient {
-
+	private static Logger logger = Logger.getLogger(GsiftpClient.class);
 	public String welcomeMessage = null;
 	public GsiftpClient(String host, int port) throws IOException,
 			ServerException {
@@ -58,6 +50,11 @@ public class GsiftpClient extends GridFTPClient {
 	}
 	
 	public void disconnect() throws ServerException, IOException {
-		super.close();
+		try{
+			super.close();
+		}catch(EOFException e){
+			//Already closed ?
+			logger.warn("The GSIFTP connection seems already closed: " + e.getMessage());
+		}
 	}
 }
