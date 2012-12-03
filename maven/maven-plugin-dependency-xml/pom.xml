@@ -14,6 +14,16 @@
     <name>Dependencies Serializer Plugin</name>
     <description>This plugin serializes project dependencies to an XML file.</description>
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
         <sourceDirectory>src</sourceDirectory>
     </build>
     <reporting>
