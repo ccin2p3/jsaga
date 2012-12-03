@@ -77,6 +77,7 @@ public class WMStoLB {
         if (lbHost != null) {
             return lbHost;
         } else {
+        	//TODO: check the BDII ?
             return null;
         }
     }

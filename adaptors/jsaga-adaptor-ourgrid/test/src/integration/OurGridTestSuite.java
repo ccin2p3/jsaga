@@ -43,15 +43,15 @@ public class OurGridTestSuite extends TestSuite {
     // test cases
     public static class OurGridJobRunRequiredTest extends JobRunRequiredTest {
         public OurGridJobRunRequiredTest() throws Exception {super("ourgrid");}
-        // FIXME: server sould send FAILED
-        public void test_run_error() { super.ignore("disabled because server sends RUNNING when command does not exists"); }
+//        // FIXME: server sould send FAILED
+//        public void test_run_error() { super.ignore("disabled because server sends RUNNING when command does not exists"); }
     }
     
     // test cases
     public static class OurGridJobRunDescriptionTest extends JobRunDescriptionTest {
         public OurGridJobRunDescriptionTest() throws Exception {super("ourgrid");}
-        // FIXME: FAILED state is not handled properly
-        public void test_run_inWorkingDirectory() { super.ignore("FAILED state is not handled properly"); }
+//        // FIXME: FAILED state is not handled properly
+//        public void test_run_inWorkingDirectory() { super.ignore("FAILED state is not handled properly"); }
         // FIXME: requirements not handled
         public void test_run_queueRequirement() throws Exception { super.ignore("Queue is ignored");}
         public void test_run_cpuTimeRequirement() throws Exception { super.ignore("TotalCPUTime is ignored");}
@@ -60,14 +60,14 @@ public class OurGridTestSuite extends TestSuite {
       /** test cases */
     public static class OurGridJobRunSandboxTest extends JobRunSandboxTest {
         public OurGridJobRunSandboxTest() throws Exception {super("ourgrid");}
-        // FIXME: stays RUNNING forever
-        public void test_remote_input_explicit() throws Exception { super.ignore("DISABLED: stay RUNNING"); }
-        // FIXME: stays RUNNING forever
-        public void test_remote_output_explicit() throws Exception { super.ignore("DISABLED: stay RUNNING"); }
-        // FIXME: stays RUNNING forever
-        public void test_input_output_explicit() throws Exception { super.ignore("DISABLED: stay RUNNING"); }
-        // FIXME: stays RUNNING forever
-        public void test_input_output_implicit() throws Exception { super.ignore("DISABLED: stay RUNNING"); }
+//        // FIXME: stays RUNNING forever
+//        public void test_remote_input_explicit() throws Exception { super.ignore("DISABLED: stay RUNNING"); }
+//        // FIXME: stays RUNNING forever
+//        public void test_remote_output_explicit() throws Exception { super.ignore("DISABLED: stay RUNNING"); }
+//        // FIXME: stays RUNNING forever
+//        public void test_input_output_explicit() throws Exception { super.ignore("DISABLED: stay RUNNING"); }
+//        // FIXME: stays RUNNING forever
+//        public void test_input_output_implicit() throws Exception { super.ignore("DISABLED: stay RUNNING"); }
     
     }
     // test cases

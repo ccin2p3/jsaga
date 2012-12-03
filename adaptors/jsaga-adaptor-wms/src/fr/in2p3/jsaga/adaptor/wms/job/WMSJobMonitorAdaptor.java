@@ -18,11 +18,6 @@ import org.glite.wsdl.services.lb.LoggingAndBookkeepingLocator;
 import org.glite.wsdl.services.lb.LoggingAndBookkeepingPortType;
 import org.glite.wsdl.types.lb.GenericFault;
 import org.glite.wsdl.types.lb.JobFlagsValue;
-import org.glite.wsdl.types.lb.QueryAttr;
-import org.glite.wsdl.types.lb.QueryConditions;
-import org.glite.wsdl.types.lb.QueryOp;
-import org.glite.wsdl.types.lb.QueryRecValue;
-import org.glite.wsdl.types.lb.QueryRecord;
 import org.glite.wsdl.types.lb.StatName;
 import org.glite.wsdl.types.lb.StateEnterTimesItem;
 import org.glite.wsdl.types.lb.holders.JobStatusArrayHolder;
@@ -46,7 +41,6 @@ import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
-import org.glite.wsdl.types.lb.JobFlags;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -164,8 +158,7 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        // get job Status
 	        JobFlagsValue[] jobFlagsValue = new JobFlagsValue[1];
 	        jobFlagsValue[0] = JobFlagsValue.CLASSADS;
-                
-	        org.glite.wsdl.types.lb.JobStatus jobInfo = stub.jobStatus(nativeJobId, new JobFlags(jobFlagsValue));
+	        org.glite.wsdl.types.lb.JobStatus jobInfo = stub.jobStatus(nativeJobId, jobFlagsValue);
 	        if(jobInfo == null) {
 	            throw new NoSuccessException("Unable to get information about job: "+nativeJobId);
 	        }
@@ -203,25 +196,9 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
         try {
             // get stub
             LoggingAndBookkeepingPortType stub = getLBStub(m_credential);
-
-            // get list of jobids
-            JobFlagsValue[] jobFlagsValue = new JobFlagsValue[1];
-            jobFlagsValue[0] = JobFlagsValue.CLASSADS;
-
             JobStatusArrayHolder jobStatusResult = new JobStatusArrayHolder();
             StringArrayHolder jobNativeIdResult = new StringArrayHolder();
-
-            QueryConditions[] queryConditions = new  QueryConditions[1];
-            queryConditions[0] = new QueryConditions();
-            queryConditions[0].setAttr(QueryAttr.JOBID);
-
-            QueryRecord[] qR = new QueryRecord[1];
-            QueryRecValue value1 = new QueryRecValue();
-            value1.setC("https://"+m_lbHost+"/");
-            qR[0] = new QueryRecord(QueryOp.UNEQUAL, value1, null );
-            queryConditions[0].setRecord(qR);
-            // Cannot use stub.userJobs() because not yet implemented (version > 1.8 needed)
-	        stub.queryJobs(queryConditions, new JobFlags(jobFlagsValue), jobNativeIdResult, jobStatusResult);
+            stub.userJobs(jobNativeIdResult, jobStatusResult);
             return jobNativeIdResult.value;
         } catch (MalformedURLException e) {
             throw new NoSuccessException(e);

@@ -30,16 +30,10 @@ rem set PROPERTIES=%PROPERTIES% -Ddebug
 
 REM # set classpath
 set CLASSPATH=.
-for %%i in ("%JSAGA_HOME%\lib\*.jar") do (
-  set CLASSPATH=!CLASSPATH!;%%i
-)
-for %%i in ("%JSAGA_HOME%\lib-adaptors\*.jar") do (
-  set CLASSPATH=!CLASSPATH!;%%i
-)
+set CLASSPATH=!CLASSPATH!;"%JSAGA_HOME%\lib\*"
+set CLASSPATH=!CLASSPATH!;"%JSAGA_HOME%\lib-adaptors\*"
 if "${class.name}"=="junit.textui.TestRunner" (
-    for %%i in ("%JSAGA_HOME%\lib-test\*.jar") do (
-      set CLASSPATH=!CLASSPATH!;%%i
-    )
+  set CLASSPATH=!CLASSPATH!;"%JSAGA_HOME%\lib-test\*"
 )
 
 REM # set java

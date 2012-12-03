@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
+
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
@@ -36,6 +37,8 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     protected String m_delegationId;
     protected CreamStub m_creamStub;
 
+    protected String m_creamVersion = "";
+    
     public String getType() {
         return "cream";
     }

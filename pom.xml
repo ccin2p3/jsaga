@@ -63,14 +63,14 @@
         <url>http://forge.in2p3.fr/projects/jsaga/issues</url>
     </issueManagement>
     <distributionManagement>
+
+
         <repository>
-            <id>maven2-repository</id>
-            <url>${maven.repository}</url>
+          <id>maatg-fr-snapshots</id>
+          <name>maatG France Snapshots</name>
+          <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
         </repository>
-        <site>
-            <id>project-web-site</id>
-            <url>${project.web.site}</url>
-        </site>
+        
     </distributionManagement>
     <profiles>
         <!-- WARNING: behavior is not the same if moved in profiles.xml -->

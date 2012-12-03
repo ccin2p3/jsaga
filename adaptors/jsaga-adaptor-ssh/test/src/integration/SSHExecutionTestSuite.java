@@ -79,4 +79,9 @@ public class SSHExecutionTestSuite extends JSAGATestSuite {
         public SSHJobRunInteractiveTest() throws Exception {super("ssh");}
         public void test_simultaneousStdin()  { super.ignore("Not supported");}
     }
+
+    // test cases
+    public static class SSHJobRunInfoTest extends JobRunInfoTest {
+        public SSHJobRunInfoTest() throws Exception {super("ssh");}
+    }
 }

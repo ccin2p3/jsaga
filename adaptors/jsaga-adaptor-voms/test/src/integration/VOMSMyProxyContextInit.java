@@ -21,6 +21,6 @@ public class VOMSMyProxyContextInit extends ContextInitTest {
     }
 
     protected void updateContextAttributes(Context context) throws Exception {
-        context.setAttribute(Context.LIFETIME, "P7D");
+        context.setAttribute(Context.LIFETIME, "P1D");
     }
 }

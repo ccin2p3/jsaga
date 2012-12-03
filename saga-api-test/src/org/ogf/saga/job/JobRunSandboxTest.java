@@ -2,8 +2,10 @@ package org.ogf.saga.job;
 
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
+import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.job.abstracts.AbstractJobTest;
+import org.ogf.saga.job.abstracts.Attribute;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.task.State;
 import org.ogf.saga.url.URLFactory;
@@ -82,6 +84,27 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
         this.cleanup(localOutput);
     }
 
+    public void test_output_workingDirectory() throws Exception {
+        Object localOutput = getLocal("output");
+        Object workerOutput = getWorker("output");
+
+        // create job
+        JobDescription desc = JobFactory.createJobDescription();
+        desc.setAttribute(JobDescription.EXECUTABLE, "/bin/pwd");
+    	desc.setAttribute(JobDescription.WORKINGDIRECTORY, "/tmp");
+        desc.setVectorAttribute(JobDescription.FILETRANSFER, new String[]{
+                localOutput+" < "+workerOutput
+        });
+        desc.setAttribute(JobDescription.OUTPUT, workerOutput.toString());
+
+        // run job
+        String outputContent = this.runAndGetOutput(desc, localOutput);
+        assertEquals("/tmp", outputContent.trim());
+
+        // cleanup
+        this.cleanup(localOutput);
+    }
+
     //////////////////////////////////////////// private methods ////////////////////////////////////////////
 
     protected File getLocal(String suffix) {
@@ -143,21 +166,26 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
 
         
         // for debugging
+        // only works for interactive jobs
         if (State.FAILED.equals(job.getState())) {
-            // print stderr
-            byte[] buffer = new byte[1024];
-            InputStream stderr = job.getStderr();
-            for (int len; (len=stderr.read(buffer))>-1; ) {
-                System.err.write(buffer, 0, len);
-            }
-            stderr.close();
-
-            // rethrow exception
-            job.rethrow();
+        	try {
+	            // print stderr
+	            byte[] buffer = new byte[1024];
+	            InputStream stderr = job.getStderr();
+	            for (int len; (len=stderr.read(buffer))>-1; ) {
+	                System.err.write(buffer, 0, len);
+	            }
+	            stderr.close();
+	
+	            // rethrow exception
+	            job.rethrow();
+        	} catch (IncorrectStateException is) {
+        		// ignore
+        	}
         }
 
         // check job status
-        assertEquals(State.DONE.getValue(), job.getState().getValue());
+        assertEquals(State.DONE, job.getState());
 
         // return job output content
         return this.get(localOutput);

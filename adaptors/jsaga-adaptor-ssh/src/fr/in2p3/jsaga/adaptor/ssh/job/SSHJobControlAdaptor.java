@@ -2,19 +2,27 @@ package fr.in2p3.jsaga.adaptor.ssh.job;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
+import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobInteractiveSet;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
+import fr.in2p3.jsaga.adaptor.job.local.LocalAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.job.local.LocalJobProcess;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
 import org.ogf.saga.error.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
@@ -22,6 +30,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -39,7 +48,7 @@ import java.util.regex.Matcher;
  * TODO : Support of pre-requisite
  */
 public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
-		JobControlAdaptor, CleanableJobAdaptor, StreamableJobInteractiveSet {
+		JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorTwoPhase {
 
     private static final String ROOTDIR = "RootDir";
 
@@ -78,106 +87,53 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
         return translator;
     }
 
-    private SSHJobProcess submit(String jobDesc, String uniqId, InputStream stdin, OutputStream stdout, OutputStream stderr)
-			throws PermissionDeniedException, TimeoutException, NoSuccessException {
-    	SSHJobProcess sjp = new SSHJobProcess(uniqId);
+    private SSHJobProcess submit(String jobDesc, String uniqId)
+			throws PermissionDeniedException, TimeoutException, BadResource, NoSuccessException {
+    	SSHJobProcess sjp;
 		try {
-//System.out.println(jobDesc);
-			if (stdin != null) {
-				m_sftp.put(stdin, sjp.getInfile());
+			sjp = new SSHJobProcess(uniqId, jobDesc, session.getHost(), session.getPort(), m_sftp.getHome());
+		} catch (SftpException sftpe) {
+			throw new NoSuccessException(sftpe);
+		}
+    	sjp.checkResources();
+    	// create user working directory only if not specified
+		try {
+			if (!sjp.isUserWorkingDirectory()) {
+				m_sftp.mkdir(sjp.getWorkingDirectory());
+			}
+		} catch (SftpException e) {
+			if (e.id == ChannelSftp.SSH_FX_FAILURE) { // Already Exists
+				// ignore
+			} else if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED) {
+				m_sftp.disconnect();
+				throw new PermissionDeniedException(e);
 			} else {
-				m_sftp.put(sjp.getInfile()).close();
+				m_sftp.disconnect();
+				throw new NoSuccessException(e); 
 			}
-
-			ChannelExec channel = (ChannelExec) session.openChannel("exec");
-	    	
-            sjp.setCreated(new Date());
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		}
+        sjp.setCreated(new Date());
+		try {
             store(sjp, uniqId);
-
-        	ShellScriptBuffer command = new ShellScriptBuffer();
-    		Properties jobProps = new Properties();
-    		jobProps.load(new ByteArrayInputStream(jobDesc.getBytes()));
-    		File _workDir = null;
-    		String _exec = null;
-            Enumeration e = jobProps.propertyNames();
-    		Hashtable _envParams = new Hashtable();
-            while (e.hasMoreElements()){
-                   String key = (String)e.nextElement();
-                   String val = (String)jobProps.getProperty(key);
-                   if (key.equals("_WorkingDirectory")) { 
-                	   _workDir = new File(val);
-                   } else if (key.equals("_Executable")) {
-                	   // The following line does not work -> indexArrayOutOfBoundException
-                	   // _exec = val.replaceAll("\\$", "\\\\$");
-                	   _exec = Matcher.quoteReplacement(val);
-                   } else {
-                	   // channel.setEnv does not work
-                	   _envParams.put(key, val);
-                   }
-            }
-     	    // channel.setEnv does not work
-            Iterator i = _envParams.entrySet().iterator();
-
-            while(i.hasNext()){
-              Map.Entry me = (Map.Entry)i.next();
-              command.append(me.getKey() + "=" + me.getValue());
-            }
-        	if (_workDir != null) {
-			   command.append("if [ ! -d " + _workDir + " ] ");
-			   command.append("then exit 1");
-			   command.append("fi");
-			   command.append("cd "+_workDir);
-        	}
-   			command.append("eval '" + _exec + " < " + m_sftp.getHome() + "/" +sjp.getInfile() + " &' ");
-        	command.append("MYPID=\\$!");
-        	command.append("echo \\$MYPID > " + m_sftp.getHome() + "/" + SSHJobProcess.getRootDir() + "/" + uniqId + ".pid");
-        	command.append("wait \\$MYPID");
-    		command.append("errcode=\\$?");
-        	command.append("echo \\$errcode > " + m_sftp.getHome() + "/" + SSHJobProcess.getRootDir() + "/" + uniqId + ".endcode");
-        	command.append("exit \\$errcode");
-
-			String cde = "cat << EOS | bash -s \n" + command.toString() + "EOS\n";
-//System.out.println("NEW command="+cde);
-            channel.setCommand(cde);
-
-			if (stdout != null) channel.setOutputStream(stdout);
-			//else channel.setOutputStream(System.out);
-			if (stderr != null) channel.setErrStream(stderr);
-			//else channel.setErrStream(System.err);
-			channel.connect();
-			
-			Thread.sleep(500);
-			if (channel.isClosed()) {
-				int error = channel.getExitStatus();
-				// It is possible that the wrapper script failed without writing any .endcode file
-				// Here this is simulated by storing returnCode into the serialized object
-				sjp.setReturnCode(error);
-	            store(sjp, uniqId);
-	            //System.out.println("channel is closed and return = " + error);
-			}
-			return sjp;
-			
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
+		return sjp;
 	}
 
 	public String submit(String jobDesc, boolean checkMatch, String uniqId)
-			throws PermissionDeniedException, TimeoutException, NoSuccessException {
-    	return this.submit(jobDesc, uniqId, null, null, null).getJobId();
+			throws PermissionDeniedException, TimeoutException, BadResource, NoSuccessException {
+    	return this.submit(jobDesc, uniqId).getJobId();
     }
-
-    public String submitInteractive(String jobDesc, boolean checkMatch, InputStream stdin, OutputStream stdout, OutputStream stderr) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-    	SSHJobProcess sjp = this.submit(jobDesc, UUID.randomUUID().toString(), stdin, stdout, stderr);
-    	return sjp.getJobId();
-	}
 
 	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
 		ChannelExec channelCancel=null;
 		try {
 			channelCancel = (ChannelExec) session.openChannel("exec");
-			channelCancel.setCommand("kill `cat " + SSHJobProcess.getRootDir() + "/" + nativeJobId+".pid`;");
+			channelCancel.setCommand("kill `cat " + new SSHJobProcess(nativeJobId).getPidFile() + "`;");
 			channelCancel.connect();
 			while(!channelCancel.isClosed()) {
 				Thread.sleep(100);
@@ -196,7 +152,13 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
 		try {
-			m_sftp.rm(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".*");
+			SSHJobProcess sshjp = new SSHJobProcess(nativeJobId);
+			m_sftp.rm(sshjp.getFile(".*"));
+			try {
+				m_sftp.rmdir(sshjp.getGeneratedWorkingDirectory());
+			} catch (Exception e1) {
+				// ignore: the working directory could be user defined
+			}
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
@@ -211,5 +173,111 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		public String toString() {
 			return m_script;
 		}
+	}
+
+	public String getStagingDirectory(String nativeJobId)
+			throws PermissionDeniedException, TimeoutException,
+			NoSuccessException {
+		// The staging directory is built at connect
+		return null;
+	}
+
+	public StagingTransfer[] getInputStagingTransfer(String nativeJobId)
+			throws PermissionDeniedException, TimeoutException,
+			NoSuccessException {
+		try {
+			SSHJobProcess sshjp = restore(nativeJobId);
+			return sshjp.getInputStaging();
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		} catch (ClassNotFoundException e) {
+			throw new NoSuccessException(e);
+		} catch (JSchException e) {
+			throw new NoSuccessException(e);
+		} catch (SftpException e) {
+			throw new NoSuccessException(e);
+		} catch (InterruptedException e) {
+			throw new NoSuccessException(e);
+		}
+	}
+
+	public StagingTransfer[] getOutputStagingTransfer(String nativeJobId)
+			throws PermissionDeniedException, TimeoutException,
+			NoSuccessException {
+		try {
+			SSHJobProcess sshjp = restore(nativeJobId);
+			return sshjp.getOutputStaging();
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		} catch (ClassNotFoundException e) {
+			throw new NoSuccessException(e);
+		} catch (JSchException e) {
+			throw new NoSuccessException(e);
+		} catch (SftpException e) {
+			throw new NoSuccessException(e);
+		} catch (InterruptedException e) {
+			throw new NoSuccessException(e);
+		}
+	}
+
+	public void start(String nativeJobId) throws PermissionDeniedException,
+			TimeoutException, NoSuccessException {
+		try {
+			ChannelExec channel = (ChannelExec) session.openChannel("exec");
+	    	
+	    	ShellScriptBuffer command = new ShellScriptBuffer();
+			Properties jobProps = new Properties();
+			SSHJobProcess sshjp = restore(nativeJobId);
+			jobProps.load(new ByteArrayInputStream(sshjp.getJobDesc().getBytes()));
+			String _exec = null;
+	        Enumeration e = jobProps.propertyNames();
+			Hashtable _envParams = new Hashtable();
+	        while (e.hasMoreElements()){
+	               String key = (String)e.nextElement();
+	               String val = (String)jobProps.getProperty(key);
+	               if (key.equals("_Executable")) {
+	            	   // The following line does not work -> indexArrayOutOfBoundException
+	            	   // _exec = val.replaceAll("\\$", "\\\\$");
+	            	   _exec = Matcher.quoteReplacement(val);
+	               } else {
+	            	   // channel.setEnv does not work
+	            	   _envParams.put(key, val);
+	               }
+	        }
+	 	    // channel.setEnv does not work
+	        Iterator i = _envParams.entrySet().iterator();
+	
+	        while(i.hasNext()){
+	          Map.Entry me = (Map.Entry)i.next();
+	          command.append(me.getKey() + "=" + me.getValue());
+	        }
+
+	        command.append(_exec);
+			String cde = "cat << EOS | bash -s \n" + command.toString() + "EOS\n";
+//			System.out.println("NEW command="+cde);
+	        channel.setCommand(cde);
+	
+			channel.connect();
+			Thread.sleep(1000);
+			if (channel.isClosed()) {
+				int error = channel.getExitStatus();
+				// It is possible that the wrapper script failed without writing any .endcode file
+				// Here this is simulated by storing returnCode into the serialized object
+				sshjp.setReturnCode(error);
+				store(sshjp, nativeJobId);
+	            //System.out.println("channel is closed and return = " + error);
+			}
+		} catch (JSchException e) {
+			throw new NoSuccessException(e);
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		} catch (ClassNotFoundException e) {
+			throw new NoSuccessException(e);
+		} catch (SftpException e) {
+			throw new NoSuccessException(e);
+		} catch (InterruptedException e) {
+			throw new NoSuccessException(e);
+		}
+	
 	}
 }

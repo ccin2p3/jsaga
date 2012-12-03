@@ -1,7 +1,9 @@
 package fr.in2p3.jsaga.adaptor.ssh.job;
 
+import java.io.IOException;
 import org.ogf.saga.error.NoSuccessException;
 
+import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.local.LocalJobProcess;
 
 /* ***************************************************
@@ -18,21 +20,65 @@ public class SSHJobProcess extends LocalJobProcess {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 3723657591636633186L;
+	private static final long serialVersionUID = 1L;
+	/**
+	 * 
+	 */
+	private String m_host;
+	private int m_port;
+	private String m_home;
 	
+	public SSHJobProcess(String jobId, String jobDesc, String host, int port, String home) {
+		super(jobId, jobDesc);
+		m_host = host;
+		m_port = port;
+		m_home = home;
+	}
+
 	public SSHJobProcess(String jobId) {
 		super(jobId);
 	}
-
+	
     public static String getRootDir() {
     	return ".jsaga/var/adaptor/ssh";
     }
 
+    @Override
+    public String getGeneratedWorkingDirectory() {
+		return SSHJobProcess.getRootDir() + "/" + m_jobId;
+    }
+
+    @Override
+    public String getWorkingDirectory() throws IOException {
+    	if (isUserWorkingDirectory()) {
+			return getValue("_WorkingDirectory");
+		} else {
+			return m_home + "/" + getRootDir() + "/" + m_jobId;
+		}
+    }
+    
+    // Cannot create working directory here
+    @Override
+	public void createWorkingDirectory() throws IOException {
+	}
+    
+    @Override
 	public int getReturnCode() throws NoSuccessException {
 		return m_returnCode;
 	}
 
-    public String getFile(String suffix) {
-    	return getRootDir() + "/" + m_jobId + "." + suffix;
-    }
+    @Override
+	public void checkResources() throws BadResource, NoSuccessException {
+	}
+
+    @Override
+	protected String toURL(String filename) throws NoSuccessException {
+		try {
+			return "sftp://" + m_host + ":" + m_port + "/" + getWorkingDirectory() + "/" + filename;
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		}
+	}
+	
+	
 }

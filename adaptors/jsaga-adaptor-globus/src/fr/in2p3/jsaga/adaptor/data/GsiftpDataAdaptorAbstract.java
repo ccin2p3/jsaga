@@ -21,7 +21,6 @@ import org.ogf.saga.error.*;
 
 import java.io.*;
 import java.util.Map;
-import java.util.logging.Level;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

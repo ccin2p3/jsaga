@@ -17,14 +17,14 @@ public enum OurGridJobState {
 	UNSTARTED("[UNSTARTED]"),
 	RUNNING("[RUNNING]"), 
 	FINISHED("[FINISHED]"),
-	CANCELLED("[CANCELLED]");
+	CANCELLED("[CANCELLED]"),
+	FAILED("[FAILED]");
 	
 	
 	private String stateDescription;
 
 	/**
-	 * @param stateDescription
-	 *            Describes the status of the job
+	 * @param stateDescription Describes the status of the job
 	 * */
 	private OurGridJobState(String stateDescription) {
 		

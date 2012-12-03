@@ -23,6 +23,7 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -167,10 +168,14 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     }
 
     public void disconnect() throws NoSuccessException {
-    	m_sftp.disconnect();
-    	m_sftp = null;
-    	session.disconnect();
-        session = null;
+    	if (m_sftp != null) {
+    		m_sftp.disconnect();
+        	m_sftp = null;
+    	}
+    	if (session != null) {
+    		session.disconnect();
+    		session = null;
+    	}
     }
     
     public  void store(SSHJobProcess p, String nativeJobId) throws SftpException, IOException, JSchException, InterruptedException {
@@ -189,8 +194,10 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     }
 
     public SSHJobProcess restore(String nativeJobId) throws IOException, ClassNotFoundException, JSchException, SftpException, InterruptedException {
-		InputStream is = m_sftp.get(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".process");
-    	byte[] buf = new byte[1024];
+    	String processFile = SSHJobProcess.getRootDir() + "/" + nativeJobId + ".process";
+		SftpATTRS attrs = m_sftp.lstat(processFile);
+    	byte[] buf = new byte[(int)attrs.getSize()];
+		InputStream is = m_sftp.get(processFile);
     	int len = is.read(buf);
     	is.close();
 
@@ -209,4 +216,14 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
         }
     }
     
+//    protected void finalize() throws Throwable {
+//    	try {
+//    		System.out.println("finalize" + getClass().toString());
+//			disconnect();
+//		} catch (NoSuccessException e) {
+//			e.printStackTrace();
+//		} finally {
+//			super.finalize();
+//		}
+//    }
 }

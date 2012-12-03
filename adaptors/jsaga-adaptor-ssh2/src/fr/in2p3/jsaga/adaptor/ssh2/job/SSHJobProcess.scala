@@ -38,7 +38,7 @@ class SSHJobProcess(jobId: String) extends LocalJobProcess(jobId) {
   override def getFile(suffix: String) = rootDir + "/" + m_jobId + "." + suffix
   
   def getJobDir =  rootDir + "/" + m_jobId
-  def getPidFile = SSHJobProcess.getPidFile(jobId)
-  def getEndCodeFile = SSHJobProcess.getEndCodeFile(jobId)
+//  def getPidFile = SSHJobProcess.getPidFile(jobId)
+//  def getEndCodeFile = SSHJobProcess.getEndCodeFile(jobId)
   
 }
