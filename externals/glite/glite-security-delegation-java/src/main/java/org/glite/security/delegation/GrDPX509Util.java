@@ -47,6 +47,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -60,9 +61,10 @@ import org.bouncycastle.util.encoders.Hex;
 import org.glite.security.SecurityContext;
 import org.glite.security.delegation.storage.GrDPStorageFactory;
 import org.glite.security.util.PrivateKeyReader;
-import org.glite.voms.VOMSValidator;
+import org.italiangrid.voms.VOMSAttribute;
 //import org.glite.voms.PKIStore;
 //import org.glite.voms.ac.ACValidator;
+import org.italiangrid.voms.VOMSValidators;
 
 
 /**
@@ -949,12 +951,13 @@ public class GrDPX509Util {
      * @return A String list containing the attributes. Empty (0 element) array if no attributes.
      */
     public static String[] getVOMSAttributes(SecurityContext sc) {
-        // TODO: should use static truststores or something to avoid initializing them for each request.
-        VOMSValidator validator = new VOMSValidator(sc.getClientCertChain());
-        String attributes[] =  validator.validate().getAllFullyQualifiedAttributes();
-        // kill the truststrores.
-        validator.cleanup();
-        return attributes;
+        List<VOMSAttribute> vomsAttributes =  VOMSValidators.newParser().parse(sc.getClientCertChain());
+        List<String> attributes = new ArrayList<String>();
+        for (VOMSAttribute vomsAttribute : vomsAttributes) {
+        	List<String> fqans = vomsAttribute.getFQANs();
+        	attributes.addAll(fqans);
+		}
+        return attributes.toArray(new String[attributes.size()]);
     }
     
     /**
