@@ -4,16 +4,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.glite.voms.VOMSAttribute;
-import org.glite.voms.VOMSValidator;
-import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.X509Credential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSException;
+import org.italiangrid.voms.VOMSAttribute;
+import org.italiangrid.voms.VOMSValidators;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.AlreadyExistsException;
@@ -877,7 +877,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		throw new NoSuccessException("Not implemented");
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("rawtypes")
 	public String[] getGroupsOf(String id) throws BadParameterException, NoSuccessException {
 		String userId = null;
 		try {
@@ -888,20 +888,20 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		if(!userId.equals(id)){
 			throw new BadParameterException("The id is not the actual user");
 		}
-		GlobusCredential globusCred = null;
+		X509Credential globusCred = null;
 		if (m_globuscredential.getGSSCredential() instanceof GlobusGSSCredentialImpl) {
-			globusCred = ((GlobusGSSCredentialImpl)m_globuscredential.getGSSCredential()).getGlobusCredential();
+			globusCred = ((GlobusGSSCredentialImpl)m_globuscredential.getGSSCredential()).getX509Credential();
 		} else {
 			throw new BadParameterException("Not a globus proxy");
 		}
 
-		Vector<VOMSAttribute> v = VOMSValidator.parse(globusCred.getCertificateChain());
+		List<VOMSAttribute> v = VOMSValidators.newParser().parse(globusCred.getCertificateChain());
 		for (int i=0; i<v.size(); i++) {
-			VOMSAttribute attr = (VOMSAttribute) v.elementAt(i);
+			VOMSAttribute attr = (VOMSAttribute) v.get(i);
 			if(m_vo.equals(attr.getVO())){
-				String[] groups = new String[attr.getFullyQualifiedAttributes().size()];
+				String[] groups = new String[attr.getFQANs().size()];
 				int index = 0;
-				for (Iterator it=attr.getFullyQualifiedAttributes().iterator(); it.hasNext(); ) {
+				for (Iterator it=attr.getFQANs().iterator(); it.hasNext(); ) {
 					groups[index] = (String) it.next();
 					if(groups[index].startsWith("/")){
 						groups[index] = groups[index].substring(1);
