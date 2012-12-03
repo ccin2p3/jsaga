@@ -1,35 +1,29 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.*;
-import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
-import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
-
-import org.apache.axis.AxisFault;
-import org.apache.axis.Handler;
-import org.apache.axis.MessageContext;
-import org.apache.axis.SimpleTargetedChain;
-import org.apache.axis.client.AxisClient;
-import org.apache.axis.client.Call;
-import org.apache.axis.components.net.BooleanHolder;
-import org.apache.axis.configuration.SimpleProvider;
-import org.apache.axis.strategies.InvocationStrategy;
-import org.apache.axis.transport.http.SocketHolder;
-import org.apache.axis.utils.Messages;
-import org.globus.axis.transport.GSIHTTPSender;
-import org.globus.axis.transport.GSIHTTPTransport;
-import org.globus.axis.transport.HTTPSSender;
-import org.ietf.jgss.GSSCredential;
-import org.ogf.saga.context.Context;
-import org.ogf.saga.error.*;
-
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import org.apache.axis.SimpleTargetedChain;
+import org.apache.axis.client.Call;
+import org.apache.axis.configuration.SimpleProvider;
+import org.globus.axis.transport.GSIHTTPTransport;
+import org.ietf.jgss.GSSCredential;
+import org.ogf.saga.context.Context;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.TimeoutException;
+
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
