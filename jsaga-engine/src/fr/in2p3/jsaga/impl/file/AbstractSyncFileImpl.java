@@ -52,6 +52,7 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
         boolean initOK = false;
         try {
            this.init(flags);
+           initOK = true;
         } finally {
         	if (!initOK) this.close();
         }
@@ -63,6 +64,7 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
         boolean initOK = false;
         try {
            this.init(flags);
+           initOK = true;
         } finally {
         	if (!initOK) this.close();
         }

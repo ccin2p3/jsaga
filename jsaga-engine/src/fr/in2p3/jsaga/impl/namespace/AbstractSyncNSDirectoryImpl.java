@@ -10,8 +10,6 @@ import fr.in2p3.jsaga.helpers.SAGAPattern;
 import fr.in2p3.jsaga.impl.url.*;
 import fr.in2p3.jsaga.sync.namespace.SyncNSDirectory;
 import fr.in2p3.jsaga.sync.namespace.SyncNSEntry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSFactory;
