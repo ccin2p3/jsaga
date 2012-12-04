@@ -17,6 +17,7 @@ import org.apache.axis.configuration.SimpleProvider;
 import org.glite.wsdl.services.lb.LoggingAndBookkeepingLocator;
 import org.glite.wsdl.services.lb.LoggingAndBookkeepingPortType;
 import org.glite.wsdl.types.lb.GenericFault;
+import org.glite.wsdl.types.lb.JobFlags;
 import org.glite.wsdl.types.lb.JobFlagsValue;
 import org.glite.wsdl.types.lb.StatName;
 import org.glite.wsdl.types.lb.StateEnterTimesItem;
@@ -159,7 +160,6 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        // get job Status
 	        JobFlagsValue[] jobFlagsValue = new JobFlagsValue[1];
 	        jobFlagsValue[0] = JobFlagsValue.CLASSADS;
-                
 	        org.glite.wsdl.types.lb.JobStatus jobInfo = stub.jobStatus(nativeJobId, new JobFlags(jobFlagsValue));
 	        if(jobInfo == null) {
 	            throw new NoSuccessException("Unable to get information about job: "+nativeJobId);

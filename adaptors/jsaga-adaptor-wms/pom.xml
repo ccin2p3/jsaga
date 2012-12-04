@@ -51,20 +51,25 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.glite</groupId>
-			<artifactId>glite-jdl-api-java</artifactId>
-			<version>3.1.6</version>
+			<groupId>org.jglobus</groupId>
+			<artifactId>gridftp</artifactId>
+			<version>2.0-Beta6-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glite.jdl</groupId>
+			<artifactId>jdl-api-java</artifactId>
+			<version>3.3.1</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.glite</groupId>
 			<artifactId>glite-wms-wmproxy-api-java</artifactId>
-			<version>3.3.2</version>
+			<version>3.3.2-1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glite</groupId>
 			<artifactId>glite-lb-api-java</artifactId>
-			<version>3.2-p1</version>
+			<version>3.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.condor</groupId>
@@ -73,4 +78,10 @@
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>emi-infn-repo</id>
+			<url>http://devel12.cnaf.infn.it:7444/pub/emi/packaging/maven</url>
+		</repository>
+	</repositories>
 </project>
