@@ -11,13 +11,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.glite</groupId>
     <artifactId>glite-lb-api-java</artifactId>
-    <version>3.2-p1</version>
+    <version>3.3.1</version>
     <name>gLite-LB API</name>
-    <!--
-        mvn -f pom-java.xml generate-sources
-        sed build/generated-sources/org/glite/wsdl/types/lb/GenericFault.java -e "s/GenericFault  implements/GenericFault extends org.apache.axis.AxisFault implements/" -i
-        mvn -f pom-java.xml package
-    -->
     <build>
         <plugins>
             <plugin>
@@ -49,22 +44,6 @@
             <groupId>axis</groupId>
             <artifactId>axis</artifactId>
             <version>1.4-patched</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jglobus</groupId>
-            <artifactId>gss</artifactId>
-            <version>2.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.globus</groupId>
-            <artifactId>cog-axis</artifactId>
-            <version>gt4</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
