@@ -79,7 +79,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
 		logger.debug("DOING: connect");
 		try{
-			m_lfcConnector = CNSConnector.getInstance(host, port, m_vo, m_globuscredential.getGSSCredential());
+			m_lfcConnector = CNSConnector.getInstance(host, port, m_vo, m_globuscredential.getGSSCredential(), m_globuscredential.getCertRepository().getAbsolutePath());
 		}catch (IllegalArgumentException e) {
 			throw new NoSuccessException(e.getMessage());
 		} catch (IOException e) {
@@ -97,6 +97,9 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			m_lfcConnector.startSession(connection, null);
 			connection = CNSConnections.getCNSConnectionTimeout(connection);
 		} catch (IOException e) {
+			logger.debug("ERROR: connect("+userInfo+", "+host+", "+port+"): "+e.getMessage());
+			throw new NoSuccessException(e);
+		} catch (GSSException e) {
 			logger.debug("ERROR: connect("+userInfo+", "+host+", "+port+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
@@ -152,7 +155,6 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			logger.debug("DOING: exists("+absolutePath+", "+additionalArgs+")");
 			boolean exist = m_lfcConnector.exist(connection, absolutePath);
-			System.err.println();
 			logger.debug("DONE: exists("+absolutePath+", "+additionalArgs+")");
 			return exist;
 		} catch (IOException e) {
@@ -178,6 +180,9 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			m_lfcConnector.create(connection, logicalEntry, UUID.randomUUID().toString(), 0L, permission);
 			logger.debug("DONE: create("+logicalEntry+", "+additionalArgs+")");
 		} catch (IOException e) {
+			logger.debug("ERROR: create("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
+			throw new NoSuccessException(e);
+		} catch (GSSException e) {
 			logger.debug("ERROR: create("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
@@ -619,6 +624,9 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.symbLink(connection, sourceAbsolutePath, linkAbsolutePath, overwrite);
 		}catch (IOException e) {
+			logger.debug("ERROR: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+"): "+e.getMessage());
+			throw new NoSuccessException(e);
+		} catch (GSSException e) {
 			logger.debug("ERROR: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
