@@ -26,8 +26,20 @@
         <module>glite-security-delegation-java</module>
         <module>glite-security-util-java</module>
     </modules>
-    
-	<repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <repositories>
     	<!-- CNAF repos for glite/EMI libs (https://github.com/italiangrid) -->
     	<repository>
 			<id>cnaf-releases</id>

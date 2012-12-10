@@ -59,11 +59,11 @@
         </dependency>
 	</dependencies>
   	<modules>
-<module>opensaml39</module>
-<module>opensaml40</module>
-    <module>globus_usage_packets_common</module>
-	<module>wsrf-provider-jce</module>
-	<module>addressing-1.0</module>
+		<!--<module>opensaml39</module>-->
+		<module>opensaml40</module>
+		<module>globus_usage_packets_common</module>
+		<module>wsrf-provider-jce</module>
+		<module>addressing-1.0</module>
 		<module>wss4j-globus</module>
 		<module>wsrf-usage</module>
 		<module>wsrf-tools</module>
