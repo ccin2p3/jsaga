@@ -26,13 +26,13 @@ import org.glite.wms.wmproxy.InvalidArgumentFaultType;
 import org.glite.wms.wmproxy.JdlType;
 import org.glite.wms.wmproxy.NoSuitableResourcesFaultType;
 import org.glite.wms.wmproxy.ServerOverloadedFaultType;
+import org.glite.wms.wmproxy.StringAndLongList;
 import org.glite.wms.wmproxy.StringAndLongType;
+import org.glite.wms.wmproxy.StringList;
 import org.glite.wms.wmproxy.WMProxyLocator;
 import org.glite.wms.wmproxy.WMProxy_PortType;
 import org.globus.axis.gsi.GSIConstants;
 import org.globus.axis.transport.HTTPSSender;
-import org.globus.gsi.GlobusCredential;
-import org.globus.gsi.TrustedCertificates;
 import org.globus.gsi.bc.BouncyCastleCertProcessingFactory;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.gsi.gssapi.auth.NoAuthorization;
@@ -64,6 +64,8 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.globus.gsi.TrustedCertificates;
+import org.globus.gsi.X509Credential;
 
 
 /*
@@ -269,15 +271,13 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         }
 
         // get available CE
-        StringAndLongType[] result = m_client.jobListMatch(jobDesc, delegationId);
+        StringAndLongList result = m_client.jobListMatch(jobDesc, delegationId);
         if (result != null) {
             // list of CE
-           /*
-             * StringAndLongType[] list = (StringAndLongType[])
-             * result.getFile(); if (list == null) { throw new BadResource("No
-             * Computing Element matching your job requirements has been
-             * found!"); }
-             */
+           StringAndLongType[] list = (StringAndLongType[])result.getFile();
+           if (list == null) {
+        	   throw new BadResource("No Computing Element matching your job requirements has been found!");
+           }
         } else {
             throw new BadResource("No Computing Element matching your job requirements has been found!");
         }
@@ -292,7 +292,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                     String certReq = delegationServiceStub.getProxyReq(delegationId);
 
                     //create proxy from certificate request
-                    GlobusCredential globusCred = ((GlobusGSSCredentialImpl) m_credential).getGlobusCredential();
+                    X509Credential globusCred = ((GlobusGSSCredentialImpl) m_credential).getX509Credential();
 
                     X509Certificate[] userCerts = globusCred.getCertificateChain();
                     PrivateKey key = globusCred.getPrivateKey();
@@ -303,7 +303,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                     // We must detect the user proxy type and then generate the new one accordingly.
                     X509Certificate certificate = factory.createCertificate(new ByteArrayInputStream(GrDPX509Util.readPEM(
                             new ByteArrayInputStream(certReq.getBytes()), GrDPConstants.CRH,
-                            GrDPConstants.CRF)), userCerts[0], key, 12 * 3600, GSIConstants.GSI_2_PROXY); //12 hours proxy
+                            GrDPConstants.CRF)), userCerts[0], key, 12 * 3600, GSIConstants.CertificateType.GSI_2_PROXY); //12 hours proxy
 
                     X509Certificate[] finalCerts = new X509Certificate[userCerts.length + 1];
                     finalCerts[0] = certificate;
@@ -331,7 +331,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                     throw new NoSuccessException(createExceptionMessage(exc));
                 } catch (java.rmi.RemoteException exc) {
                     disconnect();
-                    throw new NoSuccessException(exc.getMessage());
+                    throw new NoSuccessException(exc);
                 } catch (Exception exc) {
                     disconnect();
                     throw new NoSuccessException(exc.getMessage());
@@ -346,7 +346,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }
 
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        String[] result = null;
+        StringList result = null;
         try {
             result = m_client.getSandboxDestURI(nativeJobId, "gsiftp");
         } catch (BaseFaultType e) {
@@ -354,10 +354,10 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         } catch (RemoteException e) {
             throw new NoSuccessException(e.getMessage());
         }
-        if (result == null || result.length < 1) {
+        if (result == null || result.getItem() == null || result.getItem().length < 1) {
             throw new NoSuccessException("Unable to find sandbox dest uri");
         }
-        String baseUri = result[0];
+        String baseUri = result.getItem(0);
 
         String jdl = null;
         try {
@@ -372,7 +372,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }
 
     public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        StringAndLongType[] result = null;
+        StringAndLongList result = null;
         try {
             result = m_client.getOutputFileList(nativeJobId, "gsiftp");
         } catch (BaseFaultType e) {
@@ -380,7 +380,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         } catch (RemoteException e) {
             throw new NoSuccessException(e.getMessage());
         }
-        if (result == null || result.length < 1) {
+        if (result == null || result.getFile() == null || result.getFile().length < 1) {
             throw new NoSuccessException("Unable to find output file list");
         }
 
@@ -393,7 +393,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             throw new NoSuccessException(e.getMessage());
         }
         StagingJDL parsedJdl = new StagingJDL(jdl);
-        return parsedJdl.getOutputStagingTransfers(result);
+        return parsedJdl.getOutputStagingTransfers(result.getFile());
     }
 
     public void start(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {

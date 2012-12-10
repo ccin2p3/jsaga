@@ -5,164 +5,158 @@
     <version>4.0.0</version>
     <name>Stubs for WSRF Core</name>
     <build>
-		<sourceDirectory>java</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>resources</directory>
-			</resource>
-		</resources>
+        <sourceDirectory>java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>resources</directory>
+            </resource>
+        </resources>
         <plugins>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-						<phase>generate-sources</phase>
+                        <phase>generate-sources</phase>
                         <configuration>
-							<tasks>
-							 <property name="compile_classpath" refid="maven.compile.classpath"/>
-							 <property name="runtime_classpath" refid="maven.runtime.classpath"/>
-								<!-- Build stubs for wsrf_core -->
-								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml">
-									<property name="ns.excludes" value=""/>
-									<property name="source.stubs.dir" 
-										location="${basedir}/resources/wsdl/schema/wsrf/properties"/>
-									<property name="wsdl.file" 
-										value="WS-ResourceProperties_service.wsdl"/>
-									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
-								</ant>
-						        <ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
-									<property name="ns.excludes" value=""/>
-									<property name="source.stubs.dir" 
-									location="${basedir}/resources/wsdl/schema/wsrf/lifetime"/>
-									<property name="wsdl.file" 
-									value="WS-ResourceLifetime_service.wsdl"/>
-									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
-								</ant>
+                            <tasks>
+                                <property name="compile_classpath" refid="maven.compile.classpath"/>
+                                <property name="runtime_classpath" refid="maven.runtime.classpath"/>
+                                <!-- Build stubs for wsrf_core -->
+                                <ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml">
+                                    <property name="ns.excludes" value=""/>
+                                    <property name="source.stubs.dir" 
+                                              location="${basedir}/resources/wsdl/schema/wsrf/properties"/>
+                                    <property name="wsdl.file" 
+                                              value="WS-ResourceProperties_service.wsdl"/>
+                                    <property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+                                </ant>
+                                <ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+                                    <property name="ns.excludes" value=""/>
+                                    <property name="source.stubs.dir" 
+                                              location="${basedir}/resources/wsdl/schema/wsrf/lifetime"/>
+                                    <property name="wsdl.file" 
+                                              value="WS-ResourceLifetime_service.wsdl"/>
+                                    <property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+                                </ant>
 
-								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
-									<property name="ns.excludes" value=""/>
-									<property name="source.stubs.dir" 
-										location="${basedir}/resources/wsdl/schema/wsrf/notification"/>
-									<property name="wsdl.file" 
-										value="WS-BaseN_service.wsdl"/>
-									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
-								</ant>
+                                <ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+                                    <property name="ns.excludes" value=""/>
+                                    <property name="source.stubs.dir" 
+                                              location="${basedir}/resources/wsdl/schema/wsrf/notification"/>
+                                    <property name="wsdl.file" 
+                                              value="WS-BaseN_service.wsdl"/>
+                                    <property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+                                </ant>
 
-							   <ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
-									<property name="ns.excludes" value=""/>
-									<property name="source.stubs.dir" 
-										location="${basedir}/resources/wsdl/schema/wsrf/servicegroup"/>
-									<property name="wsdl.file" 
-										value="WS-ServiceGroup_service.wsdl"/>
-									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
-								</ant>
+                                <ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+                                    <property name="ns.excludes" value=""/>
+                                    <property name="source.stubs.dir" 
+                                              location="${basedir}/resources/wsdl/schema/wsrf/servicegroup"/>
+                                    <property name="wsdl.file" 
+                                              value="WS-ServiceGroup_service.wsdl"/>
+                                    <property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+                                </ant>
 
-								<!-- Security, WS Secure Conversation -->
-								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
-									<property name="ns.excludes" value=""/>
-									<property name="source.stubs.dir" 
-										location="${basedir}/resources/wsdl/schema/core/security/secconv"/>
-									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
-									<property name="wsdl.file" 
-										value="secure_conversation_service.wsdl"/>
-								</ant>
+                                <!-- Security, WS Secure Conversation -->
+                                <ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+                                    <property name="ns.excludes" value=""/>
+                                    <property name="source.stubs.dir" 
+                                              location="${basedir}/resources/wsdl/schema/core/security/secconv"/>
+                                    <property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+                                    <property name="wsdl.file" 
+                                              value="secure_conversation_service.wsdl"/>
+                                </ant>
 
-								<!-- Authorization -->
-								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
-									<property name="source.stubs.dir" 
-										location="${basedir}/resources/wsdl/schema/core/security/authorization"/>
-									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
-									<property name="wsdl.file" value="authz_service.wsdl"/>
-								</ant>
-								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
-									<property name="source.stubs.dir" 
-										location="${basedir}/resources/wsdl/schema/core/types"/>
-									<property name="wsdl.file" 
-										value="timestamp.wsdl"/>
-									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
-								</ant>
+                                <!-- Authorization -->
+                                <ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+                                    <property name="source.stubs.dir" 
+                                              location="${basedir}/resources/wsdl/schema/core/security/authorization"/>
+                                    <property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+                                    <property name="wsdl.file" value="authz_service.wsdl"/>
+                                </ant>
+                                <ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+                                    <property name="source.stubs.dir" 
+                                              location="${basedir}/resources/wsdl/schema/core/types"/>
+                                    <property name="wsdl.file" 
+                                              value="timestamp.wsdl"/>
+                                    <property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+                                </ant>
 
-								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
-									<property name="ns.excludes" value=""/>
-									<property name="source.stubs.dir" 
-										location="${basedir}/resources/wsdl/schema/core/notification"/>
-									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
-									<property name="wsdl.file" 
-										value="subscription_manager_service.wsdl"/>
-								</ant>        
+                                <ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+                                    <property name="ns.excludes" value=""/>
+                                    <property name="source.stubs.dir" 
+                                              location="${basedir}/resources/wsdl/schema/core/notification"/>
+                                    <property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+                                    <property name="wsdl.file" 
+                                              value="subscription_manager_service.wsdl"/>
+                                </ant>        
 
-								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
-									<property name="source.stubs.dir" 
-										location="${basedir}/resources/wsdl/schema/core/notification"/>
-									<property name="wsdl.file" 
-										value="notification_consumer_service.wsdl"/>
-									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
-								</ant>
+                                <ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+                                    <property name="source.stubs.dir" 
+                                              location="${basedir}/resources/wsdl/schema/core/notification"/>
+                                    <property name="wsdl.file" 
+                                              value="notification_consumer_service.wsdl"/>
+                                    <property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+                                </ant>
 
-								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
-									<property name="source.stubs.dir" 
-										location="${basedir}/resources/wsdl/schema/core/management"/>
-									<property name="wsdl.file" 
-										value="shutdown_service.wsdl"/>
-									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
-								</ant>
+                                <ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+                                    <property name="source.stubs.dir" 
+                                              location="${basedir}/resources/wsdl/schema/core/management"/>
+                                    <property name="wsdl.file" 
+                                              value="shutdown_service.wsdl"/>
+                                    <property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+                                </ant>
 
-								<!-- Due to axis 1.4 -->
-								<delete quiet="yes" file="${project.build.directory}/generated-sources/org/xmlsoap/schemas/ws/_2002/_07/utility/Context.java"/>
-								<delete quiet="yes" file="${project.build.directory}/generated-sources/org/globus/wsrf/client/BaseClient.java"/>
+                                <!-- Due to axis 1.4 -->
+                                <delete quiet="yes" file="${project.build.directory}/generated-sources/org/xmlsoap/schemas/ws/_2002/_07/utility/Context.java"/>
+                                <delete quiet="yes" file="${project.build.directory}/generated-sources/org/globus/wsrf/client/BaseClient.java"/>
 								
-								 <copy toDir="${project.build.directory}/generated-sources" overwrite="yes">
-									<fileset dir="${basedir}/config" casesensitive="yes">
-										<include name="org/oasis/**/*"/>
-						            </fileset>
-								</copy>
-							</tasks>
-							<sourceRoot>${project.build.directory}/generated-sources</sourceRoot>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
+                                <copy toDir="${project.build.directory}/generated-sources" overwrite="yes">
+                                    <fileset dir="${basedir}/config" casesensitive="yes">
+                                        <include name="org/oasis/**/*"/>
+                                    </fileset>
+                                </copy>
+                            </tasks>
+                            <sourceRoot>${project.build.directory}/generated-sources</sourceRoot>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
                     </execution>	
-				</executions>
+                </executions>
             </plugin>
-		</plugins>
+        </plugins>
     </build>
     <dependencies>
         <!-- adaptor specific -->
-		<dependency>
+        <dependency>
             <groupId>org.apache</groupId>
             <artifactId>addressing-1.0</artifactId>
             <version>1.0</version>
             <scope>compile</scope>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.globus</groupId>
             <artifactId>wsrf-tools</artifactId>
             <version>4.0.0</version>
             <scope>compile</scope>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
             <version>0.2</version>
             <scope>compile</scope>
         </dependency>
-		<dependency>
-    		<groupId>axis</groupId>
-			<artifactId>axis-wsdl4j</artifactId>
-			<version>1.5.1</version>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-wsdl4j</artifactId>
+            <version>1.5.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
             <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.globus</groupId>
-            <artifactId>cog-jglobus</artifactId>
-            <version>1.8</version>
-			 <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.globus</groupId>
@@ -176,21 +170,37 @@
             <version>4.0.0</version>
         </dependency>
         <dependency>
+            <groupId>org.jglobus</groupId>
+            <artifactId>gss</artifactId>
+            <version>2.0-Beta6-SNAPSHOT</version>
+        </dependency>   
+        <dependency>
+            <groupId>org.jglobus</groupId>
+            <artifactId>ssl-proxies</artifactId>
+            <version>2.0-Beta6-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jglobus</groupId>
+            <artifactId>myproxy</artifactId>
+            <version>2.0-Beta6-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.globus</groupId>
             <artifactId>wsrf-usage</artifactId>
             <version>4.0.0</version>
         </dependency>
-		<dependency>
-			<groupId>directory-naming</groupId>
-			<artifactId>naming-factory</artifactId>
-			<version>0.8</version>
+        <dependency>
+            <groupId>directory-naming</groupId>
+            <artifactId>naming-factory</artifactId>
+            <version>0.8</version>
         </dependency>
-		<dependency>
-		    <groupId>bouncycastle</groupId>
-		    <artifactId>bcprov-jdk13</artifactId>
-		    <version>140</version>
-		</dependency>
-		 <dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15</artifactId>
+            <version>1.46</version>
+        </dependency>
+
+        <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
             <version>3.0</version>
@@ -202,40 +212,40 @@
             <version>1.4.5</version>
             <scope>compile</scope>
         </dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-		</dependency>
-		<dependency>
-			<groupId>org.globus</groupId>
-			<artifactId>wsrf-provider-jce</artifactId>
-			<version>4.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-digester</groupId>
-			<artifactId>commons-digester</artifactId>
-			<version>1.5</version>
-		</dependency>
-		<dependency>
-			<groupId>org.globus</groupId>
-			<artifactId>commonj</artifactId>
-			<version>4.0.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.globus</groupId>
-			<artifactId>concurrent</artifactId>
-			<version>4.0.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.globus</groupId>
-			<artifactId>opensaml</artifactId>
-			<version>4.0.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.ws.patched</groupId>
-			<artifactId>wss4j-globus</artifactId>
-			<version>4.0.0</version>
-		</dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>wsrf-provider-jce</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-digester</groupId>
+            <artifactId>commons-digester</artifactId>
+            <version>1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>commonj</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>concurrent</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>opensaml</artifactId>
+            <version>4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.patched</groupId>
+            <artifactId>wss4j-globus</artifactId>
+            <version>4.0.0</version>
+        </dependency>
     </dependencies>
 </project>

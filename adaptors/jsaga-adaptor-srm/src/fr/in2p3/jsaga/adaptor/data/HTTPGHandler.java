@@ -9,10 +9,10 @@ import org.globus.axis.transport.GSIHTTPSender;
 import java.io.IOException;
 
 /**
- * This class allow to bypass the need of declaring the URL handler for the HTTPG protocol.
+ * This class allows to bypass the need of declaring the URL handler for the HTTPG protocol.
  * This is really useful if you use JSAGA within tomcat or an OGSi container.
  * 
- * @author Jérôme Revillard
+ * @author Jerome Revillard
  *
  */
 public class HTTPGHandler extends GSIHTTPSender {

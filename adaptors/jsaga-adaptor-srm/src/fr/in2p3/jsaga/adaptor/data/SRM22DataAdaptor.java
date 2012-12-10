@@ -1,32 +1,92 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import fr.in2p3.jsaga.adaptor.data.permission.PermissionAdaptorBasic;
-import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
-import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
+import java.io.EOFException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.rmi.RemoteException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.rpc.ServiceException;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Stub;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.glite.voms.VOMSAttribute;
-import org.glite.voms.VOMSValidator;
 import org.globus.axis.gsi.GSIConstants;
-import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.TrustedCertificates;
+import org.globus.gsi.X509Credential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSException;
-import org.ogf.saga.error.*;
+import org.italiangrid.voms.VOMSAttribute;
+import org.italiangrid.voms.VOMSValidators;
+import org.ogf.saga.error.AlreadyExistsException;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.permissions.Permission;
-import org.ogf.srm22.*;
+import org.ogf.srm22.ArrayOfAnyURI;
+import org.ogf.srm22.ArrayOfString;
+import org.ogf.srm22.ArrayOfTGetFileRequest;
+import org.ogf.srm22.ArrayOfTGroupPermission;
+import org.ogf.srm22.ArrayOfTMetaDataPathDetail;
+import org.ogf.srm22.ArrayOfTPutFileRequest;
+import org.ogf.srm22.ISRM;
+import org.ogf.srm22.SRMServiceLocator;
+import org.ogf.srm22.SrmLsRequest;
+import org.ogf.srm22.SrmLsResponse;
+import org.ogf.srm22.SrmMkdirRequest;
+import org.ogf.srm22.SrmMkdirResponse;
+import org.ogf.srm22.SrmPingRequest;
+import org.ogf.srm22.SrmPingResponse;
+import org.ogf.srm22.SrmPrepareToGetRequest;
+import org.ogf.srm22.SrmPrepareToGetResponse;
+import org.ogf.srm22.SrmPrepareToPutRequest;
+import org.ogf.srm22.SrmPrepareToPutResponse;
+import org.ogf.srm22.SrmPutDoneRequest;
+import org.ogf.srm22.SrmPutDoneResponse;
+import org.ogf.srm22.SrmReleaseFilesRequest;
+import org.ogf.srm22.SrmReleaseFilesResponse;
+import org.ogf.srm22.SrmRmRequest;
+import org.ogf.srm22.SrmRmResponse;
+import org.ogf.srm22.SrmRmdirRequest;
+import org.ogf.srm22.SrmRmdirResponse;
+import org.ogf.srm22.SrmSetPermissionRequest;
+import org.ogf.srm22.SrmSetPermissionResponse;
+import org.ogf.srm22.SrmStatusOfGetRequestRequest;
+import org.ogf.srm22.SrmStatusOfGetRequestResponse;
+import org.ogf.srm22.SrmStatusOfLsRequestRequest;
+import org.ogf.srm22.SrmStatusOfLsRequestResponse;
+import org.ogf.srm22.SrmStatusOfPutRequestRequest;
+import org.ogf.srm22.SrmStatusOfPutRequestResponse;
+import org.ogf.srm22.TAccessPattern;
+import org.ogf.srm22.TConnectionType;
+import org.ogf.srm22.TDirOption;
+import org.ogf.srm22.TExtraInfo;
+import org.ogf.srm22.TGetFileRequest;
+import org.ogf.srm22.TGetRequestFileStatus;
+import org.ogf.srm22.TGroupPermission;
+import org.ogf.srm22.TMetaDataPathDetail;
+import org.ogf.srm22.TPermissionMode;
+import org.ogf.srm22.TPermissionType;
+import org.ogf.srm22.TPutFileRequest;
+import org.ogf.srm22.TPutRequestFileStatus;
+import org.ogf.srm22.TReturnStatus;
+import org.ogf.srm22.TSURLReturnStatus;
+import org.ogf.srm22.TStatusCode;
+import org.ogf.srm22.TTransferParameters;
 
-import javax.xml.rpc.ServiceException;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.rmi.RemoteException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Vector;
+import fr.in2p3.jsaga.adaptor.data.permission.PermissionAdaptorBasic;
+import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -68,6 +128,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             // set security
             Stub stub = (Stub) m_stub;
             stub._setProperty(GSIConstants.GSI_CREDENTIALS, m_credential);
+            stub._setProperty(GSIConstants.TRUSTED_CERTIFICATES, TrustedCertificates.load(m_certRepository.getAbsolutePath()));
             stub.setTimeout(120 * 1000); //2 mins
 //            stub._setProperty(GSIConstants.GSI_MODE, GSIConstants.GSI_MODE_FULL_DELEG);
         } catch (MalformedURLException e) {
@@ -695,20 +756,20 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 		if(!userId.equals(id)){
 			throw new BadParameterException("The id is not the actual user");
 		}
-		GlobusCredential globusCred = null;
+		X509Credential globusCred = null;
 		if (m_credential instanceof GlobusGSSCredentialImpl) {
-			globusCred = ((GlobusGSSCredentialImpl)m_credential).getGlobusCredential();
+			globusCred = ((GlobusGSSCredentialImpl)m_credential).getX509Credential();
 		} else {
 			throw new BadParameterException("Not a globus proxy");
 		}
 
-		Vector v = VOMSValidator.parse(globusCred.getCertificateChain());
+		List<VOMSAttribute> v = VOMSValidators.newParser().parse(globusCred.getCertificateChain());
 		for (int i=0; i<v.size(); i++) {
-			VOMSAttribute attr = (VOMSAttribute) v.elementAt(i);
+			VOMSAttribute attr = (VOMSAttribute) v.get(i);
 			if(m_vo.equals(attr.getVO())){
-				String[] groups = new String[attr.getFullyQualifiedAttributes().size()];
+				String[] groups = new String[attr.getFQANs().size()];
 				int index = 0;
-				for (Iterator it=attr.getFullyQualifiedAttributes().iterator(); it.hasNext(); ) {
+				for (Iterator<String> it=attr.getFQANs().iterator(); it.hasNext(); ) {
 					groups[index] = (String) it.next();
 					if(groups[index].startsWith("/")){
 						groups[index] = groups[index].substring(1);

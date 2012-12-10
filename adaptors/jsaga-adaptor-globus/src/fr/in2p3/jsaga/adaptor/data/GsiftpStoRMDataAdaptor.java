@@ -1,18 +1,14 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.globus.ftp.GridFTPClient;
-import org.globus.ftp.exception.ServerException;
-import org.globus.ftp.exception.UnexpectedReplyCodeException;
-import org.ogf.saga.error.*;
-
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Map;
+
+import org.globus.ftp.exception.ServerException;
+import org.ogf.saga.error.AlreadyExistsException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

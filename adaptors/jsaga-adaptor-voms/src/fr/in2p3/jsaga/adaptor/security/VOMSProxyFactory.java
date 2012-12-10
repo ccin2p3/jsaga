@@ -1,23 +1,45 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
-import org.glite.voms.VOMSAttribute;
-import org.glite.voms.VOMSValidator;
-import org.glite.voms.contact.*;
-import org.globus.gsi.GlobusCredential;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import org.apache.log4j.Logger;
+import org.bouncycastle.openssl.PasswordFinder;
+import org.globus.gsi.CredentialException;
+import org.globus.gsi.GSIConstants;
+import org.globus.gsi.X509Credential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
+import org.globus.gsi.util.CertificateLoadUtil;
 import org.globus.util.Util;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
+import org.italiangrid.voms.VOMSAttribute;
+import org.italiangrid.voms.VOMSValidators;
+import org.italiangrid.voms.request.VOMSACRequest;
+import org.italiangrid.voms.request.VOMSErrorMessage;
+import org.italiangrid.voms.request.VOMSRequestListener;
+import org.italiangrid.voms.request.VOMSServerInfo;
+import org.italiangrid.voms.request.VOMSWarningMessage;
+import org.italiangrid.voms.request.impl.DefaultVOMSACRequest;
+import org.italiangrid.voms.request.impl.DefaultVOMSServerInfo;
+import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
+import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-import java.util.*;
+import eu.emi.security.authn.x509.proxy.ProxyPolicy;
+import eu.emi.security.authn.x509.proxy.ProxyType;
+import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
+import fr.in2p3.jsaga.adaptor.security.JSAGAVOMSACProxy.VOMSException;
 
 /*
  * ***************************************************
@@ -30,18 +52,17 @@ import java.util.*;
  *
  */
 public class VOMSProxyFactory {
-
+	private static final Logger logger = Logger.getLogger(VOMSProxyFactory.class);
+	
     public static final int CERTIFICATE_PEM = 0;
     public static final int CERTIFICATE_PKCS12 = 1;
     public static final String DEFAULTLIFE_TIME = "PT12H";
-    private static final int OID_OLD = 2;           // default
-    private static final int OID_GLOBUS = 3;
-    private static final int OID_RFC820 = 4;
-    private static final int DELEGATION_NONE = 1;
-    private static final int DELEGATION_LIMITED = 2;
-    private static final int DELEGATION_FULL = 3;   // default
-    private VOMSProxyInit m_proxyInit;
-    private VOMSRequestOptions m_requestOptions;
+    private JSAGAVOMSACProxy m_jsagaVomsACProxy;
+    private DefaultVOMSACRequest m_vomsACRequest;
+    private X509Credential m_userCredential;
+    private final String m_userProxyFile;
+    private final String vomsdir;
+    private final String cadir;
 
     /**
      * constructor for creating VOMS proxies
@@ -59,23 +80,49 @@ public class VOMSProxyFactory {
 
     private VOMSProxyFactory(Map attributes, int certificateFormat, GSSCredential cred) throws BadParameterException, ParseException, URISyntaxException {
         // required attributes
-        System.setProperty("X509_CERT_DIR", (String) attributes.get(Context.CERTREPOSITORY));
-        System.setProperty("CADIR", (String) attributes.get(Context.CERTREPOSITORY));
-        System.setProperty("VOMSDIR", (String) attributes.get(VOMSContext.VOMSDIR));
+        cadir = (String) attributes.get(Context.CERTREPOSITORY);
+        vomsdir = (String) attributes.get(VOMSContext.VOMSDIR);
 
         String serverUrl = (String) attributes.get(Context.SERVER);
         URI uri = new URI(serverUrl.replaceAll(" ", "%20"));
         if (uri.getHost() == null) {
             throw new BadParameterException("Attribute Server has no host name: " + uri.toString());
         }
-        VOMSServerInfo server = new VOMSServerInfo();
-        server.setHostName(uri.getHost());
-        server.setPort(uri.getPort());
-        server.setHostDn(uri.getPath());
+        DefaultVOMSServerInfo server = new DefaultVOMSServerInfo();
+        server.setURL(uri);
+        server.setVOMSServerDN(uri.getPath());
         server.setVoName((String) attributes.get(Context.USERVO));
+        
+        
+        
+        VOMSRequestListener vomsRequestListener = new VOMSRequestListener() {
+			
+			public void notifyWarningsInVOMSResponse(VOMSACRequest request, VOMSServerInfo si, VOMSWarningMessage[] warnings) {
+				logger.warn("Warnings In VOMS Response : \n\t- req:" + Arrays.toString(request.getRequestedFQANs().toArray()) + "\n\t- si: " + si + "\n\t- warnings: " + Arrays.toString(warnings));
+			}
+			
+			public void notifyVOMSRequestSuccess(VOMSACRequest request, VOMSServerInfo endpoint) {
+				logger.info("VOMS Request Success : \n\t- req:" + Arrays.toString(request.getRequestedFQANs().toArray()) + "\n\t- endpoint: " + endpoint);
+			}
+			
+			public void notifyVOMSRequestStart(VOMSACRequest request, VOMSServerInfo si) {
+				logger.info("VOMS Request Start : \n\t- req:" + Arrays.toString(request.getRequestedFQANs().toArray()) + "\n\t- si: " + si);
+			}
+			
+			public void notifyVOMSRequestFailure(VOMSACRequest request, VOMSServerInfo endpoint, Throwable error) {
+				logger.error("Errors In VOMS Reponse : \n\t- req:" + Arrays.toString(request.getRequestedFQANs().toArray()) + "\n\t- endpoint: " + endpoint + "\n\t- errors: " + error.getMessage());
+			}
+			
+			public void notifyErrorsInVOMSReponse(VOMSACRequest request, VOMSServerInfo si, VOMSErrorMessage[] errors) {
+				logger.error("Errors In VOMS Reponse : \n\t- req:" + Arrays.toString(request.getRequestedFQANs().toArray()) + "\n\t- si: " + si + "\n\t- errors: " + Arrays.toString(errors));
+			}
+		};
+		
+        m_jsagaVomsACProxy = new JSAGAVOMSACProxy(cadir, vomsRequestListener);
+        
         if (cred != null) {
             if (cred instanceof GlobusGSSCredentialImpl) {
-                m_proxyInit = VOMSProxyInit.instance(((GlobusGSSCredentialImpl) cred).getGlobusCredential());
+            	m_userCredential = ((GlobusGSSCredentialImpl) cred).getX509Credential();
             } else {
                 throw new BadParameterException("Not a globus proxy");
             }
@@ -85,30 +132,53 @@ public class VOMSProxyFactory {
             if ("".equals(passphrase)) {
                 passphrase = null;
             }
+            
+            final char[] pwd;
+            if(passphrase != null){
+            	pwd = passphrase.toCharArray();
+            }else{
+            	pwd = null;
+            }
 
             // get certificate
             switch (certificateFormat) {
                 case CERTIFICATE_PEM:
                     String userCert = (String) attributes.get(Context.USERCERT);
                     String userKey = (String) attributes.get(Context.USERKEY);
-                    m_proxyInit = VOMSProxyInit.instance(userCert, userKey, passphrase);
+					try {
+						X509Certificate[] x509Certificates = CertificateLoadUtil.loadCertificates(userCert);
+						PrivateKey privateKey = CertificateLoadUtil.loadPrivateKey(userKey, new PasswordFinder() {
+							public char[] getPassword() {
+								return pwd;
+							}
+						});
+						m_userCredential =  new X509Credential(privateKey, x509Certificates);
+					} catch (Exception e) {
+						throw new BadParameterException("Unable to load the provided pems files (cert: '" + userCert + "', key: '" + userKey, e);
+					}
                     break;
                 case CERTIFICATE_PKCS12:
                     String pkcs12 = (String) attributes.get(VOMSContext.USERCERTKEY);
-                    m_proxyInit = VOMSProxyInit.instance(new File(pkcs12), passphrase);
+					try {
+						m_userCredential =  CertificateLoadUtil.loadKeystore(pkcs12, passphrase != null ? passphrase.toCharArray() : null, null, null, "PKCS12");
+					} catch (Exception e) {
+						throw new BadParameterException("Unable to load the provided pkcs12 file (" + pkcs12 + ")");
+					}
                     break;
                 default:
                     throw new BadParameterException("Invalid case, either PEM or PKCS12 certificates is supported");
             }
         }
-        m_proxyInit.addVomsServer(server);
-        m_proxyInit.setProxyOutputFile((String) attributes.get(Context.USERPROXY));
-        m_requestOptions = new VOMSRequestOptions();
-        m_requestOptions.setVoName((String) attributes.get(Context.USERVO));
+        m_jsagaVomsACProxy.addVOMSServerInfo(server);
+        m_userProxyFile = (String) attributes.get(Context.USERPROXY);
+        m_vomsACRequest = new DefaultVOMSACRequest();
+        m_vomsACRequest.setVoName((String) attributes.get(Context.USERVO));
 
         // optional attributes
         if (attributes.containsKey(VOMSContext.USERFQAN)) {
-            m_requestOptions.addFQAN((String) attributes.get(VOMSContext.USERFQAN));
+        	List<String> fqans = new ArrayList<String>();
+        	fqans.add((String) attributes.get(VOMSContext.USERFQAN));
+        	m_vomsACRequest.setRequestedFQANs(fqans);
         }
 
         int lifetime;
@@ -118,54 +188,110 @@ public class VOMSProxyFactory {
             lifetime = UDuration.toInt(DEFAULTLIFE_TIME);
         }
 
-        m_proxyInit.setProxyLifetime(lifetime);
-        m_requestOptions.setLifetime(lifetime);
+        m_jsagaVomsACProxy.setProxyLifetime(lifetime);
+        m_vomsACRequest.setLifetime(lifetime);
+        GSIConstants.DelegationType delegationType = GSIConstants.DelegationType.NONE;
 
         if (attributes.containsKey(VOMSContext.DELEGATION)) {
             String delegation = (String) attributes.get(VOMSContext.DELEGATION);
             if (delegation.equalsIgnoreCase("none")) {
-                m_proxyInit.setDelegationType(DELEGATION_NONE);
+                delegationType = GSIConstants.DelegationType.NONE;
             } else if (delegation.equalsIgnoreCase("limited")) {
-                m_proxyInit.setDelegationType(DELEGATION_LIMITED);
+                delegationType = GSIConstants.DelegationType.LIMITED;
             } else if (delegation.equalsIgnoreCase("full")) {
-                m_proxyInit.setDelegationType(DELEGATION_FULL);
+                delegationType = GSIConstants.DelegationType.FULL;
             }
         }
+
         if (attributes.containsKey(VOMSContext.PROXYTYPE)) {
             String proxyType = (String) attributes.get(VOMSContext.PROXYTYPE);
+
             if (proxyType.equalsIgnoreCase("old")) {
-                m_proxyInit.setProxyType(OID_OLD);
+                switch (delegationType) {
+                    case LIMITED:
+                    	m_jsagaVomsACProxy.setProxyType(ProxyType.LEGACY);
+                    	m_jsagaVomsACProxy.setProxyLimited(true);
+                        break;
+                    case FULL:
+                    case NONE:
+                    	m_jsagaVomsACProxy.setProxyType(ProxyType.LEGACY);
+                    	m_jsagaVomsACProxy.setProxyLimited(false);
+                        break;
+                }
             } else if (proxyType.equalsIgnoreCase("globus")) {
-                m_proxyInit.setProxyType(OID_GLOBUS);
-            } else if (proxyType.equalsIgnoreCase("RFC820")) {
-                m_proxyInit.setProxyType(OID_RFC820);
+                switch (delegationType) {
+                    case LIMITED:
+                    	m_jsagaVomsACProxy.setProxyType(ProxyType.DRAFT_RFC);
+                    	m_jsagaVomsACProxy.setProxyPolicy(new ProxyPolicy(ProxyPolicy.LIMITED_PROXY_OID));
+                        break;
+                    case FULL:
+                    	m_jsagaVomsACProxy.setProxyType(ProxyType.DRAFT_RFC);
+                    	m_jsagaVomsACProxy.setProxyPolicy(new ProxyPolicy(ProxyPolicy.INHERITALL_POLICY_OID));
+                        break;
+                    case NONE:
+                    	m_jsagaVomsACProxy.setProxyType(ProxyType.DRAFT_RFC);
+                    	m_jsagaVomsACProxy.setProxyPolicy(new ProxyPolicy(ProxyPolicy.INDEPENDENT_POLICY_OID));
+                        break;
+                }
+            } else if (proxyType.equalsIgnoreCase("RFC3820")) {
+                switch (delegationType) {
+                    case LIMITED:
+                    	m_jsagaVomsACProxy.setProxyType(ProxyType.RFC3820);
+                    	m_jsagaVomsACProxy.setProxyPolicy(new ProxyPolicy(ProxyPolicy.LIMITED_PROXY_OID));
+                        break;
+                    case FULL:
+                    	m_jsagaVomsACProxy.setProxyType(ProxyType.RFC3820);
+                    	m_jsagaVomsACProxy.setProxyPolicy(new ProxyPolicy(ProxyPolicy.INHERITALL_POLICY_OID));
+                        break;
+                    case NONE:
+                    	m_jsagaVomsACProxy.setProxyType(ProxyType.RFC3820);
+                    	m_jsagaVomsACProxy.setProxyLimited(true);
+                    	m_jsagaVomsACProxy.setProxyPolicy(new ProxyPolicy(ProxyPolicy.INDEPENDENT_POLICY_OID));
+                        break;
+                }
             }
         }
     }
 
-    public GSSCredential createProxy() throws GSSException, BadParameterException, NoSuccessException {
+    public GSSCredential createProxy() throws GSSException, BadParameterException, NoSuccessException, VOMSException {
         // create
-        GlobusCredential globusProxy;
-        if ("NOVO".equals(m_requestOptions.getVoName())) {
+        X509Credential globusProxy;
+        if ("NOVO".equals(m_vomsACRequest.getVoName())) {
             // TEST to create gridProxy :
-            globusProxy = m_proxyInit.getVomsProxy(null);
-        } else {
-            ArrayList options = new ArrayList();
-            options.add(m_requestOptions);
-            globusProxy = m_proxyInit.getVomsProxy(options);
-            Util.setFilePermissions(m_proxyInit.getProxyOutputFile(), 600);
-            // validate
             try {
-                Vector v = VOMSValidator.parse(globusProxy.getCertificateChain());
-                for (int i = 0; i < v.size(); i++) {
-                    VOMSAttribute attr = (VOMSAttribute) v.elementAt(i);
-                    if (!attr.getVO().equals(m_requestOptions.getVoName())) {
-                        throw new NoSuccessException("The VO name of the created VOMS proxy ('" + attr.getVO() + "') does not match with the required VO name ('" + m_requestOptions.getVoName() + "').");
-                    }
+				globusProxy = m_jsagaVomsACProxy.getVOMSProxyCertificate(m_userCredential, null);
+			} catch (CredentialException e) {
+				throw new NoSuccessException("Unable to generate the requested Grid proxy (NOVO)", e);
+			}
+        } else {
+            try {
+				globusProxy = m_jsagaVomsACProxy.getVOMSProxyCertificate(m_userCredential, m_vomsACRequest);
+			} catch (CredentialException e) {
+				throw new NoSuccessException("Unable to generate the requested VOMS proxy", e);
+			}
+            // validate
+        	List<String> vomsdirs = new ArrayList<String>();
+        	vomsdirs.add(vomsdir);
+            List<VOMSAttribute> v = VOMSValidators.newValidator(new DefaultVOMSTrustStore(vomsdirs), CertificateValidatorBuilder.buildCertificateValidator(cadir)).parse(globusProxy.getCertificateChain());
+            for (int i = 0; i < v.size(); i++) {
+                VOMSAttribute attr = (VOMSAttribute) v.get(i);
+                if (!attr.getVO().equals(m_vomsACRequest.getVoName())) {
+                    throw new NoSuccessException("The VO name of the created VOMS proxy ('" + attr.getVO() + "') does not match with the required VO name ('" + m_vomsACRequest.getVoName() + "').");
                 }
-            } catch (IllegalArgumentException iAE) {
-                throw new BadParameterException("The lifetime may be too long", iAE);
             }
+            try {
+	            FileOutputStream fileOutputStream = new FileOutputStream(m_userProxyFile);
+	            try{
+		            globusProxy.save(fileOutputStream);
+	            	Util.setFilePermissions(m_userProxyFile, 600);
+	            }finally{
+	            	try {
+						fileOutputStream.close();
+					} catch (IOException e) {}
+	            }
+            } catch (Exception e) {
+				throw new NoSuccessException("Unable to save the generated VOMS proxy in '" +m_userProxyFile + "'", e);
+			}
         }
         return new GlobusGSSCredentialImpl(globusProxy, GSSCredential.INITIATE_AND_ACCEPT);
     }

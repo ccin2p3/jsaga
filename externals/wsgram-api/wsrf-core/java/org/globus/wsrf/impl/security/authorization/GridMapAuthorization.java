@@ -19,9 +19,6 @@ import org.globus.wsrf.config.ConfigException;
 import org.globus.wsrf.impl.security.util.AuthUtil;
 import org.globus.wsrf.impl.security.descriptor.SecurityPropertiesHelper;
 
-import org.globus.gsi.jaas.UserNamePrincipal;
-import org.globus.security.gridmap.GridMap;
-
 import org.globus.util.I18n;
 
 import org.apache.commons.logging.Log;
@@ -33,6 +30,8 @@ import javax.xml.namespace.QName;
 import javax.xml.rpc.handler.MessageContext;
 
 import java.io.IOException;
+import org.globus.gsi.gridmap.GridMap;
+import org.globus.gsi.gssapi.jaas.UserNamePrincipal;
 
 import org.w3c.dom.Node;
 

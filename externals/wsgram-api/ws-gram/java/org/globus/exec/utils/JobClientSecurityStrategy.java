@@ -19,7 +19,7 @@ import org.ietf.jgss.GSSCredential;
 import org.globus.util.I18n;
 
 import org.globus.axis.gsi.GSIConstants;
-import org.globus.security.gridmap.GridMap;
+import org.globus.gsi.gridmap.GridMap;
 
 import org.globus.wsrf.impl.security.authentication.Constants;
 import org.globus.wsrf.impl.security.authorization.Authorization;

@@ -24,7 +24,7 @@ import org.apache.axis.AxisEngine;
 import org.ietf.jgss.GSSCredential;
 
 import org.globus.axis.util.Util;
-import org.globus.gsi.jaas.JaasGssUtil;
+import org.globus.gsi.gssapi.JaasGssUtil;
 import org.globus.net.ServerSocketFactory;
 import org.globus.util.I18n;
 import org.globus.wsrf.config.ContainerConfig;

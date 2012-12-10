@@ -50,14 +50,14 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.message.addressing.AddressingHeaders;
+import org.globus.axis.gsi.GSIConstants;
+import org.globus.gsi.gssapi.jaas.GlobusPrincipal;
 
 import org.ietf.jgss.GSSCredential;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.globus.axis.gsi.GSIConstants;
-import org.globus.gsi.jaas.GlobusPrincipal;
 import org.globus.util.I18n;
 import org.globus.wsrf.ResourceContext;
 import org.globus.wsrf.ResourceContextException;

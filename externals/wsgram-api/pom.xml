@@ -9,134 +9,69 @@
     <groupId>org.globus</groupId>
     <artifactId>wsgram-api</artifactId>
     <version>4.0.0</version>
-	<name>WS-GRAM API</name>
-	<description>Java API for managing jobs with WS-GRAM from Globus Toolkit 4.</description>
+	<packaging>pom</packaging>
+	<!-- CAUTION: this module cannot be built anymore -->
+	<name>WS GRAM external libraries</name>
+	<description>These are the external libraries for the WS GRAM adaptor.</description>
     <url>http://www.globus.org/</url>
-    <organization>
-        <name>The Globus Alliance</name>
-        <url>http://www.globus.org/alliance/</url>
-    </organization>
-    <licenses>
-        <license>
-            <name>Globus Toolkit Public License (GTPL) Version 3</name>
-            <url>http://www.globus.org/toolkit/legal/4.0/license-v3.html</url>
-        </license>
-        <!-- applicable for 4.0.1+
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-        -->
-    </licenses>
-    <build>
-        <plugins>
-            <plugin><!-- copy jar -->
+    <!-- Sequence of commands:
+    		mvn -f pom-java.xml install
+    		mvn -Ddescriptor=assembly.xml assembly:assembly (ignore FATAL ERROR and InvalidArtifactRTException)
+    		cp -p build/wsgram-api-4.0.0.jar wsgram-api.jar
+    -->
+	<build>
+		<directory>build</directory>
+	    <plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+					<executions>
+					    <execution>
+							<phase>package</phase>
+							<goals>
+								<goal>assembly</goal>
+	                        </goals>
+		                </execution>
+			        </executions>
+			        <configuration>
+						<descriptors>
+				            <descriptor>assembly.xml</descriptor>
+			          </descriptors>
+			        </configuration>
+		    </plugin>
+<!--			<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-    <dependencies>
-		<dependency>
-			<groupId>directory-naming</groupId>
-			<artifactId>naming-java</artifactId>
-			<version>0.8</version>
-            <scope>runtime</scope>
-        </dependency>
-		 <dependency>
-            <groupId>axis</groupId>
-            <artifactId>axis</artifactId>
-            <version>1.4-patched</version>
-            <scope>compile</scope>
-        </dependency>
-		<dependency>
-            <groupId>org.apache</groupId>
-            <artifactId>addressing-1.0</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
-        </dependency>
-		<dependency>
-            <!-- todo: to be removed (already in dependencies of axis:axis:1.4) -->
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery</artifactId>
-            <version>0.2</version>
-            <scope>compile</scope>
-        </dependency>
-		<dependency>
-            <!-- todo: to be removed (already in dependencies of axis:axis:1.4) -->
-    		<groupId>axis</groupId>
-			<artifactId>axis-wsdl4j</artifactId>
-			<version>1.5.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-            <version>1.1</version>
-        </dependency>
+            </plugin>-->
+		</plugins>
+	</build>
+	<dependencies>
         <dependency>
             <groupId>org.globus</groupId>
-            <artifactId>cog-jglobus</artifactId>
-            <version>1.8</version>
-			 <scope>compile</scope>
+            <artifactId>globus_usage_packets_common</artifactId>
+            <version>4.0.0</version>
+            <scope>compile</scope>
         </dependency>
-        <dependency>
+		<dependency>
             <groupId>org.globus</groupId>
-            <artifactId>cog-axis</artifactId>
-            <version>gt4</version>
+            <artifactId>wsrf-provider-jce</artifactId>
+            <version>4.0.0</version>
             <scope>compile</scope>
-        </dependency>
-		<dependency>
-			<groupId>directory-naming</groupId>
-			<artifactId>naming-factory</artifactId>
-			<version>0.8</version>
-        </dependency>
-		<dependency>
-		    <groupId>bouncycastle</groupId>
-		    <artifactId>bcprov-jdk13</artifactId>
-		    <version>140</version>
-		</dependency>
-		 <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.santuario</groupId>
-            <artifactId>xmlsec</artifactId>
-            <version>1.4.5</version>
-            <scope>compile</scope>
-        </dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-digester</groupId>
-			<artifactId>commons-digester</artifactId>
-			<version>1.5</version>
-		</dependency>
-		<dependency>
-			<groupId>org.globus</groupId>
-			<artifactId>commonj</artifactId>
-			<version>4.0.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.globus</groupId>
-			<artifactId>concurrent</artifactId>
-			<version>4.0.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.globus</groupId>
-			<artifactId>opensaml</artifactId>
-			<version>4.0.0</version>
-		</dependency>
-		<dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.6.2</version>
         </dependency>
 	</dependencies>
+  	<modules>
+		<module>opensaml39</module>
+		<module>opensaml40</module>
+		<module>globus_usage_packets_common</module>
+		<module>wsrf-provider-jce</module>
+		<module>addressing-1.0</module>
+		<module>wss4j-globus</module>
+		<module>wsrf-usage</module>
+		<module>wsrf-tools</module>
+		<module>ws-delegation</module>
+		<module>ws-rendezvous</module>
+		<module>wsrf-common</module>
+		<module>wsrf-core</module>
+		<module>ws-mds-aggregator</module>
+		<module>ws-gram</module>
+  	</modules>
 </project>

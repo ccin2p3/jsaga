@@ -11,6 +11,7 @@
 package org.globus.wsrf.impl.security.descriptor;
 
 import java.io.File;
+import java.io.IOException;
 import java.security.cert.X509Certificate;
 
 import javax.security.auth.Subject;
@@ -23,8 +24,10 @@ import org.ietf.jgss.GSSException;
 import org.w3c.dom.Document;
 
 import org.globus.gsi.CertUtil;
+import org.globus.gsi.CredentialException;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.GlobusCredentialException;
+import org.globus.gsi.X509Credential;
 import org.globus.util.I18n;
 import org.globus.wsrf.config.ConfigException;
 import org.globus.wsrf.impl.security.authentication.encryption.EncryptionCredentials;
@@ -91,7 +94,7 @@ public class ClientSecurityConfig {
     }
 
     private static void loadCredentials(ClientSecurityDescriptor desc)
-        throws GSSException, GlobusCredentialException, ConfigException {
+        throws GSSException, CredentialException, ConfigException, IOException {
 
         if (desc == null)
             return;
@@ -104,7 +107,7 @@ public class ClientSecurityConfig {
 
             if (proxyFile != null) {
                 logger.debug("Loading credential:proxy = '" + proxyFile + "'");
-                GlobusCredential gCred = new GlobusCredential(proxyFile);
+                X509Credential gCred = new X509Credential(proxyFile);
                 desc.setLastModified(
                      new Long((new File(proxyFile)).lastModified()));
                 cred = SecurityConfig.toGSSCredential(gCred);
@@ -120,7 +123,7 @@ public class ClientSecurityConfig {
             logger.debug("Loading credential: cert = '" + certFile
                          + "' key = '" +  keyFile + "'");
 
-            GlobusCredential gCred = new GlobusCredential(certFile, keyFile);
+            X509Credential gCred = new X509Credential(certFile, keyFile);
             desc.setLastModified(
                  new Long((new File(certFile)).lastModified()));
             cred = SecurityConfig.toGSSCredential(gCred);
