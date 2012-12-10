@@ -11,33 +11,6 @@
     <version>1.4.4-1</version>
     <name>Glite Security delegation</name>
     
-    <repositories>
-    	<!-- CNAF repos for glite/EMI libs (https://github.com/italiangrid) -->
-    	<repository>
-			<id>cnaf-releases</id>
-			<name>CNAF releases</name>
-			<url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-releases/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>cnaf-snapshots</id>
-			<name>CNAF snapshots</name>
-			<url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-snapshots/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</repository>
-	</repositories>
     <dependencies>    
         <dependency>
             <groupId>org.glite</groupId>
