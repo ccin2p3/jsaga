@@ -64,12 +64,19 @@
     </issueManagement>
     <distributionManagement>
 
-
-        <repository>
+         <repository>
+            <id>maven2-repository</id>
+            <url>${maven.repository}</url>
+         </repository>
+        <site>
+            <id>project-web-site</id>
+            <url>${project.web.site}</url>
+        </site>
+        <!--repository>
           <id>maatg-fr-snapshots</id>
           <name>maatG France Snapshots</name>
           <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
-        </repository>
+        </repository-->
         
     </distributionManagement>
     <profiles>
