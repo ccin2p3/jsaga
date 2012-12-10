@@ -59,7 +59,7 @@
         </dependency>
 	</dependencies>
   	<modules>
-		<module>opensaml39</module>
+		<!--<module>opensaml39</module>-->
 		<module>opensaml40</module>
 		<module>globus_usage_packets_common</module>
 		<module>wsrf-provider-jce</module>
