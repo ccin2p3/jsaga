@@ -5,6 +5,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.security.cert.CertificateParsingException;
+import java.util.ArrayList;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
@@ -41,10 +42,10 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
 	private ProxyType proxyType = ProxyType.LEGACY;
 	private ProxyPolicy proxyPolicy = null; //equivalent to: ProxyPolicy.INHERITALL_POLICY_OID
 
-	private final VOMSServerInfoStore serverInfoStore = new DefaultVOMSServerInfoStore(new BaseVOMSESLookupStrategy(new String[0]));
+	private final VOMSServerInfoStore serverInfoStore = new DefaultVOMSServerInfoStore(new BaseVOMSESLookupStrategy(new ArrayList<String>()));
 	
 	public JSAGAVOMSACProxy(String caDir, VOMSRequestListener vomsRequestListener){
-		super(CertificateValidatorBuilder.buildCertificateValidator(caDir), vomsRequestListener, new BaseVOMSESLookupStrategy(new String[0]), new NullListener(), new NullListener());
+		super(CertificateValidatorBuilder.buildCertificateValidator(caDir), vomsRequestListener, new BaseVOMSESLookupStrategy(new ArrayList<String>()), new NullListener(), new NullListener());
 	}
 	
 	public void addVOMSServerInfo(VOMSServerInfo vomsServerInfo) {
