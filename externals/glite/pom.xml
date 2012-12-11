@@ -69,5 +69,20 @@
 			<id>emi-infn-repo</id>
 			<url>http://devel12.cnaf.infn.it:7444/pub/emi/packaging/maven</url>
 		</repository>
-	</repositories>
+        <repository>
+            <id>maatg-fr-releases</id>
+            <name>maatG France Releases</name>
+            <url>http://nexus.maatg.fr/content/repositories/maatg-fr-releases</url>
+        </repository>
+        <repository>
+            <id>maatg-fr-snapshots</id>
+            <name>maatG France Snapshots</name>
+            <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>
