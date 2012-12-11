@@ -57,11 +57,6 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpg-jdk15</artifactId>
-            <version>1.45</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15</artifactId>
             <version>1.45</version>
         </dependency>
@@ -80,6 +75,11 @@
             <groupId>org.glite</groupId>
             <artifactId>glite-jdl-api-java</artifactId>
             <version>3.1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.condor</groupId>
+            <artifactId>classad</artifactId>
+            <version>2.4</version>
         </dependency>
     </dependencies>
 </project>
