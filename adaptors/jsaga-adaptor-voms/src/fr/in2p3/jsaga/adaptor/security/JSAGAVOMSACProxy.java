@@ -5,20 +5,16 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.security.cert.CertificateParsingException;
-import java.util.Set;
+import java.util.ArrayList;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.globus.gsi.CredentialException;
 import org.globus.gsi.X509Credential;
-import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
+import org.italiangrid.voms.request.VOMSESLookupStrategy;
 import org.italiangrid.voms.request.VOMSRequestListener;
-import org.italiangrid.voms.request.VOMSResponse;
-import org.italiangrid.voms.request.VOMSServerInfo;
-import org.italiangrid.voms.request.VOMSServerInfoStore;
 import org.italiangrid.voms.request.impl.BaseVOMSESLookupStrategy;
 import org.italiangrid.voms.request.impl.DefaultVOMSACService;
-import org.italiangrid.voms.request.impl.DefaultVOMSServerInfoStore;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.italiangrid.voms.util.NullListener;
 
@@ -33,7 +29,7 @@ import eu.emi.security.authn.x509.proxy.ProxyType;
 /**
  * custom based on {@link DefaultVOMSACService} which ease the VOMS Credential creation
  */
-public class JSAGAVOMSACProxy extends DefaultVOMSACService {
+public class JSAGAVOMSACProxy extends MyVOMSACService {
 
 	private int proxyLifetime = 86400;
 	private int proxyKeyLength = 1024;
@@ -41,14 +37,10 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
 	private ProxyType proxyType = ProxyType.LEGACY;
 	private ProxyPolicy proxyPolicy = null; //equivalent to: ProxyPolicy.INHERITALL_POLICY_OID
 
-	private final VOMSServerInfoStore serverInfoStore = new DefaultVOMSServerInfoStore(new BaseVOMSESLookupStrategy(new String[0]));
+	private static final VOMSESLookupStrategy vomsesLookupStrategy = new BaseVOMSESLookupStrategy(new ArrayList<String>());
 	
 	public JSAGAVOMSACProxy(String caDir, VOMSRequestListener vomsRequestListener){
-		super(CertificateValidatorBuilder.buildCertificateValidator(caDir), vomsRequestListener, new BaseVOMSESLookupStrategy(new String[0]), new NullListener(), new NullListener());
-	}
-	
-	public void addVOMSServerInfo(VOMSServerInfo vomsServerInfo) {
-		this.serverInfoStore.addVOMSServerInfo(vomsServerInfo);
+		super(CertificateValidatorBuilder.buildCertificateValidator(caDir), vomsRequestListener, vomsesLookupStrategy, NullListener.INSTANCE, NullListener.INSTANCE);
 	}
 	
 	public X509Credential getVOMSProxyCertificate(X509Credential credential, VOMSACRequest vomsacRequest) throws CredentialException, VOMSException{
@@ -91,28 +83,6 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
 			throw new CredentialException(e);
 		}
 		return new X509Credential(proxyCert.getPrivateKey(), proxyCert.getCertificateChain());
-	}
-	
-	@Override
-	protected VOMSResponse doRESTRequest(VOMSACRequest request, VOMSServerInfo serverInfo, eu.emi.security.authn.x509.X509Credential credential){
-		try{
-			return super.doRESTRequest(request, serverInfo, credential);
-		}catch(VOMSError error){
-			// REST function not available on old VOMS servers.
-			if("Unexpected end of file from server".equals(error.getMessage())){
-				return null;
-			}else{
-				throw error;
-			}
-		}
-	}
-	
-	@Override
-	protected Set<VOMSServerInfo> getVOMSServerInfos(VOMSACRequest request) {
-		Set<VOMSServerInfo> vomsServerInfos = this.serverInfoStore
-				.getVOMSServerInfo(request.getVoName());
-
-		return vomsServerInfos;
 	}
 	
 	public int getProxyKeyLength() {
