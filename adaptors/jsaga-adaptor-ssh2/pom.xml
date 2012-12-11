@@ -9,11 +9,11 @@
     <parent>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
-        <version>0.9.15-SNAPSHOT</version>
+        <version>0.9.15</version>
     </parent>
 
     <artifactId>jsaga-adaptor-ssh2</artifactId>
-    <version>0.9.15-SNAPSHOT</version>
+    <version>0.9.15</version>
 
     <!-- ************************************************************* -->
     <!-- *** Project Information ************************************* -->
@@ -31,13 +31,13 @@
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.15-SNAPSHOT</version>
+            <version>0.9.15</version>
             <scope>provided</scope>
         </dependency>
         <dependency><!-- for data staging (scope runtime) and for class LocalJobProcess (scope compile) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-classic</artifactId>
-            <version>0.9.15-SNAPSHOT</version>
+            <version>0.9.15</version>
             <scope>provided</scope>
         </dependency>
 		<dependency>
