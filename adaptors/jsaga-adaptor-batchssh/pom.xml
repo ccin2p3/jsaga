@@ -4,7 +4,7 @@
     <parent>
         <artifactId>adaptors</artifactId>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
-        <version>0.9.15</version>
+        <version>0.9.16-SNAPSHOT</version>
     </parent>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-batchssh</artifactId>
@@ -43,7 +43,7 @@
         <dependency><!-- needed for security context -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-ssh2</artifactId>
-            <version>0.9.15</version>
+            <version>0.9.16-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.ganymed-ssh-2</groupId>
@@ -58,7 +58,7 @@
         <dependency><!-- needed for security context -->
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.15</version>
+            <version>0.9.16-SNAPSHOT</version>
         </dependency>     
     </dependencies>
     <build>
