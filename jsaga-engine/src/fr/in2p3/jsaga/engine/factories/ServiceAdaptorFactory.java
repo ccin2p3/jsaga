@@ -30,10 +30,9 @@ public class ServiceAdaptorFactory {
         // add service config
         String scheme = context.getSchemeFromAlias(url.getScheme());
         Properties serviceConfig = context.getServiceConfig(serviceType, scheme);
+        attributes.putAll(adaptorDefaults);
         if (serviceConfig != null) {
             attributes.putAll(serviceConfig);
-        } else {
-            attributes.putAll(adaptorDefaults);
         }
 
         // add service call
