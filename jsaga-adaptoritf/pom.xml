@@ -5,7 +5,6 @@
         <version>0.9.16-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>fr.in2p3.jsaga</groupId>
     <artifactId>jsaga-adaptoritf</artifactId>
     <name>Interfaces for adaptors</name>
     <description>Set of interfaces to be implemented by JSAGA adaptors.</description>
