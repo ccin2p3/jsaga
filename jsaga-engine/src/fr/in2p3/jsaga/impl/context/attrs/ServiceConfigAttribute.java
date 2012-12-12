@@ -128,7 +128,9 @@ public abstract class ServiceConfigAttribute implements AttributeVector {
         if (m_values.containsKey("*")) {
             Properties clone = new Properties();
             clone.putAll(m_values.get("*"));
-            clone.putAll(m_values.get(scheme)); // may override common attributes
+            if(m_values.get(scheme) != null){
+            	clone.putAll(m_values.get(scheme)); // may override common attributes
+            }
             return clone;
         } else {
             return m_values.get(scheme);
