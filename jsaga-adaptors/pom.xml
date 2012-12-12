@@ -59,6 +59,7 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
+<!--
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-cream</artifactId>
@@ -71,6 +72,7 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
+-->
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-wms</artifactId>
