@@ -22,5 +22,14 @@
             </job>
             <include host="camillus" domain="cs.virginia.edu"/>
         </context>
+        <context type="AxisJKS" id="GenesisII-XCGServer1">
+            <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
+            <job type="bes-genesis2">
+            	<attribute name="ReferenceParameterNS" value="http://edu.virginia.vcgr.genii/ref-params"/>
+            	<attribute name="ReferenceParameterName" value="resource-key"/>
+            	<attribute name="ReferenceParameterValue" value="93B641B7-9422-EA4C-A90B-CA6A9D98E344"/>
+            </job>
+            <include host="xcg-server1" domain="uvacse.virginia.edu"/>
+        </context>
     </session>
 </jsaga-default>
