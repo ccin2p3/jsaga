@@ -9,10 +9,5 @@
             <exclude host="localhost6" domain="de" />
             <exclude host="localhost6" domain="org" />
         </context>
-        <context type="AxisJKS" id="Unicore-Sierra">
-            <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
-            <job type="bes-unicore"/>
-            <include host="s79r" domain="idp.sdsc.futuregrid.org"/>
-        </context>
     </session>
 </jsaga-default>
