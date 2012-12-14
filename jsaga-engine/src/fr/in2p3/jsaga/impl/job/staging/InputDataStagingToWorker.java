@@ -57,7 +57,7 @@ public class InputDataStagingToWorker extends AbstractDataStagingWorker {
         // generate script
         stdin.println("function "+FUNCTION+" () {");
         stdin.println("/bin/cat << ====");
-        stdin.print(encode(buffer.getData()));
+        stdin.println(encode(buffer.getData()));
         stdin.println("====");
         stdin.println("}");
         if (m_append) {
