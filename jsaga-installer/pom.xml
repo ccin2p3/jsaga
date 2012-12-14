@@ -2,7 +2,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga</groupId>
         <artifactId>jsaga</artifactId>
-        <version>0.9.15-SNAPSHOT</version>
+        <version>0.9.16-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jsaga-installer</artifactId>
@@ -299,7 +299,7 @@
         								</goals>
         							</pluginExecutionFilter>
         							<action>
-        								<ignore></ignore>
+        								<ignore />
         							</action>
         						</pluginExecution>
         						<pluginExecution>
@@ -318,7 +318,7 @@
         								</goals>
         							</pluginExecutionFilter>
         							<action>
-        								<ignore></ignore>
+        								<ignore />
         							</action>
         						</pluginExecution>
         					</pluginExecutions>
@@ -349,28 +349,28 @@
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.15-SNAPSHOT</version>
+            <version>0.9.16-SNAPSHOT</version>
         </dependency>
 
         <!-- core -->
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.15-SNAPSHOT</version>
+            <version>0.9.16-SNAPSHOT</version>
             <classifier>config</classifier>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.15-SNAPSHOT</version>
+            <version>0.9.16-SNAPSHOT</version>
         </dependency>
 
         <!-- adaptors -->
         <dependency>
             <groupId>fr.in2p3.jsaga.poms</groupId>
             <artifactId>jsaga-adaptors</artifactId>
-            <version>0.9.15-SNAPSHOT</version>
+            <version>0.9.16-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
     </dependencies>
