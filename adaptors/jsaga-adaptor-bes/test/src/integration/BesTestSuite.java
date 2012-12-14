@@ -68,9 +68,17 @@ public class BesTestSuite extends JSAGATestSuite {
 //        	// resource 9BC75AB7-41C5-DF7F-905D-90058E35D2FB is unknown
 //        	this.test_BES("bes://s79r.idp.sdsc.futuregrid.org:18443/axis/services/GeniiBESPortType?genii-container-id=D3C0D562-DB2A-7650-1799-63AB627860A9");
 //        }
+    	public void test_GenesisII_Futuregrid_XCGServer1() throws Exception {
+    		System.setProperty("javax.net.ssl.keyStore", "/home/schwarz/.jsaga/keystoreGrid2.jks");
+    		System.setProperty("javax.net.ssl.trustStore", "/home/schwarz/.jsaga/truststore.jks");
+        	this.test_BES("bes://xcg-server1.uvacse.virginia.edu:20443/axis/services/GeniiBESPortType?genii-container-id=93B641B7-9422-EA4C-A90B-CA6A9D98E344");
+        }
+        
+    	
 
     	public void test_Unicore6_local() throws Exception {
-    		System.setProperty("javax.net.ssl.keyStore", "/home/schwarz/.jsaga/keystoreDemoUser.jks");
+    		System.setProperty("javax.net.ssl.keyStore", "/home/schwarz/.jsaga/contexts/unicore6/demouser.jks");
+    		System.setProperty("javax.net.ssl.keyStorePassword", "the!user");
     		System.setProperty("javax.net.ssl.trustStore", "/home/schwarz/.jsaga/truststore.jks");
         	this.test_BES("bes://localhost6:8080/DEMO-SITE/services/BESFactory?res=default_bes_factory");
         }
