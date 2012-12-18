@@ -47,6 +47,7 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
+<!--
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-wsgram</artifactId>
@@ -59,7 +60,6 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
-<!--
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-cream</artifactId>
@@ -145,6 +145,7 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
+<!--
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-naregi</artifactId>
@@ -157,6 +158,7 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
+-->
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-batchssh</artifactId>
