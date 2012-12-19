@@ -171,14 +171,13 @@ public class VOMSProxyFactory {
         }
         m_jsagaVomsACProxy.addVOMSServerInfo(server);
         m_userProxyFile = (String) attributes.get(Context.USERPROXY);
-        m_vomsACRequest = new DefaultVOMSACRequest();
-        m_vomsACRequest.setVoName((String) attributes.get(Context.USERVO));
+        DefaultVOMSACRequest.Builder m_vomsACRequestBuilder = new DefaultVOMSACRequest.Builder((String) attributes.get(Context.USERVO));
 
         // optional attributes
         if (attributes.containsKey(VOMSContext.USERFQAN)) {
         	List<String> fqans = new ArrayList<String>();
         	fqans.add((String) attributes.get(VOMSContext.USERFQAN));
-        	m_vomsACRequest.setRequestedFQANs(fqans);
+        	m_vomsACRequestBuilder.fqans(fqans);
         }
 
         int lifetime;
@@ -189,7 +188,8 @@ public class VOMSProxyFactory {
         }
 
         m_jsagaVomsACProxy.setProxyLifetime(lifetime);
-        m_vomsACRequest.setLifetime(lifetime);
+        m_vomsACRequestBuilder.lifetime(lifetime);
+        m_vomsACRequest = m_vomsACRequestBuilder.build();
         GSIConstants.DelegationType delegationType = GSIConstants.DelegationType.NONE;
 
         if (attributes.containsKey(VOMSContext.DELEGATION)) {

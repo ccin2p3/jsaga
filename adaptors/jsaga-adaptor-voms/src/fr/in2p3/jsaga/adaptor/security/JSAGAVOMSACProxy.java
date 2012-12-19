@@ -10,11 +10,18 @@ import java.util.ArrayList;
 import org.bouncycastle.asn1.x509.AttributeCertificate;
 import org.globus.gsi.CredentialException;
 import org.globus.gsi.X509Credential;
+import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
 import org.italiangrid.voms.request.VOMSRequestListener;
+import org.italiangrid.voms.request.VOMSResponse;
+import org.italiangrid.voms.request.VOMSServerInfo;
+import org.italiangrid.voms.request.impl.AbstractVOMSProtocol;
 import org.italiangrid.voms.request.impl.BaseVOMSESLookupStrategy;
 import org.italiangrid.voms.request.impl.DefaultVOMSACService;
+import org.italiangrid.voms.request.impl.DefaultVOMSServerInfoStore;
+import org.italiangrid.voms.request.impl.LegacyProtocol;
+import org.italiangrid.voms.request.impl.RESTProtocol;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.italiangrid.voms.util.NullListener;
 
@@ -29,7 +36,7 @@ import eu.emi.security.authn.x509.proxy.ProxyType;
 /**
  * custom based on {@link DefaultVOMSACService} which ease the VOMS Credential creation
  */
-public class JSAGAVOMSACProxy extends MyVOMSACService {
+public class JSAGAVOMSACProxy extends DefaultVOMSACService {
 
     private int proxyLifetime = 86400;
     private int proxyKeyLength = 1024;
@@ -40,8 +47,41 @@ public class JSAGAVOMSACProxy extends MyVOMSACService {
     private static final VOMSESLookupStrategy vomsesLookupStrategy = new BaseVOMSESLookupStrategy(new ArrayList<String>());
 
     public JSAGAVOMSACProxy(String caDir, VOMSRequestListener vomsRequestListener){
-        super(CertificateValidatorBuilder.buildCertificateValidator(caDir), vomsRequestListener, vomsesLookupStrategy, NullListener.INSTANCE, NullListener.INSTANCE);
+    	super(new Builder(CertificateValidatorBuilder.buildCertificateValidator(caDir)).requestListener(vomsRequestListener));
+    	//buildServerInfoStore();
+    	serverInfoStore = new DefaultVOMSServerInfoStore.Builder()
+			.lookupStrategy(vomsesLookupStrategy)
+			.storeListener(NullListener.INSTANCE)
+			.vomsesPaths(null)
+			.build();
+		
+		//buildProtocols();
+    	httpProtocol = new RESTProtocol(validator, protocolListener, AbstractVOMSProtocol.DEFAULT_CONNECT_TIMEOUT, AbstractVOMSProtocol.DEFAULT_READ_TIMEOUT){
+    		/* (non-Javadoc)
+    		 * @see org.italiangrid.voms.request.impl.RESTProtocol#doRequest(org.italiangrid.voms.request.VOMSServerInfo, eu.emi.security.authn.x509.X509Credential, org.italiangrid.voms.request.VOMSACRequest)
+    		 */
+    		@Override
+    		public VOMSResponse doRequest(VOMSServerInfo endpoint,
+    				eu.emi.security.authn.x509.X509Credential credential, VOMSACRequest request) {
+    		try{
+    			return super.doRequest(endpoint, credential, request);
+    		}catch(VOMSError error){
+    			// REST function not available on old VOMS servers.
+    			if("Unexpected end of file from server".equals(error.getMessage())){
+    				return null;
+    			}else{
+    				throw error;
+    			}
+    		}
+    		}
+    	};
+		
+		legacyProtocol = new LegacyProtocol(validator, protocolListener, AbstractVOMSProtocol.DEFAULT_CONNECT_TIMEOUT, AbstractVOMSProtocol.DEFAULT_READ_TIMEOUT);
     }
+    
+    public void addVOMSServerInfo(VOMSServerInfo vomsServerInfo) {
+		serverInfoStore.addVOMSServerInfo(vomsServerInfo);
+	}
 
     public X509Credential getVOMSProxyCertificate(X509Credential credential, VOMSACRequest vomsacRequest) throws CredentialException, VOMSException{
         eu.emi.security.authn.x509.X509Credential emiCred;
