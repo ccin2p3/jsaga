@@ -75,6 +75,9 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
 			return new Integer(stat[stat.length-1].getExitCode());
 		} catch (TimeoutException e) {
 			throw new NoSuccessException(e);
+		} catch (NumberFormatException nfe) {
+			// Not a number
+			return null;
 		}
 	}
 
