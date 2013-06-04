@@ -13,8 +13,25 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.apache.log4j.Logger;
-import org.glite.ce.creamapi.ws.cream2.CREAMPort;
-import org.glite.ce.creamapi.ws.cream2.types.*;
+
+import org.glite.x2007.x11.ce.cream.CREAMPort;
+import org.glite.x2007.x11.ce.cream.CreamBindingStub;
+import org.glite.x2007.x11.ce.cream.types.AuthorizationFault;
+import org.glite.x2007.x11.ce.cream.types.CommandResult;
+import org.glite.x2007.x11.ce.cream.types.GenericFault;
+import org.glite.x2007.x11.ce.cream.types.InvalidArgumentFault;
+import org.glite.x2007.x11.ce.cream.types.JobDescription;
+import org.glite.x2007.x11.ce.cream.types.JobFilter;
+import org.glite.x2007.x11.ce.cream.types.JobId;
+import org.glite.x2007.x11.ce.cream.types.JobInfo;
+import org.glite.x2007.x11.ce.cream.types.JobInfoResponse;
+import org.glite.x2007.x11.ce.cream.types.JobInfoResult;
+import org.glite.x2007.x11.ce.cream.types.JobRegisterRequest;
+import org.glite.x2007.x11.ce.cream.types.JobRegisterResponse;
+import org.glite.x2007.x11.ce.cream.types.JobRegisterResult;
+import org.glite.x2007.x11.ce.cream.types.JobSubmissionDisabledFault;
+import org.glite.x2007.x11.ce.cream.types.Result;
+import org.glite.x2007.x11.ce.cream.types.ServiceInfo;
 import org.globus.ftp.exception.FTPException;
 import org.ogf.saga.error.*;
 
@@ -78,14 +95,15 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
 
         // renew/create delegated proxy
-        DelegationStub delegationStub = new DelegationStub(host, port, m_vo);
-        m_delegProxy = delegationStub.renewDelegation(m_delegationId, m_credential);
-        // put new delegated proxy for multiple jobs
-        if (m_delegProxy != null) {
-            delegationStub.putProxy(m_delegationId, m_delegProxy);
-        }
+        // TODO: delegation renew
+//        DelegationStub delegationStub = new DelegationStub(host, port, m_vo);
+//        m_delegProxy = delegationStub.renewDelegation(m_delegationId, m_credential);
+//        // put new delegated proxy for multiple jobs
+//        if (m_delegProxy != null) {
+//            delegationStub.putProxy(m_delegationId, m_delegProxy);
+//        }
         try {
-			ServiceInfo service_info = m_creamStub.getStub().getServiceInfo(0);
+			ServiceInfo service_info = m_creamStub.getServiceInfo(0);
 			String cream_desc = host + " (interface version=" + 
 								service_info.getInterfaceVersion() + ",service version=" + 
 								service_info.getServiceVersion() + ")";
@@ -124,17 +142,35 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 */
 
         // submit job
-        CREAMPort stub = m_creamStub.getStub();
-        JobRegisterResult[] resultArray;
-        try {
-            resultArray = stub.jobRegister(new JobDescription[]{jd});
-        } catch (RemoteException e) {
-            throw new NoSuccessException(e);
-        }
-
+//        CREAMPort stub = m_creamStub.getStub();
+//        JobRegisterResult[] resultArray;
+//        try {
+//            resultArray = stub.jobRegister(new JobDescription[]{jd});
+//        } catch (RemoteException e) {
+//            throw new NoSuccessException(e);
+//        }
+    	JobRegisterRequest request = new JobRegisterRequest();
+    	request.setJobDescriptionList(new JobDescription[]{jd});
+        JobRegisterResponse response;
+		try {
+			response = m_creamStub.jobRegister(request);
+		} catch (AuthorizationFault e) {
+			throw new PermissionDeniedException(e);
+		} catch (GenericFault e) {
+			throw new NoSuccessException(e);
+		} catch (InvalidArgumentFault e) {
+			throw new BadResource(e);
+		} catch (JobSubmissionDisabledFault e) {
+			throw new PermissionDeniedException(e);
+		} catch (RemoteException e) {
+			throw new NoSuccessException(e);
+		}
+        
         // rethrow exception if any fault in result
+        JobRegisterResult[] resultArray = response.getResult();
+        // TODO: check if this is necessary ??? because exception was catched before
         CreamExceptionFactory.rethrow(resultArray);
-
+        
         // return jobid
         if (resultArray.length == 1) {
             JobId jobid = resultArray[0].getJobId();
@@ -226,15 +262,23 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // get job info
-        CREAMPort stub = m_creamStub.getStub();
+//        CREAMPort stub = m_creamStub.getStub();
         JobInfoResult resultArray[];
-        try {
-            resultArray = stub.jobInfo(filter);
-        } catch (RemoteException e) {
-            throw new TimeoutException(e);
-        }
 
+        try {
+//          resultArray = stub.jobInfo(filter);
+			resultArray = m_creamStub.jobInfo(filter).getResult();
+		} catch (AuthorizationFault e) {
+			throw new NoSuccessException(e);
+		} catch (GenericFault e) {
+			throw new NoSuccessException(e);
+		} catch (InvalidArgumentFault e) {
+			throw new NoSuccessException(e);
+		} catch (RemoteException e) {
+			throw new TimeoutException(e);
+		}
         // rethrow exception if any fault in result
+        // TODO check this
         CreamExceptionFactory.rethrow(resultArray);
 
         // return job info
@@ -253,66 +297,91 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // cancel job
-        CREAMPort stub = m_creamStub.getStub();
+//        CREAMPort stub = m_creamStub.getStub();
         Result[] resultArray;
         try {
-            resultArray = stub.jobStart(filter);
-        } catch (RemoteException e) {
-            throw new TimeoutException(e);
-        }
+			resultArray = m_creamStub.jobStart(filter).getResult();
+		} catch (AuthorizationFault e) {
+			throw new NoSuccessException(e);
+		} catch (GenericFault e) {
+			throw new NoSuccessException(e);
+		} catch (InvalidArgumentFault e) {
+			throw new NoSuccessException(e);
+		} catch (RemoteException e) {
+			throw new NoSuccessException(e);
+		}
 
         // rethrow exception if any fault in result
-        CreamExceptionFactory.rethrow(resultArray);
+        // TODO check this
+//        CreamExceptionFactory.rethrow(resultArray);
     }
 
     public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // cancel job
-        CREAMPort stub = m_creamStub.getStub();
+//        CREAMPort stub = m_creamStub.getStub();
         Result[] resultArray;
         try {
-            resultArray = stub.jobCancel(filter);
-        } catch (RemoteException e) {
-            throw new TimeoutException(e);
-        }
+            resultArray = m_creamStub.jobCancel(filter).getResult();
+		} catch (AuthorizationFault e) {
+			throw new NoSuccessException(e);
+		} catch (GenericFault e) {
+			throw new NoSuccessException(e);
+		} catch (InvalidArgumentFault e) {
+			throw new NoSuccessException(e);
+		} catch (RemoteException e) {
+			throw new NoSuccessException(e);
+		}
 
         // rethrow exception if any fault in result
-        CreamExceptionFactory.rethrow(resultArray);
+//        CreamExceptionFactory.rethrow(resultArray);
     }
 
     public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // purge job
-        CREAMPort stub = m_creamStub.getStub();
+//        CREAMPort stub = m_creamStub.getStub();
         Result[] resultArray;
         try {
-            resultArray = stub.jobPurge(filter);
-        } catch (RemoteException e) {
-            throw new TimeoutException(e);
-        }
+            resultArray = m_creamStub.jobPurge(filter).getResult();
+		} catch (AuthorizationFault e) {
+			throw new NoSuccessException(e);
+		} catch (GenericFault e) {
+			throw new NoSuccessException(e);
+		} catch (InvalidArgumentFault e) {
+			throw new NoSuccessException(e);
+		} catch (RemoteException e) {
+			throw new NoSuccessException(e);
+		}
 
         // rethrow exception if any fault in result
-        CreamExceptionFactory.rethrow(resultArray);
+//        CreamExceptionFactory.rethrow(resultArray);
     }
 
 	public boolean hold(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // purge job
-        CREAMPort stub = m_creamStub.getStub();
+//        CREAMPort stub = m_creamStub.getStub();
         Result[] resultArray;
         try {
-            resultArray = stub.jobSuspend(filter);
-        } catch (RemoteException e) {
-            throw new TimeoutException(e);
-        }
+            resultArray = m_creamStub.jobSuspend(filter).getResult();
+		} catch (AuthorizationFault e) {
+			throw new NoSuccessException(e);
+		} catch (GenericFault e) {
+			throw new NoSuccessException(e);
+		} catch (InvalidArgumentFault e) {
+			throw new NoSuccessException(e);
+		} catch (RemoteException e) {
+			throw new NoSuccessException(e);
+		}
         if (resultArray[0].getJobStatusInvalidFault() != null) return false;
         // Not sure why we get this exception sometimes:
         if (resultArray[0].getJobUnknownFault() != null) return false;
         // rethrow exception if any fault in result
-        CreamExceptionFactory.rethrow(resultArray);
+//        CreamExceptionFactory.rethrow(resultArray);
         return true;
 	}
 
@@ -320,25 +389,31 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // purge job
-        CREAMPort stub = m_creamStub.getStub();
+//        CREAMPort stub = m_creamStub.getStub();
         Result[] resultArray;
         try {
-            resultArray = stub.jobResume(filter);
-        } catch (RemoteException e) {
-            throw new TimeoutException(e);
-        }
+            resultArray = m_creamStub.jobResume(filter).getResult();
+		} catch (AuthorizationFault e) {
+			throw new NoSuccessException(e);
+		} catch (GenericFault e) {
+			throw new NoSuccessException(e);
+		} catch (InvalidArgumentFault e) {
+			throw new NoSuccessException(e);
+		} catch (RemoteException e) {
+			throw new NoSuccessException(e);
+		}
 
         if (resultArray[0].getJobStatusInvalidFault() != null) return false;
         // Not sure why we get this exception sometimes:
         if (resultArray[0].getJobUnknownFault() != null) return false;
         // rethrow exception if any fault in result
-        CreamExceptionFactory.rethrow(resultArray);
+//        CreamExceptionFactory.rethrow(resultArray);
         return true;
 	}
 
 	private JobFilter getJobFilter(String nativeJobId) throws NoSuccessException {
         JobId jobId = new JobId();
-        jobId.setCreamURL(m_creamStub.getURI());
+//        jobId.setCreamURL(m_creamStub);
         jobId.setId(nativeJobId);
         JobFilter filter = new JobFilter();
         filter.setDelegationId(m_delegationId);

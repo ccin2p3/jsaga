@@ -1,8 +1,9 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
+import org.glite.x2007.x11.ce.cream.types.Status;
+
 import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
-import org.glite.ce.creamapi.ws.cream2.types.Status;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

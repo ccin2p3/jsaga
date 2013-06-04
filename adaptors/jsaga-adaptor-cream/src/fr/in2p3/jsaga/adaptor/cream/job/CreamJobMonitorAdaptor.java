@@ -5,8 +5,14 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
 import org.apache.axis.types.URI;
-import org.glite.ce.creamapi.ws.cream2.CREAMPort;
-import org.glite.ce.creamapi.ws.cream2.types.*;
+import org.glite.x2007.x11.ce.cream.types.BaseFaultType;
+import org.glite.x2007.x11.ce.cream.types.Command;
+import org.glite.x2007.x11.ce.cream.types.DelegationIdMismatchFault;
+import org.glite.x2007.x11.ce.cream.types.JobFilter;
+import org.glite.x2007.x11.ce.cream.types.JobId;
+import org.glite.x2007.x11.ce.cream.types.JobInfo;
+import org.glite.x2007.x11.ce.cream.types.JobInfoResult;
+import org.glite.x2007.x11.ce.cream.types.Status;
 import org.ogf.saga.error.*;
 
 import java.rmi.RemoteException;
@@ -54,7 +60,7 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
     public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
         JobId[] resultArray;
         try {
-            resultArray = m_creamStub.getStub().jobList();
+            resultArray = m_creamStub.jobList().getResult();
         } catch (RemoteException e) {
             throw new TimeoutException(e);
         }
@@ -111,20 +117,20 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
 	}
 	
     private JobInfo[] getJobInfoResult(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
-        URI creamUri = m_creamStub.getURI();
+//        URI creamUri = m_creamStub.getURI();
         JobId[] jobIdList = new JobId[nativeJobIdArray.length];
         for (int i = 0; i < nativeJobIdArray.length; i++) {
             jobIdList[i] = new JobId();
-            jobIdList[i].setCreamURL(creamUri);
+//            jobIdList[i].setCreamURL(creamUri);
             jobIdList[i].setId(nativeJobIdArray[i]);
         }
         JobFilter filter = new JobFilter();
         filter.setDelegationId(m_delegationId);
         filter.setJobId(jobIdList);
-        CREAMPort stub = m_creamStub.getStub();
+//        CREAMPort stub = m_creamStub.getStub();
         JobInfoResult[] resultArray;
         try {
-            resultArray = stub.jobInfo(filter);
+            resultArray = m_creamStub.jobInfo(filter).getResult();
         } catch (RemoteException e) {
             throw new TimeoutException(e);
         }

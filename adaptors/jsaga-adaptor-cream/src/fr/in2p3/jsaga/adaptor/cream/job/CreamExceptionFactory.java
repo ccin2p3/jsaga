@@ -1,6 +1,9 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
-import org.glite.ce.creamapi.ws.cream2.types.*;
+import org.glite.x2007.x11.ce.cream.types.BaseFaultType;
+import org.glite.x2007.x11.ce.cream.types.JobInfoResult;
+import org.glite.x2007.x11.ce.cream.types.JobRegisterResult;
+import org.glite.x2007.x11.ce.cream.types.Result;
 import org.ogf.saga.error.NoSuccessException;
 
 /* ***************************************************

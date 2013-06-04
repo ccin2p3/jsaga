@@ -7,13 +7,20 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 
+import org.glite.x2007.x11.ce.cream.CREAMLocator;
+import org.glite.x2007.x11.ce.cream.CREAMPort;
+import org.glite.x2007.x11.ce.cream.CreamBindingStub;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
+
+import javax.xml.rpc.ServiceException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -35,7 +42,8 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     protected File m_certRepository;
 
     protected String m_delegationId;
-    protected CreamStub m_creamStub;
+//    protected CreamBindingStub m_creamStub;
+    protected CREAMPort m_creamStub;
 
     protected String m_creamVersion = "";
     
@@ -85,7 +93,17 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
                 throw new NoSuccessException(e);
             }
         }
-        m_creamStub = new CreamStub(host, port, m_vo);
+//        m_creamStub = new CreamStub(host, port, m_vo);
+    	CREAMLocator cream_service = new CREAMLocator();
+    	try {
+			// TODO: check CREAM2 ou CREAM ???
+			cream_service.setCREAM2EndpointAddress(new URL("https", host, port, "/ce-cream/services/CREAM").toString());
+			m_creamStub = cream_service.getCREAM2();
+		} catch (MalformedURLException e) {
+            throw new BadParameterException(e.getMessage(), e);
+		} catch (ServiceException e) {
+            throw new BadParameterException(e.getMessage(), e);
+		}
     }
 
     public void disconnect() throws NoSuccessException {
