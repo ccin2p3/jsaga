@@ -89,12 +89,12 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     		
     	try {
-    		
+    		boolean knownHostsUsed = (attributes.containsKey(KNOWN_HOSTS) && attributes.get(KNOWN_HOSTS) != null && ((String)attributes.get(KNOWN_HOSTS)).length()>0);
     		JSch jsch = new JSch();
     		// set known hosts file : checking will be done
-    		if (attributes.containsKey(KNOWN_HOSTS) && attributes.get(KNOWN_HOSTS) != null) {
+    		if (knownHostsUsed) {
     			if(!new File((String) attributes.get(KNOWN_HOSTS)).exists())
-    				throw new BadParameterException("Unable to find the selected known host file.");
+    				throw new BadParameterException("Unable to find the selected known host file:" + (String) attributes.get(KNOWN_HOSTS) );
 				jsch.setKnownHosts((String) attributes.get(KNOWN_HOSTS));
 			}
     		
@@ -132,7 +132,7 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
         	}
     		
     		// checking know host will not be done
-    		if (!attributes.containsKey(KNOWN_HOSTS) || attributes.get(KNOWN_HOSTS) == null) {
+    		if (!knownHostsUsed) {
     			session.setConfig("StrictHostKeyChecking", "no");
     		}
     		
