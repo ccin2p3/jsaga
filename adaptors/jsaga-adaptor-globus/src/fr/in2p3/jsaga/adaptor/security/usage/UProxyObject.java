@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.security.usage;
 
 import fr.in2p3.jsaga.adaptor.base.usage.UNoPrompt;
+import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.IncorrectStateException;
 
@@ -29,7 +30,8 @@ public class UProxyObject extends UNoPrompt {
     }
 
     protected Object throwExceptionIfInvalid(Object value) throws Exception {
-        GSSCredential cred = (GSSCredential) super.throwExceptionIfInvalid(value);
+        String v = (String) super.throwExceptionIfInvalid(value);
+        GSSCredential cred = InMemoryProxySecurityCredential.toGSSCredential(v);
         if (cred.getRemainingLifetime() < m_minLifeTime) {
             throw new IncorrectStateException("Proxy object remaining lifetime is not enougth: "+cred.getRemainingLifetime());
         }

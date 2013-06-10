@@ -81,16 +81,15 @@ Requirements = true <xsl:text/>
 		<xsl:for-each select="jsdl:Resources/jsdl:TotalPhysicalMemory/jsdl:UpperBoundedRange/text()">
 &amp;&amp; other.GlueHostMainMemoryRAMSize >= <xsl:value-of select="."/> <xsl:text/>
 		</xsl:for-each>
- 		<xsl:for-each select="jsdl:Resources/jsdl:CandidateHosts/jsdl:HostName/text()">
-             <xsl:choose>
-                 <xsl:when test="contains(.,'/')">
-&amp;&amp; other.GlueCEUniqueID == "<xsl:value-of select="."/>" <xsl:text/>
-                 </xsl:when>
-                 <xsl:otherwise>
-&amp;&amp; other.GlueCEInfoHostName == "<xsl:value-of select="."/>" <xsl:text/>
-                 </xsl:otherwise>
-             </xsl:choose>
-		</xsl:for-each>
+ 		<xsl:if test="jsdl:Resources/jsdl:CandidateHosts/jsdl:HostName/text()">
+&amp;&amp; (<xsl:for-each select="jsdl:Resources/jsdl:CandidateHosts/jsdl:HostName/text()">
+                <xsl:if test="position() > 1"> || </xsl:if>
+                <xsl:choose>
+                    <xsl:when test="contains(.,'/')">other.GlueCEUniqueID=="<xsl:value-of select="."/>"</xsl:when>
+                    <xsl:otherwise>other.GlueCEInfoHostName=="<xsl:value-of select="."/>"</xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>)<xsl:text/>
+		</xsl:if>
 		<xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost/text()">
 &amp;&amp; other.GlueHostArchitectureSMPSize  >= <xsl:value-of select="."/> <xsl:text/>
 		</xsl:for-each>
