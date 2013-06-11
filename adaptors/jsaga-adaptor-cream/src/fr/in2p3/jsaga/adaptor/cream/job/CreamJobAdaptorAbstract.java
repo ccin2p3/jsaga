@@ -42,7 +42,6 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     protected File m_certRepository;
 
     protected String m_delegationId;
-//    protected CreamBindingStub m_creamStub;
     protected CREAMPort m_creamStub;
 
     protected String m_creamVersion = "";
@@ -88,12 +87,12 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
         } else {
             try {
                 String dn = m_credential.getName().toString();
+                // TODO: add vo name 
                 m_delegationId = "delegation-"+Math.abs(dn.hashCode());
             } catch (GSSException e) {
                 throw new NoSuccessException(e);
             }
         }
-//        m_creamStub = new CreamStub(host, port, m_vo);
     	CREAMLocator cream_service = new CREAMLocator();
     	try {
 			// TODO: check CREAM2 ou CREAM ???
