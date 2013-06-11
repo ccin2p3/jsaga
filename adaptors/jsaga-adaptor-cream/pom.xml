@@ -96,6 +96,12 @@
             <version>unknown</version>
         </dependency>
 		<dependency>
+			<groupId>org.glite</groupId>
+			<artifactId>glite-security-util-java</artifactId>
+			<version>1.4.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.condor</groupId>
 			<artifactId>classad</artifactId>
 			<version>2.4</version>
@@ -105,7 +111,7 @@
 	<repositories>
 		<repository>
 			<id>emi-infn-repo</id>
-			<url>http://devel12.cnaf.infn.it:7444/maven/repository</url>
+			<url>http://www.pd.infn.it/~andreett/pub/maven/repository/</url>
 		</repository>
         <!-- argus-pep-common and argus-parent repo -->
         <repository>

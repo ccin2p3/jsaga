@@ -95,13 +95,12 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
 
         // renew/create delegated proxy
-        // TODO: delegation renew
-//        DelegationStub delegationStub = new DelegationStub(host, port, m_vo);
-//        m_delegProxy = delegationStub.renewDelegation(m_delegationId, m_credential);
-//        // put new delegated proxy for multiple jobs
-//        if (m_delegProxy != null) {
-//            delegationStub.putProxy(m_delegationId, m_delegProxy);
-//        }
+        DelegationStub delegationStub = new DelegationStub(host, port, m_vo);
+        m_delegProxy = delegationStub.renewDelegation(m_delegationId, m_credential);
+        // put new delegated proxy for multiple jobs
+        if (m_delegProxy != null) {
+            delegationStub.putProxy(m_delegationId, m_delegProxy);
+        }
         try {
 			ServiceInfo service_info = m_creamStub.getServiceInfo(0);
 			String cream_desc = host + " (interface version=" + 
@@ -134,21 +133,13 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         jd.setJDL(jobDesc);
         jd.setAutoStart(false);
         jd.setDelegationId(m_delegationId);
-/*
+
         // put new delegated proxy for current job
         if (m_delegProxy != null) {
             jd.setDelegationProxy(m_delegProxy);
         }
-*/
 
         // submit job
-//        CREAMPort stub = m_creamStub.getStub();
-//        JobRegisterResult[] resultArray;
-//        try {
-//            resultArray = stub.jobRegister(new JobDescription[]{jd});
-//        } catch (RemoteException e) {
-//            throw new NoSuccessException(e);
-//        }
     	JobRegisterRequest request = new JobRegisterRequest();
     	request.setJobDescriptionList(new JobDescription[]{jd});
         JobRegisterResponse response;
@@ -262,11 +253,9 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // get job info
-//        CREAMPort stub = m_creamStub.getStub();
         JobInfoResult resultArray[];
 
         try {
-//          resultArray = stub.jobInfo(filter);
 			resultArray = m_creamStub.jobInfo(filter).getResult();
 		} catch (AuthorizationFault e) {
 			throw new NoSuccessException(e);
@@ -297,7 +286,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // cancel job
-//        CREAMPort stub = m_creamStub.getStub();
         Result[] resultArray;
         try {
 			resultArray = m_creamStub.jobStart(filter).getResult();
@@ -320,7 +308,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // cancel job
-//        CREAMPort stub = m_creamStub.getStub();
         Result[] resultArray;
         try {
             resultArray = m_creamStub.jobCancel(filter).getResult();
@@ -342,7 +329,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // purge job
-//        CREAMPort stub = m_creamStub.getStub();
         Result[] resultArray;
         try {
             resultArray = m_creamStub.jobPurge(filter).getResult();
@@ -363,8 +349,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 	public boolean hold(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
-        // purge job
-//        CREAMPort stub = m_creamStub.getStub();
+        // hold job
         Result[] resultArray;
         try {
             resultArray = m_creamStub.jobSuspend(filter).getResult();
@@ -388,8 +373,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 	public boolean release(String nativeJobId) throws PermissionDeniedException, TimeoutException,	NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
-        // purge job
-//        CREAMPort stub = m_creamStub.getStub();
+        // release job
         Result[] resultArray;
         try {
             resultArray = m_creamStub.jobResume(filter).getResult();
