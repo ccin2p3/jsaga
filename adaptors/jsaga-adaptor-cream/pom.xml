@@ -39,6 +39,7 @@
                             <fileNamespaceToPackage>${basedir}/resources/wsdl/NStoPkg.properties</fileNamespaceToPackage>
                             <wsdlFiles>
                             	<wsdlFile>org.glite.ce-cream2_service.wsdl</wsdlFile>
+                            	<wsdlFile>www.gridsite.org-delegation-2.0.0.wsdl</wsdlFile>
                             </wsdlFiles>
                         </configuration>
                     </execution>
@@ -90,17 +91,6 @@
             <artifactId>io</artifactId>
             <version>2.0-Beta6-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>org.glite</groupId>
-            <artifactId>glite-ce-delegation</artifactId>
-            <version>unknown</version>
-        </dependency>
-		<dependency>
-			<groupId>org.glite</groupId>
-			<artifactId>glite-security-util-java</artifactId>
-			<version>1.4.0</version>
-			<scope>compile</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.condor</groupId>
 			<artifactId>classad</artifactId>

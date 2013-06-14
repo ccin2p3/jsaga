@@ -1,0 +1,1579 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+	* Copyright (c) 2004 on behalf of the EU EGEE Project:
+	* The European Organization for Nuclear Research (CERN),
+	* Istituto Nazionale di Fisica Nucleare (INFN), Italy
+	* Datamat Spa, Italy
+	* Centre National de la Recherche Scientifique (CNRS), France
+	* CS Systeme d'Information (CSSI), France
+	* Royal Institute of Technology, Center for Parallel Computers (KTH-PDC), Sweden
+	* Universiteit van Amsterdam (UvA), Netherlands
+	* University of Helsinki (UH.HIP), Finland
+	* University of Bergen (UiB), Norway
+	* Council for the Central Laboratory of the Research Councils (CCLRC), United Kingdom
+	*
+	* Authors: Luigi Zangrando (zangrando@pd.infn.it)
+-->
+
+
+
+<wsdl:definitions name="CREAM"
+	targetNamespace='http://glite.org/2007/11/ce/cream'
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:common_faults="http://glite.org/ce/faults"
+	xmlns:cream="http://glite.org/2007/11/ce/cream"
+	xmlns:wsa="http://www.w3/org/2005/08/addressing"
+	xmlns:cream_types="http://glite.org/2007/11/ce/cream/types">
+
+	<wsdl:types>
+		<xsd:schema attributeFormDefault="unqualified"
+			elementFormDefault="qualified"
+			xmlns:cream_types="http://glite.org/2007/11/ce/cream/types"
+			xmlns:ce_faults="http://glite.org/ce/faults"
+			xmlns:wsa="http://www.w3.org/2005/08/addressing"
+			targetNamespace="http://glite.org/2007/11/ce/cream/types">
+
+			<xsd:complexType name="JobId">
+				<xsd:sequence>
+					<xsd:element name="id" type="xsd:string" />
+					<xsd:element name="creamURL" type="xsd:anyURI" />
+					<xsd:element name="property" type="cream_types:Property" minOccurs="0" maxOccurs="unbounded" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="Property">
+				<xsd:sequence>
+					<xsd:element name="name" type="xsd:string" />
+					<xsd:element name="value" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:element name="iceId" type="xsd:string"
+				soap:mustUnderstand="true" />
+
+			<xsd:complexType name="ServiceInfo">
+				<xsd:sequence>
+					<xsd:element name="interfaceVersion" type="xsd:string" />
+					<xsd:element name="serviceVersion" type="xsd:string" />
+					<xsd:element name="description" type="xsd:string" minOccurs="0" />
+					<xsd:element name="startupTime" type="xsd:dateTime" />
+					<xsd:element name="doesAcceptNewJobSubmissions" type="xsd:boolean" />
+					<xsd:element name="property" type="cream_types:Property" minOccurs="0" maxOccurs="unbounded" />
+					<xsd:element name="status" type="xsd:string" minOccurs="0" />
+					<xsd:element name="message" type="cream_types:ServiceMessage" minOccurs="0" maxOccurs="unbounded" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="ServiceMessage">
+				<xsd:sequence>
+					<xsd:element name="type" type="xsd:string" />
+					<xsd:element name="message" type="xsd:string" />
+					<xsd:element name="timastamp" type="xsd:dateTime" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="Command">
+				<xsd:sequence>
+					<xsd:element name="id" type="xsd:string"
+						minOccurs="0" />
+					<xsd:element name="name" type="xsd:string"
+						minOccurs="1" />
+					<xsd:element name="category" type="xsd:string"
+						minOccurs="1" />
+					<xsd:element name="status" type="xsd:string"
+						minOccurs="1" />
+					<xsd:element name="description" type="xsd:string"
+						minOccurs="0" />
+					<xsd:element name="failureReason" type="xsd:string"
+						minOccurs="0" />
+					<xsd:element name="creationTime" type="xsd:dateTime"
+						minOccurs="0" />
+					<xsd:element name="startSchedulingTime" type="xsd:dateTime"
+					    minOccurs="0" />
+					<xsd:element name="startProcessingTime" type="xsd:dateTime"
+					    minOccurs="0" />
+					<xsd:element name="executionCompletedTime" type="xsd:dateTime"
+					    minOccurs="0" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="Status">
+				<xsd:sequence>
+					<xsd:element name="jobId" type="cream_types:JobId"
+						minOccurs="1" />
+					<xsd:element name="name" type="xsd:string"
+						minOccurs="1" />
+					<xsd:element name="timestamp" type="xsd:dateTime"
+						minOccurs="1" />
+					<xsd:element name="exitCode" type="xsd:string"
+						minOccurs="0" maxOccurs="1" />
+					<xsd:element name="failureReason" type="xsd:string"
+						minOccurs="0" />
+					<xsd:element name="description" type="xsd:string"
+						minOccurs="0" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="JobStatusResult">
+				<xsd:choice>
+					<xsd:element name="jobStatus" type="cream_types:Status" minOccurs="0" />
+					<xsd:element ref="cream_types:JobUnknownFault" minOccurs="0" />
+					<xsd:element ref="cream_types:JobStatusInvalidFault" minOccurs="0" />
+					<xsd:element ref="cream_types:DelegationIdMismatchFault" minOccurs="0" />
+					<xsd:element ref="cream_types:DateMismatchFault" minOccurs="0" />
+					<xsd:element ref="cream_types:LeaseIdMismatchFault" minOccurs="0" />
+					<xsd:element ref="cream_types:GenericFault" minOccurs="0" />
+				</xsd:choice>
+				<xsd:attribute name="jobDescriptionId" type="xsd:string"/>
+			</xsd:complexType>
+
+			<xsd:element name="JobStatusResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="result" type="cream_types:JobStatusResult" minOccurs="0" maxOccurs="unbounded" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:complexType name="Lease">
+				<xsd:sequence>
+					<xsd:element name="leaseId" type="xsd:string" />
+					<xsd:element name="leaseTime" type="xsd:dateTime" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="JobInfo">
+				<xsd:sequence>
+					<xsd:element name="jobId" type="cream_types:JobId" minOccurs="1" maxOccurs="1"/>
+					<xsd:element name="fatherJobId" type="cream_types:JobId" minOccurs="0" />
+					<xsd:element name="childJobId" type="cream_types:JobId" minOccurs="0" maxOccurs="unbounded" />
+					<xsd:element name="GridJobId" type="xsd:string" minOccurs="1" maxOccurs="1" default="N/A" />
+					<xsd:element name="LRMSAbsLayerJobId" type="xsd:string" minOccurs="1" maxOccurs="1" default="N/A" />
+					<xsd:element name="LRMSJobId" type="xsd:string" minOccurs="1" maxOccurs="1" default="N/A" />
+					<xsd:element name="delegationProxyId" minOccurs="1"	maxOccurs="1" type="xsd:string" default="N/A" />
+					<xsd:element name="delegationProxyInfo" type="xsd:string" minOccurs="1" maxOccurs="1" default="N/A" />
+					<xsd:element name="workerNode" type="xsd:string" minOccurs="1" maxOccurs="1" default="N/A" />
+					<xsd:element name="localUser" type="xsd:string" minOccurs="0" maxOccurs="1" default="N/A" />
+					<xsd:element name="workingDirectory" type="xsd:string" minOccurs="1" maxOccurs="1" default="N/A" />
+					<xsd:element name="CREAMInputSandboxURI" type="xsd:string" minOccurs="1" maxOccurs="1" default="N/A" />
+					<xsd:element name="CREAMOutputSandboxURI" type="xsd:string" minOccurs="1" maxOccurs="1" default="N/A" />
+					<xsd:element name="JDL" type="xsd:string" minOccurs="0" />
+					<xsd:element name="type" type="xsd:string" minOccurs="1" />
+					<xsd:element name="lease" type="cream_types:Lease" minOccurs="0" maxOccurs="1" />
+					<xsd:element name="status" type="cream_types:Status" minOccurs="1" maxOccurs="unbounded" />
+					<xsd:element name="lastCommand" type="cream_types:Command" minOccurs="0" maxOccurs="unbounded" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="JobInfoResult">
+				<xsd:choice>
+					<xsd:element name="jobInfo" type="cream_types:JobInfo" minOccurs="0" />
+					<xsd:element ref="cream_types:JobUnknownFault" minOccurs="0" />
+					<xsd:element ref="cream_types:JobStatusInvalidFault" minOccurs="0" />
+					<xsd:element ref="cream_types:DelegationIdMismatchFault" minOccurs="0" />
+					<xsd:element ref="cream_types:DateMismatchFault" minOccurs="0" />
+					<xsd:element ref="cream_types:LeaseIdMismatchFault" minOccurs="0" />
+					<xsd:element ref="cream_types:GenericFault" minOccurs="0" />
+				</xsd:choice>
+				<xsd:attribute name="jobDescriptionId" type="xsd:string"/>
+			</xsd:complexType>
+
+			<xsd:element name="JobInfoResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="result" type="cream_types:JobInfoResult" minOccurs="0" maxOccurs="unbounded" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:complexType name="Event">
+				<xsd:sequence>
+					<xsd:element name="id" type="xsd:string" minOccurs="1" />
+					<xsd:element name="type" type="xsd:string" minOccurs="1" />
+					<xsd:element name="timestamp" type="xsd:dateTime" minOccurs="1" />
+					<xsd:element name="property" type="cream_types:Property" minOccurs="0" maxOccurs="unbounded" />
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:element name="QueryEventResult">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="event" type="cream_types:Event" minOccurs="0" maxOccurs="unbounded" />
+					   <!-- <xsd:element name="moreResults" type="xsd:boolean"/> -->
+						<xsd:element name="queryExecutionTimeInMillis" type="xsd:long"/>
+						<xsd:element name="dbId" type="xsd:string"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+						
+			<xsd:complexType name="JobFilter">
+				<xsd:sequence>
+					<xsd:element name="jobId" type="cream_types:JobId" minOccurs="0" maxOccurs="unbounded" />
+					<xsd:element name="status" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+					<xsd:element name="fromDate" type="xsd:dateTime" minOccurs="0" maxOccurs="1" />
+					<xsd:element name="toDate" type="xsd:dateTime" minOccurs="0" maxOccurs="1" />
+					<xsd:element name="delegationId" type="xsd:string" minOccurs="0" maxOccurs="1" />
+					<xsd:element name="leaseId" type="xsd:string" minOccurs="0" maxOccurs="1" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="JobDescription">
+				<xsd:sequence>
+					<xsd:element name="JDL" type="xsd:string" minOccurs="1" />
+					<xsd:element name="delegationId" type="xsd:string" minOccurs="0" />
+					<xsd:element name="delegationProxy" type="xsd:string" minOccurs="0" />
+					<xsd:element name="leaseId" type="xsd:string" minOccurs="0" />
+					<xsd:element name="autoStart" type="xsd:boolean" default="true" />
+				</xsd:sequence>
+				<xsd:attribute name="jobDescriptionId" type="xsd:string"/>
+			</xsd:complexType>
+
+			<xsd:element name="JobRegisterRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="jobDescriptionList" type="cream_types:JobDescription" minOccurs="1" maxOccurs="unbounded" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:complexType name="JobRegisterResult">
+				<xsd:choice>
+					<xsd:element name="jobId" type="cream_types:JobId" minOccurs="0" />
+					<xsd:element ref="cream_types:DelegationProxyFault" minOccurs="0" />
+					<xsd:element ref="cream_types:DelegationIdMismatchFault" minOccurs="0" />
+					<xsd:element ref="cream_types:LeaseIdMismatchFault" minOccurs="0" />
+					<xsd:element ref="cream_types:GenericFault" minOccurs="0" />
+				</xsd:choice>
+				<xsd:attribute name="jobDescriptionId" type="xsd:string"/>
+			</xsd:complexType>
+
+			<xsd:element name="JobRegisterResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="result" type="cream_types:JobRegisterResult" minOccurs="1" maxOccurs="unbounded" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:complexType name="Result">
+				<xsd:sequence>
+					<xsd:element name="jobId" type="cream_types:JobId" minOccurs="1" maxOccurs="1" />
+					<xsd:choice>				
+						<xsd:element ref="cream_types:JobUnknownFault" minOccurs="0" />
+						<xsd:element ref="cream_types:JobStatusInvalidFault" minOccurs="0" />
+						<xsd:element ref="cream_types:DelegationIdMismatchFault" minOccurs="0" />
+						<xsd:element ref="cream_types:DateMismatchFault" minOccurs="0" />
+						<xsd:element ref="cream_types:LeaseIdMismatchFault" minOccurs="0" />	
+						<xsd:element ref="cream_types:GenericFault" minOccurs="0" />				
+					</xsd:choice>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="CommandResult">
+				<xsd:sequence>
+					<xsd:element name="result" type="cream_types:Result" minOccurs="0" maxOccurs="unbounded" />
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:element name="JobCancelRequest" type="cream_types:JobFilter" />
+			<xsd:element name="JobCancelResponse" type="cream_types:CommandResult" />
+
+			<xsd:element name="JobInfoRequest" type="cream_types:JobFilter" />
+
+			<xsd:element name="QueryEventRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="fromEventId" type="xsd:string" minOccurs="0" />
+						<xsd:element name="toEventId" type="xsd:string" minOccurs="0" />
+						<xsd:element name="fromDate" type="xsd:dateTime" minOccurs="0" />
+						<xsd:element name="toDate" type="xsd:dateTime" minOccurs="0" />
+						<xsd:element name="eventType" type="xsd:string" />
+						<xsd:element name="maxQueryEventResultSize" type="xsd:int" default="100" />
+						<xsd:element name="verbosityLevel" type="xsd:int" default="0" />
+                                                <xsd:element name="property" type="cream_types:Property" minOccurs="0" maxOccurs="unbounded" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="setLeaseRequest" type="cream_types:Lease" />
+			<xsd:element name="setLeaseResponse" type="cream_types:Lease" />
+
+			<xsd:element name="JobSetLeaseIdRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="newLeaseId" type="xsd:string" minOccurs="0" />
+						<xsd:element name="jobFilter" type="cream_types:JobFilter" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="JobSetLeaseIdResponse" type="cream_types:CommandResult" />
+
+			<xsd:element name="getLeaseRequest" type="xsd:string" />
+			<xsd:element name="getLeaseResponse" type="cream_types:Lease" />
+			
+			<xsd:element name="deleteLeaseRequest" type="xsd:string" />
+
+			<xsd:element name="jobLeaseRequest" type="cream_types:JobFilter" />
+
+			<xsd:element name="getLeaseListResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="result"
+							type="cream_types:Lease" minOccurs="0" maxOccurs="unbounded" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+
+			<!--xsd:element name="JobListRequest"  type="cream_types:JobFilter" /-->
+
+			<xsd:element name="JobListResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="result"
+							type="cream_types:JobId" minOccurs="0" maxOccurs="unbounded" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="JobPurgeRequest" type="cream_types:JobFilter" />
+			<xsd:element name="JobPurgeResponse" type="cream_types:CommandResult" />
+
+			<xsd:element name="JobResumeRequest" type="cream_types:JobFilter" />
+			<xsd:element name="JobResumeResponse" type="cream_types:CommandResult" />
+
+			<xsd:element name="JobStartRequest" type="cream_types:JobFilter" />
+			<xsd:element name="JobStartResponse" type="cream_types:CommandResult" />
+
+			<xsd:element name="JobStatusRequest" type="cream_types:JobFilter" />
+
+			<xsd:element name="JobSuspendRequest" type="cream_types:JobFilter" />
+			<xsd:element name="JobSuspendResponse" type="cream_types:CommandResult" />
+
+			<xsd:element name="ServiceInfoRequest" type="xsd:int" />
+			<xsd:element name="ServiceInfoResponse" type="cream_types:ServiceInfo" />
+			<xsd:element name="acceptNewJobSubmissions" type="xsd:boolean" />
+
+
+			<xsd:complexType name="BaseFaultType">
+				<xsd:sequence>
+					<xsd:element name="MethodName" type="xsd:string" />
+					<xsd:element name="Timestamp" type="xsd:dateTime" />
+					<xsd:element name="ErrorCode" type="xsd:string"
+						minOccurs="0" maxOccurs="1" />
+					<xsd:element name="Description" type="xsd:string"
+						minOccurs="0" maxOccurs="1" />
+					<xsd:element name="FaultCause" type="xsd:string"
+						minOccurs="0" maxOccurs="1" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:element name="GenericFault">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="cream_types:BaseFaultType" />
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="AuthorizationFault">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="cream_types:BaseFaultType" />
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="DelegationIdMismatchFault">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="cream_types:BaseFaultType" />
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+			
+			<xsd:element name="LeaseIdMismatchFault">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="cream_types:BaseFaultType" />
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+			
+			<xsd:element name="DateMismatchFault">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="cream_types:BaseFaultType" />
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+			
+			<xsd:element name="JobUnknownFault">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="cream_types:BaseFaultType" />
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="InvalidArgumentFault">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="cream_types:BaseFaultType" />
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="OperationNotSupportedFault">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="cream_types:BaseFaultType" />
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="NoSuitableResourcesFault">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="cream_types:BaseFaultType" />
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="DelegationProxyFault">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="cream_types:BaseFaultType" />
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="JobStatusInvalidFault">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="cream_types:BaseFaultType" />
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="JobSubmissionDisabledFault">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="cream_types:BaseFaultType" />
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+
+	<!-- Messages -->
+
+	<wsdl:message name="acceptNewJobSubmissions">
+                <wsdl:part name="acceptNewJobSubmissions"
+                        element="cream_types:acceptNewJobSubmissions" />
+        </wsdl:message>
+
+	<wsdl:message name="acceptNewJobSubmissionsResponse">
+		<!--wsdl:part name="acceptNewJobSubmissions"
+			element="cream_types:acceptNewJobSubmissionsResponse" /-->
+	</wsdl:message>
+
+	<wsdl:message name="JobCancelRequest">
+		<wsdl:part name="JobCancelRequest"
+			element="cream_types:JobCancelRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="JobCancelResponse">
+		<wsdl:part name="JobCancelResponse"
+			element="cream_types:JobCancelResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="JobInfoRequest">
+		<wsdl:part name="JobInfoRequest"
+			element="cream_types:JobInfoRequest">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="JobInfoResponse">
+		<wsdl:part name="JobInfoResponse"
+			element="cream_types:JobInfoResponse">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="QueryEventHeader">
+		<wsdl:part name="iceId" element="cream_types:iceId" />
+	</wsdl:message>
+	
+	<wsdl:message name="QueryEventRequest">
+		<wsdl:part name="request"
+			element="cream_types:QueryEventRequest">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="QueryEventResponse">
+		<wsdl:part name="QueryEventResult"
+			element="cream_types:QueryEventResult">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="setLeaseRequest">
+		<wsdl:part name="parameters"
+			element="cream_types:setLeaseRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="setLeaseResponse">
+		<wsdl:part name="parameters"
+			element="cream_types:setLeaseResponse">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="getLeaseRequest">
+		<wsdl:part name="parameters"
+			element="cream_types:getLeaseRequest">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="getLeaseResponse">
+		<wsdl:part name="parameters"
+			element="cream_types:getLeaseResponse">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="getLeaseListRequest" />
+	<wsdl:message name="getLeaseListResponse">
+		<wsdl:part name="parameters" element="cream_types:getLeaseListResponse">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="deleteLeaseRequest">
+		<wsdl:part name="parameters"
+			element="cream_types:deleteLeaseRequest">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="deleteLeaseResponse" />
+	
+	<wsdl:message name="JobSetLeaseIdRequest">
+                <wsdl:part name="parameters" element="cream_types:JobSetLeaseIdRequest" />
+	</wsdl:message>
+	<wsdl:message name="JobSetLeaseIdResponse">
+		<wsdl:part name="parameters" element="cream_types:JobSetLeaseIdResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="JobListRequest" />
+	<wsdl:message name="JobListResponse">
+		<wsdl:part name="JobListResponse" element="cream_types:JobListResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="JobPurgeRequest">
+		<wsdl:part name="JobPurgeRequest" element="cream_types:JobPurgeRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="JobPurgeResponse">
+		<wsdl:part name="JobPurgeResponse"
+			element="cream_types:JobPurgeResponse">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="JobRegisterHeader">
+		<wsdl:part name="iceId" element="cream_types:iceId" />
+	</wsdl:message>
+
+	<wsdl:message name="JobRegisterRequest">
+		<wsdl:part name="JobRegisterRequest"
+			element="cream_types:JobRegisterRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="JobRegisterResponse">
+		<wsdl:part name="JobRegisterResponse"
+			element="cream_types:JobRegisterResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="JobResumeRequest">
+		<wsdl:part name="JobResumeRequest"
+			element="cream_types:JobResumeRequest">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="JobResumeResponse">
+		<wsdl:part name="JobResumeResponse"
+			element="cream_types:JobResumeResponse">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="JobStatusRequest">
+		<wsdl:part name="JobStatusRequest"
+			element="cream_types:JobStatusRequest">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="JobStatusResponse">
+		<wsdl:part name="JobStatusResponse"
+			element="cream_types:JobStatusResponse">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="JobStartRequest">
+		<wsdl:part name="JobStartRequest"
+			element="cream_types:JobStartRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="JobStartResponse">
+		<wsdl:part name="JobStartResponse"
+			element="cream_types:JobStartResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="JobSuspendRequest">
+		<wsdl:part name="JobSuspendRequest"
+			element="cream_types:JobSuspendRequest">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="JobSuspendResponse">
+		<wsdl:part name="JobSuspendResponse"
+			element="cream_types:JobSuspendResponse">
+		</wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="ServiceInfoRequest">
+		<wsdl:part name="verbosityLevel"
+			element="cream_types:ServiceInfoRequest" />	
+	</wsdl:message>
+
+	<wsdl:message name="ServiceInfoResponse">
+		<wsdl:part name="ServiceInfoResponse"
+			element="cream_types:ServiceInfoResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="Generic_Fault">
+		<wsdl:part name="fault" element="cream_types:GenericFault" />
+	</wsdl:message>
+
+	<wsdl:message name="Authorization_Fault">
+		<wsdl:part name="fault"
+			element="cream_types:AuthorizationFault" />
+	</wsdl:message>
+
+	<wsdl:message name="InvalidArgument_Fault">
+		<wsdl:part name="fault"
+			element="cream_types:InvalidArgumentFault" />
+	</wsdl:message>
+
+	<wsdl:message name="JobUnknown_Fault">
+		<wsdl:part name="fault" element="cream_types:JobUnknownFault" />
+	</wsdl:message>
+
+	<wsdl:message name="JobSubmissionDisabled_Fault">
+		<wsdl:part name="fault"
+			element="cream_types:JobSubmissionDisabledFault" />
+	</wsdl:message>
+
+	<wsdl:message name="OperationNotSupported_Fault">
+		<wsdl:part name="fault"
+			element="cream_types:OperationNotSupportedFault" />
+	</wsdl:message>
+
+	<wsdl:message name="NoSuitableResources_Fault">
+		<wsdl:part name="fault"
+			element="cream_types:NoSuitableResourcesFault" />
+	</wsdl:message>
+	
+	
+	
+	<wsdl:portType name="CREAMPort">
+		<wsdl:documentation>
+			The main portType of CREAM. It exposes via Web Service the
+			methods and services offered by CREAM.
+		</wsdl:documentation>
+
+		<wsdl:operation name="getServiceInfo">
+			<wsdl:input message="cream:ServiceInfoRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/ServiceInfo" />
+			<wsdl:output message="cream:ServiceInfoResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/ServiceInfoResponse" />
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+				<wsdl:documentation>
+					Thrown in case of authorization problems.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+				<wsdl:documentation>
+					Thrown if any other possible error occurs.
+				</wsdl:documentation>
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="acceptNewJobSubmissions">
+			<wsdl:input message="cream:acceptNewJobSubmissions"
+				wsa:Action="http://glite.org/2007/11/ce/cream/acceptNewJobSubmissions" />
+			<wsdl:output
+				message="cream:acceptNewJobSubmissionsResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/acceptNewJobSubmissionsResponse" />
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+				<wsdl:documentation>
+					Thrown in case of authorization problems.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+				<wsdl:documentation>
+					Thrown if any other possible error occurs.
+				</wsdl:documentation>
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="JobRegister">
+			<wsdl:documentation>
+				First operation to be called when a job has to be
+				submitted to CREAM. This operation, which takes as input
+				the job's JDL, returns a jobInfo object encompassing,
+				among other information, the CREAM jobid and a URL where
+				the user can upload files of the InputSandbox (e.g.
+				files needed for the execution of the job that must be
+				therefore staged in the executing node). When this
+				upload has been done, the actual submission can be
+				triggered via the jobStart operation.
+			</wsdl:documentation>
+			<wsdl:input message="cream:JobRegisterRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobRegister" />
+			<wsdl:output message="cream:JobRegisterResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobRegisterResponse">
+				<wsdl:documentation>
+					A jobInfo object containing information about the
+					job (its status, etc.). In particular the
+					InputSandboxURI, where the user can upload the files
+					of the InputSandbox needed by the job, is returned.
+					The other attributes of the jobInfo object includes
+					also a CREAMJobid, which identified the job, and
+					which can be used to perform operations on it.
+				</wsdl:documentation>
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+				<wsdl:documentation>
+					Thrown in case of authorization problems.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault"
+				message="cream:InvalidArgument_Fault">
+				<wsdl:documentation>
+					Thrown if an invalid argument was passed.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="jobSubmissionDisabledFault"
+				message="cream:JobSubmissionDisabled_Fault">
+				<wsdl:documentation>Thrown if</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+				<wsdl:documentation>
+					Thrown if any other possible error occurs.
+				</wsdl:documentation>
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="JobCancel">
+			<wsdl:documentation>
+				Cancel prevously submitted job(s). It can be applied
+				only when the job status is &quot;pending&quot;,
+				&quot;running&quot; or &quot;held&quot;. Even if the job
+				is cancelled, its relevant information (which can be
+				retrieved via the jobInfo operation) is still available
+				(until the job explicitly calls the jobPurge operation,
+				or this purge is done by the CE administrator.
+			</wsdl:documentation>
+			<wsdl:input message="cream:JobCancelRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobCancel">
+				<wsdl:documentation>
+					A list of CREAMJobIDs to cancel.
+				</wsdl:documentation>
+			</wsdl:input>
+			<wsdl:output message="cream:JobCancelResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobCancelResponse" />
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+				<wsdl:documentation>
+					Thrown in case of authorization problems.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault"
+				message="cream:InvalidArgument_Fault">
+				<wsdl:documentation>
+					Thrown if an invalid argument is passed.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+				<wsdl:documentation>
+					Thrown if any other possible error occurs.
+				</wsdl:documentation>
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="JobPurge">
+			<wsdl:documentation>
+				Permanently deletes all information regarding the
+				specified jobs. It works only if the job status is
+				&quot;aborted&quot;, &quot;cancelled&quot;,
+				&quot;done-ok&quot;, &quot;done-failed&quot; or
+				&quot;registered&quot;.
+			</wsdl:documentation>
+			<wsdl:input message="cream:JobPurgeRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobPurge">
+				<wsdl:documentation>
+					A list of CREAMJobIDs to cancel.
+				</wsdl:documentation>
+			</wsdl:input>
+			<wsdl:output message="cream:JobPurgeResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobPurgeResponse" />
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+				<wsdl:documentation>
+					Thrown in case of authorization problems.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault"
+				message="cream:InvalidArgument_Fault">
+				<wsdl:documentation>
+					Thrown if an invalid argument is passed.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+				<wsdl:documentation>
+					Thrown if any other possible error occurs.
+				</wsdl:documentation>
+			</wsdl:fault>
+		</wsdl:operation>
+
+
+		<wsdl:operation name="JobSuspend">
+			<wsdl:documentation>
+				Suspend the execution of a list of jobs.
+			</wsdl:documentation>
+			<wsdl:input message="cream:JobSuspendRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobSuspend">
+				<wsdl:documentation>
+					A list of jobIDs.
+				</wsdl:documentation>
+			</wsdl:input>
+			<wsdl:output message="cream:JobSuspendResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobSuspendResponse" />
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+				<wsdl:documentation>
+					Thrown in case of authorization problems.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault"
+				message="cream:InvalidArgument_Fault">
+				<wsdl:documentation>
+					Thrown if an invalid argument is passed.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+				<wsdl:documentation>
+					Thrown if any other possible error occurs.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="operationNotSupportedFault"
+				message="cream:OperationNotSupported_Fault">
+				<wsdl:documentation>
+					Thrown if the abstraction layer of the LRMS (i.e.
+					BLAH in the current implementation) doesn't support
+					this operation.
+				</wsdl:documentation>
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="JobResume">
+			<wsdl:documentation>
+				Resume the execution of a list of previously suspended
+				jobs.
+			</wsdl:documentation>
+			<wsdl:input message="cream:JobResumeRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobResume" />
+			<wsdl:output message="cream:JobResumeResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobResumeResponse" />
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+				<wsdl:documentation>
+					Thrown in case of authorization problems.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault"
+				message="cream:InvalidArgument_Fault">
+				<wsdl:documentation>
+					Thrown if an invalid argument is passed.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+				<wsdl:documentation>
+					Thrown if any other possible error occurs.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="operationNotSupportedFault"
+				message="cream:OperationNotSupported_Fault">
+				<wsdl:documentation>
+					Thrown if the abstraction layer of the LRMS (i.e.
+					BLAH in the current implementation) tdoesn't support
+					this operation.
+				</wsdl:documentation>
+			</wsdl:fault>
+		</wsdl:operation>
+
+
+		<wsdl:operation name="JobStart">
+			<wsdl:documentation>
+				This operation actually triggers the submission process
+				eof a job previously registered via the jobRegister
+				operation.
+			</wsdl:documentation>
+			<wsdl:input message="cream:JobStartRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobStart">
+				<wsdl:documentation>
+					The jobID previously returned from the jobRegister
+					operation.
+				</wsdl:documentation>
+			</wsdl:input>
+			<wsdl:output message="cream:JobStartResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobStartResponse" />
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+				<wsdl:documentation>
+					Thrown in case of authorization problems.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault"
+				message="cream:InvalidArgument_Fault">
+				<wsdl:documentation>
+					Thrown if an invalid argument is passed.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+				<wsdl:documentation>
+					Thrown if any other possible error occurs.
+				</wsdl:documentation>
+			</wsdl:fault>
+		</wsdl:operation>
+
+
+		<wsdl:operation name="JobInfo">
+			<wsdl:documentation>
+				return information about user's jobs, filtered as
+				specified in input.
+			</wsdl:documentation>
+			<wsdl:input message="cream:JobInfoRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobInfo">
+				<wsdl:documentation>
+					A filter used to select the jobs the user is
+					interested in. The filter can specify a set of
+					jobIDs or a set of states. If empty the jobInfo will
+					return information concerning all the submitted jobs
+					belonging to that user.
+				</wsdl:documentation>
+			</wsdl:input>
+			<wsdl:output message="cream:JobInfoResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobInfoResponse">
+				<wsdl:documentation>
+					A list of jobInfo, one per job.
+				</wsdl:documentation>
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+				<wsdl:documentation>
+					Thrown in case of authorization problems.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault"
+				message="cream:InvalidArgument_Fault">
+				<wsdl:documentation>
+					Thrown if an invalid argument is passed.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+				<wsdl:documentation>
+					Thrown if any other possible error occurs.
+				</wsdl:documentation>
+			</wsdl:fault>
+		</wsdl:operation>
+
+
+		<wsdl:operation name="QueryEvent">
+			<wsdl:input message="cream:QueryEventRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/QueryEvent">
+			</wsdl:input>
+			<wsdl:output message="cream:QueryEventResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/QueryEventResponse">
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+				<wsdl:documentation>
+					Thrown in case of authorization problems.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault"
+				message="cream:InvalidArgument_Fault">
+				<wsdl:documentation>
+					Thrown if an invalid argument is passed.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+				<wsdl:documentation>
+					Thrown if any other possible error occurs.
+				</wsdl:documentation>
+			</wsdl:fault>
+		</wsdl:operation>
+
+
+		<wsdl:operation name="JobStatus">
+			<wsdl:documentation>
+				return the status about user's jobs, filtered as
+				specified in input.
+			</wsdl:documentation>
+			<wsdl:input message="cream:JobStatusRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobStatus">
+				<wsdl:documentation>
+					A filter used to select the jobs the user is
+					interested in. The filter can specify a set of
+					jobIDs or a set of states. If empty the jobInfo will
+					return information concerning all the submitted jobs
+					belonging to that user.
+				</wsdl:documentation>
+			</wsdl:input>
+			<wsdl:output message="cream:JobStatusResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobStatusResponse">
+				<wsdl:documentation>
+					A list of jobInfo, one per job.
+				</wsdl:documentation>
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+				<wsdl:documentation>
+					Thrown in case of authorization problems.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault"
+				message="cream:InvalidArgument_Fault">
+				<wsdl:documentation>
+					Thrown if an invalid argument is passed.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+				<wsdl:documentation>
+					Thrown if any other possible error occurs.
+				</wsdl:documentation>
+			</wsdl:fault>
+		</wsdl:operation>
+
+
+		<wsdl:operation name="JobList">
+			<wsdl:documentation>
+				Returns the list of jobIDs referring to all active jobs
+				belonging to that user.
+			</wsdl:documentation>
+			<wsdl:input message="cream:JobListRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobList" />
+			<wsdl:output message="cream:JobListResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobListResponse">
+				<wsdl:documentation>
+					A list of jobIDs.
+				</wsdl:documentation>
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+				<wsdl:documentation>
+					Thrown in case of authorization problems.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+				<wsdl:documentation>
+					Thrown if any other possible error occurs.
+				</wsdl:documentation>
+			</wsdl:fault>
+		</wsdl:operation>
+
+
+		<wsdl:operation name="setLease">
+			<wsdl:documentation>
+				Returns the list of jobIDs referring to all active jobs
+				belonging to that user.
+			</wsdl:documentation>
+			<wsdl:input message="cream:setLeaseRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/setLease" />
+			<wsdl:output message="cream:setLeaseResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/setLeaseResponse">
+				<wsdl:documentation>
+					A list of jobIDs.
+				</wsdl:documentation>
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+				<wsdl:documentation>
+					Thrown in case of authorization problems.
+				</wsdl:documentation>
+			</wsdl:fault>
+
+			<wsdl:fault name="invalidArgumentFault"
+				message="cream:InvalidArgument_Fault">
+				<wsdl:documentation>
+					Thrown if an invalid argument is passed.
+				</wsdl:documentation>
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+				<wsdl:documentation>
+					Thrown if any other possible error occurs.
+				</wsdl:documentation>
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="getLease">
+			<wsdl:input message="cream:getLeaseRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/getLease" />
+			<wsdl:output message="cream:getLeaseResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/getLeaseResponse" />
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault"
+				message="cream:InvalidArgument_Fault">
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="getLeaseList">
+			<wsdl:input message="cream:getLeaseListRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/getLeaseList" />
+			<wsdl:output message="cream:getLeaseListResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/getLeaseListResponse" />
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="deleteLease">
+			<wsdl:input message="cream:deleteLeaseRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/deleteLease" />
+			<wsdl:output message="cream:deleteLeaseResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/deleteLeaseResponse" />
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault"
+				message="cream:InvalidArgument_Fault">
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="JobSetLeaseId">
+			<wsdl:input message="cream:JobSetLeaseIdRequest"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobSetLeaseId" />
+			<wsdl:output message="cream:JobSetLeaseIdResponse"
+				wsa:Action="http://glite.org/2007/11/ce/cream/JobSetLeaseIdResponse" />
+			<wsdl:fault name="authorizationFault"
+				message="cream:Authorization_Fault">
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault"
+				message="cream:InvalidArgument_Fault">
+			</wsdl:fault>
+			<wsdl:fault name="genericFault"
+				message="cream:Generic_Fault">
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:portType>
+
+
+	<wsdl:binding name="CreamBinding" type="cream:CREAMPort">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="getServiceInfo">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/ServiceInfo"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="acceptNewJobSubmissions">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/AcceptNewJobSubmissions"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="JobRegister">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/JobRegister"
+				style="document" />
+			<wsdl:input>
+				<soap:header message="cream:JobRegisterHeader"
+					part="iceId" use="literal" />
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault">
+				<soap:fault use="literal" name="invalidArgumentFault" />
+			</wsdl:fault>
+			<wsdl:fault name="jobSubmissionDisabledFault">
+				<soap:fault use="literal"
+					name="jobSubmissionDisabledFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="JobStart">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/JobStart"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault">
+				<soap:fault use="literal" name="invalidArgumentFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="JobCancel">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/JobCancel"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault">
+				<soap:fault use="literal" name="invalidArgumentFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="JobPurge">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/JobPurge"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault">
+				<soap:fault use="literal" name="invalidArgumentFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="JobResume">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/JobResume"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault">
+				<soap:fault use="literal" name="invalidArgumentFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+			<wsdl:fault name="operationNotSupportedFault">
+				<soap:fault use="literal"
+					name="operationNotSupportedFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="JobSuspend">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/JobSuspend"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault">
+				<soap:fault use="literal" name="invalidArgumentFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+			<wsdl:fault name="operationNotSupportedFault">
+				<soap:fault use="literal"
+					name="operationNotSupportedFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="JobInfo">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/JobInfo"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault">
+				<soap:fault use="literal" name="invalidArgumentFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="QueryEvent">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/QueryEvent"
+				style="document" />
+			<wsdl:input>
+				<soap:header message="cream:QueryEventHeader" part="iceId" use="literal" />
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault">
+				<soap:fault use="literal" name="invalidArgumentFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="JobStatus">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/JobStatus"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault">
+				<soap:fault use="literal" name="invalidArgumentFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="JobList">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/JobList"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="setLease">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/setLease"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault">
+				<soap:fault use="literal" name="invalidArgumentFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getLease">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/getLease"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault">
+				<soap:fault use="literal" name="invalidArgumentFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getLeaseList">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/getLeaseList"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="deleteLease">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/deleteLease"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault">
+				<soap:fault use="literal" name="invalidArgumentFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="JobSetLeaseId">
+			<soap:operation
+				soapAction="http://glite.org/2007/11/ce/cream/JobSetLeaseId"
+				style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="authorizationFault">
+				<soap:fault use="literal" name="authorizationFault" />
+			</wsdl:fault>
+			<wsdl:fault name="invalidArgumentFault">
+				<soap:fault use="literal" name="invalidArgumentFault" />
+			</wsdl:fault>
+			<wsdl:fault name="genericFault">
+				<soap:fault use="literal" name="genericFault" />
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+
+	<wsdl:service name="CREAM">
+		<wsdl:port name="CREAM2" binding="cream:CreamBinding">
+			<soap:address
+				location="http://localhost:8080/ce-cream/services/CREAM" />
+		</wsdl:port>
+	</wsdl:service>
+
+</wsdl:definitions>
+

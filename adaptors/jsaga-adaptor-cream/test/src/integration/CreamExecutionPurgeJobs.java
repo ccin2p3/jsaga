@@ -2,8 +2,11 @@ package integration;
 
 import fr.in2p3.jsaga.adaptor.cream.job.CreamStub;
 import fr.in2p3.jsaga.adaptor.cream.job.DelegationStub;
-import org.glite.x2007.x11.ce.cream.CREAMLocator;
-import org.glite.x2007.x11.ce.cream.CREAMPort;
+
+import org.glite.ce.creamapi.ws.cream2.CREAMLocator;
+import org.glite.ce.creamapi.ws.cream2.CREAMPort;
+import org.glite.ce.creamapi.ws.cream2.types.JobFilter;
+import org.glite.ce.creamapi.ws.cream2.types.Result;
 import org.ogf.saga.AbstractTest;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.url.URL;
@@ -48,7 +51,7 @@ public class CreamExecutionPurgeJobs extends AbstractTest {
         System.setProperty("sslCAFiles", new File(new File(new File(System.getProperty("user.home"),".globus"),"certificates"),"*.0").getAbsolutePath());
 
         // set filter
-        org.glite.x2007.x11.ce.cream.types.JobFilter filter = new org.glite.x2007.x11.ce.cream.types.JobFilter();
+        JobFilter filter = new JobFilter();
         if (m_delegationId != null) {
             filter.setDelegationId(m_delegationId);
         }
@@ -60,7 +63,7 @@ public class CreamExecutionPurgeJobs extends AbstractTest {
 			// TODO: check CREAM2 ou CREAM ???
 			cream_service.setCREAM2EndpointAddress(m_url.getString());
 			CREAMPort creamStub = cream_service.getCREAM2();
-	        org.glite.x2007.x11.ce.cream.types.Result[] resultArray = creamStub.jobPurge(filter).getResult();
+	        Result[] resultArray = creamStub.jobPurge(filter).getResult();
 	        System.out.println(resultArray.length+" have been purged!");
 		} catch (ServiceException e) {
             throw new BadParameterException(e.getMessage(), e);

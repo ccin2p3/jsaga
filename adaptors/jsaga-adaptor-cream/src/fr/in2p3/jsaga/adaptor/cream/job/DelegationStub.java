@@ -1,13 +1,10 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
-//import org.glite.ce.creamapi.ws.cream2.types.AuthorizationFault;
-//import org.glite.ce.commonj.authz.AuthorizationException;
-import org.glite.security.delegation.Delegation;
-import org.glite.security.delegation.DelegationException;
-import org.glite.security.delegation.DelegationServiceLocator;
+import org.glite.ce.creamapi.ws.cream2.types.AuthorizationFault;
+import org.glite.ce.security.delegation.Delegation;
+import org.glite.ce.security.delegation.DelegationException;
+import org.glite.ce.security.delegation.DelegationServiceLocator;
 import org.glite.security.util.proxy.ProxyCertificateGenerator;
-import org.glite.x2007.x11.ce.cream.types.AuthorizationFault;
-//import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.AuthenticationFailedException;
@@ -18,7 +15,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-//import javax.xml.rpc.ServiceException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;

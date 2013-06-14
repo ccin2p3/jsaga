@@ -7,9 +7,8 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 
-import org.glite.x2007.x11.ce.cream.CREAMLocator;
-import org.glite.x2007.x11.ce.cream.CREAMPort;
-import org.glite.x2007.x11.ce.cream.CreamBindingStub;
+import org.glite.ce.creamapi.ws.cream2.CREAMLocator;
+import org.glite.ce.creamapi.ws.cream2.CREAMPort;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
@@ -96,8 +95,9 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     	CREAMLocator cream_service = new CREAMLocator();
     	try {
 			// TODO: check CREAM2 ou CREAM ???
-			cream_service.setCREAM2EndpointAddress(new URL("https", host, port, "/ce-cream/services/CREAM").toString());
+			cream_service.setCREAM2EndpointAddress(new URL("https", host, port, "/ce-cream/services/CREAM2").toString());
 			m_creamStub = cream_service.getCREAM2();
+//    		m_creamStub = new CREAMStub(new URL("https", host, port, "/ce-cream/services/CREAM2").toString());
 		} catch (MalformedURLException e) {
             throw new BadParameterException(e.getMessage(), e);
 		} catch (ServiceException e) {
