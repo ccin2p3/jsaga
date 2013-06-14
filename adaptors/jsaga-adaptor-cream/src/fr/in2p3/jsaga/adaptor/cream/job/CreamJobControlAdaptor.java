@@ -34,6 +34,7 @@ import org.glite.ce.creamapi.ws.cream2.types.JobRegisterResponse;
 import org.glite.ce.creamapi.ws.cream2.types.JobRegisterResult;
 import org.glite.ce.creamapi.ws.cream2.types.JobSubmissionDisabledFault;
 import org.glite.ce.creamapi.ws.cream2.types.Result;
+import org.glite.ce.creamapi.ws.cream2.types.ServiceInfo;
 import org.glite.ce.security.delegation.Delegation;
 import org.glite.ce.security.delegation.DelegationException;
 import org.glite.ce.security.delegation.DelegationService;
@@ -119,33 +120,33 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
 
         // renew/create delegated proxy
-//        DelegationStub delegationStub = new DelegationStub(host, port, m_vo);
-//        m_delegProxy = delegationStub.renewDelegation(m_delegationId, m_credential);
-//        // put new delegated proxy for multiple jobs
-//        if (m_delegProxy != null) {
-//            delegationStub.putProxy(m_delegationId, m_delegProxy);
-//        }
-//        try {
-//			ServiceInfo service_info = m_creamStub.getServiceInfo(0);
-//			String cream_desc = host + " (interface version=" + 
-//								service_info.getInterfaceVersion() + ",service version=" + 
-//								service_info.getServiceVersion() + ")";
-//    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Connecting to "+cream_desc);
-//    		m_creamVersion = service_info.getServiceVersion();
-//		} catch (Exception e) {
-//    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Could not get service version");
-//		}
+        DelegationStub delegationStub = new DelegationStub(host, port, m_vo);
+        m_delegProxy = delegationStub.renewDelegation(m_delegationId, m_credential);
+        // put new delegated proxy for multiple jobs
+        if (m_delegProxy != null) {
+            delegationStub.putProxy(m_delegationId, m_delegProxy);
+        }
+        try {
+			ServiceInfo service_info = m_creamStub.getServiceInfo(0);
+			String cream_desc = host + " (interface version=" + 
+								service_info.getInterfaceVersion() + ",service version=" + 
+								service_info.getServiceVersion() + ")";
+    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Connecting to "+cream_desc);
+    		m_creamVersion = service_info.getServiceVersion();
+		} catch (Exception e) {
+    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Could not get service version");
+		}
 //		throw new NoSuccessException("END");
         
-        try {
-            DelegationServiceLocator delegation_service = new DelegationServiceLocator();
-            delegation_service.setGridsiteDelegationEndpointAddress(new URL("https", host, port, "/ce-cream/services/gridsite-delegation").toString());
-			m_delegationServiceStub = delegation_service.getGridsiteDelegation();
-		} catch (ServiceException e) {
-            throw new BadParameterException(e.getMessage(), e);
-		} catch (MalformedURLException e) {
-            throw new BadParameterException(e.getMessage(), e);
-		}
+//        try {
+//            DelegationServiceLocator delegation_service = new DelegationServiceLocator();
+//            delegation_service.setGridsiteDelegationEndpointAddress(new URL("https", host, port, "/ce-cream/services/gridsite-delegation").toString());
+//			m_delegationServiceStub = delegation_service.getGridsiteDelegation();
+//		} catch (ServiceException e) {
+//            throw new BadParameterException(e.getMessage(), e);
+//		} catch (MalformedURLException e) {
+//            throw new BadParameterException(e.getMessage(), e);
+//		}
     }
 
     public void disconnect() throws NoSuccessException {
@@ -162,37 +163,39 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
     
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
-    	String delegProxy = null;
-    	String pkcs10;
-		try {
-			pkcs10 = m_delegationServiceStub.getProxyReq(m_delegationId);
-	    	delegProxy = signRequest(pkcs10, m_delegationId);
-		} catch (DelegationException e) {
-			throw new PermissionDeniedException(e);
-		} catch (RemoteException e) {
-			throw new PermissionDeniedException(e);
-		} catch (InvalidKeyException e) {
-			throw new PermissionDeniedException(e);
-		} catch (KeyStoreException e) {
-			throw new PermissionDeniedException(e);
-		} catch (CertificateException e) {
-			throw new PermissionDeniedException(e);
-		} catch (SignatureException e) {
-			throw new PermissionDeniedException(e);
-		} catch (NoSuchAlgorithmException e) {
-			throw new PermissionDeniedException(e);
-		} catch (NoSuchProviderException e) {
-			throw new PermissionDeniedException(e);
-		} catch (IOException e) {
-			throw new PermissionDeniedException(e);
-		}
+//    	String delegProxy = null;
+//    	String pkcs10;
+//		try {
+//			pkcs10 = m_delegationServiceStub.getProxyReq(m_delegationId);
+//	    	delegProxy = signRequest(pkcs10, m_delegationId);
+//		} catch (DelegationException e) {
+//			throw new PermissionDeniedException(e);
+//		} catch (RemoteException e) {
+//			throw new PermissionDeniedException(e);
+//		} catch (InvalidKeyException e) {
+//			throw new PermissionDeniedException(e);
+//		} catch (KeyStoreException e) {
+//			throw new PermissionDeniedException(e);
+//		} catch (CertificateException e) {
+//			throw new PermissionDeniedException(e);
+//		} catch (SignatureException e) {
+//			throw new PermissionDeniedException(e);
+//		} catch (NoSuchAlgorithmException e) {
+//			throw new PermissionDeniedException(e);
+//		} catch (NoSuchProviderException e) {
+//			throw new PermissionDeniedException(e);
+//		} catch (IOException e) {
+//			throw new PermissionDeniedException(e);
+//		}
     	
         // create job description
         JobDescription jd = new JobDescription();
         jd.setJDL(jobDesc);
         jd.setAutoStart(false);
         jd.setDelegationId(m_delegationId);
-        jd.setDelegationProxy(delegProxy);
+        if (m_delegProxy != null) {
+            jd.setDelegationProxy(m_delegProxy);
+        }
         
         // submit job
     	JobRegisterRequest request = new JobRegisterRequest();
@@ -506,106 +509,4 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         return filter;
     }
 
-	
-    protected String signRequest(String certReq, String delegationID)
-            throws IOException, KeyStoreException, CertificateException,
-            InvalidKeyException, SignatureException,
-            NoSuchAlgorithmException, NoSuchProviderException {
-        
-        String confFileName = System.getProperty("user.home") + "/.glite/dlgor.properties";
-        Properties dlgorOpt = this.loadProperties(confFileName);
-        
-        X509Certificate[] parentChain = null;
-        PrivateKey pKey = null;
-        
-        String proxyFilename = dlgorOpt.getProperty("issuerProxyFile", "");
-        String certFilename = dlgorOpt.getProperty("issuerCertFile", "");
-        String keyFilename = dlgorOpt.getProperty("issuerKeyFile", "");
-        String passwd = dlgorOpt.getProperty("issuerPass", "");
-        
-        if (proxyFilename.length() == 0) {
-            
-            if (certFilename.length() == 0) {
-                throw new AxisFault("Missing user credentials: issuerCertFile not found in " + confFileName);
-            }
-            
-            if (keyFilename.length() == 0) {
-                throw new AxisFault("Missing user credentials: issuerKeyFile not found in " + confFileName);
-            }
-            
-            char[] tmppwd = null;
-            if (passwd.length() != 0) {
-                tmppwd = passwd.toCharArray();
-            }
-            
-            FileInputStream inStream = null;
-            try {
-                inStream = new FileInputStream(keyFilename);
-                pKey = CertificateUtils.loadPrivateKey(inStream, CertificateUtils.Encoding.PEM, tmppwd);
-            } finally {
-                if (inStream != null) {
-                    inStream.close();
-                }
-            }
-                        
-            inStream = null;
-            try {
-                inStream = new FileInputStream(certFilename);
-                parentChain = CertificateUtils.loadCertificateChain(inStream, CertificateUtils.Encoding.PEM);
-            } finally {
-                if (inStream != null) {
-                    inStream.close();
-                }
-            }
-            
-        }else{
-            
-            FileInputStream inStream = null;
-            try {
-                
-                inStream = new FileInputStream(proxyFilename);
-                PEMCredential credentials = new PEMCredential(inStream, (char[]) null);
-                pKey = credentials.getKey();
-                parentChain = credentials.getCertificateChain();
-                
-            } finally {
-                if (inStream != null) {
-                    inStream.close();
-                }
-            }
-            
-        }
-            
-        
-        PEMReader pemReader = new PEMReader(new StringReader(certReq));
-        PKCS10CertificationRequest proxytReq = (PKCS10CertificationRequest) pemReader.readObject();
-        ProxyRequestOptions csrOpt = new ProxyRequestOptions(parentChain, proxytReq);
-        
-        X509Certificate[] certChain = ProxyGenerator.generate(csrOpt, pKey);
-        
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        for (X509Certificate tmpcert : certChain) {
-            CertificateUtils.saveCertificate(outStream, tmpcert, CertificateUtils.Encoding.PEM);
-        }
-        
-        return outStream.toString();
-
-    }	
-    
-    private Properties loadProperties(String filename) throws IOException {
-        Properties dlgorOpt = new Properties();
-        
-        FileInputStream inStream = null;
-        try {
-            inStream = new FileInputStream(filename);
-            dlgorOpt.load(inStream);
-        } finally {
-            if (inStream != null) {
-                    inStream.close();
-            }
-        }
-        
-        return dlgorOpt;
-
-    }
 }

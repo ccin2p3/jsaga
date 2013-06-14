@@ -1,28 +1,45 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
+import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.openssl.PEMReader;
 import org.glite.ce.creamapi.ws.cream2.types.AuthorizationFault;
 import org.glite.ce.security.delegation.Delegation;
 import org.glite.ce.security.delegation.DelegationException;
 import org.glite.ce.security.delegation.DelegationServiceLocator;
-import org.glite.security.util.proxy.ProxyCertificateGenerator;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.SignatureException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import javax.xml.rpc.ServiceException;
 
 import org.globus.gsi.CredentialException;
 import org.globus.gsi.X509Credential;
+
+import eu.emi.security.authn.x509.impl.CertificateUtils;
+import eu.emi.security.authn.x509.impl.PEMCredential;
+import eu.emi.security.authn.x509.proxy.ProxyGenerator;
+import eu.emi.security.authn.x509.proxy.ProxyRequestOptions;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -82,8 +99,6 @@ public class DelegationStub {
                 OutputStream out = new FileOutputStream(m_proxyFile);
                 globusProxy.save(out);
                 out.close();
-//            } catch (CertificateEncodingException e) {
-//                throw new AuthenticationFailedException(e);
             } catch (IOException e) {
                 throw new AuthenticationFailedException(e);
             } catch (CredentialException e) {
@@ -154,21 +169,37 @@ public class DelegationStub {
             }
 
             // sign delegated proxy
-            try {
-            	ProxyCertificateGenerator proxyGenerator = new ProxyCertificateGenerator(globusProxy.getIdentityCertificate());
-                proxyGenerator.setLifetime(hours);
-                return proxyGenerator.getProxyAsPEM();
+//            try {
+//                GrDProxyGenerator proxyGenerator = new GrDProxyGenerator();
+//                proxyGenerator.setLifetime(hours);                 
 //                byte[] x509Cert = proxyGenerator.x509MakeProxyCert(
 //                        pkcs10.getBytes(),
 //                        GrDPX509Util.getFilesBytes(m_proxyFile),
 //                        "null");
 //                String delegProxy = new String(x509Cert);
 //                return delegProxy;
-            } catch (IOException e) {
-                throw new AuthenticationFailedException(e);
+//            } catch (IOException e) {
+//                throw new AuthenticationFailedException(e);
 //            } catch (GeneralSecurityException e) {
 //                throw new AuthenticationFailedException(e);
-            }
+//            }
+            try {
+				return signRequest(pkcs10, delegationId);
+			} catch (InvalidKeyException e) {
+				throw new AuthenticationFailedException(e);
+			} catch (CertificateException e) {
+				throw new AuthenticationFailedException(e);
+			} catch (SignatureException e) {
+				throw new AuthenticationFailedException(e);
+			} catch (NoSuchAlgorithmException e) {
+				throw new AuthenticationFailedException(e);
+			} catch (NoSuchProviderException e) {
+				throw new AuthenticationFailedException(e);
+			} catch (IOException e) {
+				throw new AuthenticationFailedException(e);
+			} catch (KeyStoreException e) {
+				throw new AuthenticationFailedException(e);
+			}
         } else {
             return null;
         }
@@ -210,4 +241,107 @@ public class DelegationStub {
 //			return null;
 //		}
 //    }
+    
+    private String signRequest(String certReq, String delegationID)
+            throws IOException, KeyStoreException, CertificateException,
+            InvalidKeyException, SignatureException,
+            NoSuchAlgorithmException, NoSuchProviderException {
+        
+//        String confFileName = System.getProperty("user.home") + "/.glite/dlgor.properties";
+//        Properties dlgorOpt = this.loadProperties(confFileName);
+        
+        X509Certificate[] parentChain = null;
+        PrivateKey pKey = null;
+        
+//        String proxyFilename = dlgorOpt.getProperty("issuerProxyFile", "");
+//        String certFilename = dlgorOpt.getProperty("issuerCertFile", "");
+//        String keyFilename = dlgorOpt.getProperty("issuerKeyFile", "");
+//        String passwd = dlgorOpt.getProperty("issuerPass", "");
+        
+//        if (proxyFilename.length() == 0) {
+//            
+//            if (certFilename.length() == 0) {
+//                throw new AxisFault("Missing user credentials: issuerCertFile not found in " + confFileName);
+//            }
+//            
+//            if (keyFilename.length() == 0) {
+//                throw new AxisFault("Missing user credentials: issuerKeyFile not found in " + confFileName);
+//            }
+//            
+//            char[] tmppwd = null;
+//            if (passwd.length() != 0) {
+//                tmppwd = passwd.toCharArray();
+//            }
+//            
+//            FileInputStream inStream = null;
+//            try {
+//                inStream = new FileInputStream(keyFilename);
+//                pKey = CertificateUtils.loadPrivateKey(inStream, CertificateUtils.Encoding.PEM, tmppwd);
+//            } finally {
+//                if (inStream != null) {
+//                    inStream.close();
+//                }
+//            }
+//                        
+//            inStream = null;
+//            try {
+//                inStream = new FileInputStream(certFilename);
+//                parentChain = CertificateUtils.loadCertificateChain(inStream, CertificateUtils.Encoding.PEM);
+//            } finally {
+//                if (inStream != null) {
+//                    inStream.close();
+//                }
+//            }
+//            
+//        }else{
+            
+            FileInputStream inStream = null;
+            try {
+                
+                inStream = new FileInputStream(m_proxyFile);
+                PEMCredential credentials = new PEMCredential(inStream, (char[]) null);
+                pKey = credentials.getKey();
+                parentChain = credentials.getCertificateChain();
+                
+            } finally {
+                if (inStream != null) {
+                    inStream.close();
+                }
+            }
+            
+//        }
+            
+        
+        PEMReader pemReader = new PEMReader(new StringReader(certReq));
+        PKCS10CertificationRequest proxytReq = (PKCS10CertificationRequest) pemReader.readObject();
+        ProxyRequestOptions csrOpt = new ProxyRequestOptions(parentChain, proxytReq);
+        
+        X509Certificate[] certChain = ProxyGenerator.generate(csrOpt, pKey);
+        
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        for (X509Certificate tmpcert : certChain) {
+            CertificateUtils.saveCertificate(outStream, tmpcert, CertificateUtils.Encoding.PEM);
+        }
+        
+        return outStream.toString();
+
+    }	
+    
+//    private Properties loadProperties(String filename) throws IOException {
+//        Properties dlgorOpt = new Properties();
+//        
+//        FileInputStream inStream = null;
+//        try {
+//            inStream = new FileInputStream(filename);
+//            dlgorOpt.load(inStream);
+//        } finally {
+//            if (inStream != null) {
+//                    inStream.close();
+//            }
+//        }
+//        
+//        return dlgorOpt;
+//
+//    }
+    
 }
