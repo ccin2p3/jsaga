@@ -1,13 +1,13 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
-import org.apache.axis.client.Call;
-import org.apache.axis.types.URI;
+//import org.apache.axis.client.Call;
+//import org.apache.axis.types.URI;
 //import org.glite.ce.creamapi.ws.cream2.CREAMLocator;
 //import org.glite.ce.creamapi.ws.cream2.CREAMPort;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 
-import javax.xml.rpc.ServiceException;
+//import javax.xml.rpc.ServiceException;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;

@@ -4,15 +4,19 @@ import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
-import org.apache.axis.types.URI;
-import org.glite.ce.creamapi.ws.cream2.types.BaseFaultType;
-import org.glite.ce.creamapi.ws.cream2.types.Command;
-import org.glite.ce.creamapi.ws.cream2.types.DelegationIdMismatchFault;
-import org.glite.ce.creamapi.ws.cream2.types.JobFilter;
-import org.glite.ce.creamapi.ws.cream2.types.JobId;
-import org.glite.ce.creamapi.ws.cream2.types.JobInfo;
-import org.glite.ce.creamapi.ws.cream2.types.JobInfoResult;
-import org.glite.ce.creamapi.ws.cream2.types.Status;
+//import org.apache.axis.types.URI;
+//import org.glite.ce.creamapi.ws.cream2.BaseFault_Type;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.Command;
+import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
+//import org.glite.ce.creamapi.ws.cream2.DelegationIdMismatch_Fault;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobFilter;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobId;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfo;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoRequest;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoResult;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.Status;
+import org.glite.ce.creamapi.ws.cream2.Generic_Fault;
+import org.glite.ce.creamapi.ws.cream2.InvalidArgument_Fault;
 import org.ogf.saga.error.*;
 
 import java.rmi.RemoteException;
@@ -63,7 +67,11 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
             resultArray = m_creamStub.jobList().getResult();
         } catch (RemoteException e) {
             throw new TimeoutException(e);
-        }
+        } catch (Authorization_Fault e) {
+			throw new PermissionDeniedException(e);
+		} catch (Generic_Fault e) {
+			throw new NoSuccessException(e);
+		}
         if (resultArray != null) {
             String[] jobIds = new String[resultArray.length];
             for (int i=0; i<resultArray.length; i++) {
@@ -128,51 +136,58 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
         filter.setDelegationId(m_delegationId);
         filter.setJobId(jobIdList);
 //        CREAMPort stub = m_creamStub.getStub();
+        JobInfoRequest request = new JobInfoRequest();
         JobInfoResult[] resultArray;
         try {
-            resultArray = m_creamStub.jobInfo(filter).getResult();
+            resultArray = m_creamStub.jobInfo(request).getResult();
         } catch (RemoteException e) {
             throw new TimeoutException(e);
-        }
+        } catch (Authorization_Fault e) {
+        	throw new NoSuccessException(new PermissionDeniedException(e));
+		} catch (Generic_Fault e) {
+        	throw new NoSuccessException(e);
+		} catch (InvalidArgument_Fault e) {
+        	throw new NoSuccessException(e);
+		}
         JobInfo[] infos = new JobInfo[resultArray.length];
         for (int i=0; resultArray!=null && i<resultArray.length; i++) {
             // rethrow exception
-            try {
-                if (resultArray[i].getDateMismatchFault()!=null) {
-                    throw resultArray[i].getDateMismatchFault();
-                } else if (resultArray[i].getDelegationIdMismatchFault()!=null) {
-                    throw resultArray[i].getDelegationIdMismatchFault();
-                } else if (resultArray[i].getGenericFault()!=null) {
-                    throw resultArray[i].getGenericFault();
-                } else if (resultArray[i].getJobStatusInvalidFault()!=null) {
-                    throw resultArray[i].getJobStatusInvalidFault();
-                } else if (resultArray[i].getJobUnknownFault()!=null) {
-                    throw resultArray[i].getJobUnknownFault();
-                } else if (resultArray[i].getLeaseIdMismatchFault()!=null) {
-                    throw resultArray[i].getLeaseIdMismatchFault();
-                }
-            } catch (DelegationIdMismatchFault fault) {
-                throw new NoSuccessException(new PermissionDeniedException(getMessage(fault), fault));
-            } catch (BaseFaultType fault) {
-                throw new NoSuccessException(getMessage(fault), fault);
-            }
+//            try {
+//                if (resultArray[i].getDateMismatchFault()!=null) {
+//                    throw resultArray[i].getDateMismatchFault();
+//                } else if (resultArray[i].getDelegationIdMismatchFault()!=null) {
+//                    throw resultArray[i].getDelegationIdMismatchFault();
+//                } else if (resultArray[i].getGenericFault()!=null) {
+//                    throw resultArray[i].getGenericFault();
+//                } else if (resultArray[i].getJobStatusInvalidFault()!=null) {
+//                    throw resultArray[i].getJobStatusInvalidFault();
+//                } else if (resultArray[i].getJobUnknownFault()!=null) {
+//                    throw resultArray[i].getJobUnknownFault();
+//                } else if (resultArray[i].getLeaseIdMismatchFault()!=null) {
+//                    throw resultArray[i].getLeaseIdMismatchFault();
+//                }
+//            } catch (DelegationIdMismatchFault fault) {
+//                throw new NoSuccessException(new PermissionDeniedException(getMessage(fault), fault));
+//            } catch (BaseFaultType fault) {
+//                throw new NoSuccessException(getMessage(fault), fault);
+//            }
             // extract  job info
             JobInfo info = resultArray[i].getJobInfo();
             if (info == null) {
-                throw new NoSuccessException("Empty info for job: "+filter.getJobId(i));
+                throw new NoSuccessException("Empty info for job: "+filter.getJobId());
             }
             infos[i] = info;
         }
         return infos;
     }
 
-    private static String getMessage(BaseFaultType fault) {
-        if (fault.getDescription()!=null && !fault.getDescription().equals("")) {
-            return fault.getDescription();
-        } else if (fault.getFaultCause()!=null && !fault.getFaultCause().equals("N/A")) {
-            return fault.getFaultCause();
-        } else {
-            return fault.getClass().getName();
-        }
-    }
+//    private static String getMessage(BaseFault_Type fault) {
+//        if (fault.getDescription()!=null && !fault.getDescription().equals("")) {
+//            return fault.getDescription();
+//        } else if (fault.getFaultCause()!=null && !fault.getFaultCause().equals("N/A")) {
+//            return fault.getFaultCause();
+//        } else {
+//            return fault.getClass().getName();
+//        }
+//    }
 }

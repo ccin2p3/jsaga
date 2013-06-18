@@ -1,11 +1,22 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
+import org.apache.axis2.AxisFault;
+import org.apache.commons.httpclient.protocol.Protocol;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.openssl.PEMReader;
-import org.glite.ce.creamapi.ws.cream2.types.AuthorizationFault;
-import org.glite.ce.security.delegation.Delegation;
-import org.glite.ce.security.delegation.DelegationException;
-import org.glite.ce.security.delegation.DelegationServiceLocator;
+import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub;
+import org.glite.ce.security.delegation.DelegationException_Fault;
+import org.glite.ce.security.delegation.DelegationServiceStub;
+import org.glite.ce.security.delegation.DelegationServiceStub.DelegationException;
+import org.glite.ce.security.delegation.DelegationServiceStub.GetProxyReq;
+import org.glite.ce.security.delegation.DelegationServiceStub.GetTerminationTime;
+import org.glite.ce.security.delegation.DelegationServiceStub.GetTerminationTimeResponse;
+import org.glite.ce.security.delegation.DelegationServiceStub.PutProxy;
+import org.glite.ce.security.delegation.DelegationServiceStub.RenewProxyReq;
+//import org.glite.ce.security.delegation.Delegation;
+//import org.glite.ce.security.delegation.DelegationException;
+//import org.glite.ce.security.delegation.DelegationServiceLocator;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.AuthenticationFailedException;
@@ -31,7 +42,9 @@ import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
-import javax.xml.rpc.ServiceException;
+import java.util.Properties;
+
+//import javax.xml.rpc.ServiceException;
 
 import org.globus.gsi.CredentialException;
 import org.globus.gsi.X509Credential;
@@ -40,6 +53,7 @@ import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 import eu.emi.security.authn.x509.proxy.ProxyRequestOptions;
+import eu.emi.security.canl.axis2.CANLAXIS2SocketFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -57,11 +71,19 @@ public class DelegationStub {
     public static final String ANY_VO = null;
 
     private File m_proxyFile;
-    private Delegation m_stub;
+    private DelegationServiceStub m_stub;
 
     public DelegationStub(String host, int port, String vo) throws BadParameterException, NoSuccessException {
         // set endpoint
         URL epr;
+        Protocol.registerProtocol("https", new Protocol("https", new CANLAXIS2SocketFactory(), 8443));
+        
+        Properties sslConfig = new Properties();
+        sslConfig.put("truststore", "/home/schwarz/.jsaga/contexts/voms/certificates/");
+        sslConfig.put("crlcheckingmode", "ifvalid");
+        sslConfig.put("proxy", "/home/schwarz/.jsaga/tmp/voms_cred.txt");
+        CANLAXIS2SocketFactory.setCurrentProperties(sslConfig);
+
         try {
             epr = new URL("https", host, port, "/ce-cream/services/gridsite-delegation");
         } catch (MalformedURLException e) {
@@ -70,21 +92,28 @@ public class DelegationStub {
 
         // create stub
         m_proxyFile = getDlgorFile(host, vo);
-            if (epr.getProtocol().startsWith("https")) {
-                System.setProperty("axis.socketSecureFactory", "org.glite.security.trustmanager.axis.AXISSocketFactory");
-                System.setProperty("gridProxyFile", m_proxyFile.getAbsolutePath());
-            }
-            DelegationServiceLocator delegationLocator = new DelegationServiceLocator();
-            try {
-				m_stub = delegationLocator.getGridsiteDelegation(epr);
-			} catch (ServiceException e) {
-				throw new NoSuccessException(e);
-			}
+//            if (epr.getProtocol().startsWith("https")) {
+//                System.setProperty("axis.socketSecureFactory", "org.glite.security.trustmanager.axis.AXISSocketFactory");
+//                System.setProperty("gridProxyFile", m_proxyFile.getAbsolutePath());
+//            }
+//            DelegationServiceLocator delegationLocator = new DelegationServiceLocator();
+//            try {
+//				m_stub = delegationLocator.getGridsiteDelegation(epr);
+//			} catch (ServiceException e) {
+//				throw new NoSuccessException(e);
+//			}
+		try {
+			m_stub = new DelegationServiceStub(new URL("https", host, port, "/ce-cream/services/gridsite-delegation").toString());
+		} catch (AxisFault e) {
+			throw new NoSuccessException(e);
+		} catch (MalformedURLException e) {
+			throw new NoSuccessException(e);
+		}
     }
 
-    public Delegation getStub() {
-        return m_stub;
-    }
+//    public Delegation getStub() {
+//        return m_stub;
+//    }
 
     /**
      * Renew delegation, or create a new delegation if it does not exist.
@@ -111,12 +140,53 @@ public class DelegationStub {
         // renew/create delegated proxy
         String pkcs10 = null;
         try {
-            Calendar cal = m_stub.getTerminationTime(delegationId);
+        	GetTerminationTime gtt = new GetTerminationTime();
+        	gtt.setDelegationID(delegationId);
+        	Calendar cal = m_stub.getTerminationTime(gtt).getGetTerminationTimeReturn();
             if (cal.before(Calendar.getInstance())) {
                 // renew delegation
-                pkcs10 = m_stub.renewProxyReq(delegationId);
+            	RenewProxyReq rpq = new RenewProxyReq();
+            	rpq.setDelegationID(delegationId);
+                pkcs10 = m_stub.renewProxyReq(rpq).getRenewProxyReqReturn();
             }
-        } catch (DelegationException e) {
+		} catch (RemoteException e) {
+			// TODO: check this
+        	// New CreamCE sends a RemoteException when delegationId not found
+            if (e.getMessage()!=null && e.getMessage().startsWith("not found")) {
+                // create a new delegation
+                try {
+                   	GetProxyReq gpr = new GetProxyReq();
+                	gpr.setDelegationID(delegationId);
+ 					pkcs10 = m_stub.getProxyReq(gpr).getGetProxyReqReturn();
+				} catch (RemoteException e1) {
+		            throw new AuthenticationFailedException(e);
+				} catch (DelegationException_Fault e1) {
+		            throw new AuthenticationFailedException(e);
+				}
+            } else {
+                // rethrow exception
+                throw new AuthenticationFailedException(e.getMessage(), e);
+            }
+		} catch (DelegationException_Fault e) {
+			// TODO: check this
+            if (e.getMessage()!=null && e.getMessage().startsWith("Failed to find delegation ID")) {
+                // create a new delegation
+                try {
+                   	GetProxyReq gpr = new GetProxyReq();
+                	gpr.setDelegationID(delegationId);
+ 					pkcs10 = m_stub.getProxyReq(gpr).getGetProxyReqReturn();
+				} catch (RemoteException e1) {
+		            throw new AuthenticationFailedException(e);
+				} catch (DelegationException_Fault e1) {
+		            throw new AuthenticationFailedException(e);
+				}
+            } else {
+                // rethrow exception
+                throw new AuthenticationFailedException(e.getMessage(), e);
+            }
+		}
+/*
+    } catch (DelegationException e) {
             if (e.getMsg()!=null && e.getMsg().startsWith("Failed to find delegation ID")) {
                 // create a new delegation
                 try {
@@ -160,7 +230,7 @@ public class DelegationStub {
                 throw new AuthenticationFailedException(e.getMessage(), e);
             }
         }
-
+*/
         if (pkcs10 != null) {
             // set delegation lifetime
             int hours = (int) (globusProxy.getTimeLeft() / 3600) - 1;
@@ -206,13 +276,16 @@ public class DelegationStub {
     }
 
     public void putProxy(String delegationId, String delegProxy) throws NoSuccessException {
-        try {
-            m_stub.putProxy(delegationId, delegProxy);
-        } catch (DelegationException e) {
-            throw new NoSuccessException(e.getMsg(), e);
-        } catch (RemoteException e) {
-            throw new NoSuccessException(e);
-        }
+        	PutProxy pp = new PutProxy();
+        	pp.setDelegationID(delegationId);
+        	pp.setProxy(delegProxy);
+            try {
+				m_stub.putProxy(pp);
+			} catch (RemoteException e) {
+				throw new NoSuccessException(e);
+			} catch (DelegationException_Fault e) {
+				throw new NoSuccessException(e);
+			}
     }
 
     public static File getDlgorFile(String host, String vo) {
@@ -223,15 +296,15 @@ public class DelegationStub {
         }
     }
     
-    private void rethrowAuthorizationException(AuthorizationFault af) throws AuthenticationFailedException {
-    	try {
-    		throw new AuthenticationFailedException(af.getFaultDetails()[0].getElementsByTagNameNS("http://glite.org/2007/11/ce/cream/types", "Description").item(0).getFirstChild().getNodeValue());
-    	} catch (NullPointerException npe) {
-    		throw new AuthenticationFailedException(af);
-    	} catch (ArrayIndexOutOfBoundsException aioobe) {
-    		throw new AuthenticationFailedException(af);
-    	}
-    }
+//    private void rethrowAuthorizationException(AuthorizationFault af) throws AuthenticationFailedException {
+//    	try {
+//    		throw new AuthenticationFailedException(af.getFaultDetails()[0].getElementsByTagNameNS("http://glite.org/2007/11/ce/cream/types", "Description").item(0).getFirstChild().getNodeValue());
+//    	} catch (NullPointerException npe) {
+//    		throw new AuthenticationFailedException(af);
+//    	} catch (ArrayIndexOutOfBoundsException aioobe) {
+//    		throw new AuthenticationFailedException(af);
+//    	}
+//    }
     
 //    private String getDescription(AuthorizationException af) {
 //		org.w3c.dom.Element[] details = af.getFaultDetails();

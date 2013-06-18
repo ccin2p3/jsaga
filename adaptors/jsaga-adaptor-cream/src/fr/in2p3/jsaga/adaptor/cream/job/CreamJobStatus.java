@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
-import org.glite.ce.creamapi.ws.cream2.types.Status;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.Status;
 
 import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;

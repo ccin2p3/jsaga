@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
+import eu.emi.security.canl.axis2.CANLAXIS2SocketFactory;
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
@@ -7,8 +8,11 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 
-import org.glite.ce.creamapi.ws.cream2.CREAMLocator;
-import org.glite.ce.creamapi.ws.cream2.CREAMPort;
+import org.apache.axis2.AxisFault;
+import org.apache.commons.httpclient.protocol.Protocol;
+//import org.glite.ce.creamapi.ws.cream2.CREAMLocator;
+//import org.glite.ce.creamapi.ws.cream2.CREAMPort;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
@@ -18,8 +22,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Properties;
 
-import javax.xml.rpc.ServiceException;
+//import javax.xml.rpc.ServiceException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -41,7 +46,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     protected File m_certRepository;
 
     protected String m_delegationId;
-    protected CREAMPort m_creamStub;
+    protected CREAMStub m_creamStub;
 
     protected String m_creamVersion = "";
     
@@ -80,6 +85,14 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+        Protocol.registerProtocol("https", new Protocol("https", new CANLAXIS2SocketFactory(), 8443));
+        
+        Properties sslConfig = new Properties();
+        sslConfig.put("truststore", m_certRepository.getPath());
+        sslConfig.put("crlcheckingmode", "ifvalid");
+        sslConfig.put("proxy", "/home/schwarz/.jsaga/tmp/voms_cred.txt");
+        CANLAXIS2SocketFactory.setCurrentProperties(sslConfig);
+
         // set DELEGATION_ID
         if (attributes.containsKey(DELEGATION_ID)) {
             m_delegationId = (String) attributes.get(DELEGATION_ID);
@@ -92,15 +105,14 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
                 throw new NoSuccessException(e);
             }
         }
-    	CREAMLocator cream_service = new CREAMLocator();
+//    	CREAMLocator cream_service = new CREAMLocator();
     	try {
-			// TODO: check CREAM2 ou CREAM ???
-			cream_service.setCREAM2EndpointAddress(new URL("https", host, port, "/ce-cream/services/CREAM2").toString());
-			m_creamStub = cream_service.getCREAM2();
-//    		m_creamStub = new CREAMStub(new URL("https", host, port, "/ce-cream/services/CREAM2").toString());
+//			cream_service.setCREAM2EndpointAddress(new URL("https", host, port, "/ce-cream/services/CREAM2").toString());
+//			m_creamStub = cream_service.getCREAM2();
+    		m_creamStub = new CREAMStub(new URL("https", host, port, "/ce-cream/services/CREAM2").toString());
 		} catch (MalformedURLException e) {
             throw new BadParameterException(e.getMessage(), e);
-		} catch (ServiceException e) {
+		} catch (AxisFault e) {
             throw new BadParameterException(e.getMessage(), e);
 		}
     }

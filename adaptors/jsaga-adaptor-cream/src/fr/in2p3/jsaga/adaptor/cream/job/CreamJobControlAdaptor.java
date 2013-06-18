@@ -4,6 +4,7 @@ import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 import eu.emi.security.authn.x509.proxy.ProxyRequestOptions;
+import eu.emi.security.canl.axis2.CANLAXIS2SocketFactory;
 import fr.in2p3.jsaga.adaptor.data.GsiftpClient;
 import fr.in2p3.jsaga.adaptor.data.GsiftpDataAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.data.GsiftpInputStream;
@@ -18,27 +19,32 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.apache.axis2.AxisFault;
 import org.apache.log4j.Logger;
+import org.apache.commons.httpclient.protocol.Protocol;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.openssl.PEMReader;
 
-import org.glite.ce.creamapi.ws.cream2.types.AuthorizationFault;
-import org.glite.ce.creamapi.ws.cream2.types.GenericFault;
-import org.glite.ce.creamapi.ws.cream2.types.InvalidArgumentFault;
-import org.glite.ce.creamapi.ws.cream2.types.JobDescription;
-import org.glite.ce.creamapi.ws.cream2.types.JobFilter;
-import org.glite.ce.creamapi.ws.cream2.types.JobId;
-import org.glite.ce.creamapi.ws.cream2.types.JobInfo;
-import org.glite.ce.creamapi.ws.cream2.types.JobInfoResult;
-import org.glite.ce.creamapi.ws.cream2.types.JobRegisterRequest;
-import org.glite.ce.creamapi.ws.cream2.types.JobRegisterResponse;
-import org.glite.ce.creamapi.ws.cream2.types.JobRegisterResult;
-import org.glite.ce.creamapi.ws.cream2.types.JobSubmissionDisabledFault;
-import org.glite.ce.creamapi.ws.cream2.types.Result;
-import org.glite.ce.creamapi.ws.cream2.types.ServiceInfo;
-import org.glite.ce.security.delegation.Delegation;
-import org.glite.ce.security.delegation.DelegationException;
-import org.glite.ce.security.delegation.DelegationService;
-import org.glite.ce.security.delegation.DelegationServiceLocator;
+import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoRequest;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobStartRequest;
+import org.glite.ce.creamapi.ws.cream2.Generic_Fault;
+import org.glite.ce.creamapi.ws.cream2.InvalidArgument_Fault;
+import org.glite.ce.creamapi.ws.cream2.JobSubmissionDisabled_Fault;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobCancelRequest;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobDescription;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobFilter;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobId;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfo;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoResult;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterRequest;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterResponse;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterResult;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.Result;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.ServiceInfo;
+import org.glite.ce.security.delegation.DelegationServiceStub;
+//import org.glite.ce.security.delegation.Delegation;
+//import org.glite.ce.security.delegation.DelegationException;
+//import org.glite.ce.security.delegation.DelegationService;
+//import org.glite.ce.security.delegation.DelegationServiceLocator;
 import org.globus.ftp.exception.FTPException;
 import org.ogf.saga.error.*;
 
@@ -67,7 +73,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.rpc.ServiceException;
+//import javax.xml.rpc.ServiceException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -95,7 +101,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     private String m_delegProxy;
     private Boolean m_hasOutputSandboxBug = null;
     
-    private Delegation m_delegationServiceStub;
+//    private DelegationServiceStub m_delegationServiceStub;
     
     public JobMonitorAdaptor getDefaultJobMonitor() {
         // use CREAM portType as default monitoring service (instead of CEMon portType)
@@ -109,7 +115,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         // set SSL_CA_FILES
         System.setProperty(SSL_CA_FILES, m_certRepository.getPath() + "/*.0");
         System.setProperty("crlEnabled", "false");
-        
+
         // extract parameters from basePath
         Matcher m = Pattern.compile("/cream-(.*)-(.*)").matcher(basePath);
         if (m.matches()) {
@@ -126,17 +132,17 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         if (m_delegProxy != null) {
             delegationStub.putProxy(m_delegationId, m_delegProxy);
         }
-        try {
-			ServiceInfo service_info = m_creamStub.getServiceInfo(0);
-			String cream_desc = host + " (interface version=" + 
-								service_info.getInterfaceVersion() + ",service version=" + 
-								service_info.getServiceVersion() + ")";
-    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Connecting to "+cream_desc);
-    		m_creamVersion = service_info.getServiceVersion();
-		} catch (Exception e) {
-    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Could not get service version");
-		}
-//		throw new NoSuccessException("END");
+        // TODO: reactivate
+//        try {
+//			ServiceInfo service_info = m_creamStub.getServiceInfo(0);
+//			String cream_desc = host + " (interface version=" + 
+//								service_info.getInterfaceVersion() + ",service version=" + 
+//								service_info.getServiceVersion() + ")";
+//    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Connecting to "+cream_desc);
+//    		m_creamVersion = service_info.getServiceVersion();
+//		} catch (Exception e) {
+//    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Could not get service version");
+//		}
         
 //        try {
 //            DelegationServiceLocator delegation_service = new DelegationServiceLocator();
@@ -151,7 +157,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 
     public void disconnect() throws NoSuccessException {
         m_delegProxy = null;
-        m_delegationServiceStub = null;
+//        m_delegationServiceStub = null;
         super.disconnect();
     }
 
@@ -202,14 +208,14 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     	request.setJobDescriptionList(new JobDescription[]{jd});
         JobRegisterResponse response;
 		try {
-			response = m_creamStub.jobRegister(request);
-		} catch (AuthorizationFault e) {
+			response = m_creamStub.jobRegister(request, null);
+		} catch (Authorization_Fault e) {
 			throw new PermissionDeniedException(e);
-		} catch (GenericFault e) {
+		} catch (Generic_Fault e) {
 			throw new NoSuccessException(e);
-		} catch (InvalidArgumentFault e) {
+		} catch (InvalidArgument_Fault e) {
 			throw new BadResource(e);
-		} catch (JobSubmissionDisabledFault e) {
+		} catch (JobSubmissionDisabled_Fault e) {
 			throw new PermissionDeniedException(e);
 		} catch (RemoteException e) {
 			throw new NoSuccessException(e);
@@ -230,7 +236,8 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
             throw new NoSuccessException("Unexpected content of response message ["+resultArray.length+"]");
         }
     }
-    
+
+    /*
     public String submitOLD(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
         // create job description
         JobDescription jd = new JobDescription();
@@ -277,7 +284,8 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
             throw new NoSuccessException("Unexpected content of response message ["+resultArray.length+"]");
         }
     }
-
+	*/
+    
     public String getStagingDirectory(String nativeJobId) throws TimeoutException, NoSuccessException {
         return null;    // use the CREAM default staging directory
     }
@@ -359,13 +367,15 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         // get job info
         JobInfoResult resultArray[];
 
+        JobInfoRequest request = new JobInfoRequest();
+        request.setJobInfoRequest(filter);
         try {
-			resultArray = m_creamStub.jobInfo(filter).getResult();
-		} catch (AuthorizationFault e) {
+			resultArray = m_creamStub.jobInfo(request).getResult();
+		} catch (Authorization_Fault e) {
 			throw new NoSuccessException(e);
-		} catch (GenericFault e) {
+		} catch (Generic_Fault e) {
 			throw new NoSuccessException(e);
-		} catch (InvalidArgumentFault e) {
+		} catch (InvalidArgument_Fault e) {
 			throw new NoSuccessException(e);
 		} catch (RemoteException e) {
 			throw new TimeoutException(e);
@@ -389,15 +399,18 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     public void start(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
+        JobStartRequest request = new JobStartRequest();
+        request.setJobStartRequest(filter);
+        
         // cancel job
         Result[] resultArray;
         try {
-			resultArray = m_creamStub.jobStart(filter).getResult();
-		} catch (AuthorizationFault e) {
+			resultArray = m_creamStub.jobStart(request).getJobStartResponse().getResult();
+		} catch (Authorization_Fault e) {
 			throw new NoSuccessException(e);
-		} catch (GenericFault e) {
+		} catch (Generic_Fault e) {
 			throw new NoSuccessException(e);
-		} catch (InvalidArgumentFault e) {
+		} catch (InvalidArgument_Fault e) {
 			throw new NoSuccessException(e);
 		} catch (RemoteException e) {
 			throw new NoSuccessException(e);
@@ -411,15 +424,18 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
+        JobCancelRequest request = new JobCancelRequest();
+        request.setJobCancelRequest(filter);
+        
         // cancel job
         Result[] resultArray;
         try {
-            resultArray = m_creamStub.jobCancel(filter).getResult();
-		} catch (AuthorizationFault e) {
+            resultArray = m_creamStub.jobCancel(request).getJobCancelResponse().getResult();
+		} catch (Authorization_Fault e) {
 			throw new NoSuccessException(e);
-		} catch (GenericFault e) {
+		} catch (Generic_Fault e) {
 			throw new NoSuccessException(e);
-		} catch (InvalidArgumentFault e) {
+		} catch (InvalidArgument_Fault e) {
 			throw new NoSuccessException(e);
 		} catch (RemoteException e) {
 			throw new NoSuccessException(e);
@@ -433,18 +449,18 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // purge job
-        Result[] resultArray;
-        try {
-            resultArray = m_creamStub.jobPurge(filter).getResult();
-		} catch (AuthorizationFault e) {
-			throw new NoSuccessException(e);
-		} catch (GenericFault e) {
-			throw new NoSuccessException(e);
-		} catch (InvalidArgumentFault e) {
-			throw new NoSuccessException(e);
-		} catch (RemoteException e) {
-			throw new NoSuccessException(e);
-		}
+//        Result[] resultArray;
+//        try {
+//            resultArray = m_creamStub.jobPurge(filter).getResult();
+//		} catch (AuthorizationFault e) {
+//			throw new NoSuccessException(e);
+//		} catch (GenericFault e) {
+//			throw new NoSuccessException(e);
+//		} catch (InvalidArgumentFault e) {
+//			throw new NoSuccessException(e);
+//		} catch (RemoteException e) {
+//			throw new NoSuccessException(e);
+//		}
 
         // rethrow exception if any fault in result
 //        CreamExceptionFactory.rethrow(resultArray);
@@ -454,23 +470,21 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // hold job
-        Result[] resultArray;
-        try {
-            resultArray = m_creamStub.jobSuspend(filter).getResult();
-		} catch (AuthorizationFault e) {
-			throw new NoSuccessException(e);
-		} catch (GenericFault e) {
-			throw new NoSuccessException(e);
-		} catch (InvalidArgumentFault e) {
-			throw new NoSuccessException(e);
-		} catch (RemoteException e) {
-			throw new NoSuccessException(e);
-		}
-        if (resultArray[0].getJobStatusInvalidFault() != null) return false;
-        // Not sure why we get this exception sometimes:
-        if (resultArray[0].getJobUnknownFault() != null) return false;
-        // rethrow exception if any fault in result
-//        CreamExceptionFactory.rethrow(resultArray);
+//        Result[] resultArray;
+//        try {
+//            resultArray = m_creamStub.jobSuspend(filter).getResult();
+//		} catch (AuthorizationFault e) {
+//			throw new NoSuccessException(e);
+//		} catch (GenericFault e) {
+//			throw new NoSuccessException(e);
+//		} catch (InvalidArgumentFault e) {
+//			throw new NoSuccessException(e);
+//		} catch (RemoteException e) {
+//			throw new NoSuccessException(e);
+//		}
+//        if (resultArray[0].getJobStatusInvalidFault() != null) return false;
+//        // Not sure why we get this exception sometimes:
+//        if (resultArray[0].getJobUnknownFault() != null) return false;
         return true;
 	}
 
@@ -478,24 +492,22 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // release job
-        Result[] resultArray;
-        try {
-            resultArray = m_creamStub.jobResume(filter).getResult();
-		} catch (AuthorizationFault e) {
-			throw new NoSuccessException(e);
-		} catch (GenericFault e) {
-			throw new NoSuccessException(e);
-		} catch (InvalidArgumentFault e) {
-			throw new NoSuccessException(e);
-		} catch (RemoteException e) {
-			throw new NoSuccessException(e);
-		}
-
-        if (resultArray[0].getJobStatusInvalidFault() != null) return false;
-        // Not sure why we get this exception sometimes:
-        if (resultArray[0].getJobUnknownFault() != null) return false;
-        // rethrow exception if any fault in result
-//        CreamExceptionFactory.rethrow(resultArray);
+//        Result[] resultArray;
+//        try {
+//            resultArray = m_creamStub.jobResume(filter).getResult();
+//		} catch (AuthorizationFault e) {
+//			throw new NoSuccessException(e);
+//		} catch (GenericFault e) {
+//			throw new NoSuccessException(e);
+//		} catch (InvalidArgumentFault e) {
+//			throw new NoSuccessException(e);
+//		} catch (RemoteException e) {
+//			throw new NoSuccessException(e);
+//		}
+//
+//        if (resultArray[0].getJobStatusInvalidFault() != null) return false;
+//        // Not sure why we get this exception sometimes:
+//        if (resultArray[0].getJobUnknownFault() != null) return false;
         return true;
 	}
 
