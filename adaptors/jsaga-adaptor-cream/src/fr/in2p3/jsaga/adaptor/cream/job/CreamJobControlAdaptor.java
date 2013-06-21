@@ -1,10 +1,5 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
-import eu.emi.security.authn.x509.impl.CertificateUtils;
-import eu.emi.security.authn.x509.impl.PEMCredential;
-import eu.emi.security.authn.x509.proxy.ProxyGenerator;
-import eu.emi.security.authn.x509.proxy.ProxyRequestOptions;
-import eu.emi.security.canl.axis2.CANLAXIS2SocketFactory;
 import fr.in2p3.jsaga.adaptor.data.GsiftpClient;
 import fr.in2p3.jsaga.adaptor.data.GsiftpDataAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.data.GsiftpInputStream;
@@ -17,12 +12,7 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
-import org.apache.axis2.AxisFault;
 import org.apache.log4j.Logger;
-import org.apache.commons.httpclient.protocol.Protocol;
-import org.bouncycastle.jce.PKCS10CertificationRequest;
-import org.bouncycastle.openssl.PEMReader;
-
 import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoRequest;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobStartRequest;
@@ -39,37 +29,13 @@ import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterRequest;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterResponse;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterResult;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.Result;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.ServiceInfo;
-import org.glite.ce.security.delegation.DelegationServiceStub;
-//import org.glite.ce.security.delegation.Delegation;
-//import org.glite.ce.security.delegation.DelegationException;
-//import org.glite.ce.security.delegation.DelegationService;
-//import org.glite.ce.security.delegation.DelegationServiceLocator;
-import org.globus.ftp.exception.FTPException;
 import org.ogf.saga.error.*;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.rmi.RemoteException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.SignatureException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
