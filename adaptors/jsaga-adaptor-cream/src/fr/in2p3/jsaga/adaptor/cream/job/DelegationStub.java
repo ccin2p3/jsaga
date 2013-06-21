@@ -152,7 +152,7 @@ public class DelegationStub {
 		} catch (RemoteException e) {
 			// TODO: check this
         	// New CreamCE sends a RemoteException when delegationId not found
-            if (e.getMessage()!=null && e.getMessage().startsWith("not found")) {
+            if (e.getMessage()!=null && e.getMessage().contains("not found")) {
                 // create a new delegation
                 try {
                    	GetProxyReq gpr = new GetProxyReq();
