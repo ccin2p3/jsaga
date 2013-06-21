@@ -39,8 +39,7 @@ import java.util.Properties;
  *
  */
 public class CreamJobAdaptorAbstract implements ClientAdaptor {
-    // parameters configured
-//    private static final String SSL_CA_FILES = "sslCAFiles";
+
 
     private static final String DELEGATION_ID = "delegationId";
 
@@ -119,11 +118,6 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
 		} catch (AxisFault e) {
             throw new BadParameterException(e.getMessage(), e);
 		}
-
-    	// set SSL_CA_FILES
-//        System.setProperty(SSL_CA_FILES, m_certRepository.getPath() + "/*.0");
-//        System.setProperty("crlEnabled", "false");
-
     }
 
     public void disconnect() throws NoSuccessException {
@@ -133,7 +127,6 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     
 	protected JobFilter getJobFilter(String nativeJobId) throws NoSuccessException {
         JobId jobId = new JobId();
-//        jobId.setCreamURL(m_creamStub);
         jobId.setId(nativeJobId);
         try {
 			jobId.setCreamURL(new URI(m_creamUrl.toString()));

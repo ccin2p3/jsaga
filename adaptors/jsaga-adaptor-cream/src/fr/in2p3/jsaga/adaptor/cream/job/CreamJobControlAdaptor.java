@@ -128,30 +128,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
     
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
-//    	String delegProxy = null;
-//    	String pkcs10;
-//		try {
-//			pkcs10 = m_delegationServiceStub.getProxyReq(m_delegationId);
-//	    	delegProxy = signRequest(pkcs10, m_delegationId);
-//		} catch (DelegationException e) {
-//			throw new PermissionDeniedException(e);
-//		} catch (RemoteException e) {
-//			throw new PermissionDeniedException(e);
-//		} catch (InvalidKeyException e) {
-//			throw new PermissionDeniedException(e);
-//		} catch (KeyStoreException e) {
-//			throw new PermissionDeniedException(e);
-//		} catch (CertificateException e) {
-//			throw new PermissionDeniedException(e);
-//		} catch (SignatureException e) {
-//			throw new PermissionDeniedException(e);
-//		} catch (NoSuchAlgorithmException e) {
-//			throw new PermissionDeniedException(e);
-//		} catch (NoSuchProviderException e) {
-//			throw new PermissionDeniedException(e);
-//		} catch (IOException e) {
-//			throw new PermissionDeniedException(e);
-//		}
     	
         // create job description
         JobDescription jd = new JobDescription();
@@ -181,8 +157,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 		}
         // rethrow exception if any fault in result
         JobRegisterResult[] resultArray = response.getResult();
-        // TODO: check if this is necessary ??? because exception was catched before
-//        CreamExceptionFactory.rethrow(resultArray);
         
         // return jobid
         if (resultArray.length == 1) {
@@ -195,55 +169,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
             throw new NoSuccessException("Unexpected content of response message ["+resultArray.length+"]");
         }
     }
-
-    /*
-    public String submitOLD(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
-        // create job description
-        JobDescription jd = new JobDescription();
-        jd.setJDL(jobDesc);
-        jd.setAutoStart(false);
-        jd.setDelegationId(m_delegationId);
-
-        // put new delegated proxy for current job
-        if (m_delegProxy != null) {
-            jd.setDelegationProxy(m_delegProxy);
-        }
-
-        // submit job
-    	JobRegisterRequest request = new JobRegisterRequest();
-    	request.setJobDescriptionList(new JobDescription[]{jd});
-        JobRegisterResponse response;
-		try {
-			response = m_creamStub.jobRegister(request);
-		} catch (AuthorizationFault e) {
-			throw new PermissionDeniedException(e);
-		} catch (GenericFault e) {
-			throw new NoSuccessException(e);
-		} catch (InvalidArgumentFault e) {
-			throw new BadResource(e);
-		} catch (JobSubmissionDisabledFault e) {
-			throw new PermissionDeniedException(e);
-		} catch (RemoteException e) {
-			throw new NoSuccessException(e);
-		}
-        
-        // rethrow exception if any fault in result
-        JobRegisterResult[] resultArray = response.getResult();
-        // TODO: check if this is necessary ??? because exception was catched before
-//        CreamExceptionFactory.rethrow(resultArray);
-        
-        // return jobid
-        if (resultArray.length == 1) {
-            JobId jobid = resultArray[0].getJobId();
-            if (jobid == null) {
-                throw new NoSuccessException("Null job identifier");
-            }
-            return jobid.getId();
-        } else {
-            throw new NoSuccessException("Unexpected content of response message ["+resultArray.length+"]");
-        }
-    }
-	*/
     
     public String getStagingDirectory(String nativeJobId) throws TimeoutException, NoSuccessException {
         return null;    // use the CREAM default staging directory
@@ -375,9 +300,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 			throw new NoSuccessException(e);
 		}
 
-        // rethrow exception if any fault in result
-        // TODO check this
-//        CreamExceptionFactory.rethrow(resultArray);
     }
 
     public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
