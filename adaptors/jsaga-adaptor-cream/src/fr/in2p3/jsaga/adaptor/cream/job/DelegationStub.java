@@ -75,14 +75,6 @@ public class DelegationStub {
 
     public DelegationStub(String host, int port, String vo) throws BadParameterException, NoSuccessException {
         // set endpoint
-        URL epr;
-
-        try {
-            epr = new URL("https", host, port, "/ce-cream/services/gridsite-delegation");
-        } catch (MalformedURLException e) {
-            throw new BadParameterException(e.getMessage(), e);
-        }
-
         // create stub
         m_proxyFile = getDlgorFile(host, vo);
 		try {
