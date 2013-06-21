@@ -76,13 +76,6 @@ public class DelegationStub {
     public DelegationStub(String host, int port, String vo) throws BadParameterException, NoSuccessException {
         // set endpoint
         URL epr;
-        Protocol.registerProtocol("https", new Protocol("https", new CANLAXIS2SocketFactory(), 8443));
-        
-        Properties sslConfig = new Properties();
-        sslConfig.put("truststore", "/home/schwarz/.jsaga/contexts/voms/certificates/");
-        sslConfig.put("crlcheckingmode", "ifvalid");
-        sslConfig.put("proxy", "/home/schwarz/.jsaga/tmp/voms_cred.txt");
-        CANLAXIS2SocketFactory.setCurrentProperties(sslConfig);
 
         try {
             epr = new URL("https", host, port, "/ce-cream/services/gridsite-delegation");
@@ -92,16 +85,6 @@ public class DelegationStub {
 
         // create stub
         m_proxyFile = getDlgorFile(host, vo);
-//            if (epr.getProtocol().startsWith("https")) {
-//                System.setProperty("axis.socketSecureFactory", "org.glite.security.trustmanager.axis.AXISSocketFactory");
-//                System.setProperty("gridProxyFile", m_proxyFile.getAbsolutePath());
-//            }
-//            DelegationServiceLocator delegationLocator = new DelegationServiceLocator();
-//            try {
-//				m_stub = delegationLocator.getGridsiteDelegation(epr);
-//			} catch (ServiceException e) {
-//				throw new NoSuccessException(e);
-//			}
 		try {
 			m_stub = new DelegationServiceStub(new URL("https", host, port, "/ce-cream/services/gridsite-delegation").toString());
 		} catch (AxisFault e) {
@@ -110,10 +93,6 @@ public class DelegationStub {
 			throw new NoSuccessException(e);
 		}
     }
-
-//    public Delegation getStub() {
-//        return m_stub;
-//    }
 
     /**
      * Renew delegation, or create a new delegation if it does not exist.
@@ -185,52 +164,6 @@ public class DelegationStub {
                 throw new AuthenticationFailedException(e.getMessage(), e);
             }
 		}
-/*
-    } catch (DelegationException e) {
-            if (e.getMsg()!=null && e.getMsg().startsWith("Failed to find delegation ID")) {
-                // create a new delegation
-                try {
-                    pkcs10 = m_stub.getProxyReq(delegationId);
-                } catch (DelegationException e2) {
-                    throw new AuthenticationFailedException(e2.getMsg(), e2);
-                } catch (RemoteException e2) {
-                    throw new AuthenticationFailedException(e2);
-                }
-            } else {
-                // rethrow exception
-                throw new AuthenticationFailedException(e.getMsg(), e);
-            }
-        } catch (AuthorizationFault e) {
-        	// If operation getTermintationTime is not allowed
-//        	String exceptionDescription = getDescription(e);
-//        	if (exceptionDescription!= null && exceptionDescription.contains("not authorized for operation")) {
-//                try {
-//                    pkcs10 = m_stub.getProxyReq(delegationId);
-//                } catch (DelegationException e2) {
-//                    throw new AuthenticationFailedException(e2.getMsg(), e2);
-//                } catch (RemoteException e2) {
-//                    throw new AuthenticationFailedException(e2);
-//                }
-//        	} else {
-	        	rethrowAuthorizationException(e);
-//        	}
-        } catch (RemoteException e) {
-        	// New CreamCE sends a RemoteException when delegationId not found
-            if (e.getMessage()!=null && (e.getMessage().contains("not found"))) {
-                // create a new delegation
-                try {
-                    pkcs10 = m_stub.getProxyReq(delegationId);
-                } catch (DelegationException e2) {
-                    throw new AuthenticationFailedException(e2.getMsg(), e2);
-                } catch (RemoteException e2) {
-                    throw new AuthenticationFailedException(e2);
-                }
-            } else {
-                // rethrow exception
-                throw new AuthenticationFailedException(e.getMessage(), e);
-            }
-        }
-*/
         if (pkcs10 != null) {
             // set delegation lifetime
             int hours = (int) (globusProxy.getTimeLeft() / 3600) - 1;
@@ -238,21 +171,6 @@ public class DelegationStub {
                 throw new AuthenticationFailedException("Proxy is expired or about to expire: "+globusProxy.getIdentity());
             }
 
-            // sign delegated proxy
-//            try {
-//                GrDProxyGenerator proxyGenerator = new GrDProxyGenerator();
-//                proxyGenerator.setLifetime(hours);                 
-//                byte[] x509Cert = proxyGenerator.x509MakeProxyCert(
-//                        pkcs10.getBytes(),
-//                        GrDPX509Util.getFilesBytes(m_proxyFile),
-//                        "null");
-//                String delegProxy = new String(x509Cert);
-//                return delegProxy;
-//            } catch (IOException e) {
-//                throw new AuthenticationFailedException(e);
-//            } catch (GeneralSecurityException e) {
-//                throw new AuthenticationFailedException(e);
-//            }
             try {
 				return signRequest(pkcs10, delegationId);
 			} catch (InvalidKeyException e) {
@@ -296,78 +214,14 @@ public class DelegationStub {
         }
     }
     
-//    private void rethrowAuthorizationException(AuthorizationFault af) throws AuthenticationFailedException {
-//    	try {
-//    		throw new AuthenticationFailedException(af.getFaultDetails()[0].getElementsByTagNameNS("http://glite.org/2007/11/ce/cream/types", "Description").item(0).getFirstChild().getNodeValue());
-//    	} catch (NullPointerException npe) {
-//    		throw new AuthenticationFailedException(af);
-//    	} catch (ArrayIndexOutOfBoundsException aioobe) {
-//    		throw new AuthenticationFailedException(af);
-//    	}
-//    }
-    
-//    private String getDescription(AuthorizationException af) {
-//		org.w3c.dom.Element[] details = af.getFaultDetails();
-//		if (details != null && details.length>0) {
-//			return details[0].getElementsByTagNameNS("http://glite.org/2007/11/ce/cream/types", "Description").item(0).getFirstChild().getNodeValue();
-//		} else {
-//			return null;
-//		}
-//    }
-    
     private String signRequest(String certReq, String delegationID)
             throws IOException, KeyStoreException, CertificateException,
             InvalidKeyException, SignatureException,
             NoSuchAlgorithmException, NoSuchProviderException {
         
-//        String confFileName = System.getProperty("user.home") + "/.glite/dlgor.properties";
-//        Properties dlgorOpt = this.loadProperties(confFileName);
-        
         X509Certificate[] parentChain = null;
         PrivateKey pKey = null;
         
-//        String proxyFilename = dlgorOpt.getProperty("issuerProxyFile", "");
-//        String certFilename = dlgorOpt.getProperty("issuerCertFile", "");
-//        String keyFilename = dlgorOpt.getProperty("issuerKeyFile", "");
-//        String passwd = dlgorOpt.getProperty("issuerPass", "");
-        
-//        if (proxyFilename.length() == 0) {
-//            
-//            if (certFilename.length() == 0) {
-//                throw new AxisFault("Missing user credentials: issuerCertFile not found in " + confFileName);
-//            }
-//            
-//            if (keyFilename.length() == 0) {
-//                throw new AxisFault("Missing user credentials: issuerKeyFile not found in " + confFileName);
-//            }
-//            
-//            char[] tmppwd = null;
-//            if (passwd.length() != 0) {
-//                tmppwd = passwd.toCharArray();
-//            }
-//            
-//            FileInputStream inStream = null;
-//            try {
-//                inStream = new FileInputStream(keyFilename);
-//                pKey = CertificateUtils.loadPrivateKey(inStream, CertificateUtils.Encoding.PEM, tmppwd);
-//            } finally {
-//                if (inStream != null) {
-//                    inStream.close();
-//                }
-//            }
-//                        
-//            inStream = null;
-//            try {
-//                inStream = new FileInputStream(certFilename);
-//                parentChain = CertificateUtils.loadCertificateChain(inStream, CertificateUtils.Encoding.PEM);
-//            } finally {
-//                if (inStream != null) {
-//                    inStream.close();
-//                }
-//            }
-//            
-//        }else{
-            
             FileInputStream inStream = null;
             try {
                 
@@ -382,9 +236,6 @@ public class DelegationStub {
                 }
             }
             
-//        }
-            
-        
         PEMReader pemReader = new PEMReader(new StringReader(certReq));
         PKCS10CertificationRequest proxytReq = (PKCS10CertificationRequest) pemReader.readObject();
         ProxyRequestOptions csrOpt = new ProxyRequestOptions(parentChain, proxytReq);
@@ -399,22 +250,5 @@ public class DelegationStub {
         return outStream.toString();
 
     }	
-    
-//    private Properties loadProperties(String filename) throws IOException {
-//        Properties dlgorOpt = new Properties();
-//        
-//        FileInputStream inStream = null;
-//        try {
-//            inStream = new FileInputStream(filename);
-//            dlgorOpt.load(inStream);
-//        } finally {
-//            if (inStream != null) {
-//                    inStream.close();
-//            }
-//        }
-//        
-//        return dlgorOpt;
-//
-//    }
     
 }
