@@ -9,10 +9,12 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.databinding.types.URI;
+import org.apache.axis2.databinding.types.URI.MalformedURIException;
 import org.apache.commons.httpclient.protocol.Protocol;
-//import org.glite.ce.creamapi.ws.cream2.CREAMLocator;
-//import org.glite.ce.creamapi.ws.cream2.CREAMPort;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobFilter;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobId;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
@@ -23,8 +25,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
-
-//import javax.xml.rpc.ServiceException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -39,6 +39,9 @@ import java.util.Properties;
  *
  */
 public class CreamJobAdaptorAbstract implements ClientAdaptor {
+    // parameters configured
+//    private static final String SSL_CA_FILES = "sslCAFiles";
+
     private static final String DELEGATION_ID = "delegationId";
 
     protected GSSCredential m_credential;
@@ -47,6 +50,8 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
 
     protected String m_delegationId;
     protected CREAMStub m_creamStub;
+    // TODO: check if URL can be retrieved from Stub
+    protected URL m_creamUrl;
 
     protected String m_creamVersion = "";
     
@@ -90,6 +95,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
         Properties sslConfig = new Properties();
         sslConfig.put("truststore", m_certRepository.getPath());
         sslConfig.put("crlcheckingmode", "ifvalid");
+        // TODO: hardcoded
         sslConfig.put("proxy", "/home/schwarz/.jsaga/tmp/voms_cred.txt");
         CANLAXIS2SocketFactory.setCurrentProperties(sslConfig);
 
@@ -105,19 +111,40 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
                 throw new NoSuccessException(e);
             }
         }
-//    	CREAMLocator cream_service = new CREAMLocator();
     	try {
-//			cream_service.setCREAM2EndpointAddress(new URL("https", host, port, "/ce-cream/services/CREAM2").toString());
-//			m_creamStub = cream_service.getCREAM2();
-    		m_creamStub = new CREAMStub(new URL("https", host, port, "/ce-cream/services/CREAM2").toString());
+    		m_creamUrl = new URL("https", host, port, "/ce-cream/services/CREAM2");
+    		m_creamStub = new CREAMStub(m_creamUrl.toString());
 		} catch (MalformedURLException e) {
             throw new BadParameterException(e.getMessage(), e);
 		} catch (AxisFault e) {
             throw new BadParameterException(e.getMessage(), e);
 		}
+
+    	// set SSL_CA_FILES
+//        System.setProperty(SSL_CA_FILES, m_certRepository.getPath() + "/*.0");
+//        System.setProperty("crlEnabled", "false");
+
     }
 
     public void disconnect() throws NoSuccessException {
         m_creamStub = null;
+        m_creamUrl = null;
     }
+    
+	protected JobFilter getJobFilter(String nativeJobId) throws NoSuccessException {
+        JobId jobId = new JobId();
+//        jobId.setCreamURL(m_creamStub);
+        jobId.setId(nativeJobId);
+        try {
+			jobId.setCreamURL(new URI(m_creamUrl.toString()));
+		} catch (MalformedURIException e) {
+			throw new NoSuccessException(e);
+		}
+        JobFilter filter = new JobFilter();
+        filter.setDelegationId(m_delegationId);
+        filter.setJobId(new JobId[]{jobId});
+        return filter;
+    }
+
+
 }

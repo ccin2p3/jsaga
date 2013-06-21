@@ -12,6 +12,8 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
+import org.apache.axis2.databinding.types.URI;
+import org.apache.axis2.databinding.types.URI.MalformedURIException;
 import org.apache.log4j.Logger;
 import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoRequest;
@@ -33,13 +35,10 @@ import org.ogf.saga.error.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-//import javax.xml.rpc.ServiceException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -55,8 +54,6 @@ import java.util.regex.Pattern;
  */
 public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StagingJobAdaptorTwoPhase, CleanableJobAdaptor,
 	HoldableJobAdaptor {
-    // parameters configured
-    private static final String SSL_CA_FILES = "sslCAFiles";
 
     // parameters extracted from URI
     private static final String BATCH_SYSTEM = "BatchSystem";
@@ -77,10 +74,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         // set delegationId and create stub for CREAM service
         super.connect(userInfo, host, port, basePath, attributes);
-
-        // set SSL_CA_FILES
-        System.setProperty(SSL_CA_FILES, m_certRepository.getPath() + "/*.0");
-        System.setProperty("crlEnabled", "false");
 
         // extract parameters from basePath
         Matcher m = Pattern.compile("/cream-(.*)-(.*)").matcher(basePath);
@@ -476,15 +469,5 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 //        if (resultArray[0].getJobUnknownFault() != null) return false;
         return true;
 	}
-
-	private JobFilter getJobFilter(String nativeJobId) throws NoSuccessException {
-        JobId jobId = new JobId();
-//        jobId.setCreamURL(m_creamStub);
-        jobId.setId(nativeJobId);
-        JobFilter filter = new JobFilter();
-        filter.setDelegationId(m_delegationId);
-        filter.setJobId(new JobId[]{jobId});
-        return filter;
-    }
 
 }

@@ -1,9 +1,13 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
+import eu.emi.security.canl.axis2.CANLAXIS2SocketFactory;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
+import org.apache.axis2.databinding.types.URI;
+import org.apache.axis2.databinding.types.URI.MalformedURIException;
+import org.apache.commons.httpclient.protocol.Protocol;
 //import org.apache.axis.types.URI;
 //import org.glite.ce.creamapi.ws.cream2.BaseFault_Type;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.Command;
@@ -21,6 +25,7 @@ import org.ogf.saga.error.*;
 
 import java.rmi.RemoteException;
 import java.util.Date;
+import java.util.Properties;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -37,6 +42,15 @@ import java.util.Date;
 public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements QueryListJob, ListableJobAdaptor, JobInfoAdaptor {
 	
     public JobStatus[] getStatusList(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
+    	// TODO: move this
+        Protocol.registerProtocol("https", new Protocol("https", new CANLAXIS2SocketFactory(), 8443));
+        
+        Properties sslConfig = new Properties();
+        sslConfig.put("truststore", m_certRepository.getPath());
+        sslConfig.put("crlcheckingmode", "ifvalid");
+        sslConfig.put("proxy", "/home/schwarz/.jsaga/tmp/voms_cred.txt");
+        CANLAXIS2SocketFactory.setCurrentProperties(sslConfig);
+
         JobInfo[] resultArray;
 		resultArray = getJobInfoResult(nativeJobIdArray);
         // convert
@@ -125,18 +139,21 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
 	}
 	
     private JobInfo[] getJobInfoResult(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
-//        URI creamUri = m_creamStub.getURI();
         JobId[] jobIdList = new JobId[nativeJobIdArray.length];
         for (int i = 0; i < nativeJobIdArray.length; i++) {
             jobIdList[i] = new JobId();
-//            jobIdList[i].setCreamURL(creamUri);
             jobIdList[i].setId(nativeJobIdArray[i]);
+            try {
+				jobIdList[i].setCreamURL(new URI(m_creamUrl.toString()));
+			} catch (MalformedURIException e) {
+				throw new NoSuccessException(e);
+			}
         }
         JobFilter filter = new JobFilter();
         filter.setDelegationId(m_delegationId);
         filter.setJobId(jobIdList);
-//        CREAMPort stub = m_creamStub.getStub();
         JobInfoRequest request = new JobInfoRequest();
+        request.setJobInfoRequest(filter);
         JobInfoResult[] resultArray;
         try {
             resultArray = m_creamStub.jobInfo(request).getResult();
