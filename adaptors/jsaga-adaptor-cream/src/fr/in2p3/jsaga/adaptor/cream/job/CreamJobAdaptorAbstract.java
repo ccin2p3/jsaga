@@ -46,6 +46,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     protected GSSCredential m_credential;
     protected String m_vo;
     protected File m_certRepository;
+    protected String m_proxyFilename;
 
     protected String m_delegationId;
     protected CREAMStub m_creamStub;
@@ -53,6 +54,8 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     protected URL m_creamUrl;
 
     protected String m_creamVersion = "";
+    
+    protected Properties m_sslConfig;
     
     public String getType() {
         return "cream";
@@ -74,6 +77,11 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
         } catch (Exception e) {
             /* ignore */
         }
+        try {
+            m_proxyFilename = credential.getAttribute(Context.USERPROXY);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public int getDefaultPort() {
@@ -91,12 +99,11 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         Protocol.registerProtocol("https", new Protocol("https", new CANLAXIS2SocketFactory(), 8443));
         
-        Properties sslConfig = new Properties();
-        sslConfig.put("truststore", m_certRepository.getPath());
-        sslConfig.put("crlcheckingmode", "ifvalid");
-        // TODO: hardcoded
-        sslConfig.put("proxy", "/home/schwarz/.jsaga/tmp/voms_cred.txt");
-        CANLAXIS2SocketFactory.setCurrentProperties(sslConfig);
+        m_sslConfig = new Properties();
+        m_sslConfig.put("truststore", m_certRepository.getPath());
+        m_sslConfig.put("crlcheckingmode", "ifvalid");
+        m_sslConfig.put("proxy", m_proxyFilename);
+        CANLAXIS2SocketFactory.setCurrentProperties(m_sslConfig);
 
         // set DELEGATION_ID
         if (attributes.containsKey(DELEGATION_ID)) {
