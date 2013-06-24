@@ -17,6 +17,9 @@ import org.apache.log4j.Logger;
 import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoRequest;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobStartRequest;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.ServiceInfo;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.ServiceInfoRequest;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.ServiceInfoResponse;
 import org.glite.ce.creamapi.ws.cream2.Generic_Fault;
 import org.glite.ce.creamapi.ws.cream2.InvalidArgument_Fault;
 import org.glite.ce.creamapi.ws.cream2.JobSubmissionDisabled_Fault;
@@ -90,32 +93,11 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         if (m_delegProxy != null) {
             delegationStub.putProxy(m_delegationId, m_delegProxy);
         }
-        // TODO: reactivate
-//        try {
-//			ServiceInfo service_info = m_creamStub.getServiceInfo(0);
-//			String cream_desc = host + " (interface version=" + 
-//								service_info.getInterfaceVersion() + ",service version=" + 
-//								service_info.getServiceVersion() + ")";
-//    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Connecting to "+cream_desc);
-//    		m_creamVersion = service_info.getServiceVersion();
-//		} catch (Exception e) {
-//    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Could not get service version");
-//		}
-        
-//        try {
-//            DelegationServiceLocator delegation_service = new DelegationServiceLocator();
-//            delegation_service.setGridsiteDelegationEndpointAddress(new URL("https", host, port, "/ce-cream/services/gridsite-delegation").toString());
-//			m_delegationServiceStub = delegation_service.getGridsiteDelegation();
-//		} catch (ServiceException e) {
-//            throw new BadParameterException(e.getMessage(), e);
-//		} catch (MalformedURLException e) {
-//            throw new BadParameterException(e.getMessage(), e);
-//		}
+
     }
 
     public void disconnect() throws NoSuccessException {
         m_delegProxy = null;
-//        m_delegationServiceStub = null;
         super.disconnect();
     }
 

@@ -12,9 +12,12 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.databinding.types.URI;
 import org.apache.axis2.databinding.types.URI.MalformedURIException;
 import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.log4j.Logger;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobFilter;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobId;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.ServiceInfo;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.ServiceInfoRequest;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
@@ -126,6 +129,20 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
 		} catch (AxisFault e) {
             throw new BadParameterException(e.getMessage(), e);
 		}
+
+    	try {
+        	ServiceInfoRequest request = new ServiceInfoRequest();
+        	ServiceInfo service_info = m_creamStub.getServiceInfo(request).getServiceInfoResponse();
+			String cream_desc = host + " (interface version=" + 
+								service_info.getInterfaceVersion() + ",service version=" + 
+								service_info.getServiceVersion() + ")";
+    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Connecting to "+cream_desc);
+    		m_creamVersion = service_info.getServiceVersion();
+		} catch (Exception e) {
+    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Could not get service version");
+		}
+        
+
     }
 
     public void disconnect() throws NoSuccessException {
