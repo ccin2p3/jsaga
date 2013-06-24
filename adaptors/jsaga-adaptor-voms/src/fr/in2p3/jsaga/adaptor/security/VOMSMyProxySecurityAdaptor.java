@@ -189,7 +189,8 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
 
     protected SecurityCredential createSecurityAdaptor(GSSCredential cred, Map attributes) {
         File certRepository = new File((String) attributes.get(Context.CERTREPOSITORY));
-        return new VOMSMyProxySecurityCredential(cred, certRepository, attributes);
+        File userProxyFilename = new File((String) attributes.get(Context.USERPROXY));
+        return new VOMSMyProxySecurityCredential(cred, certRepository, userProxyFilename, attributes);
     }
 
     public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception {

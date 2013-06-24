@@ -239,11 +239,12 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
 	    	}
     	}*/
         File certRepository = new File((String) attributes.get(Context.CERTREPOSITORY));
+        File userProxyFilename = new File((String) attributes.get(Context.USERPROXY));
         if (cred instanceof GlobusGSSCredentialImpl) {
             X509Credential globusProxy = ((GlobusGSSCredentialImpl)cred).getX509Credential();
 	        try {
 				if (!VOMSACUtils.getACsFromCertificate(globusProxy.getCertificateChain()[0]).isEmpty()) {
-				    return new VOMSSecurityCredential(cred, certRepository);
+				    return new VOMSSecurityCredential(cred, certRepository, userProxyFilename);
 				} else {
 				    throw new IncorrectStateException("Security context is not of type: "+this.getType());
 				}

@@ -6,12 +6,17 @@ import org.globus.util.Util;
 import org.ietf.jgss.GSSCredential;
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSValidators;
+import org.italiangrid.voms.ac.VOMSValidationResult;
+import org.italiangrid.voms.ac.impl.DefaultVOMSValidator;
+import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.globus.gsi.X509Credential;
@@ -31,8 +36,12 @@ import org.globus.gsi.util.ProxyCertificateUtil;
  *
  */
 public class VOMSSecurityCredential extends GSSCredentialSecurityCredential implements SecurityCredential {
-    public VOMSSecurityCredential(GSSCredential proxy, File certRepository) {
+
+    protected File m_userProxyFilename;
+
+    public VOMSSecurityCredential(GSSCredential proxy, File certRepository, File userProxyFilename) {
         super(proxy, certRepository);
+        m_userProxyFilename = userProxyFilename;
     }
 
     /** override super.getAttribute() */
@@ -44,8 +53,23 @@ public class VOMSSecurityCredential extends GSSCredentialSecurityCredential impl
         } else {
             throw new NoSuccessException("Not a globus proxy");
         }
-        List<VOMSAttribute> v = VOMSValidators.newValidator().validate(globusProxy.getCertificateChain());
-        VOMSAttribute attr = (VOMSAttribute) v.get(0);
+        if (Context.USERPROXY.equals(key)) {
+        	try {
+				return this.m_userProxyFilename.getCanonicalPath();
+			} catch (IOException e) {
+				throw new NoSuccessException(e);
+			}
+        }
+        ArrayList<String> vomsdirs = new ArrayList<String>(1);
+        // TODO: hardcoded
+        vomsdirs.add("/home/schwarz/.jsaga/contexts/voms/vomsdir");
+        List<VOMSValidationResult> v = new DefaultVOMSValidator.Builder()
+        							.trustStore(new DefaultVOMSTrustStore(vomsdirs))
+//        							.certChainValidator(v)
+        							.build()
+        							.validateWithResult(globusProxy.getCertificateChain());
+        
+        VOMSAttribute attr = ((VOMSValidationResult) v.get(0)).getAttributes();
         // get attribute
         if (Context.USERVO.equals(key)) {
             return attr.getVO();
