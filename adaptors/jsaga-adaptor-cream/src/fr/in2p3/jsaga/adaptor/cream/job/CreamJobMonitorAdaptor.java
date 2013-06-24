@@ -39,14 +39,8 @@ import java.util.Properties;
 public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements QueryListJob, ListableJobAdaptor, JobInfoAdaptor {
 	
     public JobStatus[] getStatusList(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
-    	// TODO: move this
-        Protocol.registerProtocol("https", new Protocol("https", new CANLAXIS2SocketFactory(), 8443));
-        
-        Properties sslConfig = new Properties();
-        sslConfig.put("truststore", m_certRepository.getPath());
-        sslConfig.put("crlcheckingmode", "ifvalid");
-        sslConfig.put("proxy", "/home/schwarz/.jsaga/tmp/voms_cred.txt");
-        CANLAXIS2SocketFactory.setCurrentProperties(sslConfig);
+    	// TODO: removing this line gives : "no truststore defined". Check CANLAXIS2 threadsafe
+        CANLAXIS2SocketFactory.setCurrentProperties(m_sslConfig);
 
         JobInfo[] resultArray;
 		resultArray = getJobInfoResult(nativeJobIdArray);
