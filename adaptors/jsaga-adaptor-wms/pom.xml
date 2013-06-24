@@ -56,9 +56,9 @@
 			<version>2.0-Beta6-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.glite.jdl</groupId>
-			<artifactId>jdl-api-java</artifactId>
-			<version>3.3.1</version>
+			<groupId>org.glite</groupId>
+			<artifactId>glite-jdl-api-java</artifactId>
+			<version>3.1.6</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -78,10 +78,4 @@
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
-	<repositories>
-		<repository>
-			<id>emi-infn-repo</id>
-			<url>http://devel12.cnaf.infn.it:7444/pub/emi/packaging/maven</url>
-		</repository>
-	</repositories>
 </project>
