@@ -80,7 +80,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
         try {
             m_proxyFilename = credential.getAttribute(Context.USERPROXY);
         } catch (Exception e) {
-            e.printStackTrace();
+            /* ignore */
         }
     }
 
@@ -111,8 +111,9 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
         } else {
             try {
                 String dn = m_credential.getName().toString();
-                // TODO: add vo name 
-                m_delegationId = "delegation-"+Math.abs(dn.hashCode());
+                m_delegationId = "delegation-";
+               	m_delegationId += (m_vo != null)?m_vo+"-":"";
+                m_delegationId += Math.abs(dn.hashCode());
             } catch (GSSException e) {
                 throw new NoSuccessException(e);
             }
