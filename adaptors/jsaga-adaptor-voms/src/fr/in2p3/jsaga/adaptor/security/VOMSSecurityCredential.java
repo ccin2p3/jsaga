@@ -19,6 +19,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 import org.globus.gsi.X509Credential;
 import org.globus.gsi.util.CertificateUtil;
 import org.globus.gsi.util.ProxyCertificateUtil;
@@ -38,10 +40,12 @@ import org.globus.gsi.util.ProxyCertificateUtil;
 public class VOMSSecurityCredential extends GSSCredentialSecurityCredential implements SecurityCredential {
 
     protected File m_userProxyFilename;
+    protected File m_vomsDir;
 
-    public VOMSSecurityCredential(GSSCredential proxy, File certRepository, File userProxyFilename) {
-        super(proxy, certRepository);
-        m_userProxyFilename = userProxyFilename;
+    public VOMSSecurityCredential(GSSCredential proxy, Map attributes) {
+        super(proxy, new File((String) attributes.get(Context.CERTREPOSITORY)));
+        m_userProxyFilename = new File((String) attributes.get(Context.USERPROXY));
+        m_vomsDir = new File((String) attributes.get(VOMSContext.VOMSDIR));
     }
 
     /** override super.getAttribute() */
@@ -54,15 +58,10 @@ public class VOMSSecurityCredential extends GSSCredentialSecurityCredential impl
             throw new NoSuccessException("Not a globus proxy");
         }
         if (Context.USERPROXY.equals(key)) {
-        	try {
-				return this.m_userProxyFilename.getCanonicalPath();
-			} catch (IOException e) {
-				throw new NoSuccessException(e);
-			}
+			return this.m_userProxyFilename.getAbsolutePath();
         }
         ArrayList<String> vomsdirs = new ArrayList<String>(1);
-        // TODO: hardcoded
-        vomsdirs.add("/home/schwarz/.jsaga/contexts/voms/vomsdir");
+        vomsdirs.add(m_vomsDir.getAbsolutePath());
         List<VOMSValidationResult> v = new DefaultVOMSValidator.Builder()
         							.trustStore(new DefaultVOMSTrustStore(vomsdirs))
 //        							.certChainValidator(v)

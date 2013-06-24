@@ -238,13 +238,11 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
 	    		System.out.println("Is a GlobusRFC820 proxy");    		
 	    	}
     	}*/
-        File certRepository = new File((String) attributes.get(Context.CERTREPOSITORY));
-        File userProxyFilename = new File((String) attributes.get(Context.USERPROXY));
         if (cred instanceof GlobusGSSCredentialImpl) {
             X509Credential globusProxy = ((GlobusGSSCredentialImpl)cred).getX509Credential();
 	        try {
 				if (!VOMSACUtils.getACsFromCertificate(globusProxy.getCertificateChain()[0]).isEmpty()) {
-				    return new VOMSSecurityCredential(cred, certRepository, userProxyFilename);
+				    return new VOMSSecurityCredential(cred, attributes);
 				} else {
 				    throw new IncorrectStateException("Security context is not of type: "+this.getType());
 				}
