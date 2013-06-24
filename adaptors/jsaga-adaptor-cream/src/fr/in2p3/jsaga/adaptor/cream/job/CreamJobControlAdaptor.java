@@ -13,7 +13,6 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.apache.axis2.databinding.types.URI;
-import org.apache.axis2.databinding.types.URI.MalformedURIException;
 import org.apache.log4j.Logger;
 import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoRequest;
