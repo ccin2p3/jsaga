@@ -65,10 +65,6 @@
 				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
 		</repository>
-		<repository>
-			<id>emi-infn-repo</id>
-			<url>http://devel12.cnaf.infn.it:7444/pub/emi/packaging/maven</url>
-		</repository>
         <repository>
             <id>maatg-fr-releases</id>
             <name>maatG France Releases</name>
