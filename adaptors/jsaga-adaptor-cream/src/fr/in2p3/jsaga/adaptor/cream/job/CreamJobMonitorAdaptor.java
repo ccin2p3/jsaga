@@ -105,7 +105,8 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
 		return this.getLastCommand(nativeJobId).getStartProcessingTime().getTime();
 	}
 
-	public Date getFinished(String nativeJobId) throws NotImplementedException,	NoSuccessException {
+	public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException {
+		// TODO getExecutionCompletedTime() for JOB_START returns null
 		return this.getLastCommand(nativeJobId).getExecutionCompletedTime().getTime();
 	}
 
@@ -159,26 +160,6 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
 		}
         JobInfo[] infos = new JobInfo[resultArray.length];
         for (int i=0; resultArray!=null && i<resultArray.length; i++) {
-            // rethrow exception
-//            try {
-//                if (resultArray[i].getDateMismatchFault()!=null) {
-//                    throw resultArray[i].getDateMismatchFault();
-//                } else if (resultArray[i].getDelegationIdMismatchFault()!=null) {
-//                    throw resultArray[i].getDelegationIdMismatchFault();
-//                } else if (resultArray[i].getGenericFault()!=null) {
-//                    throw resultArray[i].getGenericFault();
-//                } else if (resultArray[i].getJobStatusInvalidFault()!=null) {
-//                    throw resultArray[i].getJobStatusInvalidFault();
-//                } else if (resultArray[i].getJobUnknownFault()!=null) {
-//                    throw resultArray[i].getJobUnknownFault();
-//                } else if (resultArray[i].getLeaseIdMismatchFault()!=null) {
-//                    throw resultArray[i].getLeaseIdMismatchFault();
-//                }
-//            } catch (DelegationIdMismatchFault fault) {
-//                throw new NoSuccessException(new PermissionDeniedException(getMessage(fault), fault));
-//            } catch (BaseFaultType fault) {
-//                throw new NoSuccessException(getMessage(fault), fault);
-//            }
             // extract  job info
             JobInfo info = resultArray[i].getJobInfo();
             if (info == null) {
@@ -189,13 +170,4 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
         return infos;
     }
 
-//    private static String getMessage(BaseFault_Type fault) {
-//        if (fault.getDescription()!=null && !fault.getDescription().equals("")) {
-//            return fault.getDescription();
-//        } else if (fault.getFaultCause()!=null && !fault.getFaultCause().equals("N/A")) {
-//            return fault.getFaultCause();
-//        } else {
-//            return fault.getClass().getName();
-//        }
-//    }
 }
