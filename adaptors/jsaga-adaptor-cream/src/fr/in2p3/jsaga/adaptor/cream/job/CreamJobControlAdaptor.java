@@ -162,6 +162,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         return parsedJdl.getInputStagingTransfer(jobInfo.getCREAMInputSandboxURI()+"/");
     }
     
+    // TODO: fix data staging: DoesNotExist
     public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
     	StagingTransfer[] st;
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
@@ -302,6 +303,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 
     }
 
+    // TODO: clean
     public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
@@ -323,6 +325,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 //        CreamExceptionFactory.rethrow(resultArray);
     }
 
+    // TODO: hold
 	public boolean hold(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
@@ -345,6 +348,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         return true;
 	}
 
+	// TODO: release
 	public boolean release(String nativeJobId) throws PermissionDeniedException, TimeoutException,	NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
