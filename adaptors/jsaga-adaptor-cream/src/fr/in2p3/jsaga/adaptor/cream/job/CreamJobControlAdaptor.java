@@ -17,9 +17,6 @@ import org.apache.log4j.Logger;
 import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoRequest;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobStartRequest;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.ServiceInfo;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.ServiceInfoRequest;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.ServiceInfoResponse;
 import org.glite.ce.creamapi.ws.cream2.Generic_Fault;
 import org.glite.ce.creamapi.ws.cream2.InvalidArgument_Fault;
 import org.glite.ce.creamapi.ws.cream2.JobSubmissionDisabled_Fault;
@@ -162,7 +159,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         return parsedJdl.getInputStagingTransfer(jobInfo.getCREAMInputSandboxURI()+"/");
     }
     
-    // TODO: fix data staging: DoesNotExist
+    // TODO: fix data staging: DoesNotExist: pb proxy delegated
     public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
     	StagingTransfer[] st;
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
@@ -183,13 +180,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         
         // If list is empty return
         if (st.length == 0) return st;
-        
-        // If old Cream CE, return
-        // NO NO NO: the bug is on cccreamceli09!!!
-//        if (m_creamVersion.contains("1.13")) {
-//        	m_hasOutputSandboxBug = false;
-//        	return st;
-//        }
         
         // Otherwise, check if CREAM CE has the bug on OSB
 		try {
