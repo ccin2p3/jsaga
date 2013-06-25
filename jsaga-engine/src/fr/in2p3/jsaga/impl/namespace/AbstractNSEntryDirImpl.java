@@ -255,6 +255,8 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
                 }
             }
             // remove source directory
+            if (Flags.OVERWRITE.isSet(flags))
+            	flags = flags - Flags.OVERWRITE.getValue();
             this.removeSync(flags);
             if (m_url instanceof AbstractURLImpl) {
                 ((AbstractURLImpl) m_url).setCache(null);
