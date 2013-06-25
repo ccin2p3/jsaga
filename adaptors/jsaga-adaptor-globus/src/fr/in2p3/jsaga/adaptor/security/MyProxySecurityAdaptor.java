@@ -98,7 +98,7 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
         return new Default[]{
                 // concat with ".myproxy" to avoid conflict with Globus context type
                 new Default(Context.USERPROXY, new String[]{
-                        env.getProperty("X509_USER_PROXY")+".myproxy",
+                        env.getProperty("X509_USER_PROXY")!=null ? env.getProperty("X509_USER_PROXY")+".myproxy" : null,
                         System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u"+
                                 (System.getProperty("os.name").toLowerCase().startsWith("windows")
                                         ? "_"+System.getProperty("user.name").toLowerCase()
