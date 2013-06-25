@@ -245,9 +245,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 		} catch (RemoteException e) {
 			throw new TimeoutException(e);
 		}
-        // rethrow exception if any fault in result
-        // TODO check this
-//        CreamExceptionFactory.rethrow(resultArray);
 
         // return job info
         if (resultArray.length == 1) {
@@ -303,8 +300,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 			throw new NoSuccessException(e);
 		}
 
-        // rethrow exception if any fault in result
-//        CreamExceptionFactory.rethrow(resultArray);
     }
 
     public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
