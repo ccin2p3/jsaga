@@ -10,6 +10,7 @@ import org.ogf.saga.job.JobRunInfoTest;
 import org.ogf.saga.job.JobRunInteractiveTest;
 import org.ogf.saga.job.JobRunMinimalTest;
 import org.ogf.saga.job.JobRunOptionalTest;
+import org.ogf.saga.job.JobRunRequiredTest;
 import org.ogf.saga.job.JobRunSandboxTest;
 import org.ogf.saga.task.State;
 
@@ -36,7 +37,12 @@ public class CreamExecutionTestSuite extends JSAGATestSuite {
         public CreamJobRunMinimalTest() throws Exception {super("cream");}
     }
 
-    public static class CreamJobDescriptionTest extends JobDescriptionTest {
+    // test cases
+    public static class CreamJobRunRequiredTest extends JobRunRequiredTest {
+        public CreamJobRunRequiredTest() throws Exception {super("cream");}
+    }
+    
+   public static class CreamJobDescriptionTest extends JobDescriptionTest {
         public CreamJobDescriptionTest() throws Exception {super("cream");}
         public void test_totalCPUCount() throws Exception {super.ignore("Not supported"); }
         public void test_workingDirectory() throws Exception {super.ignore("Not supported"); }
