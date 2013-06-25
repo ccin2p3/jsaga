@@ -67,6 +67,6 @@ public class CreamExecutionDestroyDelegation extends AbstractTest {
         DelegationStub stub = new DelegationStub(m_url.getHost(), m_url.getPort(), DelegationStub.ANY_VO);
         Destroy destroy = new Destroy();
         destroy.setDelegationID(m_delegationId);
-        stub.getStub().destroy(destroy);
+        stub.destroy(destroy);
     }
 }

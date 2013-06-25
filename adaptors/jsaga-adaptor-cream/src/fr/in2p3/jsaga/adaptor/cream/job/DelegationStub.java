@@ -9,6 +9,8 @@ import org.glite.ce.creamapi.ws.cream2.CREAMStub;
 import org.glite.ce.security.delegation.DelegationException_Fault;
 import org.glite.ce.security.delegation.DelegationServiceStub;
 import org.glite.ce.security.delegation.DelegationServiceStub.DelegationException;
+import org.glite.ce.security.delegation.DelegationServiceStub.Destroy;
+import org.glite.ce.security.delegation.DelegationServiceStub.DestroyResponse;
 import org.glite.ce.security.delegation.DelegationServiceStub.GetProxyReq;
 import org.glite.ce.security.delegation.DelegationServiceStub.GetTerminationTime;
 import org.glite.ce.security.delegation.DelegationServiceStub.GetTerminationTimeResponse;
@@ -86,6 +88,10 @@ public class DelegationStub {
 		}
     }
 
+    public void destroy(Destroy destroy2) throws RemoteException, DelegationException_Fault {
+    	m_stub.destroy(destroy2);
+    }
+    
     /**
      * Renew delegation, or create a new delegation if it does not exist.
      * @return null if delegation is renewed, or proxy if delegation is created
