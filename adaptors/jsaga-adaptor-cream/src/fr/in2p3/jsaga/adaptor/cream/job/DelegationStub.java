@@ -170,7 +170,7 @@ public class DelegationStub {
             }
 
             try {
-				return signRequest(pkcs10, delegationId);
+				return signRequest(pkcs10, delegationId, hours);
 			} catch (InvalidKeyException e) {
 				throw new AuthenticationFailedException(e);
 			} catch (CertificateException e) {
@@ -212,7 +212,7 @@ public class DelegationStub {
         }
     }
     
-    private String signRequest(String certReq, String delegationID)
+    private String signRequest(String certReq, String delegationID, int hours)
             throws IOException, KeyStoreException, CertificateException,
             InvalidKeyException, SignatureException,
             NoSuchAlgorithmException, NoSuchProviderException {
@@ -237,6 +237,7 @@ public class DelegationStub {
         PEMReader pemReader = new PEMReader(new StringReader(certReq));
         PKCS10CertificationRequest proxytReq = (PKCS10CertificationRequest) pemReader.readObject();
         ProxyRequestOptions csrOpt = new ProxyRequestOptions(parentChain, proxytReq);
+        csrOpt.setLifetime(hours*3600);
         
         X509Certificate[] certChain = ProxyGenerator.generate(csrOpt, pKey);
         
