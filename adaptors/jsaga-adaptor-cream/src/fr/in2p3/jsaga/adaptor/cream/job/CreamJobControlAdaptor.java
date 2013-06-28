@@ -112,9 +112,9 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         jd.setJDL(jobDesc);
         jd.setAutoStart(false);
         jd.setDelegationId(m_delegationId);
-        if (m_delegProxy != null) {
-            jd.setDelegationProxy(m_delegProxy);
-        }
+//        if (m_delegProxy != null) {
+//            jd.setDelegationProxy(m_delegProxy);
+//        }
         
         // submit job
     	JobRegisterRequest request = new JobRegisterRequest();
@@ -138,6 +138,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         
         // return jobid
         if (resultArray.length == 1) {
+//        	resultArray[0].getDelegationProxyFault()
             JobId jobid = resultArray[0].getJobId();
             if (jobid == null) {
                 throw new NoSuccessException("Null job identifier");
