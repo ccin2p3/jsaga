@@ -41,7 +41,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
 public class GlobusProxyFactory {
     public static final int OID_OLD = 2;
     public static final int OID_GLOBUS = 3;    // default
-    public static final int OID_RFC820 = 4;
+    public static final int OID_RFC3820 = 4;
     
     private static final int PROXY_BITS = 1024;
     private static final int DEFAULT_PROXY_LIFETIME = 3600 * 12;
@@ -120,7 +120,7 @@ public class GlobusProxyFactory {
                         GSIConstants.CertificateType.GSI_3_LIMITED_PROXY :
                         GSIConstants.CertificateType.GSI_3_IMPERSONATION_PROXY;
                 break;
-            case OID_RFC820:
+            case OID_RFC3820:
             	m_proxyType = (limited) ?
                         GSIConstants.CertificateType.GSI_4_LIMITED_PROXY :
                         GSIConstants.CertificateType.GSI_4_IMPERSONATION_PROXY;

@@ -9,7 +9,7 @@ import org.ietf.jgss.GSSCredential;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   GlobusSecurityAdaptorExtendedRFC820
+* File:   GlobusSecurityAdaptorExtendedRFC3820
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
 * Date:   8 oct. 2007
 * ***************************************************
@@ -17,13 +17,13 @@ import org.ietf.jgss.GSSCredential;
 /**
  *
  */
-public class GlobusSecurityAdaptorExtendedRFC820 extends GlobusSecurityAdaptor implements ExpirableSecurityAdaptor {
+public class GlobusSecurityAdaptorExtendedRFC3820 extends GlobusSecurityAdaptor implements ExpirableSecurityAdaptor {
     public String getType() {
-        return "GlobusRFC820";
+        return "GlobusRFC3820";
     }
 
     protected int getGlobusType() {
-        return GlobusProxyFactory.OID_RFC820;
+        return GlobusProxyFactory.OID_RFC3820;
     }
 
     protected boolean checkType(GSSCredential proxy) {
