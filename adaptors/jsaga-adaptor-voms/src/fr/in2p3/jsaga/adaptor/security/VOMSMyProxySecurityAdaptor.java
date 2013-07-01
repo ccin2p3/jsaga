@@ -88,8 +88,8 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
                                 protected Object throwExceptionIfInvalid(Object value) throws Exception {
                                     if (super.throwExceptionIfInvalid(value) != null) {
                                         String v = (String) value;
-                                        if (!v.equalsIgnoreCase("old") && !v.equalsIgnoreCase("globus") && !v.equalsIgnoreCase("RFC820")) {
-                                            throw new BadParameterException("Expected: old | globus | RFC820");
+                                        if (!v.equalsIgnoreCase("old") && !v.equalsIgnoreCase("globus") && !v.equalsIgnoreCase("RFC3820")) {
+                                            throw new BadParameterException("Expected: old | globus | RFC3820");
                                         }
                                     }
                                     return value;
