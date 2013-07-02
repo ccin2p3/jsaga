@@ -111,6 +111,7 @@ public class CreamExecutionTestSuite extends JSAGATestSuite {
 
     public static class CreamJobRunSandboxTest extends JobRunSandboxTest {
         public CreamJobRunSandboxTest() throws Exception {super("cream");}
+        public void test_output_workingDirectory() throws Exception { super.ignore("WorkingDirectory is not supported");   }
     }
     
     public static class CreamJobRunInteractiveTest extends JobRunInteractiveTest {
