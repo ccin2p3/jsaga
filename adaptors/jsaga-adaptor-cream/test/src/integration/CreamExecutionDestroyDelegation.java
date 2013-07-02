@@ -44,7 +44,7 @@ public class CreamExecutionDestroyDelegation extends AbstractTest {
     }
 
     public void test_destroy() throws Exception {
-        Protocol.registerProtocol("https", new Protocol("https", new CANLAXIS2SocketFactory(), 8443));
+        Protocol.registerProtocol("https", new Protocol("https", new CANLAXIS2SocketFactory(), m_url.getPort()));
         
         Properties m_sslConfig = new Properties();
         m_sslConfig.put("truststore", new File(
