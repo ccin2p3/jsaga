@@ -100,7 +100,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
-        Protocol.registerProtocol("https", new Protocol("https", new CANLAXIS2SocketFactory(), 8443));
+        Protocol.registerProtocol("https", new Protocol("https", new CANLAXIS2SocketFactory(), port));
         
         m_sslConfig = new Properties();
         m_sslConfig.put("truststore", m_certRepository.getPath());
