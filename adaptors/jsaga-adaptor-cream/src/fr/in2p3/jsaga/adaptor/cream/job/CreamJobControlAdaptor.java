@@ -160,7 +160,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         return parsedJdl.getInputStagingTransfer(jobInfo.getCREAMInputSandboxURI()+"/");
     }
     
-    // TODO: fix data staging: DoesNotExist: pb proxy delegated
     public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
     	StagingTransfer[] st;
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
@@ -189,7 +188,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 	        // build the job wrapper URI
 	        URI jobWrapper_uri = new URI(outputSandboxURI.substring(0, outputSandboxURI.length()-4) + "/" + jobInfo.getJobId().getId() + "_jobWrapper.sh");
 	        // connect to GridFTP
-	        GsiftpClient client = GsiftpDataAdaptorAbstract.createConnection(m_credential, jobWrapper_uri.getHost(), 2811, 1024*16, true);
+	        GsiftpClient client = GsiftpDataAdaptorAbstract.createConnection(m_credential, jobWrapper_uri.getHost(), 2811, 1024*16, false);
 	        // Read the job wrapper
 	        BufferedReader in = new BufferedReader(new InputStreamReader(new GsiftpInputStream(client, jobWrapper_uri.getPath())));
 	        String line = null;
