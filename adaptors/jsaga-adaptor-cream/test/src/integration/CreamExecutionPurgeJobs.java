@@ -1,8 +1,14 @@
 package integration;
 
+import eu.emi.security.canl.axis2.CANLAXIS2SocketFactory;
 import fr.in2p3.jsaga.adaptor.cream.job.CreamStub;
 import fr.in2p3.jsaga.adaptor.cream.job.DelegationStub;
 
+import org.apache.commons.httpclient.protocol.Protocol;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobFilter;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobPurgeRequest;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.Result;
 //import org.glite.ce.creamapi.ws.cream2.CREAMLocator;
 //import org.glite.ce.creamapi.ws.cream2.CREAMPort;
 //import org.glite.ce.creamapi.ws.cream2.types.JobFilter;
@@ -14,6 +20,7 @@ import org.ogf.saga.url.URLFactory;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.Properties;
 
 //import javax.xml.rpc.ServiceException;
 
@@ -48,25 +55,35 @@ public class CreamExecutionPurgeJobs extends AbstractTest {
     }
 
     public void test_purge() throws Exception {
-//        System.setProperty("sslCAFiles", new File(new File(new File(System.getProperty("user.home"),".globus"),"certificates"),"*.0").getAbsolutePath());
-//
-//        // set filter
-//        JobFilter filter = new JobFilter();
-//        if (m_delegationId != null) {
-//            filter.setDelegationId(m_delegationId);
-//        }
-//
-//        // purge jobs
-////        CreamStub creamStub = new CreamStub(m_url.getHost(), m_url.getPort(), DelegationStub.ANY_VO);
-//    	CREAMLocator cream_service = new CREAMLocator();
-//    	try {
-//			// TODO: check CREAM2 ou CREAM ???
-//			cream_service.setCREAM2EndpointAddress(m_url.getString());
-//			CREAMPort creamStub = cream_service.getCREAM2();
-//	        Result[] resultArray = creamStub.jobPurge(filter).getResult();
-//	        System.out.println(resultArray.length+" have been purged!");
-//		} catch (ServiceException e) {
-//            throw new BadParameterException(e.getMessage(), e);
-//		}
+        Protocol.registerProtocol("https", new Protocol("https", new CANLAXIS2SocketFactory(), 8443));
+        
+        Properties m_sslConfig = new Properties();
+        m_sslConfig.put("truststore", new File(
+        									new File(
+        										new File(
+        											new File(System.getProperty("user.home"), ".jsaga"),
+        										"contexts"),
+        									"voms"),
+        								"certificates")
+        								.getAbsolutePath());
+        m_sslConfig.put("proxy", new File(
+        							new File(
+    										new File(System.getProperty("user.home"), ".jsaga"),
+        							"tmp"),
+        						 "voms_cred.txt")
+        						 .getAbsolutePath());
+        							
+        CANLAXIS2SocketFactory.setCurrentProperties(m_sslConfig);
+
+        // set filter
+        JobFilter filter = new JobFilter();
+        if (m_delegationId != null) {
+            filter.setDelegationId(m_delegationId);
+        }
+        JobPurgeRequest jpr = new JobPurgeRequest();
+        jpr.setJobPurgeRequest(filter);
+        CREAMStub creamStub = new CREAMStub(new java.net.URL("https", m_url.getPath(), m_url.getPort(), "/ce-cream/services/CREAM2").toString());
+        Result[] resultArray = creamStub.jobPurge(jpr).getJobPurgeResponse().getResult();
+        System.out.println(resultArray.length+" have been purged!");
     }
 }
