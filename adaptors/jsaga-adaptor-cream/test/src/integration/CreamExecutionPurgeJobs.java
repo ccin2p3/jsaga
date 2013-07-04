@@ -82,8 +82,13 @@ public class CreamExecutionPurgeJobs extends AbstractTest {
         }
         JobPurgeRequest jpr = new JobPurgeRequest();
         jpr.setJobPurgeRequest(filter);
-        CREAMStub creamStub = new CREAMStub(new java.net.URL("https", m_url.getPath(), m_url.getPort(), "/ce-cream/services/CREAM2").toString());
-        Result[] resultArray = creamStub.jobPurge(jpr).getJobPurgeResponse().getResult();
-        System.out.println(resultArray.length+" have been purged!");
+        String url = new java.net.URL("https", m_url.getHost(), m_url.getPort(), "/ce-cream/services/CREAM2").toString();
+        CREAMStub creamStub = new CREAMStub(url);
+        try {
+        	Result[] resultArray = creamStub.jobPurge(jpr).getJobPurgeResponse().getResult();
+        	System.out.println(resultArray.length+" have been purged!");
+        } catch (NullPointerException npe) {
+        	System.out.println("no jobs have been purged!");
+        }
     }
 }
