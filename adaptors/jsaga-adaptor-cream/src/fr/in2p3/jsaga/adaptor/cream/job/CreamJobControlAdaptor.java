@@ -15,8 +15,15 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.apache.axis2.databinding.types.URI;
 import org.apache.log4j.Logger;
 import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.CommandResult;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoRequest;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobPurgeRequest;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobResumeRequest;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobResumeResponse;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobStartRequest;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobSuspendRequest;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobSuspendResponse;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.ResultChoice_type0;
 import org.glite.ce.creamapi.ws.cream2.Generic_Fault;
 import org.glite.ce.creamapi.ws.cream2.InvalidArgument_Fault;
 import org.glite.ce.creamapi.ws.cream2.JobSubmissionDisabled_Fault;
@@ -30,6 +37,7 @@ import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterRequest;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterResponse;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterResult;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.Result;
+import org.glite.ce.creamapi.ws.cream2.OperationNotSupported_Fault;
 import org.ogf.saga.error.*;
 
 import java.io.BufferedReader;
@@ -282,7 +290,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         try {
             resultArray = m_creamStub.jobCancel(request).getJobCancelResponse().getResult();
 		} catch (Authorization_Fault e) {
-			throw new NoSuccessException(e);
+			throw new PermissionDeniedException(e);
 		} catch (Generic_Fault e) {
 			throw new NoSuccessException(e);
 		} catch (InvalidArgument_Fault e) {
@@ -293,73 +301,96 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 
     }
 
-    // TODO: clean
     public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
-        // purge job
-//        Result[] resultArray;
-//        try {
-//            resultArray = m_creamStub.jobPurge(filter).getResult();
-//		} catch (AuthorizationFault e) {
-//			throw new NoSuccessException(e);
-//		} catch (GenericFault e) {
-//			throw new NoSuccessException(e);
-//		} catch (InvalidArgumentFault e) {
-//			throw new NoSuccessException(e);
-//		} catch (RemoteException e) {
-//			throw new NoSuccessException(e);
-//		}
-
-        // rethrow exception if any fault in result
-//        CreamExceptionFactory.rethrow(resultArray);
+        JobPurgeRequest request = new JobPurgeRequest();
+        request.setJobPurgeRequest(filter);
+        
+        // cancel job
+        Result[] resultArray;
+        try {
+            resultArray = m_creamStub.jobPurge(request).getJobPurgeResponse().getResult();
+		} catch (Authorization_Fault e) {
+			throw new PermissionDeniedException(e);
+		} catch (Generic_Fault e) {
+			throw new NoSuccessException(e);
+		} catch (InvalidArgument_Fault e) {
+			throw new NoSuccessException(e);
+		} catch (RemoteException e) {
+			throw new NoSuccessException(e);
+		}
     }
 
-    // TODO: hold
 	public boolean hold(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
-        // hold job
-//        Result[] resultArray;
-//        try {
-//            resultArray = m_creamStub.jobSuspend(filter).getResult();
-//		} catch (AuthorizationFault e) {
-//			throw new NoSuccessException(e);
-//		} catch (GenericFault e) {
-//			throw new NoSuccessException(e);
-//		} catch (InvalidArgumentFault e) {
-//			throw new NoSuccessException(e);
-//		} catch (RemoteException e) {
-//			throw new NoSuccessException(e);
-//		}
-//        if (resultArray[0].getJobStatusInvalidFault() != null) return false;
-//        // Not sure why we get this exception sometimes:
-//        if (resultArray[0].getJobUnknownFault() != null) return false;
-        return true;
+        JobSuspendRequest request = new JobSuspendRequest();
+        request.setJobSuspendRequest(filter);
+        
+        // cancel job
+        Result[] resultArray;
+        try {
+        	JobSuspendResponse jsr = m_creamStub.jobSuspend(request);
+            resultArray = jsr.getJobSuspendResponse().getResult();
+		} catch (Authorization_Fault e) {
+			throw new PermissionDeniedException(e);
+		} catch (Generic_Fault e) {
+			throw new NoSuccessException(e);
+		} catch (InvalidArgument_Fault e) {
+			throw new NoSuccessException(e);
+		} catch (RemoteException e) {
+			throw new NoSuccessException(e);
+		} catch (OperationNotSupported_Fault e) {
+			return false;
+		}
+        return getBooleanResult(resultArray[0]);
 	}
 
-	// TODO: release
 	public boolean release(String nativeJobId) throws PermissionDeniedException, TimeoutException,	NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
-        // release job
-//        Result[] resultArray;
-//        try {
-//            resultArray = m_creamStub.jobResume(filter).getResult();
-//		} catch (AuthorizationFault e) {
-//			throw new NoSuccessException(e);
-//		} catch (GenericFault e) {
-//			throw new NoSuccessException(e);
-//		} catch (InvalidArgumentFault e) {
-//			throw new NoSuccessException(e);
-//		} catch (RemoteException e) {
-//			throw new NoSuccessException(e);
-//		}
-//
-//        if (resultArray[0].getJobStatusInvalidFault() != null) return false;
-//        // Not sure why we get this exception sometimes:
-//        if (resultArray[0].getJobUnknownFault() != null) return false;
-        return true;
+        JobResumeRequest request = new JobResumeRequest();
+        request.setJobResumeRequest(filter);
+        
+        // cancel job
+        Result[] resultArray;
+        try {
+        	CommandResult jrr = m_creamStub.jobResume(request).getJobResumeResponse();
+            resultArray = jrr.getResult();
+		} catch (Authorization_Fault e) {
+			throw new PermissionDeniedException(e);
+		} catch (Generic_Fault e) {
+			throw new NoSuccessException(e);
+		} catch (InvalidArgument_Fault e) {
+			throw new NoSuccessException(e);
+		} catch (RemoteException e) {
+			throw new NoSuccessException(e);
+		} catch (OperationNotSupported_Fault e) {
+			return false;
+		}
+        return getBooleanResult(resultArray[0]);
 	}
 
+	private boolean getBooleanResult(Result res) throws NoSuccessException, PermissionDeniedException {
+        ResultChoice_type0 err = res.getResultChoice_type0();
+        if (err != null) {
+        	if (err.isJobStatusInvalidFaultSpecified()) {
+        		return false;
+        	} else if (err.isJobUnknownFaultSpecified()) {
+        		throw new NoSuccessException(err.getJobUnknownFault().getDescription());
+        	} else if (err.isDateMismatchFaultSpecified()) {
+        		throw new NoSuccessException(err.getDateMismatchFault().getDescription());
+        	} else if (err.isDelegationIdMismatchFaultSpecified()) {
+        		throw new PermissionDeniedException(err.getDelegationIdMismatchFault().getDescription());
+        	} else if (err.isGenericFaultSpecified()) {
+        		throw new NoSuccessException(err.getGenericFault().getDescription());
+        	} else if (err.isLeaseIdMismatchFaultSpecified()) {
+        		throw new NoSuccessException(err.getLeaseIdMismatchFault().getDescription());
+        	} else {
+        		throw new NoSuccessException("Unable to get Fault");
+        	}
+        }
+        return true;
+	}
 }
