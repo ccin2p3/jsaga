@@ -30,7 +30,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>axistools-maven-plugin</artifactId>
                 <!--<version>1.0</version>--><!-- axis 1.2.1 -->
-                <version>1.4</version><!-- axis 1.4 -->
+                <version>1.1</version><!-- axis 1.4 -->
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
