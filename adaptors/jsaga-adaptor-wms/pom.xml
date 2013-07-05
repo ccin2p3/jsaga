@@ -81,7 +81,7 @@
 	<repositories>
 		<repository>
 			<id>emi-infn-repo</id>
-			<url>http://devel12.cnaf.infn.it:7444/maven/repository</url>
+			<url>http://www.pd.infn.it/~andreett/pub/maven/repository/</url>
 		</repository>
 	</repositories>
 </project>
