@@ -106,9 +106,27 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
+            <!-- 
+            	1) The Maven deploy plugin DOES NOT use the SSH client configuration.
+            	2) Giving the username in the URL DOES NOT work. The username must be given in settings.xml in the <server> part.
+            	3) The configuration with SSH public key does not work in settings.xml
+            	4) The password of the remote user is (encypted) in settings.xml
+            	5) The public key of the SFTP server must be added to the client's known_hosts file
+             -->
+                <maven.repository>sftp://maven.in2p3.fr/www/htdocs</maven.repository>
+            <!-- 
+            	1) The Maven site-deploy plugin DOES NOT use the SSH client configuration.
+            	2) Giving the username in the URL DOES work, but for security reasons, it is rather given in settings.xml in the <server> part.
+            	3) The public key of the SFTP server must be added to the client's known_hosts file
+             -->
+                <project.web.site>sftp://software.in2p3.fr/www/htdocs/jsaga-dev</project.web.site>
+            </properties>
+            <!--
+            <properties>
                 <maven.repository>file:///afs/in2p3.fr/home/throng/ccin2p3/grid/maven2</maven.repository>
                 <project.web.site>sftp://gridsoft@grid.in2p3.fr:/www/htdocs/jsaga-dev</project.web.site>
             </properties>
+            -->
             <build>
                 <plugins>
                     <plugin>
