@@ -1,19 +1,13 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
 import org.apache.axis2.AxisFault;
-import org.apache.commons.httpclient.protocol.Protocol;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.openssl.PEMReader;
-import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub;
 import org.glite.ce.security.delegation.DelegationException_Fault;
 import org.glite.ce.security.delegation.DelegationServiceStub;
-import org.glite.ce.security.delegation.DelegationServiceStub.DelegationException;
 import org.glite.ce.security.delegation.DelegationServiceStub.Destroy;
-import org.glite.ce.security.delegation.DelegationServiceStub.DestroyResponse;
 import org.glite.ce.security.delegation.DelegationServiceStub.GetProxyReq;
 import org.glite.ce.security.delegation.DelegationServiceStub.GetTerminationTime;
-import org.glite.ce.security.delegation.DelegationServiceStub.GetTerminationTimeResponse;
 import org.glite.ce.security.delegation.DelegationServiceStub.PutProxy;
 import org.glite.ce.security.delegation.DelegationServiceStub.RenewProxyReq;
 //import org.glite.ce.security.delegation.Delegation;
@@ -44,7 +38,7 @@ import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
-import java.util.Properties;
+
 
 //import javax.xml.rpc.ServiceException;
 
@@ -55,7 +49,6 @@ import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 import eu.emi.security.authn.x509.proxy.ProxyRequestOptions;
-import eu.emi.security.canl.axis2.CANLAXIS2SocketFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
