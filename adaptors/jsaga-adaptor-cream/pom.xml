@@ -22,29 +22,6 @@
     </developers>
     <build>
 		<plugins>
-            <!-- <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>axistools-maven-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirectory>${basedir}/resources/wsdl</sourceDirectory>
-                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
-                            <timestampDirectory>${project.build.directory}</timestampDirectory>
-                            <fileNamespaceToPackage>${basedir}/resources/wsdl/NStoPkg.properties</fileNamespaceToPackage>
-                            <wsdlFiles>
-                            	<wsdlFile>org.glite.ce-cream2_service.wsdl</wsdlFile>
-                            	<wsdlFile>www.gridsite.org-delegation-2.0.0.wsdl</wsdlFile>
-                            </wsdlFiles>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>-->
              <plugin>
                 <groupId>org.apache.axis2</groupId>
                 <artifactId>axis2-wsdl2code-maven-plugin</artifactId>
@@ -76,6 +53,19 @@
                     </execution>
                 </executions>
             </plugin>           
+	    <plugin>
+    	       <groupId>org.codehaus.mojo</groupId>
+    	       <artifactId>build-helper-maven-plugin</artifactId>
+    	       <executions>
+                   <execution>
+                       <phase>generate-sources</phase>
+                           <goals><goal>add-source</goal></goals>
+                           <configuration>
+                               <sources> <source>${project.build.directory}/generated-sources</source> </sources>
+                           </configuration>
+                   </execution>
+               </executions>
+            </plugin>
             <plugin><!-- copy jar -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
