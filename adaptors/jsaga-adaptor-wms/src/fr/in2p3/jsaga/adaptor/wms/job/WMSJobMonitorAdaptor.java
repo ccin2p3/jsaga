@@ -160,11 +160,6 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        // get job Status
 	        JobFlagsValue[] jobFlagsValue = new JobFlagsValue[1];
 	        jobFlagsValue[0] = JobFlagsValue.CLASSADS;
-<<<<<<< HEAD
-=======
-//	        JobFlags jobFlags = new JobFlags(jobFlagsValue);
-//	        jobFlags.setFlag(jobFlagsValue);
->>>>>>> refs/heads/master
 	        org.glite.wsdl.types.lb.JobStatus jobInfo = stub.jobStatus(nativeJobId, new JobFlags(jobFlagsValue));
 	        if(jobInfo == null) {
 	            throw new NoSuccessException("Unable to get information about job: "+nativeJobId);
