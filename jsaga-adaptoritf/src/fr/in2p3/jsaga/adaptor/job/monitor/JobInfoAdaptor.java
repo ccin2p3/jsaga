@@ -19,7 +19,7 @@ import java.util.Date;
 public interface JobInfoAdaptor extends JobMonitorAdaptor {
     /**
      * @param nativeJobId the identifier of the job in the grid
-     * @return the exit code of the job
+     * @return the exit code of the job as an Integer or null if the code does not exit or in not numeric
      * @throws NotImplementedException if not supported by the adaptor
      * @throws NoSuccessException if failed to get the exit code
      */
