@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.orionssh.data;
 
-import com.jcraft.jsch.SftpATTRS;
+import com.trilead.ssh2.SFTPv3FileAttributes;
+
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 
@@ -27,9 +28,9 @@ public class SFTPFileAttributes extends FileAttributes {
 	private static final int S_IXOTH = 00001; // execute/search by others
 
     private String m_filename;
-    private SftpATTRS m_attrs;
+    private SFTPv3FileAttributes m_attrs;
 
-	public SFTPFileAttributes(String filename, SftpATTRS attrs) {
+	public SFTPFileAttributes(String filename, SFTPv3FileAttributes attrs) {
         m_filename = filename;
         m_attrs = attrs;
     }
@@ -39,9 +40,9 @@ public class SFTPFileAttributes extends FileAttributes {
     }
 
     public int getType() {
-        if(m_attrs.isDir()) {
+        if(m_attrs.isDirectory()) {
             return TYPE_DIRECTORY;
-        } else if(m_attrs.isLink()) {
+        } else if(m_attrs.isSymlink()) {
             return TYPE_LINK;
         } else {
             return TYPE_FILE;
@@ -49,7 +50,7 @@ public class SFTPFileAttributes extends FileAttributes {
     }
 
     public long getSize() {
-        return m_attrs.getSize();
+        return m_attrs.size;
     }
 
     public PermissionBytes getUserPermission() {
@@ -66,7 +67,7 @@ public class SFTPFileAttributes extends FileAttributes {
 
     private PermissionBytes getPermission(int read, int write, int exec) {
         PermissionBytes perms = PermissionBytes.NONE;
-        int sftpPerms = m_attrs.getPermissions();
+        int sftpPerms = m_attrs.permissions;
         if((sftpPerms & read) != 0)
             perms = perms.or(PermissionBytes.READ);
         if((sftpPerms & write) != 0)
@@ -77,14 +78,14 @@ public class SFTPFileAttributes extends FileAttributes {
     }
 
     public String getOwner() {
-        return String.valueOf(m_attrs.getUId());
+        return String.valueOf(m_attrs.uid);
     }
 
     public String getGroup() {
-        return String.valueOf(m_attrs.getGId());
+        return String.valueOf(m_attrs.gid);
     }
 
     public long getLastModified() {
-        return ((long) m_attrs.getMTime()) * 1000;
+        return m_attrs.mtime.longValue() * 1000;
     }
 }
