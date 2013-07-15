@@ -5,7 +5,6 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.orionssh.job.SSHJobProcess;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
@@ -20,8 +19,11 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 
 import com.trilead.ssh2.Connection;
+import com.trilead.ssh2.ConnectionInfo;
+import com.trilead.ssh2.SCPClient;
 import com.trilead.ssh2.SFTPv3Client;
 import com.trilead.ssh2.SFTPv3FileAttributes;
+import com.trilead.ssh2.SFTPv3FileHandle;
 import com.trilead.ssh2.Session;
 import com.trilead.ssh2.channel.Channel;
 
@@ -59,6 +61,8 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 	protected SecurityCredential credential;
 	private int compression_level = 0;
 	protected SFTPv3Client m_sftp;
+	protected SCPClient m_scp;
+	protected final static int READ_BUFFER_LEN = 32768;
 	
     public Class[] getSupportedSecurityCredentialClasses() {
         return new Class[]{UserPassSecurityCredential.class, UserPassStoreSecurityCredential.class, SSHSecurityCredential.class};
@@ -99,6 +103,7 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 //				jsch.setKnownHosts((String) attributes.get(KNOWN_HOSTS));
 //			}
     		Connection conn = new Connection(host, port);
+    		conn.connect();
     		boolean isAuthenticated = false;
     		if(credential instanceof UserPassSecurityCredential) {
         		String userId = ((UserPassSecurityCredential) credential).getUserID();
@@ -120,6 +125,7 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 //        		}
 //    			session = jsch.getSession(userId, host, port);
         		char[] pemPrivateKey = new String(privateKey).toCharArray();
+        		// FIXME
         		isAuthenticated = conn.authenticateWithPublicKey(userId, pemPrivateKey, passPhrase);
         	} else if (credential instanceof UserPassStoreSecurityCredential) {
 				try {
@@ -169,6 +175,7 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 //    		m_sftp = (ChannelSftp) session.openChannel("sftp");
 //    		m_sftp.connect();
     		m_sftp = new SFTPv3Client(conn);
+    		m_scp = new SCPClient(conn);
 
     	} catch (Exception e) {
     		if(e.getMessage().equals("Auth fail"))
@@ -182,49 +189,52 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     		m_sftp.close();
         	m_sftp = null;
     	}
+    	if (m_scp != null) {
+        	m_sftp = null;
+    	}
     	if (session != null) {
     		session.close();
     		session = null;
     	}
     }
     
-    public  void store(SSHJobProcess p, String nativeJobId) throws IOException, InterruptedException {
-    	byte[] buf = serialize(p);
-		OutputStream os = m_sftp.put(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".process");
-    	os.write(buf);
-    	os.close();
-    }
-    
-    private static byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(buffer);
-        oos.writeObject(obj);
-        oos.close();
-        return buffer.toByteArray();
-    }
-
-    public SSHJobProcess restore(String nativeJobId) throws IOException, ClassNotFoundException,  InterruptedException {
-    	String processFile = SSHJobProcess.getRootDir() + "/" + nativeJobId + ".process";
-		SFTPv3FileAttributes attrs = m_sftp.lstat(processFile);
-    	byte[] buf = new byte[attrs.size.intValue()];
-		InputStream is = m_sftp.get(processFile);
-    	int len = is.read(buf);
-    	is.close();
-
-    	return (SSHJobProcess)deserialize(buf);
-    }
-    
-    private static Object deserialize(byte[] bytes)
-            throws ClassNotFoundException {
-        try {
-            ByteArrayInputStream input = new ByteArrayInputStream(bytes);
-            ObjectInputStream ois = new ObjectInputStream(input);
-            return ois.readObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("error reading from byte-array!");
-        }
-    }
+//    public  void store(SSHJobProcess p, String nativeJobId) throws IOException, InterruptedException {
+//    	byte[] buf = serialize(p);
+//    	m_scp.put(buf, nativeJobId + ".process", SSHJobProcess.getRootDir());
+//    }
+//    
+//    private static byte[] serialize(Object obj) throws IOException {
+//        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+//        ObjectOutputStream oos = new ObjectOutputStream(buffer);
+//        oos.writeObject(obj);
+//        oos.close();
+//        return buffer.toByteArray();
+//    }
+//
+//    public SSHJobProcess restore(String nativeJobId) throws IOException, ClassNotFoundException,  InterruptedException {
+//    	String processFile = SSHJobProcess.getRootDir() + "/" + nativeJobId + ".process";
+//		SFTPv3FileAttributes attrs = m_sftp.lstat(processFile);
+//    	byte[] buf = new byte[attrs.size.intValue()];
+//    	SFTPv3FileHandle f = m_sftp.openFileRO(processFile);
+//    	int len = m_sftp.read(f, 0, buf,0, buf.length);
+//    	if (len != buf.length) {
+//    		throw new IOException("Read " + len + " + characters out of " + buf.length);
+//    	}
+//    	m_sftp.closeFile(f);
+//    	return (SSHJobProcess)deserialize(buf);
+//    }
+//    
+//    private static Object deserialize(byte[] bytes)
+//            throws ClassNotFoundException {
+//        try {
+//            ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+//            ObjectInputStream ois = new ObjectInputStream(input);
+//            return ois.readObject();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            throw new RuntimeException("error reading from byte-array!");
+//        }
+//    }
     
 //    protected void finalize() throws Throwable {
 //    	try {
