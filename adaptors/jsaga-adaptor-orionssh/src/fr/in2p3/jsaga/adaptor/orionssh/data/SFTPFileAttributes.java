@@ -44,8 +44,10 @@ public class SFTPFileAttributes extends FileAttributes {
             return TYPE_DIRECTORY;
         } else if(m_attrs.isSymlink()) {
             return TYPE_LINK;
-        } else {
+        } else if (m_attrs.isRegularFile()) {
             return TYPE_FILE;
+        } else {
+        	return TYPE_UNKNOWN;
         }
     }
 

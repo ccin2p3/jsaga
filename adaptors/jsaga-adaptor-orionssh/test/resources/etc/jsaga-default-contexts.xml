@@ -2,11 +2,9 @@
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <contexts>
         <context type="SSH">
-            <!-- <attribute name="UserID" value="${user.name}"/>--><!-- optional -->
             <attribute name="UserKey" value="${user.home}/.jsaga/contexts/ssh/id_rsa"/>
             <attribute name="UserPass" value="${SSHKEY_PASSPHRASE}"/>
             <data type="orionsftp"/>
-            <job type="orionssh"/>
             <include host="localhost"/>
         </context>
     </contexts>
@@ -18,7 +16,7 @@
             <data type="orionsftp">
            		<attribute name="FilenameEncoding" value="ISO-8859-1"/>
             </data>
-            <job type="orionssh"/>
+            <!-- <job type="orionssh"/> -->
             <include host="ccsyre*.in2p3.fr"/>
             <exclude host="localhost"/>
 	    </context>
@@ -26,13 +24,13 @@
             <attribute name="UserID" value="${user.name}"/>
             <attribute name="UserPass" value="${AFS_PASSWORD}"/>
             <data type="orionsftp"/>
-            <job type="orionssh"/>
+            <!-- <job type="orionssh"/> -->
             <include host="ccali61.in2p3.fr"/>
             <exclude host="localhost"/>
 	    </context>
 	    <context type="UserPassStore" id="netrc">
             <data type="orionsftp"/>
-            <job type="orionssh"/>
+            <!-- <job type="orionssh"/> -->
             <include host="ccali05.in2p3.fr"/>
             <exclude host="localhost"/>
 	    </context>
