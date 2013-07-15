@@ -56,12 +56,12 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 	
 	protected static final String COMPRESSION_LEVEL = "CompressionLevel";
 	protected static final String KNOWN_HOSTS = "KnownHosts";
-	protected Session session;
+//	protected Session session;
 	protected static Map sessionMap = new HashMap();
 	protected SecurityCredential credential;
 	private int compression_level = 0;
 	protected SFTPv3Client m_sftp;
-	protected SCPClient m_scp;
+//	protected SCPClient m_scp;
 	protected final static int READ_BUFFER_LEN = 32768;
 	
     public Class[] getSupportedSecurityCredentialClasses() {
@@ -171,11 +171,11 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 //			}
 			// oonnect
 //    		session.connect();
-    		session = conn.openSession();
+//    		session = conn.openSession();
 //    		m_sftp = (ChannelSftp) session.openChannel("sftp");
 //    		m_sftp.connect();
     		m_sftp = new SFTPv3Client(conn);
-    		m_scp = new SCPClient(conn);
+//    		m_scp = new SCPClient(conn);
 
     	} catch (Exception e) {
     		if(e.getMessage().equals("Auth fail"))
@@ -189,13 +189,13 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     		m_sftp.close();
         	m_sftp = null;
     	}
-    	if (m_scp != null) {
-        	m_sftp = null;
-    	}
-    	if (session != null) {
-    		session.close();
-    		session = null;
-    	}
+//    	if (m_scp != null) {
+//        	m_scp = null;
+//    	}
+//    	if (session != null) {
+//    		session.close();
+//    		session = null;
+//    	}
     }
     
 //    public  void store(SSHJobProcess p, String nativeJobId) throws IOException, InterruptedException {
