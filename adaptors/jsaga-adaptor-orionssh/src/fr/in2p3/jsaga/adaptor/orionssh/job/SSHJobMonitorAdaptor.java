@@ -2,7 +2,9 @@ package fr.in2p3.jsaga.adaptor.orionssh.job;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -57,14 +59,18 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 
 	public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
-			Vector<SFTPv3DirectoryEntry> v = m_sftp.ls(SSHJobProcess.getRootDir());// + "/*." + SSHJobProcess.PROCESS_SUFFIX);
-			// TODO: filter *.process
-			String[] listOfJobs = new String[v.size()];
+			Vector<SFTPv3DirectoryEntry> v = m_sftp.ls(SSHJobProcess.getRootDir());
+			List<String> processes = new ArrayList<String>();
+			String suffix = "." + SSHJobProcess.PROCESS_SUFFIX;
 			for (int i=0; i<v.size(); i++) {
 				String file = ((SFTPv3DirectoryEntry)v.elementAt(i)).filename;
-				listOfJobs[i] = file.substring(0, file.length()-8);
+				if (file.endsWith(suffix)) {
+					processes.add(file.substring(0, file.length()-suffix.length()));
+				}
 			}
-			return listOfJobs;
+			String[] listOfJobs = new String[processes.size()];
+			return processes.toArray(listOfJobs);
+			
 		} catch (SFTPException e) {
 			if (e.getServerErrorCode() == ErrorCodes.SSH_FX_NO_SUCH_FILE)
 				throw new NoSuccessException(e);
@@ -122,12 +128,9 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 
 	private Integer getReturnCode(String nativeJobId) throws NoSuccessException {
     	try {    	
-//			InputStream is = m_sftp.get(new SSHJobProcess(nativeJobId).getEndcodeFile());
 			SFTPv3FileHandle f = m_sftp.openFileRO(new SSHJobProcess(nativeJobId).getEndcodeFile());
 	    	byte[] buf = new byte[4];
-//	    	int len = is.read(buf);
 			int len = m_sftp.read(f, 0, buf, 0, buf.length);
-//	    	is.close();
 			m_sftp.closeFile(f);
     		return new Integer(new String(buf).trim());
     	} catch (SFTPException sftpe) {

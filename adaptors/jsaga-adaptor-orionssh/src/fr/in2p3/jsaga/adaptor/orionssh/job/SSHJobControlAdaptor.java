@@ -140,12 +140,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		SSHExecutionChannel channelCancel=null;
 		try {
 			channelCancel = new SSHExecutionChannel(m_conn);
-//			channelCancel.setCommand("kill `cat " + new SSHJobProcess(nativeJobId).getPidFile() + "`;");
-//			channelCancel.connect();
 			channelCancel.execute("kill `cat " + new SSHJobProcess(nativeJobId).getPidFile() + "`;");
-//			while(!channelCancel.isClosed()) {
-//				Thread.sleep(100);
-//			}
 			int error = channelCancel.getExitStatus();
 			if (error > 0) {
 				throw new Exception("Cancel command failed with error code: " + error);
@@ -159,17 +154,16 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 
 	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
+		SSHExecutionChannel cleanChannel=null;
 		try {
 			SSHJobProcess sshjp = new SSHJobProcess(nativeJobId);
-			m_sftp.rm(sshjp.getFile(".*"));
-			try {
-				m_sftp.rmdir(sshjp.getGeneratedWorkingDirectory());
-			} catch (Exception e1) {
-				e1.printStackTrace();
-				// ignore: the working directory could be user defined
-			}
+			cleanChannel = new SSHExecutionChannel(m_conn);
+			String cmd = "rm -rf " + sshjp.getGeneratedWorkingDirectory() + "*";
+			cleanChannel.execute(cmd);
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
+		} finally {
+			if (cleanChannel != null) cleanChannel.close();
 		}
 	}
 
@@ -255,11 +249,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 
 	        command.append(_exec);
 			String cde = "cat << EOS | bash -s \n" + command.toString() + "EOS\n";
-			System.out.println("NEW command="+cde);
-//	        channel.setCommand(cde);
-	
-//			channel.connect();
-//			Thread.sleep(1000);
+			//System.out.println("NEW command="+cde);
 			channel.execute(cde, 1000);
 			if (channel.isClosed()) {
 				int error = channel.getExitStatus();
@@ -267,7 +257,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 				// Here this is simulated by storing returnCode into the serialized object
 				sshjp.setReturnCode(error);
 				store(sshjp, nativeJobId);
-	            System.out.println("channel is closed and return = " + error);
+	            //System.out.println("channel is closed and return = " + error);
 			}
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
