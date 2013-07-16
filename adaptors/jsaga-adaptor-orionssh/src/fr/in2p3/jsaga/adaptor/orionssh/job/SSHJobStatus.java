@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.adaptor.orionssh.job;
 
-import com.jcraft.jsch.Channel;
 import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
@@ -9,8 +8,8 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
 * File:   SSHJobStatus
-* Author: Nicolas DEMESY (nicolas.demesy@bt.com)
-* Date:   11 avril 2008
+ * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+ * Date:   16 juillet 2013
 * ***************************************************/
 
 public class SSHJobStatus extends JobStatus {
@@ -39,12 +38,12 @@ public class SSHJobStatus extends JobStatus {
 		}
     }
     
-    public SSHJobStatus(String jobId, Channel channel) {
-    	this(jobId, channel.isConnected(), "unknown", channel.getExitStatus());
-    }
+//    public SSHJobStatus(String jobId, Channel channel) {
+//    	this(jobId, channel.isConnected(), "unknown", channel.getExitStatus());
+//    }
 
 	public String getModel() {
-        return "ssh";
+        return SSHJobControlAdaptor.TYPE;
     }
 
     public SubState getSubState() {

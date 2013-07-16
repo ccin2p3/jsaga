@@ -5,14 +5,15 @@ import org.ogf.saga.error.NoSuccessException;
 
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.local.LocalJobProcess;
+import fr.in2p3.jsaga.adaptor.orionssh.data.SFTPDataAdaptor;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
 * File:   SSHJobProcess
-* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
-* Date:   22 avril 2011
+ * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+ * Date:   16 juillet 2013
 * ***************************************************/
 
 public class SSHJobProcess extends LocalJobProcess {
@@ -74,7 +75,7 @@ public class SSHJobProcess extends LocalJobProcess {
     @Override
 	protected String toURL(String filename) throws NoSuccessException {
 		try {
-			return "sftp://" + m_host + ":" + m_port + "/" + getWorkingDirectory() + "/" + filename;
+			return SFTPDataAdaptor.TYPE + "://" + m_host + ":" + m_port + "/" + getWorkingDirectory() + "/" + filename;
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
 		}

@@ -11,19 +11,21 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 import fr.in2p3.jsaga.adaptor.orionssh.SSHAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.orionssh.data.SFTPFileAttributes;
 
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
-import com.jcraft.jsch.ChannelSftp.LsEntry;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpATTRS;
-import com.jcraft.jsch.SftpException;
+import com.trilead.ssh2.SFTPException;
+import com.trilead.ssh2.SFTPv3DirectoryEntry;
+import com.trilead.ssh2.SFTPv3FileHandle;
+import com.trilead.ssh2.sftp.ErrorCodes;
 
 
 /* ***************************************************
@@ -31,8 +33,8 @@ import com.jcraft.jsch.SftpException;
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
 * File:   SSHJobMonitorAdaptor
-* Author: Nicolas DEMESY (nicolas.demesy@bt.com)
-* Date:   11 avril 2008
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   16 juillet 2013
 * ***************************************************/
 
 public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryIndividualJob, ListableJobAdaptor, JobInfoAdaptor {
@@ -53,31 +55,35 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
     	return new SSHJobStatus(nativeJobId, rc);
     }        
 
-	public String[] list() throws PermissionDeniedException, TimeoutException,
-			NoSuccessException {
+	public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
-			Vector v = m_sftp.ls(SSHJobProcess.getRootDir() + "/*." + SSHJobProcess.PROCESS_SUFFIX);
+			Vector<SFTPv3DirectoryEntry> v = m_sftp.ls(SSHJobProcess.getRootDir());// + "/*." + SSHJobProcess.PROCESS_SUFFIX);
+			// TODO: filter *.process
 			String[] listOfJobs = new String[v.size()];
 			for (int i=0; i<v.size(); i++) {
-				String file = ((LsEntry)v.elementAt(i)).getFilename();
+				String file = ((SFTPv3DirectoryEntry)v.elementAt(i)).filename;
 				listOfJobs[i] = file.substring(0, file.length()-8);
 			}
 			return listOfJobs;
-		} catch (SftpException e) {
+		} catch (SFTPException e) {
+			if (e.getServerErrorCode() == ErrorCodes.SSH_FX_NO_SUCH_FILE)
+				throw new NoSuccessException(e);
+			if (e.getServerErrorCode() == ErrorCodes.SSH_FX_PERMISSION_DENIED)
+				throw new PermissionDeniedException(e);
+    		throw new NoSuccessException(e);
+		} catch (IOException e) {
     		throw new NoSuccessException(e);
 		}
 	}
 
-	public Integer getExitCode(String nativeJobId)
-		throws NotImplementedException, NoSuccessException {
+	public Integer getExitCode(String nativeJobId)	throws NotImplementedException, NoSuccessException {
 		Integer rc = getReturnCode(nativeJobId);
 		if (rc == SSHJobProcess.PROCESS_RUNNING)
 			throw new NoSuccessException("Process not finished, exit code not available");
 		return rc;
 	}
 	
-	public Date getCreated(String nativeJobId) throws NotImplementedException,
-			NoSuccessException {
+	public Date getCreated(String nativeJobId) throws NotImplementedException, 	NoSuccessException {
 		try {
 			SSHJobProcess sshjp = restore(nativeJobId);
 			return sshjp.getCreated();
@@ -85,61 +91,56 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 			throw new NoSuccessException(e);
 		} catch (ClassNotFoundException e) {
 			throw new NoSuccessException(e);
-		} catch (JSchException e) {
-			throw new NoSuccessException(e);
-		} catch (SftpException e) {
-			throw new NoSuccessException(e);
 		} catch (InterruptedException e) {
 			throw new NoSuccessException(e);
 		}
 	}
 
-	public Date getStarted(String nativeJobId) throws NotImplementedException,
-			NoSuccessException {
+	public Date getStarted(String nativeJobId) throws NotImplementedException, NoSuccessException {
+		String filename = new SSHJobProcess(nativeJobId).getPidFile();
 		try {
-			SftpATTRS attrs = m_sftp.stat(new SSHJobProcess(nativeJobId).getPidFile());
-			return new Date(attrs.getMTime());
-		} catch (SftpException e) {
-			throw new NoSuccessException("Cannot get started time, the job has not started yet");
+			SFTPFileAttributes attrs = new SFTPFileAttributes(filename, m_sftp.stat(filename));
+			return new Date(attrs.getLastModified());
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
 		}
 	}
 
-	public Date getFinished(String nativeJobId) throws NotImplementedException,
-			NoSuccessException {
+	public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException {
+		String filename = new SSHJobProcess(nativeJobId).getEndcodeFile();
 		try {
-			SftpATTRS attrs = m_sftp.stat(new SSHJobProcess(nativeJobId).getEndcodeFile());
-			return new Date(attrs.getMTime());
-		} catch (SftpException e) {
-			throw new NoSuccessException("Cannot get finish time, the job may still be running");
+			SFTPFileAttributes attrs = new SFTPFileAttributes(filename, m_sftp.stat(filename));
+			return new Date(attrs.getLastModified());
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
 		}
 	}
 
-	public String[] getExecutionHosts(String nativeJobId)
-			throws NotImplementedException, NoSuccessException {
+	public String[] getExecutionHosts(String nativeJobId) throws NotImplementedException, NoSuccessException {
 		return new String[]{m_host};
 	}
 
 	private Integer getReturnCode(String nativeJobId) throws NoSuccessException {
     	try {    	
-			InputStream is = m_sftp.get(new SSHJobProcess(nativeJobId).getEndcodeFile());
+//			InputStream is = m_sftp.get(new SSHJobProcess(nativeJobId).getEndcodeFile());
+			SFTPv3FileHandle f = m_sftp.openFileRO(new SSHJobProcess(nativeJobId).getEndcodeFile());
 	    	byte[] buf = new byte[4];
-	    	int len = is.read(buf);
-	    	is.close();
+//	    	int len = is.read(buf);
+			int len = m_sftp.read(f, 0, buf, 0, buf.length);
+//	    	is.close();
+			m_sftp.closeFile(f);
     		return new Integer(new String(buf).trim());
-					
-    	} catch (SftpException sftpe) {
+    	} catch (SFTPException sftpe) {
     		// try first to get serialized object
     		try {
 				SSHJobProcess sjp = this.restore(nativeJobId);
 				return sjp.getReturnCode();
 			} catch (IOException e) {
 			} catch (ClassNotFoundException e) {
-			} catch (JSchException e) {
-			} catch (SftpException e) {
 			} catch (InterruptedException e) {
 			}
     		return SSHJobProcess.PROCESS_RUNNING;
-    	} catch (Exception e) {
+    	} catch (IOException e) {
     		throw new NoSuccessException(e);
 		}
 	}

@@ -9,9 +9,9 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   SFTPFileAttributes
-* Author: Nicolas DEMESY (nicolas.demesy@bt.com)
-* Date:   11 avril 2008
+* File:   SSHJobMonitorAdaptor
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   16 juillet 2013
 * ***************************************************/
 
 public class SFTPFileAttributes extends FileAttributes {

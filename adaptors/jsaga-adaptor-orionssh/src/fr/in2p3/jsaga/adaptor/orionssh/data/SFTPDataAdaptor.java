@@ -32,17 +32,18 @@ import java.util.Vector;
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
  * File:   SFTPDataAdaptor
- * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
- * Date:   11 avril 2008
+ * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+ * Date:   16 juillet 2013
  * ***************************************************/
 
 public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		FileReaderGetter, FileWriterPutter, DataRename {
 //	private ChannelSftp channelSftp;
 	protected static final String FILENAME_ENCODING = "FilenameEncoding";
+	public final static String TYPE = "orionsftp";
 	
 	public String getType() {
-		return "orionsftp";
+		return TYPE;
 	}
 
     public int getDefaultPort() {
@@ -86,8 +87,8 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 //		super.disconnect();
 //	}
 
-	public void getToStream(String absolutePath, String additionalArgs,
-			OutputStream stream) throws PermissionDeniedException, BadParameterException,
+	public void getToStream(String absolutePath, String additionalArgs, OutputStream stream) 
+			throws PermissionDeniedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
 		try {
 			SFTPv3FileHandle f = m_sftp.openFileRO(absolutePath);
@@ -133,61 +134,56 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) 
     		throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-            String filename = new EntryPath(absolutePath).getEntryName();
-            SFTPv3FileAttributes attrs;
-			try {
-				attrs = m_sftp.stat(absolutePath);
-			} catch (SFTPException sftpe) {
-				switch (sftpe.getServerErrorCode()) {
-					case ErrorCodes.SSH_FX_NO_SUCH_FILE:
-						throw new DoesNotExistException(sftpe);
-					case ErrorCodes.SSH_FX_PERMISSION_DENIED:
-						throw new PermissionDeniedException(sftpe);
-					default:
-						throw new NoSuccessException(sftpe);
-				}
-			} catch (IOException e) {
-				throw new NoSuccessException(e);
+        String filename = new EntryPath(absolutePath).getEntryName();
+        SFTPv3FileAttributes attrs;
+		try {
+			attrs = m_sftp.stat(absolutePath);
+		} catch (SFTPException sftpe) {
+			switch (sftpe.getServerErrorCode()) {
+				case ErrorCodes.SSH_FX_NO_SUCH_FILE:
+					throw new DoesNotExistException(sftpe);
+				case ErrorCodes.SSH_FX_PERMISSION_DENIED:
+					throw new PermissionDeniedException(sftpe);
+				default:
+					throw new NoSuccessException(sftpe);
 			}
-            return new SFTPFileAttributes(filename, attrs);
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		}
+        return new SFTPFileAttributes(filename, attrs);
     }
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) 
     		throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-			Vector<SFTPv3DirectoryEntry> vv;
-			try {
-				vv = m_sftp.ls(absolutePath);
-			} catch (FileNotFoundException fnfe) {
-				throw new DoesNotExistException(fnfe);
-			} catch (IOException e) {
-				// TODO handle exception
-				throw new NoSuccessException(e);
-			}
-			if (vv != null && vv.size() > 2) {
-				// remove . and .. in the list
-				FileAttributes[] list = new SFTPFileAttributes[vv.size() - 2];
-				int index=0;
-				for (int ii = 0; ii < vv.size(); ii++) {
-					Object obj = vv.elementAt(ii);
-					if (obj instanceof SFTPv3DirectoryEntry) {
-						SFTPv3DirectoryEntry entry = (SFTPv3DirectoryEntry) obj;
-                        if (!".".equals(entry.filename) && !"..".equals(entry.filename)) {
-                        	list[index++] = new SFTPFileAttributes(entry.filename, entry.attributes);
-                        }
-					}
+		Vector<SFTPv3DirectoryEntry> vv;
+		try {
+			vv = m_sftp.ls(absolutePath);
+		} catch (SFTPException e) {
+			if (e.getServerErrorCode() == ErrorCodes.SSH_FX_NO_SUCH_FILE)
+				throw new DoesNotExistException(e);
+			if (e.getServerErrorCode() == ErrorCodes.SSH_FX_PERMISSION_DENIED)
+				throw new PermissionDeniedException(e);
+			throw new NoSuccessException(e);
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		}
+		if (vv != null && vv.size() > 2) {
+			// remove . and .. in the list
+			FileAttributes[] list = new SFTPFileAttributes[vv.size() - 2];
+			int index=0;
+			for (int ii = 0; ii < vv.size(); ii++) {
+				Object obj = vv.elementAt(ii);
+				if (obj instanceof SFTPv3DirectoryEntry) {
+					SFTPv3DirectoryEntry entry = (SFTPv3DirectoryEntry) obj;
+                    if (!".".equals(entry.filename) && !"..".equals(entry.filename)) {
+                    	list[index++] = new SFTPFileAttributes(entry.filename, entry.attributes);
+                    }
 				}
-				return list;
-			} else {
-				return new SFTPFileAttributes[0];
 			}
-            // TODO: handle DoesNotExist
-//		} catch (SftpException e) {
-//			if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
-//				throw new DoesNotExistException(e);
-//			if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED)
-//				throw new PermissionDeniedException(e);
-//			throw new NoSuccessException(e);
-//		}
+			return list;
+		} else {
+			return new SFTPFileAttributes[0];
+		}
 	}
 
 	public void putFromStream(String absolutePath, boolean append, String additionalArgs, InputStream stream) 
@@ -234,22 +230,9 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 				// shift offset
 				offset += rsz;
 			}
+		} catch (IOException ex) {
+			throw new NoSuccessException(ex);
 		}
-		catch (IOException ex) {
-	      /* ... */
-		}
-//		try {
-//			if (append)
-//				channelSftp.put(stream, absolutePath, ChannelSftp.APPEND);
-//			else
-//				channelSftp.put(stream, absolutePath, ChannelSftp.OVERWRITE);
-//		} catch (SftpException e) {
-//			if (!exists(absolutePath, additionalArgs))
-//				throw new AlreadyExistsException(e);
-//			if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED)
-//				throw new PermissionDeniedException(e);
-//			throw new NoSuccessException(e);
-//		}
 	}
 
 	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) 

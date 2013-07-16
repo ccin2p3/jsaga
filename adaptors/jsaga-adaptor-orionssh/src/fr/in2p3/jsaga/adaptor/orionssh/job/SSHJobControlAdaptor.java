@@ -1,9 +1,5 @@
 package fr.in2p3.jsaga.adaptor.orionssh.job;
 
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
 
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
@@ -18,8 +14,14 @@ import fr.in2p3.jsaga.adaptor.job.local.LocalAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.job.local.LocalJobProcess;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.orionssh.SSHAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.orionssh.SSHExecutionChannel;
 
 import org.ogf.saga.error.*;
+
+import com.trilead.ssh2.SFTPException;
+import com.trilead.ssh2.Session;
+import com.trilead.ssh2.sftp.AttribPermissions;
+import com.trilead.ssh2.sftp.ErrorCodes;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -41,8 +43,8 @@ import java.util.regex.Matcher;
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
  * File:   SSHJobControlAdaptor
- * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
- * Date:   11 avril 2008
+ * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+ * Date:   16 juillet 2013
  * ***************************************************/
 
 /**
@@ -52,30 +54,10 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorTwoPhase {
 
     private static final String ROOTDIR = "RootDir";
-
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
-    	super.connect(userInfo, host, port, basePath, attributes);
-		String fullUrl = "";
-		for (String d: SSHJobProcess.getRootDir().split("/")) {
-			fullUrl += d + "/";
-			try {
-				m_sftp.mkdir(fullUrl);
-			} catch (SftpException e) {
-				if (e.id == ChannelSftp.SSH_FX_FAILURE) { // Already Exists
-					// ignore
-				} else if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED) {
-					m_sftp.disconnect();
-					throw new AuthorizationFailedException(e);
-				} else {
-					m_sftp.disconnect();
-					throw new NoSuccessException(e); 
-				}
-			}
-		}
-    }
+    protected static final String TYPE = "orionssh";
     
     public String getType() {
-		return "orionssh";
+		return TYPE;
 	}
 
 	public JobMonitorAdaptor getDefaultJobMonitor() {
@@ -88,28 +70,52 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
         return translator;
     }
 
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) 
+    		throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, 
+    		BadParameterException, TimeoutException, NoSuccessException {
+    	super.connect(userInfo, host, port, basePath, attributes);
+		String fullUrl = "";
+		for (String d: SSHJobProcess.getRootDir().split("/")) {
+			fullUrl += d + "/";
+			try {
+				m_sftp.mkdir(fullUrl, AttribPermissions.S_IRUSR	| AttribPermissions.S_IWUSR	| AttribPermissions.S_IXUSR);
+			} catch (SFTPException e) {
+				if (e.getServerErrorCode() == ErrorCodes.SSH_FX_FAILURE) { // Already Exists
+					// ignore
+				} else if (e.getServerErrorCode() == ErrorCodes.SSH_FX_PERMISSION_DENIED) {
+//					m_sftp.disconnect();
+					throw new AuthorizationFailedException(e);
+				} else {
+//					m_sftp.disconnect();
+					throw new NoSuccessException(e); 
+				}
+			} catch (IOException e) {
+				throw new NoSuccessException(e); 
+			}
+		}
+    }
+    
     private SSHJobProcess submit(String jobDesc, String uniqId)
 			throws PermissionDeniedException, TimeoutException, BadResource, NoSuccessException {
-    	SSHJobProcess sjp;
+    	SSHJobProcess sjp = null;
 		try {
-			sjp = new SSHJobProcess(uniqId, jobDesc, session.getHost(), session.getPort(), m_sftp.getHome());
-		} catch (SftpException sftpe) {
-			throw new NoSuccessException(sftpe);
-		}
-    	sjp.checkResources();
-    	// create user working directory only if not specified
-		try {
+	    	sjp = new SSHJobProcess(uniqId, jobDesc, m_conn.getHostname(), m_conn.getPort(), m_sftp.canonicalPath("."));
+	    	sjp.checkResources();
+	    	// create user working directory only if not specified
 			if (!sjp.isUserWorkingDirectory()) {
-				m_sftp.mkdir(sjp.getWorkingDirectory());
+				m_sftp.mkdir(sjp.getWorkingDirectory(), 
+						AttribPermissions.S_IRUSR
+						| AttribPermissions.S_IWUSR
+						| AttribPermissions.S_IXUSR);
 			}
-		} catch (SftpException e) {
-			if (e.id == ChannelSftp.SSH_FX_FAILURE) { // Already Exists
+		} catch (SFTPException e) {
+			if (e.getServerErrorCode() == ErrorCodes.SSH_FX_FAILURE) { // Already Exists
 				// ignore
-			} else if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED) {
-				m_sftp.disconnect();
+			} else if (e.getServerErrorCode() == ErrorCodes.SSH_FX_PERMISSION_DENIED) {
+//				m_sftp.disconnect();
 				throw new PermissionDeniedException(e);
 			} else {
-				m_sftp.disconnect();
+//				m_sftp.disconnect();
 				throw new NoSuccessException(e); 
 			}
 		} catch (IOException e) {
@@ -131,14 +137,15 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 
 	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
-		ChannelExec channelCancel=null;
+		SSHExecutionChannel channelCancel=null;
 		try {
-			channelCancel = (ChannelExec) session.openChannel("exec");
-			channelCancel.setCommand("kill `cat " + new SSHJobProcess(nativeJobId).getPidFile() + "`;");
-			channelCancel.connect();
-			while(!channelCancel.isClosed()) {
-				Thread.sleep(100);
-			}
+			channelCancel = new SSHExecutionChannel(m_conn);
+//			channelCancel.setCommand("kill `cat " + new SSHJobProcess(nativeJobId).getPidFile() + "`;");
+//			channelCancel.connect();
+			channelCancel.execute("kill `cat " + new SSHJobProcess(nativeJobId).getPidFile() + "`;");
+//			while(!channelCancel.isClosed()) {
+//				Thread.sleep(100);
+//			}
 			int error = channelCancel.getExitStatus();
 			if (error > 0) {
 				throw new Exception("Cancel command failed with error code: " + error);
@@ -146,7 +153,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		} finally {
-			if (channelCancel != null) channelCancel.disconnect();
+			if (channelCancel != null) channelCancel.close();
 		}
 	}
 
@@ -158,6 +165,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			try {
 				m_sftp.rmdir(sshjp.getGeneratedWorkingDirectory());
 			} catch (Exception e1) {
+				e1.printStackTrace();
 				// ignore: the working directory could be user defined
 			}
 		} catch (Exception e) {
@@ -193,10 +201,6 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			throw new NoSuccessException(e);
 		} catch (ClassNotFoundException e) {
 			throw new NoSuccessException(e);
-		} catch (JSchException e) {
-			throw new NoSuccessException(e);
-		} catch (SftpException e) {
-			throw new NoSuccessException(e);
 		} catch (InterruptedException e) {
 			throw new NoSuccessException(e);
 		}
@@ -212,10 +216,6 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			throw new NoSuccessException(e);
 		} catch (ClassNotFoundException e) {
 			throw new NoSuccessException(e);
-		} catch (JSchException e) {
-			throw new NoSuccessException(e);
-		} catch (SftpException e) {
-			throw new NoSuccessException(e);
 		} catch (InterruptedException e) {
 			throw new NoSuccessException(e);
 		}
@@ -224,7 +224,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 	public void start(String nativeJobId) throws PermissionDeniedException,
 			TimeoutException, NoSuccessException {
 		try {
-			ChannelExec channel = (ChannelExec) session.openChannel("exec");
+			SSHExecutionChannel channel = new SSHExecutionChannel(m_conn);
 	    	
 	    	ShellScriptBuffer command = new ShellScriptBuffer();
 			Properties jobProps = new Properties();
@@ -255,30 +255,28 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 
 	        command.append(_exec);
 			String cde = "cat << EOS | bash -s \n" + command.toString() + "EOS\n";
-//			System.out.println("NEW command="+cde);
-	        channel.setCommand(cde);
+			System.out.println("NEW command="+cde);
+//	        channel.setCommand(cde);
 	
-			channel.connect();
-			Thread.sleep(1000);
+//			channel.connect();
+//			Thread.sleep(1000);
+			channel.execute(cde, 1000);
 			if (channel.isClosed()) {
 				int error = channel.getExitStatus();
 				// It is possible that the wrapper script failed without writing any .endcode file
 				// Here this is simulated by storing returnCode into the serialized object
 				sshjp.setReturnCode(error);
 				store(sshjp, nativeJobId);
-	            //System.out.println("channel is closed and return = " + error);
+	            System.out.println("channel is closed and return = " + error);
 			}
-		} catch (JSchException e) {
-			throw new NoSuccessException(e);
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
 		} catch (ClassNotFoundException e) {
-			throw new NoSuccessException(e);
-		} catch (SftpException e) {
 			throw new NoSuccessException(e);
 		} catch (InterruptedException e) {
 			throw new NoSuccessException(e);
 		}
 	
 	}
+	
 }
