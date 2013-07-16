@@ -27,6 +27,7 @@
         <!--<module>jsaga-adaptor-naregi</module>-->
         <module>jsaga-adaptor-batchssh</module>
         <module>jsaga-adaptor-ssh</module>
+        <module>jsaga-adaptor-orionssh</module>
         <module>jsaga-adaptor-ssh2</module>
         <module>jsaga-adaptor-irods</module>
         <module>jsaga-adaptor-mail</module>
