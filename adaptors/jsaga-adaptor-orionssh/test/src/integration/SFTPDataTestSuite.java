@@ -31,10 +31,10 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
 
     /** test cases */
     public static class SFTPNSEntryTest extends NSEntryTest {
-        public SFTPNSEntryTest() throws Exception {super("sftp");}
+        public SFTPNSEntryTest() throws Exception {super("orionsftp");}
     }
     public static class SFTPDirectoryListTest extends DirectoryListTest {
-        public SFTPDirectoryListTest() throws Exception {super("sftp");}
+        public SFTPDirectoryListTest() throws Exception {super("orionsftp");}
         public void test_list_and_getAttributes() throws Exception {
         	String new_content = "new_content";
             if (m_file instanceof File) {
@@ -52,19 +52,21 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
 	              for (URL dirEntry: dirContent) {
 //	                   if (m_subDir.isEntry(dirEntry)) {
 	                       String fileName = dirEntry.getPath();
-	                       File f = FileFactory.createFile(m_session, URLFactory.createURL(m_subDir.getURL().toString() + fileName));
-	                       long size = f.getSize();
-	                       long date = f.getMTime();
-	                       boolean readPermisssion = f.permissionsCheck("*", Permission.READ.getValue());
-	                       boolean writePermission = f.permissionsCheck("*", Permission.WRITE.getValue());
-	                       boolean executePermission = f.permissionsCheck("*", Permission.EXEC.getValue());
-	
-	                       System.out.println(
-	                               fileName + " " +
-	                               (readPermisssion ? "r" : "-") + (writePermission ? "w" : "-") + (executePermission ? "x" : "-") + " " + 
-	                               (date != 0l ? new SimpleDateFormat("dd-MMM-yyyy HH:mm").format(new Date(date)) : "?") + " " 
-	                               + (size != 0l ? "" + size + "B": "?")
-	                               );
+	                       String url = m_subDir.getURL().toString() + fileName;
+	                       System.out.println(url);
+	                       File f = FileFactory.createFile(m_session, URLFactory.createURL(url)/*, Flags.NONE.getValue()*/);
+//	                       long size = f.getSize();
+//	                       long date = f.getMTime();
+//	                       boolean readPermisssion = f.permissionsCheck("*", Permission.READ.getValue());
+//	                       boolean writePermission = f.permissionsCheck("*", Permission.WRITE.getValue());
+//	                       boolean executePermission = f.permissionsCheck("*", Permission.EXEC.getValue());
+//	
+//	                       System.out.println(
+//	                               fileName + " " +
+//	                               (readPermisssion ? "r" : "-") + (writePermission ? "w" : "-") + (executePermission ? "x" : "-") + " " + 
+//	                               (date != 0l ? new SimpleDateFormat("dd-MMM-yyyy HH:mm").format(new Date(date)) : "?") + " " 
+//	                               + (size != 0l ? "" + size + "B": "?")
+//	                               );
 	                       f.close();
 //	                   }
 	              }
@@ -77,33 +79,33 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
 
     }
     public static class SFTPDirectoryMakeTest extends DirectoryMakeTest {
-        public SFTPDirectoryMakeTest() throws Exception {super("sftp");}
+        public SFTPDirectoryMakeTest() throws Exception {super("orionsftp");}
     }
     public static class SFTPDirectoryTest extends DirectoryTest {
-        public SFTPDirectoryTest() throws Exception {super("sftp");}
+        public SFTPDirectoryTest() throws Exception {super("orionsftp");}
     }
     public static class SFTPFileReadTest extends FileReadTest {
-        public SFTPFileReadTest() throws Exception {super("sftp");}
+        public SFTPFileReadTest() throws Exception {super("orionsftp");}
     }
     public static class SFTPFileWriteTest extends FileWriteTest {
-        public SFTPFileWriteTest() throws Exception {super("sftp");}
+        public SFTPFileWriteTest() throws Exception {super("orionsftp");}
     }
     public static class SFTPNSCopyTest extends NSCopyTest {
-        public SFTPNSCopyTest() throws Exception {super("sftp", "sftp");}
+        public SFTPNSCopyTest() throws Exception {super("orionsftp", "orionsftp");}
     }
     public static class SFTPNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public SFTPNSCopyRecursiveTest() throws Exception {super("sftp", "sftp");}
+        public SFTPNSCopyRecursiveTest() throws Exception {super("orionsftp", "orionsftp");}
     }
     public static class SFTPNSMoveTest extends NSMoveTest {
-        public SFTPNSMoveTest() throws Exception {super("sftp", "sftp");}
+        public SFTPNSMoveTest() throws Exception {super("orionsftp", "orionsftp");}
     }
     public static class SFTP_to_EmulatorNSCopyTest extends NSCopyTest {
-        public SFTP_to_EmulatorNSCopyTest() throws Exception {super("sftp", "test");}
+        public SFTP_to_EmulatorNSCopyTest() throws Exception {super("orionsftp", "test");}
     }
     public static class SFTP_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public SFTP_to_EmulatorNSCopyRecursiveTest() throws Exception {super("sftp", "test");}
+        public SFTP_to_EmulatorNSCopyRecursiveTest() throws Exception {super("orionsftp", "test");}
     }
     public static class SFTP_to_EmulatorNSMoveTest extends NSMoveTest {
-        public SFTP_to_EmulatorNSMoveTest() throws Exception {super("sftp", "test");}
+        public SFTP_to_EmulatorNSMoveTest() throws Exception {super("orionsftp", "test");}
     }
 }
