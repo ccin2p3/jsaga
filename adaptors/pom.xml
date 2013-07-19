@@ -108,6 +108,7 @@
                         <configuration>
                             <file>${project.build.directory}/${project.build.finalName}-sources.zip</file>
                             <url>${maven.repository}</url>
+                            <repositoryId>maven2-repository</repositoryId>
                             <groupId>fr.in2p3.jsaga.adaptor</groupId>
                             <artifactId>sources</artifactId>
                             <version>latest</version>
