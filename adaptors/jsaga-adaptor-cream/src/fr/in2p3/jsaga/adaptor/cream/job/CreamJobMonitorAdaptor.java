@@ -101,16 +101,33 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
 	}
 
 	public Date getCreated(String nativeJobId) throws NotImplementedException,	NoSuccessException {
-		return this.getLastCommand(nativeJobId).getCreationTime().getTime();
+        try {
+    		return getStatus(nativeJobId, new String[]{CreamJobStatus.REGISTERED})
+    				.getTimestamp()
+    				.getTime();
+		} catch (TimeoutException e) {
+			throw new NoSuccessException(e);
+		}
 	}
 
 	public Date getStarted(String nativeJobId) throws NotImplementedException,	NoSuccessException {
-		return this.getLastCommand(nativeJobId).getStartProcessingTime().getTime();
+        try {
+    		return getStatus(nativeJobId, new String[]{CreamJobStatus.REALLY_RUNNING})
+    				.getTimestamp()
+    				.getTime();
+		} catch (TimeoutException e) {
+			throw new NoSuccessException(e);
+		}
 	}
 
 	public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException {
-		// TODO getExecutionCompletedTime() for JOB_START returns null
-		return this.getLastCommand(nativeJobId).getExecutionCompletedTime().getTime();
+        try {
+    		return getStatus(nativeJobId, new String[]{CreamJobStatus.DONE_OK, CreamJobStatus.DONE_FAILED, CreamJobStatus.CANCELLED})
+    				.getTimestamp()
+    				.getTime();
+		} catch (TimeoutException e) {
+			throw new NoSuccessException(e);
+		}
 	}
 
 	public String[] getExecutionHosts(String nativeJobId) throws NotImplementedException, NoSuccessException {
@@ -123,15 +140,27 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
 
 	/*-----------------*/
 	/* Private methods */
-	/*-----------------*/
-	private Command getLastCommand(String nativeJobId) throws NotImplementedException, NoSuccessException {
-		try {
-			Command[] cmds = this.getJobInfoResult(new String[]{nativeJobId})[0].getLastCommand();
-			return cmds[cmds.length-1];
-		} catch (TimeoutException e) {
-			throw new NoSuccessException(e);
+	/*-----------------*/	
+	private CreamJobStatus getStatus(String nativeJobId, String[] requestedStatuses) throws NoSuccessException, TimeoutException {
+    	Status[] stats = this.getJobInfoResult(new String[]{nativeJobId})[0].getStatus();
+		for (Status stat: stats) {
+			for (String requestedStatus: requestedStatuses) {
+				if (stat.getName().equals(requestedStatus)) {
+					return new CreamJobStatus(stat);
+				}
+			}
 		}
+		throw new NoSuccessException("Status not available");
 	}
+	
+//	private Command getLastCommand(String nativeJobId) throws NotImplementedException, NoSuccessException {
+//		try {
+//			Command[] cmds = this.getJobInfoResult(new String[]{nativeJobId})[0].getLastCommand();
+//			return cmds[cmds.length-1];
+//		} catch (TimeoutException e) {
+//			throw new NoSuccessException(e);
+//		}
+//	}
 	
     private JobInfo[] getJobInfoResult(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
         JobId[] jobIdList = new JobId[nativeJobIdArray.length];
@@ -166,7 +195,7 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
             // extract  job info
             JobInfo info = resultArray[i].getJobInfo();
             if (info == null) {
-                throw new NoSuccessException("Empty info for job: "+filter.getJobId());
+                throw new NoSuccessException("Empty info for job: "+nativeJobIdArray[i]);
             }
             infos[i] = info;
         }
