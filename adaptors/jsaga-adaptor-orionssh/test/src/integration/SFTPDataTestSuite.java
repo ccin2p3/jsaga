@@ -39,12 +39,12 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
         	String new_content = "new_content";
             if (m_file instanceof File) {
             	// Write another file
-                URL file2Url = createURL(m_subDirUrl, "File2.txt");
-                NSEntry file = m_subDir.open(file2Url, FLAGS_FILE);
-                Buffer buffer = BufferFactory.createBuffer(new_content.getBytes());
-                ((File)file).write(buffer);
-                file.close();
-                checkWrited(file2Url, new_content);
+//                URL file2Url = createURL(m_subDirUrl, "File2.txt");
+//                NSEntry file = m_subDir.open(file2Url, FLAGS_FILE);
+//                Buffer buffer = BufferFactory.createBuffer(new_content.getBytes());
+//                ((File)file).write(buffer);
+//                file.close();
+//                checkWrited(file2Url, new_content);
                 // delete created file
                 List <URL> dirContent = m_subDir.list();
 //              m_dir.close();
@@ -53,7 +53,7 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
 //	                   if (m_subDir.isEntry(dirEntry)) {
 	                       String fileName = dirEntry.getPath();
 	                       String url = m_subDir.getURL().toString() + fileName;
-	                       System.out.println(url);
+//	                       System.out.println(url);
 	                       File f = FileFactory.createFile(m_session, URLFactory.createURL(url)/*, Flags.NONE.getValue()*/);
 //	                       long size = f.getSize();
 //	                       long date = f.getMTime();
@@ -70,7 +70,7 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
 	                       f.close();
 //	                   }
 	              }
-                file.remove();
+//                file.remove();
             } else {
                 fail("Not an instance of class: File");
             }
