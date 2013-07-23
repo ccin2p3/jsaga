@@ -6,7 +6,7 @@
             <question>What are the pre-requisites for building JSAGA adaptors ?</question>
             <answer>
                 <ul>
-                    <li>Install <a href="http://java.sun.com/j2se/1.5/download.html">JDK 1.5</a> (or above)</li>
+                    <li>Install <a href="http://www.oracle.com/technetwork/java/index.html">JDK 1.6</a> (or above)</li>
                     <li>Install <a href="http://maven.apache.org/download.html">Maven 2.2.1</a></li>
                 </ul>
             </answer>
@@ -15,7 +15,7 @@
             <question>How to create a new adaptor for JSAGA ?</question>
             <answer>
                 <ul>
-                    <li>Install <a href="http://grid.in2p3.fr/maven2/org/apache/maven/archetypes/maven-archetype-jsaga/1.0/maven-archetype-jsaga-1.0.jar">JSAGA Archetype 1.0</a> (or later)
+                    <li>Install <a href="http://maven.in2p3.fr//org/apache/maven/archetypes/maven-archetype-jsaga/1.0/maven-archetype-jsaga-1.0.jar">JSAGA Archetype 1.0</a> (or later)
                         <pre>mvn install:install-file -DgroupId=org.apache.maven.archetypes \
 -DartifactId=maven-archetype-jsaga -Dversion=1.0 -Dpackaging=jar \
 -Dfile=maven-archetype-jsaga-1.0.jar</pre>
@@ -38,7 +38,7 @@
             <answer>
                 <ul>
                     <li>Download and extract the latest version of the adaptor from
-                        <a href="http://grid.in2p3.fr/maven2/fr/in2p3/jsaga/adaptor/sources/latest/">here</a>.
+                        <a href="http://maven.in2p3.fr/fr/in2p3/jsaga/adaptor/sources/latest/">here</a>.
                     </li>
                     <li>Modify the code.
                     </li>

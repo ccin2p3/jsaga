@@ -30,7 +30,7 @@
                         of attribute "DefaultJdlFile" in etc/jsaga-default-contexts.xml configuration file.
                     </li>
                     <li>Default JDL attributes can be put directly into the etc/jsaga-default-contexts.xml configuration file
-                        (see example http://grid.in2p3.fr/software/jsaga-dev/adaptors/jsaga-adaptor-wms/example.html).
+                        (see example http://software.in2p3.fr/jsaga-dev/adaptors/jsaga-adaptor-wms/example.html).
                     </li>
                     <li>In addition to default JDL requirements, user-defined requirements can be added at run-time
                         by setting the non-standard attribute "JDLRequirements" in your job description.

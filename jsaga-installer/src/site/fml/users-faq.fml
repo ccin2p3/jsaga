@@ -59,7 +59,7 @@ java -cp .:$CLASSPATH -DJSAGA_HOME=$JSAGA_HOME List file:///</pre>
                 <pre><![CDATA[    <repositories>
         <repository>
             <id>CC-IN2P3 maven repository</id>
-            <url>http://grid.in2p3.fr/maven2</url>
+            <url>http://maven.in2p3.fr/</url>
         </repository>
     </repositories>]]></pre>
                 <p>Add to your project file the dependencies needed for build:</p>
