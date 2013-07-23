@@ -47,9 +47,6 @@ import java.util.regex.Matcher;
  * Date:   16 juillet 2013
  * ***************************************************/
 
-/**
- * TODO : Support of pre-requisite
- */
 public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorTwoPhase {
 
