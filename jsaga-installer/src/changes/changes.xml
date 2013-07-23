@@ -3,6 +3,12 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
+        <release version="0.9.17">
+            <action dev="lschwarz" type="update">Upgrade to JGlobus2</action>
+            <action dev="lschwarz" type="update">jsaga-* commands have been moved to "examples/" directory. Usage of these commands is not officially supported anymore and thus discouraged</action>
+            <action dev="lschwarz" type="update">WSGRAM adaptor has been removed</action>
+            <action dev="lschwarz" type="update">NAREGI adaptor has been removed</action>
+        </release>
         <release version="0.9.15" date="2012-12-11" description="Last release based on jglobus 1.8">
             <action dev="rreuillon" type="add">New SSH adaptor based upon Ganymed-ssh2 library</action>
             <action dev="lschwarz" type="update">Implementation of optional features for Cream</action>
