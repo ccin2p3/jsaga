@@ -31,8 +31,8 @@
                         <phase>process-resources</phase>
                         <goals><goal>filter</goal></goals>
                         <configuration>
-                            <file>config/bin/template.sh</file>
-                            <outputDirectory>${project.build.directory}/bin</outputDirectory>
+                            <file>config/examples/template.sh</file>
+                            <outputDirectory>${project.build.directory}/examples</outputDirectory>
                             <outputExtension>sh</outputExtension>
                             <propertyName>class.name</propertyName>
                             <propertyValues>assembly/filter.properties</propertyValues>
@@ -43,8 +43,8 @@
                         <phase>process-resources</phase>
                         <goals><goal>filter</goal></goals>
                         <configuration>
-                            <file>config/bin/template.bat</file>
-                            <outputDirectory>${project.build.directory}/bin</outputDirectory>
+                            <file>config/examples/template.bat</file>
+                            <outputDirectory>${project.build.directory}/examples</outputDirectory>
                             <outputExtension>bat</outputExtension>
                             <propertyName>class.name</propertyName>
                             <propertyValues>assembly/filter.properties</propertyValues>

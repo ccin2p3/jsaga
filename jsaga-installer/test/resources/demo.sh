@@ -1,16 +1,16 @@
 #!/bin/sh
 
 cp ./doc/etc/jsaga-default-contexts.xml ./etc/
-./bin/jsaga-help.bat -s default
+./examples/jsaga-help.bat -s default
 
-./bin/jsaga-context-info.bat
-./bin/jsaga-context-init.bat
-./bin/jsaga-context-info.bat
+./examples/jsaga-context-info.bat
+./examples/jsaga-context-init.bat
+./examples/jsaga-context-info.bat
 
-./bin/jsaga-job-run.bat
-./bin/jsaga-job-run.bat -Executable /bin/hostname -r fork://localhost
-cat doc/job-resources.txt | while read url ; do echo $url ; ./bin/jsaga-job-run.bat -Executable /bin/hostname -r "$url" ; done
+./examples/jsaga-job-run.bat
+./examples/jsaga-job-run.bat -Executable /bin/hostname -r fork://localhost
+cat doc/job-resources.txt | while read url ; do echo $url ; ./examples/jsaga-job-run.bat -Executable /examples/hostname -r "$url" ; done
 
-./bin/jsaga-ls.bat -l file://c:/
-cat doc/data-resources.txt | while read url ; do echo $url ; ./bin/jsaga-ls.bat -l $url ; done
-./bin/jsaga-cat.bat
+./examples/jsaga-ls.bat -l file://c:/
+cat doc/data-resources.txt | while read url ; do echo $url ; ./examples/jsaga-ls.bat -l $url ; done
+./examples/jsaga-cat.bat

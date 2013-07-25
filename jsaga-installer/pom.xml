@@ -232,7 +232,7 @@
                 <version>2.2-beta-2</version><!-- WARNING: regression with 2.2-beta-4 -->
                 <configuration>
                     <descriptors>
-                        <descriptor>assembly/bin.xml</descriptor>
+                        <descriptor>assembly/examples.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>
