@@ -252,6 +252,11 @@ public class LocalJobProcess implements Serializable {
     	} catch (Exception e) {
     		// ignore
     	}
+    	try {
+    		new File(getWorkingDirectory()).delete();
+    	} catch (Exception e){
+    		// ignore
+    	}
     }
 
 	public int getProcessStatus() throws NoSuccessException {

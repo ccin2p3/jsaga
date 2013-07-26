@@ -90,8 +90,8 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                                     protected Object throwExceptionIfInvalid(Object value) throws Exception {
                                         if (super.throwExceptionIfInvalid(value) != null) {
                                             String v = (String) value;
-                                            if (!v.equalsIgnoreCase("old") && !v.equalsIgnoreCase("globus") && !v.equalsIgnoreCase("RFC820")) {
-                                                throw new BadParameterException("Expected: old | globus | RFC820");
+                                            if (!v.equalsIgnoreCase("old") && !v.equalsIgnoreCase("globus") && !v.equalsIgnoreCase("RFC3820")) {
+                                                throw new BadParameterException("Expected: old | globus | RFC3820");
                                             }
                                         }
                                         return value;
@@ -139,7 +139,8 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                         new File("/etc/grid-security/vomsdir/")}),
                 new Default(Context.SERVER, new VomsesFile().getDefaultServer()),
                 new Default(Context.USERVO, new VomsesFile().getDefaultVO()),
-                new Default(Context.LIFETIME, "PT12H")
+                new Default(Context.LIFETIME, "PT12H"),
+                new Default(VOMSContext.PROXYTYPE, "RFC3820")
         };
     }
     protected static String getUnixUID() throws IncorrectStateException {
@@ -238,12 +239,11 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
 	    		System.out.println("Is a GlobusRFC820 proxy");    		
 	    	}
     	}*/
-        File certRepository = new File((String) attributes.get(Context.CERTREPOSITORY));
         if (cred instanceof GlobusGSSCredentialImpl) {
             X509Credential globusProxy = ((GlobusGSSCredentialImpl)cred).getX509Credential();
 	        try {
 				if (!VOMSACUtils.getACsFromCertificate(globusProxy.getCertificateChain()[0]).isEmpty()) {
-				    return new VOMSSecurityCredential(cred, certRepository);
+				    return new VOMSSecurityCredential(cred, attributes);
 				} else {
 				    throw new IncorrectStateException("Security context is not of type: "+this.getType());
 				}

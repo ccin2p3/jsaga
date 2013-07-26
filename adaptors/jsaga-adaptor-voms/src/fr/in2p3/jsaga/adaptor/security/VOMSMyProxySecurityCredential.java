@@ -36,8 +36,8 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
     protected String _genuineLifeTime;
     protected String _localLifeTime;
 
-    public VOMSMyProxySecurityCredential(GSSCredential proxy, File certRepository, Map attributes) {
-        super(proxy, certRepository);
+    public VOMSMyProxySecurityCredential(GSSCredential proxy, Map attributes) {
+        super(proxy, attributes);
         this._genuineLifeTime = (String) attributes.get(Context.LIFETIME);
         this._localLifeTime = (String) attributes.get(VOMSContext.DELEGATIONLIFETIME);
         if (_localLifeTime == null) {

@@ -32,7 +32,7 @@
                                 <li>Update the PATH environment variable (optional):
                                     Open up the system properties (WinKey + Pause), select the tab
                                     "Advanced", and the "Environment Variables" button, then click on
-                                    "Modify" to add at the end of variable PATH: <source>;%JSAGA_HOME%\bin</source></li>
+                                    "Modify" to add at the end of variable PATH: <source>;%JSAGA_HOME%\examples</source></li>
                             </ol>
                         </li>
                         <li><p><b>Unix-based Operating Systems (Linux, Solaris and Mac OS X):</b></p>
@@ -42,7 +42,7 @@
                                 <li>Set the JSAGA_HOME environment variable (optional):
                                     <source>export JSAGA_HOME=&lt;path_to_your_directory&gt;</source></li>
                                 <li>Update the PATH environment variable (optional):
-                                    <source>export PATH=$PATH:JSAGA_HOME/bin</source></li>
+                                    <source>export PATH=$PATH:JSAGA_HOME/examples</source></li>
                                 <li>Execute the post-install.sh script:
                                     <source>./post-install.sh</source></li>
                             </ol>
@@ -50,7 +50,7 @@
                     </ul>
                 </subsection>
                 <subsection name="Current Release">
-                    <xsl:variable name="dir">/maven2/fr/in2p3/jsaga/jsaga-installer/<xsl:value-of select="$project.version"/></xsl:variable>
+                    <xsl:variable name="dir">s/fr/in2p3/jsaga/jsaga-installer/<xsl:value-of select="$project.version"/></xsl:variable>
                     <xsl:choose>
                         <xsl:when test="contains($project.version, 'SNAPSHOT')">
                             <p>Download the latest snapshot from this <a href="{$dir}/">directory</a>:</p>

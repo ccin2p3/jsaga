@@ -13,10 +13,10 @@
 	<!-- ==== Import wsdl file for delegation services (client version 1.5 or greater) ==== -->
 	<wsdl:import
 		namespace="http://www.gridsite.org/namespaces/delegation-2"
-		location="www.gridsite.org-delegation-2.0.0.wsdl"/>
+		location="./www.gridsite.org-delegation-2.0.0.wsdl"/>
 	<wsdl:import
 		namespace="http://www.gridsite.org/namespaces/delegation-1"
-		location="www.gridsite.org-delegation-1.0.0.wsdl"/>
+		location="./www.gridsite.org-delegation-1.0.0.wsdl"/>
 
 	<!-- ==== Types definition ==== -->
 	<wsdl:types>
@@ -207,11 +207,11 @@
 		</schema>
 		
 		<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://schemas.ggf.org/jsdl/2005/11/jsdl">
-			<xsd:include schemaLocation="jsdl.xsd-18.xsd"/>
+			<xsd:include schemaLocation="./jsdl.xsd-18.xsd"/>
 		</schema>
 
 		<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
-			<xsd:include schemaLocation="jsdl-posix.xsd-6.xsd"/>
+			<xsd:include schemaLocation="./jsdl-posix.xsd-6.xsd"/>
 		</schema>
 
 		<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">

@@ -14,13 +14,13 @@
             <item name="CC-IN2P3" href="http://cc.in2p3.fr"/>
         </links>
         <menu name="JSAGA">
-            <item name="Project Home" href="http://grid.in2p3.fr/jsaga/index.html"/>
+            <item name="Project Home" href="http://software.in2p3.fr/jsaga/index.html"/>
             <item name="Contributors" href="contributors.html"/>
             <item name="Presentations" href="presentations.html"/>
             <item name="Download" href="download.html"/>
             <item name="Dependencies" href="dependencies-licenses.html"/>
             <item name="Related Projects" href="projects.html"/>
-            <item name="Development Release" href="http://grid.in2p3.fr/software/jsaga-dev/index.html"/>
+            <item name="Development Release" href="http://software.in2p3.fr/jsaga-dev/index.html"/>
         </menu>
         <menu name="User Documentation">
             <item name="Quick Start Guide" href="quickstart.html"/>

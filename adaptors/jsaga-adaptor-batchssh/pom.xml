@@ -46,11 +46,6 @@
             <version>0.9.17-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.ganymed-ssh-2</groupId>
-            <artifactId>ganymed-ssh-2</artifactId>
-            <version>260</version>
-        </dependency>
-        <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>

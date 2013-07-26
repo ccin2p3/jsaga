@@ -6,7 +6,7 @@
     <packaging>pom</packaging>
     <name>JSAGA Project</name>
     <description>JSAGA is a Java implementation of the SAGA specification (Open Grid Forum).</description>
-    <url>http://grid.in2p3.fr/jsaga</url>
+    <url>http://software.in2p3.fr/jsaga</url>
     <organization>
         <name>IN2P3 Computing Center</name>
         <url>http://cc.in2p3.fr</url>
@@ -33,7 +33,7 @@
         </developer>
         <developer>
             <name>See contributors list</name>
-            <url>http://grid.in2p3.fr/software/jsaga-dev/contributors.html</url>
+            <url>http://software.in2p3.fr/jsaga-dev/contributors.html</url>
             <roles>
                 <role>developer</role>
             </roles>
@@ -71,12 +71,6 @@
             <id>project-web-site</id>
             <url>${project.web.site}</url>
         </site>
-        <!-- repository>
-          <id>maatg-fr-snapshots</id>
-          <name>maatG France Snapshots</name>
-          <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
-        </repository-->
-        
     </distributionManagement>
     <profiles>
         <!-- WARNING: behavior is not the same if moved in profiles.xml -->
@@ -96,8 +90,20 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <maven.repository>file:///afs/in2p3.fr/home/throng/ccin2p3/grid/maven2</maven.repository>
-                <project.web.site>sftp://gridsoft@grid.in2p3.fr:/www/htdocs/jsaga</project.web.site>
+            <!-- 
+            	1) The Maven deploy plugin DOES NOT use the SSH client configuration.
+            	2) Giving the username in the URL DOES NOT work. The username must be given in settings.xml in the <server> part.
+            	3) The configuration with SSH public key does not work in settings.xml
+            	4) The password of the remote user is (encypted) in settings.xml
+            	5) The public key of the SFTP server must be added to the client's known_hosts file
+             -->
+                <maven.repository>sftp://maven.in2p3.fr/www/htdocs</maven.repository>
+            <!-- 
+            	1) The Maven site-deploy plugin DOES NOT use the SSH client configuration.
+            	2) Giving the username in the URL DOES work, but for security reasons, it is rather given in settings.xml in the <server> part.
+            	3) The public key of the SFTP server must be added to the client's known_hosts file
+             -->
+                <project.web.site>sftp://software.in2p3.fr/www/htdocs/jsaga</project.web.site>
             </properties>
         </profile>
         <profile>
@@ -106,8 +112,20 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <maven.repository>file:///afs/in2p3.fr/home/throng/ccin2p3/grid/maven2</maven.repository>
-                <project.web.site>sftp://gridsoft@grid.in2p3.fr:/www/htdocs/jsaga-dev</project.web.site>
+            <!-- 
+            	1) The Maven deploy plugin DOES NOT use the SSH client configuration.
+            	2) Giving the username in the URL DOES NOT work. The username must be given in settings.xml in the <server> part.
+            	3) The configuration with SSH public key does not work in settings.xml
+            	4) The password of the remote user is (encypted) in settings.xml
+            	5) The public key of the SFTP server must be added to the client's known_hosts file
+             -->
+                <maven.repository>sftp://maven.in2p3.fr/www/htdocs</maven.repository>
+            <!-- 
+            	1) The Maven site-deploy plugin DOES NOT use the SSH client configuration.
+            	2) Giving the username in the URL DOES work, but for security reasons, it is rather given in settings.xml in the <server> part.
+            	3) The public key of the SFTP server must be added to the client's known_hosts file
+             -->
+                <project.web.site>sftp://software.in2p3.fr/www/htdocs/jsaga-dev</project.web.site>
             </properties>
             <build>
                 <plugins>

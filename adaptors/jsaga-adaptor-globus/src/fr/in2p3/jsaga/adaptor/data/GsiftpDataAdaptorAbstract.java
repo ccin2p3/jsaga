@@ -11,17 +11,21 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import org.apache.log4j.Logger;
 import org.globus.common.ChainedIOException;
-import org.globus.ftp.*;
-import org.globus.ftp.exception.*;
+import org.globus.ftp.DataChannelAuthentication;
+import org.globus.ftp.FeatureList;
+import org.globus.ftp.GridFTPSession;
+import org.globus.ftp.exception.ClientException;
+import org.globus.ftp.exception.ServerException;
+import org.globus.ftp.exception.UnexpectedReplyCodeException;
 import org.globus.gsi.gssapi.GlobusGSSException;
 import org.globus.gsi.gssapi.auth.HostAuthorization;
-import org.globus.io.streams.GridFTPInputStream;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
-import java.util.logging.Level;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -71,7 +75,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
                 throw new BadParameterException("Bad value for configuration attribute: "+TCP_BUFFER_SIZE, e);
             }
         }
-        m_DataChannelAuthentication = true;
+        m_DataChannelAuthentication = false;
 
         // open connection
         m_client = createConnection(m_credential, host, port, m_TCPBufferSize, m_DataChannelAuthentication);
@@ -151,7 +155,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
 
         // create output stream
         try {
-        	return new GsiftpOutputStream(m_credential, m_client.getHost(), m_client.getPort(), absolutePath, append);
+        	return new GsiftpOutputStream(m_credential, m_client, absolutePath, append);
         	//return new GsiftpOutputStream(m_client, absolutePath, append);
         } catch (Exception e) {
             try {
@@ -285,7 +289,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         }
     }
 
-    private static GsiftpClient createConnection(GSSCredential cred, String host, int port, int tcpBufferSize, boolean reqDCAU) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
+    public static GsiftpClient createConnection(GSSCredential cred, String host, int port, int tcpBufferSize, boolean reqDCAU) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
         Logger.getLogger(GsiftpDataAdaptorAbstract.class).info("Connecting to Gsiftp service at: " + host + ":" + port + "...");
         GsiftpClient client;
         try {

@@ -40,7 +40,7 @@ REM # set java
 if "%JAVA_HOME%_"=="_" (
   set JAVA=java
 ) else (
-  set JAVA="%JAVA_HOME%\bin\java"
+  set JAVA="%JAVA_HOME%\examples\java"
 )
 
 REM # run command

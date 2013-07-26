@@ -13,13 +13,13 @@
 			<repositories>
 				<repository>
 					<id>in2p3-maven2-repository-libraries</id>
-					<url>http://grid.in2p3.fr/maven2</url>
+					<url>http://maven.in2p3.fr</url>
 				</repository>
 			</repositories>
 			<pluginRepositories>
 				<pluginRepository>
 					<id>in2p3-maven2-repository-plugins</id>
-					<url>http://grid.in2p3.fr/maven2</url>
+					<url>http://maven.in2p3.fr</url>
 				</pluginRepository>
 			</pluginRepositories>
 		</profile>

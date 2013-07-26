@@ -15,12 +15,12 @@
 
     <!-- aggregation -->
     <modules>
-        <module>glite-ce-common-java</module>     
+        <!--<module>glite-ce-common-java</module>  -->   
         <module>glite-lb-api-java</module>
         <module>glite-security-trustmanager</module>
         <module>glite-wms-wmproxy-api-java</module>
-        <module>glite-ce-cream-api-java</module>
-        <module>glite-security-authz-framework-java</module>
+        <!--<module>glite-ce-cream-api-java</module>-->
+        <!--<module>glite-security-authz-framework-java</module>-->
         <module>glite-security-trustmanager-axis</module>
         <module>glite-ce-delegation</module>
         <module>glite-security-delegation-java</module>
@@ -64,6 +64,10 @@
 				<updatePolicy>always</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
+		</repository>
+		<repository>
+			<id>emi-infn-repo</id>
+			<url>http://www.pd.infn.it/~andreett/pub/maven/repository/</url>
 		</repository>
         <repository>
             <id>maatg-fr-releases</id>

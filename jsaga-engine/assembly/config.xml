@@ -10,14 +10,14 @@
             <outputDirectory/>
             <directory>config</directory>
             <excludes>
-                <exclude>bin/template.bat</exclude>
-                <exclude>bin/template.sh</exclude>
+                <exclude>examples/template.bat</exclude>
+                <exclude>examples/template.sh</exclude>
             </excludes>
         </fileSet>
         <!-- generate launcher scripts -->
         <fileSet>
-            <outputDirectory>bin</outputDirectory>
-            <directory>build/bin</directory>
+            <outputDirectory>examples</outputDirectory>
+            <directory>build/examples</directory>
             <lineEnding>unix</lineEnding><!-- fixme: does not work when build is launched by parent project -->
             <fileMode>0755</fileMode>
         </fileSet>

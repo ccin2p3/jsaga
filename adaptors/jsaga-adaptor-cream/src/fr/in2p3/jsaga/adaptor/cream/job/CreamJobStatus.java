@@ -1,8 +1,11 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
+import java.util.Calendar;
+
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.Status;
+
 import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
-import org.glite.ce.creamapi.ws.cream2.types.Status;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,34 +20,43 @@ import org.glite.ce.creamapi.ws.cream2.types.Status;
  *
  */
 public class CreamJobStatus extends JobStatus {
-    private static final String REGISTERED = "REGISTERED";  //the job has been registered (but not started yet)
-    private static final String PENDING = "PENDING";        //the job has been started, but it has still to be submitted to BLAH
-    private static final String IDLE = "IDLE";              //the job is idle in the Local Resource Management System (LRMS)
-    private static final String RUNNING = "RUNNING";        //the job wrapper which "encompasses" the user job is running in the LRMS.
-    private static final String REALLY_RUNNING = "REALLY-RUNNING";  //the actual user job (the one specified as Executable in the job JDL) is running in the LRMS
-    private static final String HELD = "HELD";              //the job is held (suspended) in the LRMS
-    private static final String CANCELLED = "CANCELLED";    //the job has been cancelled
-    private static final String DONE_OK = "DONE-OK";        //the job has successfully been executed
-    private static final String DONE_FAILED = "DONE-FAILED";//the job has been executed, but some errors occurred
-    private static final String ABORTED = "ABORTED";        //errors occurred during the ``management'' of the job, e.g. the submission to the LRMS abstraction layer software (BLAH) failed.
+    public static final String REGISTERED = "REGISTERED";  //the job has been registered (but not started yet)
+    public static final String PENDING = "PENDING";        //the job has been started, but it has still to be submitted to BLAH
+    public static final String IDLE = "IDLE";              //the job is idle in the Local Resource Management System (LRMS)
+    public static final String RUNNING = "RUNNING";        //the job wrapper which "encompasses" the user job is running in the LRMS.
+    public static final String REALLY_RUNNING = "REALLY-RUNNING";  //the actual user job (the one specified as Executable in the job JDL) is running in the LRMS
+    public static final String HELD = "HELD";              //the job is held (suspended) in the LRMS
+    public static final String CANCELLED = "CANCELLED";    //the job has been cancelled
+    public static final String DONE_OK = "DONE-OK";        //the job has successfully been executed
+    public static final String DONE_FAILED = "DONE-FAILED";//the job has been executed, but some errors occurred
+    public static final String ABORTED = "ABORTED";        //errors occurred during the ``management'' of the job, e.g. the submission to the LRMS abstraction layer software (BLAH) failed.
     //private static final String UNKNOWN = "UNKNOWN";        //the job is an unknown status
 
+    private Calendar m_timestamp;
+    
     public CreamJobStatus(Status status, int returnCode) {
         super(status.getJobId().getId(), status.getName(), status.getName(), returnCode);
+        m_timestamp = status.getTimestamp();
     }
 
     public CreamJobStatus(Status status, String cause) {
         super(status.getJobId().getId(), status.getName(), status.getName(), cause);
+        m_timestamp = status.getTimestamp();
     }
 
     public CreamJobStatus(Status status) {
         super(status.getJobId().getId(), status.getName(), status.getName());
+        m_timestamp = status.getTimestamp();
     }
 
     public String getModel() {
         return "cream";
     }
 
+    public String getStatus() {
+    	return (String) m_nativeStateCode;
+    }
+    
     public SubState getSubState() {
         String name = (String) m_nativeStateCode;
         if (REGISTERED.equals(name)) {
@@ -66,5 +78,9 @@ public class CreamJobStatus extends JobStatus {
         } else {
             return null;
         }
+    }
+    
+    public Calendar getTimestamp() {
+    	return m_timestamp;
     }
 }

@@ -20,6 +20,58 @@
             </properties>
         </developer>
     </developers>
+    <build>
+		<plugins>
+             <plugin>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-wsdl2code-maven-plugin</artifactId>
+                <version>1.6.2</version>
+                <executions>
+                    <execution>
+                        <id>cream2</id>
+                        <goals>
+                            <goal>wsdl2code</goal>
+                        </goals>
+                        <configuration>
+                            <packageName>org.glite.ce.creamapi.ws.cream2</packageName>
+                            <wsdlFile>${basedir}/resources/wsdl/org.glite.ce-cream2_service.wsdl</wsdlFile>
+                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                            <flattenFiles>true</flattenFiles>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>delegation</id>
+                        <goals>
+                            <goal>wsdl2code</goal>
+                        </goals>
+                        <configuration>
+                            <packageName>org.glite.ce.security.delegation</packageName>
+                            <wsdlFile>${basedir}/resources/wsdl/www.gridsite.org-delegation-2.0.0.wsdl</wsdlFile>
+                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                            <flattenFiles>true</flattenFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>           
+	    <plugin>
+    	       <groupId>org.codehaus.mojo</groupId>
+    	       <artifactId>build-helper-maven-plugin</artifactId>
+    	       <executions>
+                   <execution>
+                       <phase>generate-sources</phase>
+                           <goals><goal>add-source</goal></goals>
+                           <configuration>
+                               <sources> <source>${project.build.directory}/generated-sources</source> </sources>
+                           </configuration>
+                   </execution>
+               </executions>
+            </plugin>
+            <plugin><!-- copy jar -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+		</plugins>
+    </build>
     <dependencies>
         <dependency><!-- for security context (WARNING: order of dependencies matters) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
@@ -27,7 +79,7 @@
             <version>0.9.17-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
-        <dependency><!-- for data staging -->
+        <dependency><!-- for data staging : to be removed when OSB bug will disappear -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-globus</artifactId>
             <version>0.9.17-SNAPSHOT</version>
@@ -39,21 +91,52 @@
             <version>0.9.17-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
-            <groupId>org.glite</groupId>
-            <artifactId>glite-ce-cream-api-java</artifactId>
-            <version>1.11.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jglobus</groupId>
-            <artifactId>gridftp</artifactId>
-            <version>2.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glite</groupId>
-            <artifactId>glite-ce-delegation</artifactId>
-            <version>unknown</version>
-        </dependency>
+        	<dependency>
+   			<groupId>eu.eu-emi.security</groupId>
+  			<artifactId>canl-java-axis2</artifactId>
+  			<version>0.1.3</version>
+		</dependency>
+        	<dependency>
+   			<groupId>eu.eu-emi.security</groupId>
+  			<artifactId>canl</artifactId>
+  			<version>1.1.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-transport-local</artifactId>
+			<version>1.6.2</version>
+            <scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-transport-http</artifactId>
+			<version>1.6.2</version>
+            		<scope>runtime</scope>
+		</dependency>
+		<dependency>
+  			<groupId>commons-httpclient</groupId>
+  			<artifactId>commons-httpclient</artifactId>
+  			<version>3.1</version>
+            <scope>compile</scope>
+		</dependency>
+		<dependency>
+    			<groupId>org.apache.ws.commons.axiom</groupId>
+		    	<artifactId>axiom-impl</artifactId>
+		    	<version>1.2.14</version>
+            		<scope>compile</scope>
+		</dependency>
+		<dependency>
+		    	<groupId>axis</groupId>
+		    	<artifactId>axis-wsdl4j</artifactId>
+		    	<version>1.5.1</version>
+            		<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.condor</groupId>
 			<artifactId>classad</artifactId>
@@ -61,4 +144,16 @@
 			<scope>compile</scope>
 		</dependency>
     </dependencies>
+	<repositories>
+		<repository>
+			<id>emi-infn-repo</id>
+			<url>http://www.pd.infn.it/~andreett/pub/maven/repository/</url>
+		</repository>
+        <!-- argus-pep-common and argus-parent repo -->
+        <repository>
+            <id>switch</id>
+            <name>SWITCH releases</name>
+            <url>http://www.switch.ch/grid/authz/docs/maven2/release</url>
+        </repository>
+	</repositories>
 </project>

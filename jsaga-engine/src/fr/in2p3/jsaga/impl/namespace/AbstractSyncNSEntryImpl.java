@@ -266,6 +266,9 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
             }
         } else {
             this.copySync(effectiveTarget, flags);
+            if (overwrite) {
+            	flags = flags - Flags.OVERWRITE.getValue();
+            }
             this.removeSync(flags);
         }
     }

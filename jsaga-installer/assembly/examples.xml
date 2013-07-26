@@ -35,7 +35,7 @@
     </fileSets>
     <files>
         <file>
-            <outputDirectory>/bin/panels</outputDirectory>
+            <outputDirectory>/examples/panels</outputDirectory>
             <destName>OptionalLicencePanel.jar</destName>
             <source>${project.build.directory}/${project.build.finalName}.jar</source>
         </file>

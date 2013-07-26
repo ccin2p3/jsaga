@@ -232,7 +232,7 @@
                 <version>2.2-beta-2</version><!-- WARNING: regression with 2.2-beta-4 -->
                 <configuration>
                     <descriptors>
-                        <descriptor>assembly/bin.xml</descriptor>
+                        <descriptor>assembly/examples.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>
@@ -315,25 +315,6 @@
         								</versionRange>
         								<goals>
         									<goal>serialize</goal>
-        								</goals>
-        							</pluginExecutionFilter>
-        							<action>
-        								<ignore />
-        							</action>
-        						</pluginExecution>
-        						<pluginExecution>
-        							<pluginExecutionFilter>
-        								<groupId>
-        									org.apache.maven.plugins
-        								</groupId>
-        								<artifactId>
-        									maven-dependency-plugin
-        								</artifactId>
-        								<versionRange>
-        									[2.1,)
-        								</versionRange>
-        								<goals>
-        									<goal>unpack</goal>
         								</goals>
         							</pluginExecutionFilter>
         							<action>
