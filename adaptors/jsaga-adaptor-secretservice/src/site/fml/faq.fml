@@ -24,7 +24,7 @@
     		<ul>
     		<li>You must use Gnome or KDE>=4.8</li>
     		<li>Java 1.5 only is supported</li>
-    		<li>You must install an external library (download at http://grid.in2p3.fr/maven2/libmatthew/libmatthew-java/0.8/ and untar/uzip)
+    		<li>You must install an external library (download at http://maven.in2p3.fr/libmatthew/libmatthew-java/0.8/ and untar/uzip)
     		<pre>
 cd libmatthew-java-0.8/
 JAVA=/your/path/to/java JAVAC=/your/path/to/javac JAR=/your/path/to/jar PREFIX=/your/path/to/libmatthew make install

@@ -7,44 +7,33 @@
         <version>1.0-SNAPSHOT</version>
         <relativePath>../pom-unreleased.xml</relativePath>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga</groupId>
     <artifactId>externals</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name/><!-- reset parent name -->
-    <description/><!-- reset parent description -->
-    <organization/><!-- reset parent organization -->
 
     <modules>
-        <module>addressing-1.0</module>
+        <!--<module>addressing-1.0</module>-->
         <module>axis</module>
         <module>classad</module>
         <module>cog-axis</module>
-        <module>cog-jglobus</module>
         <module>cog-url</module>
         <module>commonj</module>
         <module>concurrent</module>
         <module>cryptix-asn1</module>
         <module>cryptix32</module>
         <module>dbus-java</module>
-        <module>file-system</module>
+        <!--<module>file-system</module>-->
         <module>ganymed-ssh-2</module>
-        <module>glite-security</module>
-        <module>glite-jdl-api-java</module>
-        <module>glite-wms-wmproxy-api-java</module>
-        <module>glite-lb-api-java</module>
-        <module>glite-ce-cream-api-java</module>
-        <module>glite-ce-delegation</module>
+        <module>glite</module>
         <module>jargon</module>
         <module>jeldoclet</module>
         <module>libmatthew-java</module>
         <module>naregi-ss-api</module>
-        <module>opensaml</module>
-        <module>puretls</module>
         <module>secret-service-api-java</module>
-        <module>vomsjapi</module>
-        <module>wsgram-api</module>
+        <!--<module>wsgram-api</module>-->
     </modules>
     <build>
         <directory>build</directory>

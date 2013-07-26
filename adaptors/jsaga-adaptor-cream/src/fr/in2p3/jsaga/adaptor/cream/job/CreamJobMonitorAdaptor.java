@@ -1,16 +1,28 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
+import eu.emi.security.canl.axis2.CANLAXIS2SocketFactory;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
-import org.apache.axis.types.URI;
-import org.glite.ce.creamapi.ws.cream2.CREAMPort;
-import org.glite.ce.creamapi.ws.cream2.types.*;
+import org.apache.axis2.databinding.types.URI;
+import org.apache.axis2.databinding.types.URI.MalformedURIException;
+import org.apache.commons.httpclient.protocol.Protocol;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.Command;
+import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobFilter;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobId;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfo;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoRequest;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoResult;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.Status;
+import org.glite.ce.creamapi.ws.cream2.Generic_Fault;
+import org.glite.ce.creamapi.ws.cream2.InvalidArgument_Fault;
 import org.ogf.saga.error.*;
 
 import java.rmi.RemoteException;
 import java.util.Date;
+import java.util.Properties;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -27,6 +39,9 @@ import java.util.Date;
 public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements QueryListJob, ListableJobAdaptor, JobInfoAdaptor {
 	
     public JobStatus[] getStatusList(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
+    	// TODO: removing this line gives : "no truststore defined". Check CANLAXIS2 threadsafe
+        CANLAXIS2SocketFactory.setCurrentProperties(m_sslConfig);
+
         JobInfo[] resultArray;
 		resultArray = getJobInfoResult(nativeJobIdArray);
         // convert
@@ -54,10 +69,14 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
     public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
         JobId[] resultArray;
         try {
-            resultArray = m_creamStub.getStub().jobList();
+            resultArray = m_creamStub.jobList().getResult();
         } catch (RemoteException e) {
             throw new TimeoutException(e);
-        }
+        } catch (Authorization_Fault e) {
+			throw new PermissionDeniedException(e);
+		} catch (Generic_Fault e) {
+			throw new NoSuccessException(e);
+		}
         if (resultArray != null) {
             String[] jobIds = new String[resultArray.length];
             for (int i=0; i<resultArray.length; i++) {
@@ -82,15 +101,33 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
 	}
 
 	public Date getCreated(String nativeJobId) throws NotImplementedException,	NoSuccessException {
-		return this.getLastCommand(nativeJobId).getCreationTime().getTime();
+        try {
+    		return getStatus(nativeJobId, new String[]{CreamJobStatus.REGISTERED})
+    				.getTimestamp()
+    				.getTime();
+		} catch (TimeoutException e) {
+			throw new NoSuccessException(e);
+		}
 	}
 
 	public Date getStarted(String nativeJobId) throws NotImplementedException,	NoSuccessException {
-		return this.getLastCommand(nativeJobId).getStartProcessingTime().getTime();
+        try {
+    		return getStatus(nativeJobId, new String[]{CreamJobStatus.REALLY_RUNNING})
+    				.getTimestamp()
+    				.getTime();
+		} catch (TimeoutException e) {
+			throw new NoSuccessException(e);
+		}
 	}
 
-	public Date getFinished(String nativeJobId) throws NotImplementedException,	NoSuccessException {
-		return this.getLastCommand(nativeJobId).getExecutionCompletedTime().getTime();
+	public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException {
+        try {
+    		return getStatus(nativeJobId, new String[]{CreamJobStatus.DONE_OK, CreamJobStatus.DONE_FAILED, CreamJobStatus.CANCELLED})
+    				.getTimestamp()
+    				.getTime();
+		} catch (TimeoutException e) {
+			throw new NoSuccessException(e);
+		}
 	}
 
 	public String[] getExecutionHosts(String nativeJobId) throws NotImplementedException, NoSuccessException {
@@ -103,73 +140,66 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
 
 	/*-----------------*/
 	/* Private methods */
-	/*-----------------*/
-	private Command getLastCommand(String nativeJobId) throws NotImplementedException, NoSuccessException {
-		try {
-			Command[] cmds = this.getJobInfoResult(new String[]{nativeJobId})[0].getLastCommand();
-			return cmds[cmds.length-1];
-		} catch (TimeoutException e) {
-			throw new NoSuccessException(e);
+	/*-----------------*/	
+	private CreamJobStatus getStatus(String nativeJobId, String[] requestedStatuses) throws NoSuccessException, TimeoutException {
+    	Status[] stats = this.getJobInfoResult(new String[]{nativeJobId})[0].getStatus();
+		for (Status stat: stats) {
+			for (String requestedStatus: requestedStatuses) {
+				if (stat.getName().equals(requestedStatus)) {
+					return new CreamJobStatus(stat);
+				}
+			}
 		}
+		throw new NoSuccessException("Status not available");
 	}
 	
+//	private Command getLastCommand(String nativeJobId) throws NotImplementedException, NoSuccessException {
+//		try {
+//			Command[] cmds = this.getJobInfoResult(new String[]{nativeJobId})[0].getLastCommand();
+//			return cmds[cmds.length-1];
+//		} catch (TimeoutException e) {
+//			throw new NoSuccessException(e);
+//		}
+//	}
+	
     private JobInfo[] getJobInfoResult(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
-        URI creamUri = m_creamStub.getURI();
         JobId[] jobIdList = new JobId[nativeJobIdArray.length];
         for (int i = 0; i < nativeJobIdArray.length; i++) {
             jobIdList[i] = new JobId();
-            jobIdList[i].setCreamURL(creamUri);
             jobIdList[i].setId(nativeJobIdArray[i]);
+            try {
+				jobIdList[i].setCreamURL(new URI(m_creamUrl.toString()));
+			} catch (MalformedURIException e) {
+				throw new NoSuccessException(e);
+			}
         }
         JobFilter filter = new JobFilter();
         filter.setDelegationId(m_delegationId);
         filter.setJobId(jobIdList);
-        CREAMPort stub = m_creamStub.getStub();
+        JobInfoRequest request = new JobInfoRequest();
+        request.setJobInfoRequest(filter);
         JobInfoResult[] resultArray;
         try {
-            resultArray = stub.jobInfo(filter);
+            resultArray = m_creamStub.jobInfo(request).getResult();
         } catch (RemoteException e) {
             throw new TimeoutException(e);
-        }
+        } catch (Authorization_Fault e) {
+        	throw new NoSuccessException(new PermissionDeniedException(e));
+		} catch (Generic_Fault e) {
+        	throw new NoSuccessException(e);
+		} catch (InvalidArgument_Fault e) {
+        	throw new NoSuccessException(e);
+		}
         JobInfo[] infos = new JobInfo[resultArray.length];
         for (int i=0; resultArray!=null && i<resultArray.length; i++) {
-            // rethrow exception
-            try {
-                if (resultArray[i].getDateMismatchFault()!=null) {
-                    throw resultArray[i].getDateMismatchFault();
-                } else if (resultArray[i].getDelegationIdMismatchFault()!=null) {
-                    throw resultArray[i].getDelegationIdMismatchFault();
-                } else if (resultArray[i].getGenericFault()!=null) {
-                    throw resultArray[i].getGenericFault();
-                } else if (resultArray[i].getJobStatusInvalidFault()!=null) {
-                    throw resultArray[i].getJobStatusInvalidFault();
-                } else if (resultArray[i].getJobUnknownFault()!=null) {
-                    throw resultArray[i].getJobUnknownFault();
-                } else if (resultArray[i].getLeaseIdMismatchFault()!=null) {
-                    throw resultArray[i].getLeaseIdMismatchFault();
-                }
-            } catch (DelegationIdMismatchFault fault) {
-                throw new NoSuccessException(new PermissionDeniedException(getMessage(fault), fault));
-            } catch (BaseFaultType fault) {
-                throw new NoSuccessException(getMessage(fault), fault);
-            }
             // extract  job info
             JobInfo info = resultArray[i].getJobInfo();
             if (info == null) {
-                throw new NoSuccessException("Empty info for job: "+filter.getJobId(i));
+                throw new NoSuccessException("Empty info for job: "+nativeJobIdArray[i]);
             }
             infos[i] = info;
         }
         return infos;
     }
 
-    private static String getMessage(BaseFaultType fault) {
-        if (fault.getDescription()!=null && !fault.getDescription().equals("")) {
-            return fault.getDescription();
-        } else if (fault.getFaultCause()!=null && !fault.getFaultCause().equals("N/A")) {
-            return fault.getFaultCause();
-        } else {
-            return fault.getClass().getName();
-        }
-    }
 }

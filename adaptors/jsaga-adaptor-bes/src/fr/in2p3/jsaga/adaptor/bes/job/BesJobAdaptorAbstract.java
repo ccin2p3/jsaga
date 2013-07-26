@@ -7,18 +7,11 @@ import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.log4j.Logger;
-import org.apache.ws.security.WSConstants;
-//import org.apache.ws.security.components.crypto.CertificateStore;
-import org.apache.ws.security.message.WSSecEncryptedKey;
-import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecUsernameToken;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BESFactoryPortType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BasicResourceAttributesDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BesFactoryServiceLocator;
 import org.ggf.schemas.bes.x2006.x08.besFactory.FactoryResourceAttributesDocumentType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.InvalidRequestMessageFaultType;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
@@ -26,14 +19,10 @@ import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
-import org.w3c.dom.Document;
-
 import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.rmi.RemoteException;
-import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -225,25 +214,25 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 	/**
 	 * @deprecated
 	 */
-	private SOAPHeaderElement buildUsernamePassword() throws Exception {
-	    String secextNS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
-        WSSecUsernameToken token = new WSSecUsernameToken();
-        // USELESS token.setPasswordsAreEncoded(false);
-        token.setPasswordType(WSConstants.PASSWORD_TEXT);
-        // TODO: support of user/password adaptor ?
-        token.setUserInfo("indiaInterop", "XXXX");
-        // USELESS token.addCreated();
-        SOAPHeaderElement wsseSecurity = new SOAPHeaderElement(new org.apache.axis.message.PrefixedQName(secextNS,"Security", "wsse"));
-        Document doc = wsseSecurity.getAsDocument();
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.setMustUnderstand(false);
-        secHeader.setActor("http://schemas.xmlsoap.org/soap/actor/next");
-        secHeader.insertSecurityHeader(doc);
-        token.prepare(doc);
-        token.prependToHeader(secHeader);
-        
-        return new SOAPHeaderElement(secHeader.getSecurityHeader());
-	}
+//	private SOAPHeaderElement buildUsernamePassword() throws Exception {
+//	    String secextNS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+//        WSSecUsernameToken token = new WSSecUsernameToken();
+//        // USELESS token.setPasswordsAreEncoded(false);
+//        token.setPasswordType(WSConstants.PASSWORD_TEXT);
+//        // TODO: support of user/password adaptor ?
+//        token.setUserInfo("indiaInterop", "XXXX");
+//        // USELESS token.addCreated();
+//        SOAPHeaderElement wsseSecurity = new SOAPHeaderElement(new org.apache.axis.message.PrefixedQName(secextNS,"Security", "wsse"));
+//        Document doc = wsseSecurity.getAsDocument();
+//        WSSecHeader secHeader = new WSSecHeader();
+//        secHeader.setMustUnderstand(false);
+//        secHeader.setActor("http://schemas.xmlsoap.org/soap/actor/next");
+//        secHeader.insertSecurityHeader(doc);
+//        token.prepare(doc);
+//        token.prependToHeader(secHeader);
+//        
+//        return new SOAPHeaderElement(secHeader.getSecurityHeader());
+//	}
 	
 	/**
 	 * @deprecated

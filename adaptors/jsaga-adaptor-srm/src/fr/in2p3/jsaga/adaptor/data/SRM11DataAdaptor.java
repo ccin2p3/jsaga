@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.adaptor.data;
 
 import org.apache.axis.client.Stub;
 import org.globus.axis.gsi.GSIConstants;
+import org.globus.gsi.TrustedCertificates;
 import org.ogf.saga.error.*;
 import org.ogf.srm11.bean.FileMetaData;
 import org.ogf.srm11.service.ISRM;
@@ -44,6 +45,7 @@ public class SRM11DataAdaptor extends SRMDataAdaptorAbstract implements DataAdap
             // set security
             Stub stub = (Stub) m_stub;
             stub._setProperty(GSIConstants.GSI_CREDENTIALS, m_credential);
+            stub._setProperty(GSIConstants.TRUSTED_CERTIFICATES, TrustedCertificates.load(m_certRepository.getAbsolutePath()));
             stub.setTimeout(120 * 1000); //2 mins
 //            stub._setProperty(GSIConstants.GSI_MODE, GSIConstants.GSI_MODE_FULL_DELEG);
         } catch (ServiceException e) {

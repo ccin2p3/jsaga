@@ -4,9 +4,9 @@
     <parent>
         <artifactId>adaptors</artifactId>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
-        <version>0.9.16-SNAPSHOT</version>
+        <version>0.9.17-SNAPSHOT</version>
     </parent>
-    <groupId>fr.in2p3.jsaga.adaptor</groupId>
+
     <artifactId>jsaga-adaptor-batchssh</artifactId>
     <name>Adaptor for accessing clusters via SSH</name>
     <description>This module provides support for accessing cluster systems through ssh.</description>
@@ -43,12 +43,7 @@
         <dependency><!-- needed for security context -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-ssh2</artifactId>
-            <version>0.9.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.ganymed-ssh-2</groupId>
-            <artifactId>ganymed-ssh-2</artifactId>
-            <version>260</version>
+            <version>0.9.17-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.scala-lang</groupId>
@@ -58,7 +53,7 @@
         <dependency><!-- needed for security context -->
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.16-SNAPSHOT</version>
+            <version>0.9.17-SNAPSHOT</version>
         </dependency>     
     </dependencies>
     <build>
@@ -77,5 +72,42 @@
                 </executions>
             </plugin>
         </plugins>
+        <pluginManagement>
+        	<plugins>
+        		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        		<plugin>
+        			<groupId>org.eclipse.m2e</groupId>
+        			<artifactId>lifecycle-mapping</artifactId>
+        			<version>1.0.0</version>
+        			<configuration>
+        				<lifecycleMappingMetadata>
+        					<pluginExecutions>
+        						<pluginExecution>
+        							<pluginExecutionFilter>
+        								<groupId>
+        									org.scala-tools
+        								</groupId>
+        								<artifactId>
+        									maven-scala-plugin
+        								</artifactId>
+        								<versionRange>
+        									[2.15.2,)
+        								</versionRange>
+        								<goals>
+        									<goal>add-source</goal>
+        									<goal>compile</goal>
+        									<goal>testCompile</goal>
+        								</goals>
+        							</pluginExecutionFilter>
+        							<action>
+        								<ignore />
+        							</action>
+        						</pluginExecution>
+        					</pluginExecutions>
+        				</lifecycleMappingMetadata>
+        			</configuration>
+        		</plugin>
+        	</plugins>
+        </pluginManagement>
     </build>
 </project>

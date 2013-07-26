@@ -2,7 +2,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
-        <version>0.9.16-SNAPSHOT</version>
+        <version>0.9.17-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jsaga-adaptor-naregi</artifactId>
@@ -23,13 +23,18 @@
         <dependency><!-- for security context (WARNING: order of dependencies matters) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>0.9.16-SNAPSHOT</version>
+            <version>0.9.17-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.naregi.ss</groupId>
             <artifactId>naregi-ss-api</artifactId>
             <version>beta-2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jglobus</groupId>
+            <artifactId>ssl-proxies</artifactId>
+            <version>2.0-Beta6-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

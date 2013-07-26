@@ -18,6 +18,8 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -51,9 +53,11 @@ import org.globus.delegationService.DelegationFactoryServiceAddressingLocator;
 import org.globus.delegationService.DelegationFactoryServiceLocator;
 import org.globus.delegationService.DelegationPortType;
 import org.globus.delegationService.DelegationServiceAddressingLocator;
+import org.globus.gsi.CredentialException;
 import org.globus.gsi.GSIConstants;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.GlobusCredentialException;
+import org.globus.gsi.X509Credential;
 import org.globus.gsi.X509ExtensionSet;
 import org.globus.gsi.bc.BouncyCastleCertProcessingFactory;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
@@ -94,7 +98,7 @@ public class DelegationUtil {
         getServiceCertAsToken(String servicePath, boolean useDefault)
         throws DelegationException {
 
-        GlobusCredential cred = getServiceCredential(servicePath, useDefault);
+        X509Credential cred = getServiceCredential(servicePath, useDefault);
 
         if (cred == null) {
             throw new DelegationException(i18n.getMessage("insecureService"));
@@ -129,13 +133,16 @@ public class DelegationUtil {
                                                   boolean useDefault)
         throws DelegationException {
 
-        GlobusCredential cred = getServiceCredential(servicePath, useDefault);
+        X509Credential cred = getServiceCredential(servicePath, useDefault);
 
         if (cred == null) {
             throw new DelegationException(i18n.getMessage("insecureService"));
         }
-
-        return cred.getPrivateKey();
+        try {
+            return cred.getPrivateKey();
+        } catch (CredentialException ex) {
+            throw new DelegationException(ex);
+        }
     }
 
 
@@ -278,14 +285,18 @@ public class DelegationUtil {
      * PublicKey, int, boolean)
      */
     public static RequestSecurityTokenType
-        getTokenToDelegate(GlobusCredential issuingCred,
+        getTokenToDelegate(X509Credential issuingCred,
                            X509Certificate certificate,
                            int lifetime, boolean fullDelegation)
         throws DelegationException {
-        return getTokenToDelegate(issuingCred.getCertificateChain(),
-                                  issuingCred.getPrivateKey(),
-                                  certificate.getPublicKey(), lifetime,
-                                  fullDelegation);
+        try {
+            return getTokenToDelegate(issuingCred.getCertificateChain(),
+                                      issuingCred.getPrivateKey(),
+                                      certificate.getPublicKey(), lifetime,
+                                      fullDelegation);
+        } catch (CredentialException ex) {
+            throw new DelegationException(ex);
+        }
     }
 
     /**
@@ -377,7 +388,7 @@ public class DelegationUtil {
      *        Client security descriptor with relevant security properties.
      */
     public static EndpointReferenceType delegate(String delegationServiceUrl,
-                                                 GlobusCredential issuingCred,
+                                                 X509Credential issuingCred,
                                                  X509Certificate certificate,
                                                  boolean fullDelegation,
                                                  ClientSecurityDescriptor desc)
@@ -405,7 +416,7 @@ public class DelegationUtil {
      *        Client security descriptor with relevant security properties.
      */
     public static EndpointReferenceType delegate(String delegationServiceUrl,
-                                                 GlobusCredential issuingCred,
+                                                 X509Credential issuingCred,
                                                  X509Certificate certificate,
                                                  int lifetime,
                                                  boolean fullDelegation,
@@ -462,7 +473,7 @@ public class DelegationUtil {
      * @param epr
      *        EPR referring to credential that needs to be replaced.
      */
-    public static void refresh(GlobusCredential issuingCred,
+    public static void refresh(X509Credential issuingCred,
                                X509Certificate certToSign,
                                int lifetime,
                                boolean fullDelegation,
@@ -594,7 +605,7 @@ public class DelegationUtil {
         return certChain;
     }
 
-    private static GlobusCredential getServiceCredential(String servicePath,
+    private static X509Credential getServiceCredential(String servicePath,
                                                          boolean useDefault)
         throws DelegationException {
 
@@ -609,13 +620,13 @@ public class DelegationUtil {
         if (subject == null)
             throw new DelegationException(i18n.getMessage("insecureService"));
 
-        GlobusCredential cred = null;
+        X509Credential cred = null;
         Iterator privateCred = subject.getPrivateCredentials().iterator();
         while (privateCred.hasNext()) {
             Object object = privateCred.next();
             if (object instanceof GlobusGSSCredentialImpl) {
                 cred =
-                    ((GlobusGSSCredentialImpl)object).getGlobusCredential();
+                    ((GlobusGSSCredentialImpl)object).getX509Credential();
                 break;
             }
         }
@@ -623,8 +634,8 @@ public class DelegationUtil {
         if ((useDefault) && (cred == null)) {
             try {
                 cred =
-                    GlobusCredential.getDefaultCredential();
-            } catch (GlobusCredentialException exp) {
+                    X509Credential.getDefaultCredential();
+            } catch (CredentialException exp) {
                 throw new DelegationException(exp);
             }
         }

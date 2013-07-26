@@ -26,9 +26,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.X509Credential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
-import org.globus.gsi.jaas.JaasGssUtil;
-import org.globus.gsi.jaas.JaasSubject;
+import org.globus.gsi.gssapi.JaasGssUtil;
+import org.globus.gsi.gssapi.jaas.JaasSubject;
 import org.globus.gsi.proxy.ProxyPathValidator;
 import org.globus.wsrf.impl.security.authentication.Constants;
 import org.globus.wsrf.impl.security.authentication.secureconv.service.SecurityContext;
@@ -99,13 +100,13 @@ public class WSSecurityResponseEngine extends WSSecurityEngine {
             cred = AuthUtil.getCredential(msgCtx);
         }
 
-        GlobusCredential credential = null;
+        X509Credential credential = null;
         if (cred == null) {
-            credential = GlobusCredential.getDefaultCredential();
+            credential = X509Credential.getDefaultCredential();
         } else {
             if (cred instanceof GlobusGSSCredentialImpl) {
                 credential =
-                    ((GlobusGSSCredentialImpl) cred).getGlobusCredential();
+                    ((GlobusGSSCredentialImpl) cred).getX509Credential();
             }
         }
 

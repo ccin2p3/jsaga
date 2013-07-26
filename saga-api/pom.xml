@@ -3,7 +3,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga</groupId>
         <artifactId>jsaga</artifactId>
-        <version>0.9.16-SNAPSHOT</version>
+        <version>0.9.17-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ogf.saga</groupId>
@@ -19,7 +19,7 @@
     <licenses>
         <license>
             <name>Vrije Universiteit License</name>
-            <url>http://grid.in2p3.fr/jsaga/saga-api/LICENSE.txt</url>
+            <url>http://software.in2p3.fr/jsaga/saga-api/LICENSE.txt</url>
         </license>
     </licenses>
     <build>

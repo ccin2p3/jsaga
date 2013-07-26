@@ -10,11 +10,11 @@
             <info>
                 <appname>JSAGA</appname>
                 <appversion><xsl:value-of select="@version"/></appversion>
-                <url>http://grid.in2p3.fr/jsaga/</url>
+                <url>http://software.in2p3.fr/jsaga/</url>
                 <authors>
                     <author name="Sylvain Reynaud" email="sreynaud@in2p3.fr"/>
                     <author name="Lionel Schwarz" email="lionel.schwarz@in2p3.fr"/>
-                    <author name="See contributors list" email="http://grid.in2p3.fr/software/jsaga-dev/contributors.html"/>
+                    <author name="See contributors list" email="http://software.in2p3.fr/jsaga-dev/contributors.html"/>
                 </authors>
                 <javaversion>1.5</javaversion>
             </info>
@@ -79,17 +79,17 @@
             </xsl:for-each>
 
             <!-- unix -->
-            <fileset os="unix" dir="bin/" includes="*.sh" targetdir="$INSTALL_PATH/bin/"/>
+            <fileset os="unix" dir="examples/" includes="*.sh" targetdir="$INSTALL_PATH/examples/"/>
             <xsl:for-each select="$scripts/script/text()">
-                <xsl:variable name="script">$INSTALL_PATH/bin/<xsl:value-of select="."/>.sh</xsl:variable>
+                <xsl:variable name="script">$INSTALL_PATH/examples/<xsl:value-of select="."/>.sh</xsl:variable>
                 <parsable os="unix" targetfile="{$script}" type="shell"/>
                 <executable os="unix" targetfile="{$script}" stage="never"/>
             </xsl:for-each>
 
             <!-- windows -->
-            <fileset os="windows" dir="bin/" includes="*.bat" targetdir="$INSTALL_PATH/bin/"/>
+            <fileset os="windows" dir="examples/" includes="*.bat" targetdir="$INSTALL_PATH/examples/"/>
             <xsl:for-each select="$scripts/script/text()">
-                <xsl:variable name="script">$INSTALL_PATH/bin/<xsl:value-of select="."/>.bat</xsl:variable>
+                <xsl:variable name="script">$INSTALL_PATH/examples/<xsl:value-of select="."/>.bat</xsl:variable>
                 <parsable os="windows" targetfile="{$script}" type="plain"/>
             </xsl:for-each>
         </pack>

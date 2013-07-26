@@ -8,8 +8,14 @@
             <attribute name="Server" value="voms://voms.hellasgrid.gr:15004/C=GR/O=HellasGrid/OU=hellasgrid.gr/CN=voms.hellasgrid.gr"/>
             <attribute name="UserVO" value="dteam"/>
             
+<<<<<<< HEAD
+            <attribute name="Server" value="voms://voms.maatg.eu:15001/O=GRID-FR/C=FR/O=MAATG/CN=voms.maatg.eu"/>
+            <attribute name="UserVO" value="vo.neugrid.eu"/>
+            <attribute name="UserFQAN" value="/vo.neugrid.eu/poc"/>
+=======
             <!--<attribute name="Server" value="voms://voms.maatg.eu:15001/O=GRID-FR/C=FR/O=MAATG/CN=voms.maatg.eu"/>-->
             <!--<attribute name="UserVO" value="vo.neugrid.eu"/>-->
+>>>>>>> refs/heads/master
 
             <!--<attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>-->
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>

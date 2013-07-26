@@ -1,6 +1,6 @@
 JSAGA
 
- {{{http://grid.in2p3.fr/jsaga/}JSAGA}} is a Java implementation of the
+ {{{http://software.in2p3.fr/jsaga/}JSAGA}} is a Java implementation of the
  Simple API for Grid Applications ({{{http://www.ogf.org/documents/GFD.90.pdf}SAGA}})
  specification from the Open Grid Forum ({{{http://www.ogf.org/}OGF}}).
 

@@ -18,14 +18,13 @@ import org.globus.wsrf.impl.security.descriptor.util.ElementParserException;
 
 import org.globus.wsrf.config.ConfigException;
 
-import org.globus.security.gridmap.GridMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.w3c.dom.Document;
 
 import javax.security.auth.Subject;
+import org.globus.gsi.gridmap.GridMap;
 
 /**
  * Helper class for initialization of resource security descriptor. All

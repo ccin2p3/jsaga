@@ -2,7 +2,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
-        <version>0.9.16-SNAPSHOT</version>
+        <version>0.9.17-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jsaga-adaptor-globus</artifactId>
@@ -22,6 +22,15 @@ execution management technologies (Gatekeeper).</description>
             </properties>
         </developer>
         <developer>
+			<name>Jérôme Revillard</name>
+			<email>jrevillard@gnubila.fr</email>
+			<organization>gnúbila France</organization>
+			<organizationUrl>http://gnubila.fr/</organizationUrl>
+			<properties>
+				<organizationLogoUrl>https://www.gnubila.fr/documents/10157/0/Gnubila-Cloud-1000.png</organizationLogoUrl>
+			</properties>
+		</developer>
+        <developer>
             <name>Aurélien Croc</name>
             <email>aurelien.croc@cea.fr</email>
             <organization>CEA</organization>
@@ -36,9 +45,14 @@ execution management technologies (Gatekeeper).</description>
     </developers>
     <dependencies>
         <dependency>
-            <groupId>org.globus</groupId>
-            <artifactId>cog-jglobus</artifactId>
-            <version>1.8</version>
+            <groupId>org.jglobus</groupId>
+            <artifactId>io</artifactId>
+            <version>2.0-Beta6-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jglobus</groupId>
+            <artifactId>myproxy</artifactId>
+            <version>2.0-Beta6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>

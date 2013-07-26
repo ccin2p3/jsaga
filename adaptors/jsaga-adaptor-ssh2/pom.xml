@@ -9,11 +9,11 @@
     <parent>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
-        <version>0.9.16-SNAPSHOT</version>
+        <version>0.9.17-SNAPSHOT</version>
     </parent>
 
     <artifactId>jsaga-adaptor-ssh2</artifactId>
-    <version>0.9.16-SNAPSHOT</version>
+    <version>0.9.17-SNAPSHOT</version>
 
     <!-- ************************************************************* -->
     <!-- *** Project Information ************************************* -->
@@ -31,19 +31,19 @@
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.16-SNAPSHOT</version>
+            <version>0.9.17-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency><!-- for data staging (scope runtime) and for class LocalJobProcess (scope compile) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-classic</artifactId>
-            <version>0.9.16-SNAPSHOT</version>
+            <version>0.9.17-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 		<dependency>
-		    <groupId>com.googlecode.ganymed-ssh-2</groupId>
+		    <groupId>org.jvnet.hudson</groupId>
 		    <artifactId>ganymed-ssh-2</artifactId>
-		    <version>260</version>
+		    <version>build260</version>
 		</dependency>
         <!-- 
         <dependency>
@@ -87,6 +87,41 @@
         </executions>
       </plugin>
     </plugins>
+    <pluginManagement>
+    	<plugins>
+    		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+    		<plugin>
+    			<groupId>org.eclipse.m2e</groupId>
+    			<artifactId>lifecycle-mapping</artifactId>
+    			<version>1.0.0</version>
+    			<configuration>
+    				<lifecycleMappingMetadata>
+    					<pluginExecutions>
+    						<pluginExecution>
+    							<pluginExecutionFilter>
+    								<groupId>org.scala-tools</groupId>
+    								<artifactId>
+    									maven-scala-plugin
+    								</artifactId>
+    								<versionRange>
+    									[2.15.2,)
+    								</versionRange>
+    								<goals>
+    									<goal>add-source</goal>
+    									<goal>compile</goal>
+    									<goal>testCompile</goal>
+    								</goals>
+    							</pluginExecutionFilter>
+    							<action>
+    								<ignore />
+    							</action>
+    						</pluginExecution>
+    					</pluginExecutions>
+    				</lifecycleMappingMetadata>
+    			</configuration>
+    		</plugin>
+    	</plugins>
+    </pluginManagement>
   </build>
 
 </project>

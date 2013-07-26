@@ -20,8 +20,6 @@ import org.globus.wsrf.impl.security.authentication.wssec.WSSecurityFault;
 
 import org.globus.wsrf.impl.security.util.AuthUtil;
 
-import org.globus.gsi.jaas.JaasGssUtil;
-import org.globus.gsi.jaas.JaasSubject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,6 +33,8 @@ import javax.xml.rpc.handler.soap.SOAPMessageContext;
 
 import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPMessage;
+import org.globus.gsi.gssapi.JaasGssUtil;
+import org.globus.gsi.gssapi.jaas.JaasSubject;
 
 import org.globus.util.I18n;
 

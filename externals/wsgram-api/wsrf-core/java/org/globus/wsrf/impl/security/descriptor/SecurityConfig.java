@@ -20,12 +20,7 @@ import org.globus.wsrf.config.ConfigException;
 import org.globus.wsrf.jndi.JNDIUtils;
 import org.globus.wsrf.utils.XmlUtils;
 
-import org.globus.gsi.GlobusCredential;
-import org.globus.gsi.GlobusCredentialException;
-import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
-import org.globus.gsi.jaas.JaasGssUtil;
 
-import org.globus.security.gridmap.GridMap;
 
 import org.globus.util.I18n;
 
@@ -50,6 +45,11 @@ import javax.naming.NameNotFoundException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.axis.MessageContext;
+import org.globus.gsi.CredentialException;
+import org.globus.gsi.X509Credential;
+import org.globus.gsi.gridmap.GridMap;
+import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
+import org.globus.gsi.gssapi.JaasGssUtil;
 
 import org.globus.wsrf.impl.security.authorization.ServiceAuthorizationChain;
 
@@ -258,7 +258,7 @@ public abstract class SecurityConfig {
 
     // Loads and stored creds in the descriptor, if specified.
     protected void loadCredentials()
-        throws GSSException, GlobusCredentialException, ConfigException {
+        throws GSSException, CredentialException, ConfigException, IOException {
 
         if (this.desc == null) {
             return;
@@ -275,8 +275,8 @@ public abstract class SecurityConfig {
                 File tempFile =
                     resolvePath(proxyFile, i18n.getMessage("proxyFileLoadFail",
                                                            proxyFile));
-                GlobusCredential gCred =
-                    new GlobusCredential(tempFile.getPath());
+                X509Credential gCred =
+                    new X509Credential(tempFile.getPath());
                 this.desc.setLastModified(new Long(tempFile.lastModified()));
                 cred = toGSSCredential(gCred);
                 this.desc.setProxyFilename(tempFile.getAbsolutePath());
@@ -298,8 +298,8 @@ public abstract class SecurityConfig {
             File resolveCertFile =
                 resolvePath(certFile, i18n.getMessage("certFileLoadFail",
                                                       certFile));
-            GlobusCredential gCred =
-                new GlobusCredential(resolveCertFile.getPath(),
+            X509Credential gCred =
+                new X509Credential(resolveCertFile.getPath(),
                                      resolveKeyFile.getPath());
             this.desc.setLastModified(new Long(resolveCertFile
                                                .lastModified()));
@@ -316,7 +316,7 @@ public abstract class SecurityConfig {
     }
 
     // Convert to GSS
-    public static GSSCredential toGSSCredential(GlobusCredential cred)
+    public static GSSCredential toGSSCredential(X509Credential cred)
         throws GSSException {
         return new GlobusGSSCredentialImpl(
                    cred, GSSCredential.INITIATE_AND_ACCEPT

@@ -2,7 +2,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
-        <version>0.9.16-SNAPSHOT</version>
+        <version>0.9.17-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>jsaga-adaptor-wms</artifactId>
@@ -23,11 +23,11 @@
         </developer>
 		<developer>
 			<name>Jérôme Revillard</name>
-			<email>jrevillard@maatg.fr</email>
-			<organization>MAAT France</organization>
-			<organizationUrl>http://www.maatg.com/</organizationUrl>
+			<email>jrevillard@gnubila.fr</email>
+			<organization>gnúbila France</organization>
+			<organizationUrl>http://gnubila.fr/</organizationUrl>
 			<properties>
-				<organizationLogoUrl>http://www.maatg.com/ptr/gestion/usuarios/user79048/maatg/files/img/vmaatg20090921224133.png</organizationLogoUrl>
+				<organizationLogoUrl>https://www.gnubila.fr/documents/10157/0/Gnubila-Cloud-1000.png</organizationLogoUrl>
 			</properties>
 		</developer>
 	</developers>
@@ -35,36 +35,41 @@
 		<dependency><!-- for security context (WARNING: order of dependencies matters) -->
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-voms</artifactId>
-			<version>0.9.16-SNAPSHOT</version>
+			<version>0.9.17-SNAPSHOT</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency><!-- for data staging -->
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-globus</artifactId>
-			<version>0.9.16-SNAPSHOT</version>
+			<version>0.9.17-SNAPSHOT</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-classic</artifactId>
-			<version>0.9.16-SNAPSHOT</version>
+			<version>0.9.17-SNAPSHOT</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.glite</groupId>
-			<artifactId>glite-jdl-api-java</artifactId>
-			<version>3.1.6</version>
+			<groupId>org.jglobus</groupId>
+			<artifactId>gridftp</artifactId>
+			<version>2.0-Beta6-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glite.jdl</groupId>
+			<artifactId>jdl-api-java</artifactId>
+			<version>3.3.1</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.glite</groupId>
 			<artifactId>glite-wms-wmproxy-api-java</artifactId>
-			<version>3.3.2</version>
+			<version>3.3.2-1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glite</groupId>
 			<artifactId>glite-lb-api-java</artifactId>
-			<version>3.2-p1</version>
+			<version>3.3.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.condor</groupId>
@@ -73,4 +78,10 @@
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>emi-infn-repo</id>
+			<url>http://www.pd.infn.it/~andreett/pub/maven/repository/</url>
+		</repository>
+	</repositories>
 </project>

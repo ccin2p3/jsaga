@@ -24,8 +24,6 @@ import org.globus.wsrf.ResourceException;
 import org.globus.wsrf.ResourceContextException;
 
 import org.globus.axis.gsi.GSIConstants;
-import org.globus.gsi.jaas.JaasGssUtil;
-import org.globus.gsi.jaas.JaasSubject;
 
 import org.gridforum.jgss.ExtendedGSSManager;
 
@@ -36,6 +34,8 @@ import javax.security.auth.Subject;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.handler.MessageContext;
+import org.globus.gsi.gssapi.JaasGssUtil;
+import org.globus.gsi.gssapi.jaas.JaasSubject;
 
 import org.w3c.dom.Node;
 

@@ -9,6 +9,7 @@ import org.ogf.saga.error.TimeoutException;
 
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryFilteredJob;
+import org.glite.wsdl.types.lb.JobFlags;
 
 public class WMSJobMonitorEnhancedAdaptor extends WMSJobMonitorAdaptor implements QueryFilteredJob{
 

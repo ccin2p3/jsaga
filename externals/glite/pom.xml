@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <!-- declaration -->
+    <parent>
+        <groupId>fr.in2p3.jsaga</groupId>
+        <artifactId>externals</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fr.in2p3.jsaga</groupId>
+    <artifactId>glite</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>gLite</name>
+
+    <!-- aggregation -->
+    <modules>
+        <!--<module>glite-ce-common-java</module>  -->   
+        <module>glite-lb-api-java</module>
+        <module>glite-security-trustmanager</module>
+        <module>glite-wms-wmproxy-api-java</module>
+        <!--<module>glite-ce-cream-api-java</module>-->
+        <!--<module>glite-security-authz-framework-java</module>-->
+        <module>glite-security-trustmanager-axis</module>
+        <module>glite-ce-delegation</module>
+        <module>glite-security-delegation-java</module>
+        <module>glite-security-util-java</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <repositories>
+    	<!-- CNAF repos for glite/EMI libs (https://github.com/italiangrid) -->
+    	<repository>
+			<id>cnaf-releases</id>
+			<name>CNAF releases</name>
+			<url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-releases/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>cnaf-snapshots</id>
+			<name>CNAF snapshots</name>
+			<url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>fail</checksumPolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>emi-infn-repo</id>
+			<url>http://www.pd.infn.it/~andreett/pub/maven/repository/</url>
+		</repository>
+        <repository>
+            <id>maatg-fr-releases</id>
+            <name>maatG France Releases</name>
+            <url>http://nexus.maatg.fr/content/repositories/maatg-fr-releases</url>
+        </repository>
+        <repository>
+            <id>maatg-fr-snapshots</id>
+            <name>maatG France Snapshots</name>
+            <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+</project>

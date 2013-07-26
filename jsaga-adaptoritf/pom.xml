@@ -2,10 +2,9 @@
     <parent>
         <groupId>fr.in2p3.jsaga</groupId>
         <artifactId>jsaga</artifactId>
-        <version>0.9.16-SNAPSHOT</version>
+        <version>0.9.17-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>fr.in2p3.jsaga</groupId>
     <artifactId>jsaga-adaptoritf</artifactId>
     <name>Interfaces for adaptors</name>
     <description>Set of interfaces to be implemented by JSAGA adaptors.</description>
@@ -23,8 +22,8 @@
                     </execution>
                 </executions>
             </plugin>
-		</plugins>
-	</build>
+        </plugins>
+    </build>
     <reporting>
         <plugins>
             <plugin>
@@ -50,9 +49,14 @@
             <version>1.1.1</version>
         </dependency>
         <dependency>
-    		<groupId>org.apache.directory.studio</groupId>
-    		<artifactId>org.apache.commons.codec</artifactId>
-    		<version>1.6</version>
-		</dependency>
+            <groupId>org.apache.directory.studio</groupId>
+            <artifactId>org.apache.commons.codec</artifactId>
+            <version>1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.3</version>
+        </dependency>             
     </dependencies>
 </project>

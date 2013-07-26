@@ -7,7 +7,6 @@ import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.usage.UProxyFile;
 import fr.in2p3.jsaga.adaptor.security.usage.UProxyObject;
 import org.globus.common.CoGProperties;
-import org.globus.gsi.GlobusCredentialException;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
@@ -230,7 +229,7 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
         Util.destroy((String) attributes.get(Context.USERPROXY));
     }
 
-    private static GSSCredential getDelegatedCredential(GSSCredential oldCred, Map attributes) throws ParseException, URISyntaxException, MyProxyException, GSSException, GlobusCredentialException {
+    private static GSSCredential getDelegatedCredential(GSSCredential oldCred, Map attributes) throws ParseException, URISyntaxException, MyProxyException, GSSException {
         GetParams proxyParameters = new GetParams();
 
         String userId = getUserName(oldCred, attributes);
@@ -292,6 +291,6 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
     private static String getUserName(GSSCredential cred, Map attributes) {
         return attributes.get(Context.USERID) != null 
         			? (String) attributes.get(Context.USERID) 
-        			: ((GlobusGSSCredentialImpl)cred).getGlobusCredential().getIdentity();
+        			: ((GlobusGSSCredentialImpl)cred).getX509Credential().getIdentity();
     }
 }

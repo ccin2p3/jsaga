@@ -2,7 +2,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga</groupId>
         <artifactId>jsaga</artifactId>
-        <version>0.9.16-SNAPSHOT</version>
+        <version>0.9.17-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jsaga-engine</artifactId>
@@ -31,8 +31,8 @@
                         <phase>process-resources</phase>
                         <goals><goal>filter</goal></goals>
                         <configuration>
-                            <file>config/bin/template.sh</file>
-                            <outputDirectory>${project.build.directory}/bin</outputDirectory>
+                            <file>config/examples/template.sh</file>
+                            <outputDirectory>${project.build.directory}/examples</outputDirectory>
                             <outputExtension>sh</outputExtension>
                             <propertyName>class.name</propertyName>
                             <propertyValues>assembly/filter.properties</propertyValues>
@@ -43,8 +43,8 @@
                         <phase>process-resources</phase>
                         <goals><goal>filter</goal></goals>
                         <configuration>
-                            <file>config/bin/template.bat</file>
-                            <outputDirectory>${project.build.directory}/bin</outputDirectory>
+                            <file>config/examples/template.bat</file>
+                            <outputDirectory>${project.build.directory}/examples</outputDirectory>
                             <outputExtension>bat</outputExtension>
                             <propertyName>class.name</propertyName>
                             <propertyValues>assembly/filter.properties</propertyValues>
@@ -78,7 +78,7 @@
                         <manifestEntries>
                             <Specification-Title>SAGA</Specification-Title>
                             <Specification-Vendor>Open Grid Forum, Copyright 2006</Specification-Vendor>
-                            <Specification-Version>1.0 RC.6</Specification-Version>
+                            <Specification-Version>1.1.1</Specification-Version>
                             <Implementation-Title>JSAGA</Implementation-Title>
                         </manifestEntries>
                         <manifest>
@@ -176,6 +176,25 @@
         								<ignore />
         							</action>
         						</pluginExecution>
+        						<pluginExecution>
+        							<pluginExecutionFilter>
+        								<groupId>
+        									org.codehaus.mojo
+        								</groupId>
+        								<artifactId>
+        									javacc-maven-plugin
+        								</artifactId>
+        								<versionRange>
+        									[2.6,)
+        								</versionRange>
+        								<goals>
+        									<goal>javacc</goal>
+        								</goals>
+        							</pluginExecutionFilter>
+        							<action>
+        								<ignore />
+        							</action>
+        						</pluginExecution>
         					</pluginExecutions>
         				</lifecycleMappingMetadata>
         			</configuration>
@@ -206,14 +225,14 @@
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.16-SNAPSHOT</version>
+            <version>0.9.17-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- JSAGA modules -->
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.16-SNAPSHOT</version>
+            <version>0.9.17-SNAPSHOT</version>
         </dependency>
         <!-- external dependencies -->
         <dependency>

@@ -14,10 +14,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.security.auth.Subject;
+import org.globus.gsi.gridmap.GridMap;
 
 import org.globus.wsrf.config.ConfigException;
 
-import org.globus.security.gridmap.GridMap;
 
 import org.globus.wsrf.Resource;
 

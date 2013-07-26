@@ -23,8 +23,6 @@ import org.globus.wsrf.config.ConfigException;
 
 import org.globus.wsrf.utils.ContextUtils;
 
-import org.globus.security.gridmap.GridMap;
-
 import org.globus.util.I18n;
 
 import org.apache.axis.MessageContext;
@@ -35,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 
 import javax.security.auth.Subject;
+import org.globus.gsi.gridmap.GridMap;
 
 /**
  * Helper class for initialization of service security descriptor. All

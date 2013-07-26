@@ -3,7 +3,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga</groupId>
         <artifactId>jsaga</artifactId>
-        <version>0.9.16-SNAPSHOT</version>
+        <version>0.9.17-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
@@ -16,7 +16,7 @@
         <module>jsaga-adaptor-linux</module>
         <module>jsaga-adaptor-lfc</module>
         <module>jsaga-adaptor-srm</module>
-        <module>jsaga-adaptor-wsgram</module>
+        <!--<module>jsaga-adaptor-wsgram</module>-->
         <module>jsaga-adaptor-cream</module>
         <module>jsaga-adaptor-wms</module>
         <module>jsaga-adaptor-bes-genesis2</module>
@@ -24,7 +24,7 @@
         <module>jsaga-adaptor-bes-unicore6</module>
         <module>jsaga-adaptor-bes</module>
         <module>jsaga-adaptor-unicore</module>
-        <module>jsaga-adaptor-naregi</module>
+        <!--<module>jsaga-adaptor-naregi</module>-->
         <module>jsaga-adaptor-batchssh</module>
         <module>jsaga-adaptor-ssh</module>
         <module>jsaga-adaptor-ssh2</module>
@@ -179,19 +179,19 @@
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.16-SNAPSHOT</version>
+            <version>0.9.17-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.16-SNAPSHOT</version>
+            <version>0.9.17-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.16-SNAPSHOT</version>
+            <version>0.9.17-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

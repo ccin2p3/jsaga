@@ -79,11 +79,12 @@ import org.globus.exec.utils.client.ManagedJobFactoryClientHelper;
 import org.globus.exec.utils.rsl.RSLHelper;
 import org.globus.exec.utils.rsl.RSLParseException;
 import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.X509Credential;
+import org.globus.gsi.gridmap.GridMap;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.rft.generated.DeleteRequestType;
 import org.globus.rft.generated.TransferRequestType;
 import org.globus.rft.generated.TransferType;
-import org.globus.security.gridmap.GridMap;
 import org.globus.util.I18n;
 import org.globus.wsrf.NoSuchResourceException;
 import org.globus.wsrf.NotificationConsumerManager;
@@ -658,14 +659,14 @@ public class GramJob implements NotifyCallback
         }
 
         // Credential to sign with
-        GlobusCredential credential = null;
+        X509Credential credential = null;
         if (this.proxy != null) {
             //user-specified credential
             credential
-                = ((GlobusGSSCredentialImpl)this.proxy).getGlobusCredential();
+                = ((GlobusGSSCredentialImpl)this.proxy).getX509Credential();
         } else {
             //default credential
-            credential = GlobusCredential.getDefaultCredential();
+            credential = X509Credential.getDefaultCredential();
         }
 
         // lifetime in seconds

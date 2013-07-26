@@ -48,13 +48,25 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
     /** constructor for NSDirectory.open() */
     public AbstractSyncLogicalFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(dir, URLHelper.toFileURL(relativeUrl), new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
-        this.init(flags);
+        boolean initOK = false;
+        try {
+           this.init(flags);
+           initOK = true;
+        } finally {
+        	if (!initOK) this.close();
+        }
     }
 
     /** constructor for NSEntry.openAbsolute() */
     public AbstractSyncLogicalFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(entry, URLHelper.toFilePath(absolutePath), new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
-        this.init(flags);
+        boolean initOK = false;
+        try {
+           this.init(flags);
+           initOK = true;
+        } finally {
+        	if (!initOK) this.close();
+        }
     }
 
     private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {

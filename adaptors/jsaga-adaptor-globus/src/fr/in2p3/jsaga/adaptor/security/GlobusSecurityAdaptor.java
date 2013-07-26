@@ -6,7 +6,6 @@ import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.globus.common.CoGProperties;
-import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.util.Util;
 import org.gridforum.jgss.ExtendedGSSCredential;
@@ -20,6 +19,7 @@ import java.io.*;
 import java.lang.Exception;
 import java.security.cert.X509Certificate;
 import java.util.Map;
+import org.globus.gsi.X509Credential;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -184,7 +184,7 @@ public abstract class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor 
 
     private static boolean hasNonCriticalExtensions(GSSCredential proxy) {
         if (proxy instanceof GlobusGSSCredentialImpl) {
-            GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)proxy).getGlobusCredential();
+            X509Credential globusProxy = ((GlobusGSSCredentialImpl)proxy).getX509Credential();
             X509Certificate cert = globusProxy.getCertificateChain()[0];
             if (cert instanceof X509CertificateObject) {
                 X509CertificateObject bouncyCert = (X509CertificateObject) cert;

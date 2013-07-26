@@ -36,8 +36,8 @@ import org.ietf.jgss.Oid;
 
 import org.globus.axis.gsi.GSIConstants;
 import org.globus.gsi.gssapi.GSSConstants;
-import org.globus.gsi.jaas.JaasGssUtil;
-import org.globus.gsi.jaas.JaasSubject;
+import org.globus.gsi.gssapi.JaasGssUtil;
+import org.globus.gsi.gssapi.jaas.JaasSubject;
 import org.globus.wsrf.impl.security.authentication.Constants;
 import org.globus.wsrf.impl.security.authentication.secureconv.service.AuthenticationServiceConstants;
 import org.globus.wsrf.impl.security.authentication.secureconv.service.SecurityContext;

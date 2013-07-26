@@ -11,15 +11,20 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import org.apache.log4j.Logger;
 import org.globus.common.ChainedIOException;
-import org.globus.ftp.*;
-import org.globus.ftp.exception.*;
+import org.globus.ftp.DataChannelAuthentication;
+import org.globus.ftp.FeatureList;
+import org.globus.ftp.GridFTPSession;
+import org.globus.ftp.exception.ClientException;
+import org.globus.ftp.exception.ServerException;
+import org.globus.ftp.exception.UnexpectedReplyCodeException;
 import org.globus.gsi.gssapi.GlobusGSSException;
 import org.globus.gsi.gssapi.auth.HostAuthorization;
-import org.globus.io.streams.GridFTPInputStream;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 
 /* ***************************************************
@@ -70,7 +75,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
                 throw new BadParameterException("Bad value for configuration attribute: "+TCP_BUFFER_SIZE, e);
             }
         }
-        m_DataChannelAuthentication = true;
+        m_DataChannelAuthentication = false;
 
         // open connection
         m_client = createConnection(m_credential, host, port, m_TCPBufferSize, m_DataChannelAuthentication);
@@ -150,7 +155,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
 
         // create output stream
         try {
-        	return new GsiftpOutputStream(m_credential, m_client.getHost(), m_client.getPort(), absolutePath, append);
+        	return new GsiftpOutputStream(m_credential, m_client, absolutePath, append);
         	//return new GsiftpOutputStream(m_client, absolutePath, append);
         } catch (Exception e) {
             try {
@@ -174,21 +179,21 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         targetAdaptor.m_credential = m_credential;
         targetAdaptor.connect(null, targetHost, targetPort, null, null);
 
-        //todo: remove this block when overwriting target file will work (it only works with UrlCopy)
-        if (overwrite && targetAdaptor.exists(targetAbsolutePath, additionalArgs)) {
-            try {
-                targetAdaptor.m_client.deleteFile(targetAbsolutePath);
-            } catch (Exception e) {
-                throw new PermissionDeniedException("Failed to overwrite target file", e);
-            }
-        }
-
-        // need to check existence of target explicitely, else exception is never thrown
-        if (!overwrite && targetAdaptor.exists(targetAbsolutePath, additionalArgs)) {
-            throw new AlreadyExistsException("File already exists");
-        }
-
         try {
+             //todo: remove this block when overwriting target file will work (it only works with UrlCopy)
+             if (overwrite && targetAdaptor.exists(targetAbsolutePath, additionalArgs)) {
+                 try {
+                     targetAdaptor.m_client.deleteFile(targetAbsolutePath);
+                 } catch (Exception e) {
+                     throw new PermissionDeniedException("Failed to overwrite target file", e);
+                 }
+             }
+
+             // need to check existence of target explicitely, else exception is never thrown
+             if (!overwrite && targetAdaptor.exists(targetAbsolutePath, additionalArgs)) {
+                 throw new AlreadyExistsException("File already exists");
+             }
+
             // for compatibility with VDT-1.6, .NET implementation
             m_client.setDataChannelAuthentication(DataChannelAuthentication.NONE);
             targetAdaptor.m_client.setDataChannelAuthentication(DataChannelAuthentication.NONE);
@@ -214,21 +219,21 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         sourceAdaptor.m_credential = m_credential;
         sourceAdaptor.connect(null, sourceHost, sourcePort, null, null);
 
-        //todo: remove this block when overwriting target file will work (it only works with UrlCopy)
-        if (overwrite && this.exists(targetAbsolutePath, additionalArgs)) {
-            try {
-                m_client.deleteFile(targetAbsolutePath);
-            } catch (Exception e) {
-                throw new PermissionDeniedException("Failed to overwrite target file", e);
-            }
-        }
-
-        // need to check existence of target explicitely, else exception is never thrown
-        if (!overwrite && this.exists(targetAbsolutePath, additionalArgs)) {
-            throw new AlreadyExistsException("File already exists");
-        }
-
         try {
+            //todo: remove this block when overwriting target file will work (it only works with UrlCopy)
+            if (overwrite && this.exists(targetAbsolutePath, additionalArgs)) {
+                try {
+                    m_client.deleteFile(targetAbsolutePath);
+                } catch (Exception e) {
+                    throw new PermissionDeniedException("Failed to overwrite target file", e);
+                }
+            }
+
+            // need to check existence of target explicitely, else exception is never thrown
+            if (!overwrite && this.exists(targetAbsolutePath, additionalArgs)) {
+                throw new AlreadyExistsException("File already exists");
+            }
+
             // for compatibility with VDT-1.6, .NET implementation
             sourceAdaptor.m_client.setDataChannelAuthentication(DataChannelAuthentication.NONE);
             m_client.setDataChannelAuthentication(DataChannelAuthentication.NONE);
@@ -285,11 +290,39 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
     }
 
     public static GsiftpClient createConnection(GSSCredential cred, String host, int port, int tcpBufferSize, boolean reqDCAU) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
+        Logger.getLogger(GsiftpDataAdaptorAbstract.class).info("Connecting to Gsiftp service at: " + host + ":" + port + "...");
+        GsiftpClient client;
         try {
-    		Logger.getLogger(GsiftpDataAdaptorAbstract.class).info("Connecting to Gsiftp service at: " + host + ":" + port + "...");
-            GsiftpClient client = new GsiftpClient(host, port);
-    		Logger.getLogger(GsiftpDataAdaptorAbstract.class).info(client.getWelcome());
-            
+            client = new GsiftpClient(host, port);
+        } catch (IOException e) {
+            if (e.getMessage()!=null && e.getMessage().indexOf("Authentication") > -1) {
+                throw new AuthenticationFailedException(e);
+            } else {
+                throw new TimeoutException(e);
+            }
+        }  catch (ServerException e) {
+            switch(e.getCode()) {
+                case ServerException.SERVER_REFUSED:
+                    try {
+                        throw e.getRootCause();
+                    } catch (UnexpectedReplyCodeException unexpectedReplyCode) {
+                        switch(unexpectedReplyCode.getReply().getCode()) {
+                            case 530:
+                                throw new AuthorizationFailedException(unexpectedReplyCode);
+                            default:
+                                throw new NoSuccessException(unexpectedReplyCode);
+                        }
+                    } catch (Exception e1) {
+                        throw new NoSuccessException(e1);
+                    }
+                default:
+                    throw new NoSuccessException(e);
+            }
+        }
+        
+    	Logger.getLogger(GsiftpDataAdaptorAbstract.class).info(client.getWelcome());
+
+        try {
     		// TODO: alternative service name
     		// Authorization authorization = new org.globus.wsrf.impl.security.authorization.HostAuthorization("/DC=IN/DC=GARUDAINDIA/O=C-DAC/OU=CTSF/CN=xn03.ctsf.cdacb.in");
             client.setAuthorization(HostAuthorization.getInstance());
@@ -311,20 +344,23 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
             // returns
             return client;
         } catch (ChainedIOException e) {
+            disconnectClient(client);
             try {
-                throw e.getException();
+                throw e.getCause();
             } catch (GlobusGSSException gssException) {
                 throw new AuthenticationFailedException(gssException);
             } catch (Throwable throwable) {
                 throw new TimeoutException(throwable);
             }
         } catch (IOException e) {
+            disconnectClient(client);
             if (e.getMessage()!=null && e.getMessage().indexOf("Authentication") > -1) {
                 throw new AuthenticationFailedException(e);
             } else {
                 throw new TimeoutException(e);
             }
         } catch (ServerException e) {
+            disconnectClient(client);
             switch(e.getCode()) {
                 case ServerException.SERVER_REFUSED:
                     try {
@@ -342,6 +378,16 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
                 default:
                     throw new NoSuccessException(e);
             }
+        } 
+    }
+    
+    private static void disconnectClient(GsiftpClient client) {
+        try {
+            client.disconnect();
+        } catch (ServerException ex) {
+            Logger.getLogger(GsiftpDataAdaptorAbstract.class).warn("Error disconnecting", ex);
+        } catch (IOException ex) {
+            Logger.getLogger(GsiftpDataAdaptorAbstract.class).warn("Error disconnecting", ex);
         }
     }
 
