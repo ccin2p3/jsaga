@@ -64,6 +64,8 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.globus.gsi.GSIConstants.CertificateType;
 import org.globus.gsi.TrustedCertificates;
 import org.globus.gsi.X509Credential;
 
@@ -299,11 +301,15 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
                     BouncyCastleCertProcessingFactory factory = BouncyCastleCertProcessingFactory.getDefault();
 
-                    //FIXME (Jerome): We cannot mix proxy types. If the provided user certificate is not a GSI_2_PROXY, it will fail at some point server side I guess.
-                    // We must detect the user proxy type and then generate the new one accordingly.
+                    //By default, use GSI_2_PROXY type
+                    CertificateType proxyType = globusCred.getProxyType();
+                    if(proxyType.equals(CertificateType.EEC)){
+                    	proxyType = CertificateType.GSI_2_PROXY;
+                    }
+                    
                     X509Certificate certificate = factory.createCertificate(new ByteArrayInputStream(GrDPX509Util.readPEM(
                             new ByteArrayInputStream(certReq.getBytes()), GrDPConstants.CRH,
-                            GrDPConstants.CRF)), userCerts[0], key, 12 * 3600, GSIConstants.CertificateType.GSI_2_PROXY); //12 hours proxy
+                            GrDPConstants.CRF)), userCerts[0], key, 12 * 3600, proxyType); //12 hours proxy
 
                     X509Certificate[] finalCerts = new X509Certificate[userCerts.length + 1];
                     finalCerts[0] = certificate;
