@@ -88,7 +88,14 @@ public abstract class HttpDataAdaptorAbstract extends HtmlDataAdaptorAbstract im
                 	// replace "&amp;" by "%26"
                 	entryName = entryName.replaceAll("&amp;","%26");
                 	// decode URL
-                	entryName = java.net.URLDecoder.decode(entryName, "utf-8");
+                	// The URLDecoder.decode converts a "+" into a space character " ".
+                	// To avoid this, split by "+" and decode each part.
+                	String[] entryNameParts = entryName.split("\\+");
+                	entryName = "";
+                	for (String part: entryNameParts) {
+                		entryName = entryName + java.net.URLDecoder.decode(part, "utf-8") + "+";
+                	}
+                	entryName = entryName.substring(0, entryName.length()-1);
                 	entryName = new java.io.File(entryName).getPath();
                     list.add(new HtmlFileAttributes(entryName, isDir));
                 }
