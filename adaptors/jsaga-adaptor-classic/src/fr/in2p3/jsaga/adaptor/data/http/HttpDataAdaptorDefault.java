@@ -25,7 +25,7 @@ import java.net.*;
 public class HttpDataAdaptorDefault extends HttpDataAdaptorAbstract implements FileReaderStreamFactory {
     public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
-            this.getConnection(absolutePath, additionalArgs);
+            this.getConnection(absolutePath, additionalArgs).disconnect();
             return true;
         } catch (DoesNotExistException e) {
             return false;
@@ -33,8 +33,10 @@ public class HttpDataAdaptorDefault extends HttpDataAdaptorAbstract implements F
     }
 
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        URLConnection cnx = this.getConnection(absolutePath, additionalArgs);
-        return new HttpFileAttributesDefault(cnx);
+        HttpURLConnection cnx = this.getConnection(absolutePath, additionalArgs);
+        HttpFileAttributesDefault attrs =new HttpFileAttributesDefault(cnx);
+        cnx.disconnect();
+        return attrs;
     }
 
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -82,10 +84,13 @@ public class HttpDataAdaptorDefault extends HttpDataAdaptorAbstract implements F
         } else if (status.endsWith("200 OK")) {
             return cnx;
         } else if (status.endsWith("404 Not Found")) {
+            cnx.disconnect();
             throw new DoesNotExistException(status);
         } else if (status.endsWith("403 Forbidden")) {
+            cnx.disconnect();
             throw new PermissionDeniedException(status);
         } else {
+            cnx.disconnect();
             throw new NoSuccessException(status);
         }
     }
