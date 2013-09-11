@@ -47,6 +47,7 @@ import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
+import fr.in2p3.jsaga.helpers.URLEncoder;
 import fr.maatg.glite.dm.CNSConnector;
 import fr.maatg.glite.dm.connection.DMError;
 import fr.maatg.glite.dm.connection.ReceiveException;
@@ -259,11 +260,13 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			m_lfcConnector.startTransaction(connection,null);
 			boolean done = false;
 			try {
-				m_lfcConnector.addReplica(connection, guid, new java.net.URI(replicaEntry.getString()));
+				//m_lfcConnector.addReplica(connection, guid, new java.net.URI(URLEncoder.encode(replicaEntry.getString())));
+				m_lfcConnector.addReplica(connection, guid, new java.net.URI(replicaEntry.toString()));
 				m_lfcConnector.setFileSize(connection, logicalEntry, 0L, fileSize, null, null);
 				m_lfcConnector.endTransaction(connection);
 				done = true;
 			} catch (URISyntaxException e) {
+				e.printStackTrace();
 				//Cannot happen
 			}finally{
 				if(!done){
