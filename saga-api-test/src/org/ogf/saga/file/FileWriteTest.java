@@ -29,7 +29,7 @@ import org.ogf.saga.url.URLFactory;
 public abstract class FileWriteTest extends AbstractNSEntryTest {
     // test data
     private static final String DEFAULT_CONTENT2 = "Another text !";
-    private static final String DEFAULT_ENCODED_FILENAME = "fileéàê.txt";
+    private static final String DEFAULT_ENCODED_FILENAME = "fileé %.txt";
 
     protected FileWriteTest(String protocol) throws Exception {
         super(protocol);
