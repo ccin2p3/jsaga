@@ -31,9 +31,7 @@
         <module>jargon</module>
         <module>jeldoclet</module>
         <module>libmatthew-java</module>
-        <module>naregi-ss-api</module>
         <module>secret-service-api-java</module>
-        <!--<module>wsgram-api</module>-->
     </modules>
     <build>
         <directory>build</directory>
