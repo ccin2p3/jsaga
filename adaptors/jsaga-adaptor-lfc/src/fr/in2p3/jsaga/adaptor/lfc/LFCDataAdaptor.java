@@ -260,7 +260,6 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			m_lfcConnector.startTransaction(connection,null);
 			boolean done = false;
 			try {
-				//m_lfcConnector.addReplica(connection, guid, new java.net.URI(URLEncoder.encode(replicaEntry.getString())));
 				m_lfcConnector.addReplica(connection, guid, new java.net.URI(replicaEntry.toString()));
 				m_lfcConnector.setFileSize(connection, logicalEntry, 0L, fileSize, null, null);
 				m_lfcConnector.endTransaction(connection);
