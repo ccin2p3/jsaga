@@ -1,5 +1,8 @@
 package fr.in2p3.jsaga.adaptor.data;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
@@ -13,7 +16,7 @@ package fr.in2p3.jsaga.adaptor.data;
  * This is an extract of class fr.in2p3.jsaga.impl.url.URLEncoder in module jsaga-engine
  */
 public class PathEncoder {
-    static String encode(String path) {
+    static String encode(String path) throws UnsupportedEncodingException {
         StringBuffer buffer = new StringBuffer();
         char[] array = path.toCharArray();
         for (int i=0; i<array.length; i++) {
@@ -31,7 +34,7 @@ public class PathEncoder {
                     appendHex(buffer, 0xC0 | (c >> 6));
                     appendHex(buffer, 0x80 | (c & 0x3F));
                 } else {
-                    buffer.append(c);
+                    buffer.append(URLEncoder.encode(Character.toString(c), "UTF-8"));
                 }
             }
         }

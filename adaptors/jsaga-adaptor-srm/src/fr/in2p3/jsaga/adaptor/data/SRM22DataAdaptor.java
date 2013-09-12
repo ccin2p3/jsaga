@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.data;
 import java.io.EOFException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.util.Iterator;
@@ -932,7 +933,9 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             return new org.apache.axis.types.URI("srm", null, m_host, m_port, SERVICE_PATH, "SFN="+encodedPath, null);
         } catch (org.apache.axis.types.URI.MalformedURIException e) {
             throw new NoSuccessException(e);
-        }
+        } catch (UnsupportedEncodingException e) {
+            throw new NoSuccessException(e);
+		}
     }
 
     private void rethrowException(TReturnStatus status) throws PermissionDeniedException, BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException {
