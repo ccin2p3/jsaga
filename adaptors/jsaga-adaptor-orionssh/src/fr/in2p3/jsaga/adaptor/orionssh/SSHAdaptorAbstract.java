@@ -21,24 +21,17 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 
 import com.trilead.ssh2.Connection;
-import com.trilead.ssh2.ConnectionInfo;
-import com.trilead.ssh2.SCPClient;
 import com.trilead.ssh2.SFTPException;
 import com.trilead.ssh2.SFTPv3Client;
 import com.trilead.ssh2.SFTPv3FileAttributes;
 import com.trilead.ssh2.SFTPv3FileHandle;
 import com.trilead.ssh2.ServerHostKeyVerifier;
-import com.trilead.ssh2.Session;
-import com.trilead.ssh2.channel.Channel;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -99,16 +92,17 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     		
     	try {
     		// checking compression level
-    		if (attributes!=null && attributes.containsKey(COMPRESSION_LEVEL)) {
-    			try {
-    				compression_level = Integer.valueOf(((String) attributes.get(COMPRESSION_LEVEL)));
-    				if(compression_level > 9 || compression_level < 0 )
-    					throw new BadParameterException("Invalid value for CompressionLevel attribute: "+ compression_level+ " must be in the 0-9 range.");
-    			}
-    			catch (NumberFormatException e) {
-    				throw new BadParameterException("Unable to parse CompressionLevel attribute.",e);
-    			}
-    		}
+    		// TODO
+//    		if (attributes!=null && attributes.containsKey(COMPRESSION_LEVEL)) {
+//    			try {
+//    				compression_level = Integer.valueOf(((String) attributes.get(COMPRESSION_LEVEL)));
+//    				if(compression_level > 9 || compression_level < 0 )
+//    					throw new BadParameterException("Invalid value for CompressionLevel attribute: "+ compression_level+ " must be in the 0-9 range.");
+//    			}
+//    			catch (NumberFormatException e) {
+//    				throw new BadParameterException("Unable to parse CompressionLevel attribute.",e);
+//    			}
+//    		}
 
     		boolean knownHostsUsed = (attributes.containsKey(KNOWN_HOSTS) && attributes.get(KNOWN_HOSTS) != null && ((String)attributes.get(KNOWN_HOSTS)).length()>0);
     		// set known hosts file : checking will be done
