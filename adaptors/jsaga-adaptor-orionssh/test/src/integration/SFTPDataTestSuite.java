@@ -35,42 +35,29 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
     }
     public static class SFTPDirectoryListTest extends DirectoryListTest {
         public SFTPDirectoryListTest() throws Exception {super("orionsftp");}
+
         public void test_list_and_getAttributes() throws Exception {
         	String new_content = "new_content";
             if (m_file instanceof File) {
-            	// Write another file
-//                URL file2Url = createURL(m_subDirUrl, "File2.txt");
-//                NSEntry file = m_subDir.open(file2Url, FLAGS_FILE);
-//                Buffer buffer = BufferFactory.createBuffer(new_content.getBytes());
-//                ((File)file).write(buffer);
-//                file.close();
-//                checkWrited(file2Url, new_content);
-                // delete created file
                 List <URL> dirContent = m_subDir.list();
-//              m_dir.close();
+	            for (URL dirEntry: dirContent) {
+                       String fileName = dirEntry.getPath();
+                       String url = m_subDir.getURL().toString() + fileName;
+                       File f = FileFactory.createFile(m_session, URLFactory.createURL(url));
+                       long size = f.getSize();
+                       long date = f.getMTime();
+                       boolean readPermisssion = f.permissionsCheck("*", Permission.READ.getValue());
+                       boolean writePermission = f.permissionsCheck("*", Permission.WRITE.getValue());
+                       boolean executePermission = f.permissionsCheck("*", Permission.EXEC.getValue());
 
-	              for (URL dirEntry: dirContent) {
-//	                   if (m_subDir.isEntry(dirEntry)) {
-	                       String fileName = dirEntry.getPath();
-	                       String url = m_subDir.getURL().toString() + fileName;
-//	                       System.out.println(url);
-	                       File f = FileFactory.createFile(m_session, URLFactory.createURL(url)/*, Flags.NONE.getValue()*/);
-//	                       long size = f.getSize();
-//	                       long date = f.getMTime();
-//	                       boolean readPermisssion = f.permissionsCheck("*", Permission.READ.getValue());
-//	                       boolean writePermission = f.permissionsCheck("*", Permission.WRITE.getValue());
-//	                       boolean executePermission = f.permissionsCheck("*", Permission.EXEC.getValue());
-//	
-//	                       System.out.println(
-//	                               fileName + " " +
-//	                               (readPermisssion ? "r" : "-") + (writePermission ? "w" : "-") + (executePermission ? "x" : "-") + " " + 
-//	                               (date != 0l ? new SimpleDateFormat("dd-MMM-yyyy HH:mm").format(new Date(date)) : "?") + " " 
-//	                               + (size != 0l ? "" + size + "B": "?")
-//	                               );
-	                       f.close();
-//	                   }
-	              }
-//                file.remove();
+                       System.out.println(
+                               fileName + " " +
+                               (readPermisssion ? "r" : "-") + (writePermission ? "w" : "-") + (executePermission ? "x" : "-") + " " + 
+                               (date != 0l ? new SimpleDateFormat("dd-MMM-yyyy HH:mm").format(new Date(date)) : "?") + " " 
+                               + (size != 0l ? "" + size + "B": "?")
+                               );
+                       f.close();
+	            }
             } else {
                 fail("Not an instance of class: File");
             }
