@@ -42,10 +42,11 @@ public class SFTPFileAttributes extends FileAttributes {
     public int getType() {
         if(m_attrs.isDirectory()) {
             return TYPE_DIRECTORY;
-        } else if(m_attrs.isSymlink()) {
-            return TYPE_LINK;
+        // Should test isSymlink() before isRegularFile() but isSymlink() returns true when file is not a link
         } else if (m_attrs.isRegularFile()) {
             return TYPE_FILE;
+        } else if(m_attrs.isSymlink()) {
+            return TYPE_LINK;
         } else {
         	return TYPE_UNKNOWN;
         }
