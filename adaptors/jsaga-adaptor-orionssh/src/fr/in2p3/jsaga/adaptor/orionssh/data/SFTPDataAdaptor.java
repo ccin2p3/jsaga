@@ -41,7 +41,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		FileReaderGetter, FileWriterPutter, DataRename {
 //	private ChannelSftp channelSftp;
 	protected static final String FILENAME_ENCODING = "FilenameEncoding";
-	public final static String TYPE = "orionsftp";
+	public final static String TYPE = "sftp";
 	
 	public String getType() {
 		return TYPE;

@@ -44,7 +44,7 @@ public class SSHJobStatus extends JobStatus {
     }
 
 	public String getModel() {
-        return "ssh";
+        return "deprecated-ssh";
     }
 
     public SubState getSubState() {

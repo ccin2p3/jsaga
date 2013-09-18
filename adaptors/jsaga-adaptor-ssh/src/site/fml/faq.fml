@@ -35,7 +35,7 @@ ssh localhost -i ~/.ssh/id_rsa</pre>
         <faq id="url">
             <question>What is the URL syntax understood by this plug-in ?</question>
             <answer>The URL must be:
-                <pre><![CDATA[ssh://<HOSTNAME>[:<PORT>]/
+                <pre><![CDATA[deprecated-ssh://<HOSTNAME>[:<PORT>]/
 Where:
     <HOSTNAME> is the name of the host running the SSH daemon,
     <PORT> is 22 by default.

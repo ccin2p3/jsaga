@@ -6,8 +6,6 @@ import java.util.List;
 
 import junit.framework.Test;
 
-import org.ogf.saga.buffer.Buffer;
-import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.permissions.Permission;
@@ -24,6 +22,9 @@ import org.ogf.saga.url.URLFactory;
 ****************************************************/
 
 public class SFTPDataTestSuite extends JSAGATestSuite {
+	
+	private final static String TYPE = "sftp";
+	
     /** create test suite */
     public static Test suite() throws Exception {return new SFTPDataTestSuite();}
     /** index of test cases */
@@ -31,13 +32,12 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
 
     /** test cases */
     public static class SFTPNSEntryTest extends NSEntryTest {
-        public SFTPNSEntryTest() throws Exception {super("orionsftp");}
+        public SFTPNSEntryTest() throws Exception {super(TYPE);}
     }
     public static class SFTPDirectoryListTest extends DirectoryListTest {
-        public SFTPDirectoryListTest() throws Exception {super("orionsftp");}
+        public SFTPDirectoryListTest() throws Exception {super(TYPE);}
 
         public void test_list_and_getAttributes() throws Exception {
-        	String new_content = "new_content";
             if (m_file instanceof File) {
                 List <URL> dirContent = m_subDir.list();
 	            for (URL dirEntry: dirContent) {
@@ -66,33 +66,33 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
 
     }
     public static class SFTPDirectoryMakeTest extends DirectoryMakeTest {
-        public SFTPDirectoryMakeTest() throws Exception {super("orionsftp");}
+        public SFTPDirectoryMakeTest() throws Exception {super(TYPE);}
     }
     public static class SFTPDirectoryTest extends DirectoryTest {
-        public SFTPDirectoryTest() throws Exception {super("orionsftp");}
+        public SFTPDirectoryTest() throws Exception {super(TYPE);}
     }
     public static class SFTPFileReadTest extends FileReadTest {
-        public SFTPFileReadTest() throws Exception {super("orionsftp");}
+        public SFTPFileReadTest() throws Exception {super(TYPE);}
     }
     public static class SFTPFileWriteTest extends FileWriteTest {
-        public SFTPFileWriteTest() throws Exception {super("orionsftp");}
+        public SFTPFileWriteTest() throws Exception {super(TYPE);}
     }
     public static class SFTPNSCopyTest extends NSCopyTest {
-        public SFTPNSCopyTest() throws Exception {super("orionsftp", "orionsftp");}
+        public SFTPNSCopyTest() throws Exception {super(TYPE, TYPE);}
     }
     public static class SFTPNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public SFTPNSCopyRecursiveTest() throws Exception {super("orionsftp", "orionsftp");}
+        public SFTPNSCopyRecursiveTest() throws Exception {super(TYPE, TYPE);}
     }
     public static class SFTPNSMoveTest extends NSMoveTest {
-        public SFTPNSMoveTest() throws Exception {super("orionsftp", "orionsftp");}
+        public SFTPNSMoveTest() throws Exception {super(TYPE, TYPE);}
     }
     public static class SFTP_to_EmulatorNSCopyTest extends NSCopyTest {
-        public SFTP_to_EmulatorNSCopyTest() throws Exception {super("orionsftp", "test");}
+        public SFTP_to_EmulatorNSCopyTest() throws Exception {super(TYPE, "test");}
     }
     public static class SFTP_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public SFTP_to_EmulatorNSCopyRecursiveTest() throws Exception {super("orionsftp", "test");}
+        public SFTP_to_EmulatorNSCopyRecursiveTest() throws Exception {super(TYPE, "test");}
     }
     public static class SFTP_to_EmulatorNSMoveTest extends NSMoveTest {
-        public SFTP_to_EmulatorNSMoveTest() throws Exception {super("orionsftp", "test");}
+        public SFTP_to_EmulatorNSMoveTest() throws Exception {super(TYPE, "test");}
     }
 }

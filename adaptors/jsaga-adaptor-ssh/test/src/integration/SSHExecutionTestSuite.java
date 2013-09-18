@@ -13,6 +13,9 @@ import org.ogf.saga.job.*;
 ****************************************************/
 
 public class SSHExecutionTestSuite extends JSAGATestSuite {
+	
+	private static final String TYPE = "deprecated-ssh";
+	
     /** create test suite */
     public static Test suite() throws Exception {return new SSHExecutionTestSuite();}
     /** index of test cases */
@@ -20,7 +23,7 @@ public class SSHExecutionTestSuite extends JSAGATestSuite {
 
     // test cases
     public static class SSHJobDescriptionTest extends JobDescriptionTest {
-        public SSHJobDescriptionTest() throws Exception {super("ssh");}
+        public SSHJobDescriptionTest() throws Exception {super(TYPE);}
         public void test_spmdVariation() { super.ignore("not supported"); }
         public void test_totalCPUCount() { super.ignore("not supported"); }
         public void test_numberOfProcesses() { super.ignore("not supported"); }
@@ -42,22 +45,22 @@ public class SSHExecutionTestSuite extends JSAGATestSuite {
     
     // test cases
     public static class SSHJobRunMinimalTest extends JobRunMinimalTest {
-        public SSHJobRunMinimalTest() throws Exception {super("ssh");}
+        public SSHJobRunMinimalTest() throws Exception {super(TYPE);}
     }
     
     // test cases
     public static class SSHJobRunRequiredTest extends JobRunRequiredTest {
-        public SSHJobRunRequiredTest() throws Exception {super("ssh");}
+        public SSHJobRunRequiredTest() throws Exception {super(TYPE);}
     }
 
     // test cases
     public static class SSHJobRunSandboxTest extends JobRunSandboxTest {
-        public SSHJobRunSandboxTest() throws Exception {super("ssh");}
+        public SSHJobRunSandboxTest() throws Exception {super(TYPE);}
     }
     
     // test cases
     public static class SSHJobRunOptionalTest extends JobRunOptionalTest {
-        public SSHJobRunOptionalTest() throws Exception {super("ssh");}
+        public SSHJobRunOptionalTest() throws Exception {super(TYPE);}
         public void test_resume_done() { super.ignore("not supported"); }
         public void test_resume_running() { super.ignore("not supported"); }
         public void test_suspend_done() { super.ignore("not supported"); }
@@ -68,7 +71,7 @@ public class SSHExecutionTestSuite extends JSAGATestSuite {
     
  	// test cases
     public static class SSHJobRunDescriptionTest extends JobRunDescriptionTest {
-        public SSHJobRunDescriptionTest() throws Exception {super("ssh");}
+        public SSHJobRunDescriptionTest() throws Exception {super(TYPE);}
         public void test_run_queueRequirement() { super.ignore("not supported"); }
         public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
         public void test_run_memoryRequirement() { super.ignore("not supported"); }
@@ -76,12 +79,12 @@ public class SSHExecutionTestSuite extends JSAGATestSuite {
     
     // test cases
     public static class SSHJobRunInteractiveTest extends JobRunInteractiveTest {
-        public SSHJobRunInteractiveTest() throws Exception {super("ssh");}
+        public SSHJobRunInteractiveTest() throws Exception {super(TYPE);}
         public void test_simultaneousStdin()  { super.ignore("Not supported");}
     }
 
     // test cases
     public static class SSHJobRunInfoTest extends JobRunInfoTest {
-        public SSHJobRunInfoTest() throws Exception {super("ssh");}
+        public SSHJobRunInfoTest() throws Exception {super(TYPE);}
     }
 }

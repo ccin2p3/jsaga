@@ -20,6 +20,6 @@ public class SSHExecutionTestSuiteMinimal extends JSAGATestSuite {
 
     /** test cases */
     public static class SSHJobRunMinimalTest extends JobRunMinimalTest {
-        public SSHJobRunMinimalTest() throws Exception {super("ssh");}
+        public SSHJobRunMinimalTest() throws Exception {super("deprecated-ssh");}
      }
 }

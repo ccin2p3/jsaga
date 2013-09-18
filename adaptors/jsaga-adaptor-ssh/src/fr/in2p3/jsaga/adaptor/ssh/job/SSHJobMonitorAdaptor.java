@@ -40,7 +40,7 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 	private String m_host; // needs to keep it for getExecutionHosts
 	
     public String getType() {
-        return "ssh";
+        return "deprecated-ssh";
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {

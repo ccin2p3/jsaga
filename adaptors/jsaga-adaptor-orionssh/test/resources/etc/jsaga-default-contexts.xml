@@ -4,8 +4,8 @@
         <context type="SSH">
             <attribute name="UserKey" value="${user.home}/.jsaga/contexts/ssh/id_rsa"/>
             <attribute name="UserPass" value="${SSHKEY_PASSPHRASE}"/>
-            <data type="orionsftp"/>
-            <job type="orionssh"/>
+            <data type="sftp"/>
+            <job type="ssh"/>
             <include host="localhost"/>
         </context>
     </contexts>
@@ -14,24 +14,24 @@
 	    <context type="SSH" id="sreynaud">
             <attribute name="UserID" value="sreynaud"/>
             <attribute name="UserKey" value="${user.home}/.jsaga/contexts/ssh/sreynaud"/>
-            <data type="orionsftp">
+            <data type="sftp">
            		<attribute name="FilenameEncoding" value="ISO-8859-1"/>
             </data>
-            <job type="orionssh"/>
+            <job type="ssh"/>
             <include host="ccsyre*.in2p3.fr"/>
             <exclude host="localhost"/>
 	    </context>
 	    <context type="UserPass" id="AFS">
             <attribute name="UserID" value="${user.name}"/>
             <attribute name="UserPass" value="${AFS_PASSWORD}"/>
-            <data type="orionsftp"/>
-            <job type="orionssh"/>
+            <data type="sftp"/>
+            <job type="ssh"/>
             <include host="ccage022.in2p3.fr"/>
             <exclude host="localhost"/>
 	    </context>
 	    <context type="UserPassStore" id="netrc">
-            <data type="orionsftp"/>
-            <job type="orionssh"/>
+            <data type="sftp"/>
+            <job type="ssh"/>
             <include host="ccali05.in2p3.fr"/>
             <exclude host="localhost"/>
 	    </context>

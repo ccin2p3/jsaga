@@ -20,7 +20,7 @@ public class SSHExecutionTestSuiteWithPrerequisite extends JSAGATestSuite {
 
     /** test cases */
     public static class SSHJobRunWithPrequisiteTest extends JobRunWithPrequisiteTest {
-        public SSHJobRunWithPrequisiteTest() throws Exception {super("ssh");}         
+        public SSHJobRunWithPrequisiteTest() throws Exception {super("deprecated-ssh");}         
         public void test_run_MPI() { super.ignore("not supported"); }
      }
 }

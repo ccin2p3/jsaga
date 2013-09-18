@@ -74,7 +74,7 @@ public class SSHJobProcess extends LocalJobProcess {
     @Override
 	protected String toURL(String filename) throws NoSuccessException {
 		try {
-			return "sftp://" + m_host + ":" + m_port + "/" + getWorkingDirectory() + "/" + filename;
+			return "deprecated-sftp://" + m_host + ":" + m_port + "/" + getWorkingDirectory() + "/" + filename;
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
 		}

@@ -35,7 +35,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 	protected static final String FILENAME_ENCODING = "FilenameEncoding";
 	
 	public String getType() {
-		return "sftp";
+		return "deprecated-sftp";
 	}
 
     public int getDefaultPort() {

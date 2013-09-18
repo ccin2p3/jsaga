@@ -74,7 +74,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
     }
     
     public String getType() {
-		return "ssh";
+		return "deprecated-ssh";
 	}
 
 	public JobMonitorAdaptor getDefaultJobMonitor() {

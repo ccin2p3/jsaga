@@ -51,7 +51,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		JobControlAdaptor, CleanableJobAdaptor, StagingJobAdaptorTwoPhase {
 
     private static final String ROOTDIR = "RootDir";
-    protected static final String TYPE = "orionssh";
+    protected static final String TYPE = "ssh";
     
     public String getType() {
 		return TYPE;
