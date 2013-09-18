@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.orionssh.data;
 
 import com.trilead.ssh2.SFTPException;
+import com.trilead.ssh2.SFTPv3Client;
 import com.trilead.ssh2.SFTPv3DirectoryEntry;
 import com.trilead.ssh2.SFTPv3FileAttributes;
 import com.trilead.ssh2.SFTPv3FileHandle;
@@ -59,47 +60,22 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
         		});
     }
     
-//	public void connect(String userInfo, String host, int port,
-//			String basePath, Map attributes) throws NotImplementedException,
-//            AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException,
-//            NoSuccessException {
-//		super.connect(userInfo, host, port, basePath, attributes);
-		
-		// start sftp channel
-//		try {
-//			Channel channel = session.openChannel("sftp");
-//			channel.connect();
-//			channelSftp = (ChannelSftp) channel;
-//		} catch (JSchException e) {
-//			throw new NoSuccessException("Unable to open channel", e);
-//		}
-//		if (attributes.containsKey(FILENAME_ENCODING)) {
-//	        try {
-//				channelSftp.setFilenameEncoding((String) attributes.get(FILENAME_ENCODING));
-//			} catch (SftpException e) {
-//				throw new NoSuccessException("Unable to set filename encoding", e);
-//			}
-//		}
-//	}
-
-//	public void disconnect() throws NoSuccessException {
-//		channelSftp.exit();
-//		super.disconnect();
-//	}
-
 	public void getToStream(String absolutePath, String additionalArgs, OutputStream stream) 
 			throws PermissionDeniedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
 		try {
-			SFTPv3FileHandle f = m_sftp.openFileRO(absolutePath);
+			SFTPv3Client cl = new SFTPv3Client(m_conn);
+			SFTPv3FileHandle f = cl.openFileRO(absolutePath);
 			byte[] buffer = new byte[SSHAdaptorAbstract.READ_BUFFER_LEN];
 			int len = 0;
 			int offset = 0;
-			while ((len=m_sftp.read(f, offset, buffer, 0, buffer.length)) > 0) {
+			while ((len=cl.read(f, offset, buffer, 0, buffer.length)) > 0) {
 				stream.write(buffer, offset, len);
 				stream.flush();
 				offset += len;
 			}
+			cl.closeFile(f);
+			cl.close();
 		} catch (SFTPException sftpe) {
 			switch (sftpe.getServerErrorCode()) {
 				case ErrorCodes.SSH_FX_NO_SUCH_FILE:
@@ -111,13 +87,16 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			}
 		} catch (IOException ioe) {
 			throw new NoSuccessException(ioe);
+		} finally {
+			
 		}
 	}
 
 	public boolean exists(String absolutePath, String additionalArgs)
 			throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
-			return (m_sftp.stat(absolutePath) != null);
+			// if m_sftp.stat(...) is used, test_list_and_getAttributes fails with "the server sent an invalid id field" ...
+			return (new SFTPv3Client(m_conn).stat(absolutePath) != null);
 		} catch (SFTPException sftpe) {
 			switch (sftpe.getServerErrorCode()) {
 				case ErrorCodes.SSH_FX_NO_SUCH_FILE:
@@ -137,7 +116,8 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
         String filename = new EntryPath(absolutePath).getEntryName();
         SFTPv3FileAttributes attrs;
 		try {
-			attrs = m_sftp.stat(absolutePath);
+			// if m_sftp.stat(...) is used, test_list_and_getAttributes fails with "the server sent an invalid id field" ...
+			attrs = new SFTPv3Client(m_conn).stat(absolutePath);
 		} catch (SFTPException sftpe) {
 			switch (sftpe.getServerErrorCode()) {
 				case ErrorCodes.SSH_FX_NO_SUCH_FILE:
@@ -338,8 +318,6 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 	public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) 
 			throws PermissionDeniedException, BadParameterException, DoesNotExistException, 
 			AlreadyExistsException, TimeoutException, NoSuccessException {
-//		if (overwrite)
-//			throw new NoSuccessException("Overwrite not implemented");
 
 		try {
 			m_sftp.mv(sourceAbsolutePath, targetAbsolutePath);
