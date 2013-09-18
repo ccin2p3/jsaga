@@ -27,6 +27,7 @@ import com.trilead.ssh2.SFTPException;
 import com.trilead.ssh2.SFTPv3Client;
 import com.trilead.ssh2.SFTPv3FileAttributes;
 import com.trilead.ssh2.SFTPv3FileHandle;
+import com.trilead.ssh2.ServerHostKeyVerifier;
 import com.trilead.ssh2.Session;
 import com.trilead.ssh2.channel.Channel;
 
@@ -92,7 +93,9 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
            };
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) 
+    		throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, 
+    		BadParameterException, TimeoutException, NoSuccessException {
     		
     	try {
     		// checking compression level
@@ -108,16 +111,16 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     		}
 
     		boolean knownHostsUsed = (attributes.containsKey(KNOWN_HOSTS) && attributes.get(KNOWN_HOSTS) != null && ((String)attributes.get(KNOWN_HOSTS)).length()>0);
-//    		JSch jsch = new JSch();
     		// set known hosts file : checking will be done
-    		// TODO
-//    		if (knownHostsUsed) {
-//    			if(!new File((String) attributes.get(KNOWN_HOSTS)).exists())
-//    				throw new BadParameterException("Unable to find the selected known host file:" + (String) attributes.get(KNOWN_HOSTS) );
-//				jsch.setKnownHosts((String) attributes.get(KNOWN_HOSTS));
-//			}
+    		ServerHostKeyVerifier verifier = null;
+    		if (knownHostsUsed) {
+    			File knownHostsFile = new File((String) attributes.get(KNOWN_HOSTS)); 
+    			if(!knownHostsFile.exists())
+    				throw new BadParameterException("Unable to find the selected known host file:" + knownHostsFile.toString());
+    			verifier = new SSHHostKeyVerifier(knownHostsFile);
+			}
     		m_conn = new Connection(host, port);
-    		m_conn.connect();
+    		m_conn.connect(verifier);
     		boolean isAuthenticated = false;
     		if(credential instanceof UserPassSecurityCredential) {
         		String userId = ((UserPassSecurityCredential) credential).getUserID();
@@ -147,12 +150,6 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     			m_conn.close();
         		throw new AuthenticationFailedException();
     		}
-    		
-    		// checking know host will not be done
-    		// TODO
-//    		if (!knownHostsUsed) {
-//    			session.setConfig("StrictHostKeyChecking", "no");
-//    		}
     		
     		// TODO
 //			if (compression_level == 0) {
@@ -229,14 +226,4 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     	return new SFTPFileAttributes(filename, m_sftp.stat(filename));
     }
     
-//    protected void finalize() throws Throwable {
-//    	try {
-//    		System.out.println("finalize" + getClass().toString());
-//			disconnect();
-//		} catch (NoSuccessException e) {
-//			e.printStackTrace();
-//		} finally {
-//			super.finalize();
-//		}
-//    }
 }
