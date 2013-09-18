@@ -26,6 +26,7 @@
         <module>jsaga-adaptor-unicore</module>
         <module>jsaga-adaptor-batchssh</module>
         <module>jsaga-adaptor-ssh</module>
+        <module>jsaga-adaptor-orionssh</module>
         <module>jsaga-adaptor-ssh2</module>
         <module>jsaga-adaptor-irods</module>
         <module>jsaga-adaptor-mail</module>
@@ -106,6 +107,7 @@
                         <configuration>
                             <file>${project.build.directory}/${project.build.finalName}-sources.zip</file>
                             <url>${maven.repository}</url>
+                            <repositoryId>maven2-repository</repositoryId>
                             <groupId>fr.in2p3.jsaga.adaptor</groupId>
                             <artifactId>sources</artifactId>
                             <version>latest</version>
