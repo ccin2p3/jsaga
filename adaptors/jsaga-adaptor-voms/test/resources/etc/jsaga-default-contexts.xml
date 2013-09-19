@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <contexts>
-        <!-- context type="VOMS">
+        <context type="VOMS">
             <attribute name="Server" value="voms://voms.hellasgrid.gr:15004/C=GR/O=HellasGrid/OU=hellasgrid.gr/CN=voms.hellasgrid.gr"/>
             <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
             <attribute name="UserVO" value="dteam"/>
-        </context-->
+        </context>
 <!-- FIXME: this does not work anymore
         <context type="VOMS">
             <attribute name="Server" value="voms://lcg-voms.cern.ch:15004/DC=ch/DC=cern/OU=computers/CN=lcg-voms.cern.ch"/>
@@ -18,36 +18,20 @@
             <attribute name="UserCertKey" value="${user.home}/.jsaga/contexts/voms/mycert.p12"/>
         </context>
 -->	
-		<context type="VOMS">
-            <attribute name="Server" value="voms://voms.maatg.eu:15001/O=GRID-FR/C=FR/O=MAATG/CN=voms.maatg.eu"/>
-            <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
-            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
-            <attribute name="UserVO" value="vo.neugrid.eu"/>
-        </context>
-        <!-- <context type="VOMSMyProxy">
+        <context type="VOMSMyProxy">
             <attribute name="Server" value="voms://voms.hellasgrid.gr:15004/C=GR/O=HellasGrid/OU=hellasgrid.gr/CN=voms.hellasgrid.gr"/>
             <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_myproxy_cred.txt"/>
             <attribute name="UserVO" value="dteam"/>
             <attribute name="MyProxyServer" value="cclcgsrvli02.in2p3.fr:7512"/>
-            Optional attributes (equivalent to "-d -n" if not specified)
+            <!--  Optional attributes (equivalent to "-d -n" if not specified) -->
             <attribute name="MyProxyUserID" value="jsaga"/>
             <attribute name="MyProxyPass" value="tototo"/>
-        </context> -->
-        <context type="VOMSMyProxy">
-            <attribute name="Server" value="voms://voms.maatg.eu:15001/O=GRID-FR/C=FR/O=MAATG/CN=voms.maatg.eu"/>
-            <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
-            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
-            <attribute name="UserVO" value="vo.neugrid.eu"/>
-            <attribute name="MyProxyServer" value="myproxy.maatg.eu:7512"/>
-            <!-- Optional attributes (equivalent to "-d -n" if not specified) -->
-            <!--<attribute name="MyProxyUserID" value="jsaga"/>-->
-            <!-- <attribute name="MyProxyPass" value="tototo"/>-->
         </context>
     </contexts>
     <session>
         <context type="VOMS" id="dteam"/>
-        <context type="VOMSMyProxy" id="myproxy"/>
+        <!-- <context type="VOMSMyProxy" id="myproxy"/> -->
     </session>
 </jsaga-default>
