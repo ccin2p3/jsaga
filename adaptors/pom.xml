@@ -32,6 +32,7 @@
         <module>jsaga-adaptor-mail</module>
         <module>jsaga-adaptor-secretservice</module>
         <module>jsaga-adaptor-ourgrid</module>
+        <module>jsaga-adaptor-dirac</module>
         <!-- adaptors which are used as dependencies of other adaptors must be declared at the end -->
         <module>jsaga-adaptor-classic</module>
         <module>jsaga-adaptor-voms</module>

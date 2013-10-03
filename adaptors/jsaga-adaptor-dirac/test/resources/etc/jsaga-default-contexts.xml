@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <contexts>
+            <context type="Dirac">
+                <attribute name="UserCert" value="${user.home}/.jsaga/contexts/globus/grid2.p12"/>
+                <attribute name="UserPass" value="${GRID_PASSPHRASE}"/>
+                <!-- <attribute name="Group" value="dteam_user"/> -->
+                <attribute name="Setup" value="Dirac-Production"/>
+                <job type="dirac"/>
+            </context>
+            <context type="X509">
+                <attribute name="UserCert" value="${user.home}/.jsaga/contexts/globus/grid2.p12"/>
+                <attribute name="UserPass" value="${GRID_PASSPHRASE}"/>
+                <job type="dirac"/>
+            </context>
+    </contexts>
+    <session>
+	        <context type="X509"/>
+    </session>
+</jsaga-default>
