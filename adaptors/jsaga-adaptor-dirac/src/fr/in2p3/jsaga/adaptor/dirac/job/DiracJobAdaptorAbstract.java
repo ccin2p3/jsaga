@@ -157,6 +157,11 @@ public class DiracJobAdaptorAbstract implements JobAdaptor {
 						.get(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId));
 	}
 	
+	protected JSONArray getJobs()  throws NoSuccessException, AuthenticationFailedException, 
+															IncorrectURLException, MalformedURLException {
+		return getJobs(new JSONObject());
+	}
+	
 	protected JSONArray getJobs(JSONObject args)  throws NoSuccessException, AuthenticationFailedException, 
 															IncorrectURLException, MalformedURLException {
 		if (m_accessToken == null) {
