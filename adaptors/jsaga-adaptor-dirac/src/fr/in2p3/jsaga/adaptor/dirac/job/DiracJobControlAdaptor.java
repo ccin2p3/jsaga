@@ -50,12 +50,12 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 			throws PermissionDeniedException, TimeoutException,
 			NoSuccessException, BadResource {
 		try {
-			jobDesc="{ \"Executable\": \"/bin/date\"}";
 			m_logger.debug(jobDesc);
 			DiracRESTClient submittor = new DiracRESTClient(m_credential, m_accessToken);
-//			submittor.addData(jobDesc);
 			submittor.addParam("manifest", jobDesc);
 			// parse JSON jobDesc to get input files and write contents to POST data
+			// FIXME: need the local full name to read it. It is not in InputSandbox
+			// possible to add customized JSON fields "LocalInputFile1":
 //            JSONParser parser = new JSONParser();
 //            JSONObject diracJobDesc = (JSONObject) parser.parse(jobDesc);
 //            if (diracJobDesc.containsKey("InputSandbox")) {
@@ -81,7 +81,7 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 			TimeoutException, NoSuccessException {
 		JSONObject result;
 		try {
-			result = (JSONObject)new DiracRESTClient(m_credential, m_accessToken)
+			result = new DiracRESTClient(m_credential, m_accessToken)
 					.delete(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId));
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
