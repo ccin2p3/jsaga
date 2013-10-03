@@ -29,7 +29,6 @@ public class DiracJobStatus extends JobStatus {
 	}
 	
     public SubState getSubState() {
-    	// TODO getSubState
     	JSONObject jobInfo = (JSONObject)m_nativeStateCode;
     	String minorStatus = (String)jobInfo.get(DiracConstants.DIRAC_GET_RETURN_MINOR_STATUS);
     	String status = (String)jobInfo.get(DiracConstants.DIRAC_GET_RETURN_STATUS);
@@ -40,7 +39,7 @@ public class DiracJobStatus extends JobStatus {
     		return SubState.RUNNING_SUBMITTED;
         } else if (DIRAC_STATUS_DELETED.equals(status)) {
         	return SubState.CANCELED;
-        }
+        } // TODO: ERROR status
     	return null;
     }
 
