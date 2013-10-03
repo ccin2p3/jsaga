@@ -153,6 +153,18 @@ public class DiracJobAdaptorAbstract implements JobAdaptor {
 		if (m_accessToken == null) {
 			throw new NoSuccessException("Need a token first");
 		}
-		return new DiracRESTClient(m_credential, m_accessToken).get(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId));
+		return new DiracRESTClient(m_credential, m_accessToken)
+						.get(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId));
+	}
+	
+	protected JSONArray getJobs(JSONObject args)  throws NoSuccessException, AuthenticationFailedException, 
+															IncorrectURLException, MalformedURLException {
+		if (m_accessToken == null) {
+			throw new NoSuccessException("Need a token first");
+		}
+		DiracRESTClient client = new DiracRESTClient(m_credential, m_accessToken);
+		client.addParam(args);
+		return (JSONArray) client.get(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS)).get("jobs");
+		
 	}
 }

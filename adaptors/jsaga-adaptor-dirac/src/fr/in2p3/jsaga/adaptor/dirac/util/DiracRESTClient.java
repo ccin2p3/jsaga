@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -79,6 +80,12 @@ public class DiracRESTClient {
 	}
 	
 
+	public void addParam(JSONObject params) {
+    	for (Object key : params.keySet()) {
+    		addParam((String)key, (String)params.get(key));
+      	}
+		
+	}
 	public void addParam(String key, String value) {
 		m_getParams.put(key, value);
 	}
@@ -133,15 +140,15 @@ public class DiracRESTClient {
     															CertificateException, UnrecoverableKeyException, 
     															KeyManagementException, IncorrectURLException  {
 
-    	String query = "";
-    	for (Object key : m_getParams.keySet()) {
-    		if (query.length() == 0) {
-    			query = "?";
-    		} else {
-    			query = query + "&";
-    		}
-    		query = query + URLEncoder.encode((String)key, "UTF-8") + "=" + URLEncoder.encode((String)m_getParams.get(key), "UTF-8");
-      	}
+    	String query = buildQuery(m_getParams);
+//    	for (Object key : m_getParams.keySet()) {
+//    		if (query.length() == 0) {
+//    			query = "?";
+//    		} else {
+//    			query = query + "&";
+//    		}
+//    		query = query + URLEncoder.encode((String)key, "UTF-8") + "=" + URLEncoder.encode((String)m_getParams.get(key), "UTF-8");
+//      	}
     	url = new URL(url + query);
     	m_logger.debug(HTTPType + " " + url.toString());
         HttpsURLConnection httpsConnection = (HttpsURLConnection)url.openConnection();
@@ -196,5 +203,16 @@ public class DiracRESTClient {
         
     }
 
-
+    public static String buildQuery(JSONObject args) throws UnsupportedEncodingException {
+    	String query = "";
+    	for (Object key : args.keySet()) {
+    		if (query.length() == 0) {
+    			query = "?";
+    		} else {
+    			query = query + "&";
+    		}
+    		query = query + URLEncoder.encode((String)key, "UTF-8") + "=" + URLEncoder.encode((String)args.get(key), "UTF-8");
+      	}
+    	return query;
+    }
 }
