@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.adaptor.dirac.util;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -8,10 +7,8 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
@@ -20,8 +17,6 @@ import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
@@ -49,15 +44,14 @@ import fr.in2p3.jsaga.adaptor.security.impl.X509SecurityCredential;
 // TODO: make this class an internal of AbstractAdaptor
 public class DiracRESTClient {
 
-//	private String m_cert = null;
 	private X509SecurityCredential m_x509 = null;
-//	private String m_passPhrase = null;
 	private JSONObject m_getParams = new JSONObject();
 	private StringBuffer m_postData = null;
 	Logger m_logger = Logger.getLogger(this.getClass());
 	
 	/**
 	 * Constructs a client that will connect with a "access_token"
+	 * @param credential
 	 * @param token
 	 */
 	public DiracRESTClient(X509SecurityCredential credential, String token) {
@@ -66,8 +60,8 @@ public class DiracRESTClient {
 	}
 	
 	/**
-	 * Constructs a client that will connect with a X509 certificate
-	 * @param m_credential
+	 * Constructs a client that will connect without any token
+	 * @param credential
 	 */
 	public DiracRESTClient(X509SecurityCredential credential) {
 		m_x509 = credential;
@@ -79,17 +73,30 @@ public class DiracRESTClient {
 	public DiracRESTClient(String cert, String pass) {
 	}
 	
-
+	/**
+	 * Add a list of GET parmaeters
+	 * @param params
+	 */
 	public void addParam(JSONObject params) {
     	for (Object key : params.keySet()) {
     		addParam((String)key, (String)params.get(key));
       	}
 		
 	}
+	
+	/**
+	 * Add a GET parameter
+	 * @param key
+	 * @param value
+	 */
 	public void addParam(String key, String value) {
 		m_getParams.put(key, value);
 	}
 	
+	/**
+	 * Add some POST data
+	 * @param data
+	 */
 	public void addData(String data) {
 		if (m_postData == null) {
 			m_postData = new StringBuffer();
@@ -98,16 +105,51 @@ public class DiracRESTClient {
 		m_postData.append("\n");
 	}
 	
+	/**
+	 * send a GET request
+	 * @param url
+	 * @return a JSONObject
+	 * @throws NoSuccessException
+	 * @throws AuthenticationFailedException
+	 * @throws IncorrectURLException
+	 */
 	public JSONObject get(URL url) throws NoSuccessException, AuthenticationFailedException, IncorrectURLException  {
 		return this.doRequest(url, "GET");
 	}
+	
+	/**
+	 * send a POST request
+	 * @param url
+	 * @return a JSONObject
+	 * @throws NoSuccessException
+	 * @throws AuthenticationFailedException
+	 * @throws IncorrectURLException
+	 */
 	public JSONObject post(URL url) throws NoSuccessException, AuthenticationFailedException, IncorrectURLException {
 		return this.doRequest(url, "POST");
 	}
+	
+	/**
+	 * send a DELETE request
+	 * @param url
+	 * @return a JSONObject
+	 * @throws NoSuccessException
+	 * @throws AuthenticationFailedException
+	 * @throws IncorrectURLException
+	 */
 	public JSONObject delete(URL url) throws NoSuccessException, AuthenticationFailedException, IncorrectURLException {
 		return this.doRequest(url, "DELETE");
 	}
 	
+	/**
+	 * send a HTTP request
+	 * @param url
+	 * @param HTTPType
+	 * @return a JSONObject
+	 * @throws NoSuccessException
+	 * @throws AuthenticationFailedException
+	 * @throws IncorrectURLException
+	 */
     private JSONObject doRequest(URL url, String HTTPType) 
     		throws NoSuccessException, AuthenticationFailedException, IncorrectURLException {
         InputStream stream;
@@ -136,46 +178,40 @@ public class DiracRESTClient {
         }
     }
     
+    /**
+     * get the result of a HTTP request
+     * @param url
+     * @param HTTPType
+     * @return the InputStream of the result
+     * @throws IOException
+     * @throws KeyStoreException
+     * @throws NoSuchAlgorithmException
+     * @throws CertificateException
+     * @throws UnrecoverableKeyException
+     * @throws KeyManagementException
+     * @throws IncorrectURLException
+     */
     private InputStream getStream(URL url, String HTTPType) throws IOException, KeyStoreException, NoSuchAlgorithmException, 
     															CertificateException, UnrecoverableKeyException, 
     															KeyManagementException, IncorrectURLException  {
 
     	String query = buildQuery(m_getParams);
-//    	for (Object key : m_getParams.keySet()) {
-//    		if (query.length() == 0) {
-//    			query = "?";
-//    		} else {
-//    			query = query + "&";
-//    		}
-//    		query = query + URLEncoder.encode((String)key, "UTF-8") + "=" + URLEncoder.encode((String)m_getParams.get(key), "UTF-8");
-//      	}
     	url = new URL(url + query);
     	m_logger.debug(HTTPType + " " + url.toString());
         HttpsURLConnection httpsConnection = (HttpsURLConnection)url.openConnection();
-//        if (! (connection instanceof HttpsURLConnection)) {
-//            throw new IncorrectURLException("Unexpected URL: "+url);
-//        }
-//        HttpsURLConnection httpsConnection = (HttpsURLConnection) connection;
         httpsConnection.setRequestMethod(HTTPType);
 
-//            if (connection instanceof HttpsURLConnection) {
-//                HttpsURLConnection httpsConnection = (HttpsURLConnection) connection;
-                TrustManager[] trustManager = new TrustManager[]{new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() {return null;}
-                    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
-                    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
-                }};
-                SSLContext sslContext = SSLContext.getInstance("SSL");
-//                if (m_x509 != null) {
-                	sslContext.init(m_x509.getKeyManager(), trustManager, new java.security.SecureRandom());
-                	httpsConnection.setSSLSocketFactory(sslContext.getSocketFactory());
-//                }
-                httpsConnection.setHostnameVerifier(new HostnameVerifier() {
-                    public boolean verify(String hostname, SSLSession session) {return true;}
-                });
-//            } else {
-//                throw new IncorrectURLException("Unexpected URL: "+url);
-//            }
+        TrustManager[] trustManager = new TrustManager[]{new X509TrustManager() {
+            public X509Certificate[] getAcceptedIssuers() {return null;}
+            public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
+            public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
+        }};
+        SSLContext sslContext = SSLContext.getInstance("SSL");
+    	sslContext.init(m_x509.getKeyManager(), trustManager, new java.security.SecureRandom());
+    	httpsConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+        httpsConnection.setHostnameVerifier(new HostnameVerifier() {
+            public boolean verify(String hostname, SSLSession session) {return true;}
+        });
 
         // set POST message
         if (m_postData != null) {
@@ -187,23 +223,23 @@ public class DiracRESTClient {
         }
 
         // open input stream
-//        if (connection instanceof HttpURLConnection) {
-//            HttpURLConnection httpConnection = (HttpURLConnection) connection;
-//            httpConnection.setRequestMethod(HTTPType);
-            httpsConnection.connect();
-            InputStream stream = httpsConnection.getInputStream();
-            if (httpsConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                stream.close();
-                throw new IOException("Received error message: "+httpsConnection.getResponseMessage());
-            }
-            return stream;
-//        } else {
-//            throw new IncorrectURLException("Unexpected URL: "+url);
-//        }
+        httpsConnection.connect();
+        InputStream stream = httpsConnection.getInputStream();
+        if (httpsConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            stream.close();
+            throw new IOException("Received error message: "+httpsConnection.getResponseMessage());
+        }
+        return stream;
         
     }
 
-    public static String buildQuery(JSONObject args) throws UnsupportedEncodingException {
+    /**
+     * Transforms a list of params into a URL-encoded GET query
+     * @param args as a JSONObject
+     * @return a URL-encoded GET query
+     * @throws UnsupportedEncodingException
+     */
+    private static String buildQuery(JSONObject args) throws UnsupportedEncodingException {
     	String query = "";
     	for (Object key : args.keySet()) {
     		if (query.length() == 0) {
