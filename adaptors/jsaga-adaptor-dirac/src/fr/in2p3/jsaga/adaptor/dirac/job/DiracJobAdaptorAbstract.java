@@ -117,6 +117,16 @@ public class DiracJobAdaptorAbstract implements JobAdaptor {
 		return null;
 	}
 
+	/**
+	 * get the "Group" or "Setup" associated with a user, when it is not specified in the context
+	 * the method returns the value if it is the only one.
+	 * @param param "Group" or "Setup
+	 * @return the group or the setup
+	 * @throws BadParameterException if no value was found or if more than 1 value was found
+	 * @throws IncorrectURLException
+	 * @throws NoSuccessException
+	 * @throws AuthenticationFailedException
+	 */
 	private String getTokenMetadata(String param) throws BadParameterException, IncorrectURLException, 
 								NoSuccessException, AuthenticationFailedException {
 		String path;
@@ -148,6 +158,15 @@ public class DiracJobAdaptorAbstract implements JobAdaptor {
 				
 	}
 	
+	/**
+	 * get the Job information from Dirac
+	 * @param nativeJobId
+	 * @return the Job info in JSON format
+	 * @throws NoSuccessException
+	 * @throws AuthenticationFailedException
+	 * @throws IncorrectURLException
+	 * @throws MalformedURLException
+	 */
 	protected JSONObject getJob(String nativeJobId) throws NoSuccessException, AuthenticationFailedException, 
 															IncorrectURLException, MalformedURLException {
 		if (m_accessToken == null) {
@@ -157,11 +176,28 @@ public class DiracJobAdaptorAbstract implements JobAdaptor {
 						.get(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId));
 	}
 	
+	/**
+	 * get the list of jobs from Dirac
+	 * @return the list of jobs in JSON format
+	 * @throws NoSuccessException
+	 * @throws AuthenticationFailedException
+	 * @throws IncorrectURLException
+	 * @throws MalformedURLException
+	 */
 	protected JSONArray getJobs()  throws NoSuccessException, AuthenticationFailedException, 
 															IncorrectURLException, MalformedURLException {
 		return getJobs(new JSONObject());
 	}
 	
+	/**
+	 * get the list of jobs from Dirac that match arguments
+	 * @param args to match
+	 * @return the list of jobs in JSON format
+	 * @throws NoSuccessException
+	 * @throws AuthenticationFailedException
+	 * @throws IncorrectURLException
+	 * @throws MalformedURLException
+	 */
 	protected JSONArray getJobs(JSONObject args)  throws NoSuccessException, AuthenticationFailedException, 
 															IncorrectURLException, MalformedURLException {
 		if (m_accessToken == null) {
