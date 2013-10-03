@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.IncorrectURLException;
@@ -19,6 +20,7 @@ import fr.in2p3.jsaga.adaptor.dirac.util.DiracRESTClient;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
+import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -29,14 +31,14 @@ import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 * Date:   30 sept 2013
 * ***************************************************/
 public class DiracJobMonitorAdaptor extends DiracJobAdaptorAbstract implements
-		QueryIndividualJob/*, QueryListJob, ListableJobAdaptor*/, JobInfoAdaptor {
+		QueryIndividualJob, QueryListJob/*, ListableJobAdaptor*/, JobInfoAdaptor {
 
 	private static final String DIRAC_TIME = "yyyy-MM-dd HH:mm:ss";
 	
 	public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
 		try {
 			JSONObject jobInfo = this.getJob(nativeJobId);
-			return new DiracJobStatus(nativeJobId, jobInfo);
+			return new DiracJobStatus(jobInfo);
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
@@ -81,6 +83,31 @@ public class DiracJobMonitorAdaptor extends DiracJobAdaptorAbstract implements
 		} catch (ParseException e) {
 			throw new NoSuccessException(e);
 		}		
+	}
+
+	public JobStatus[] getStatusList(String[] nativeJobIdArray)
+			throws TimeoutException, NoSuccessException {
+		// build JSONObject that contains all arguments to be passed to the GET jid=xxxx&jid=yyy...
+		JSONObject statuses = new JSONObject();
+		for (String jobId: nativeJobIdArray) {
+			statuses.put(DiracConstants.DIRAC_GET_RETURN_JID, jobId);
+		}
+		try {
+			// do the request: we get a JSONArray of all JSONObject representing jobs
+			JSONArray jobs = this.getJobs(statuses);
+			// build the Array to return
+			JobStatus[] statusArray = new JobStatus[jobs.size()];
+			for (int i=0; i<jobs.size(); i++) {
+				statusArray[i] = new DiracJobStatus((JSONObject)jobs.get(i));
+			}
+			return statusArray;
+		} catch (AuthenticationFailedException e) {
+			throw new NoSuccessException(e);
+		} catch (IncorrectURLException e) {
+			throw new NoSuccessException(e);
+		} catch (MalformedURLException e) {
+			throw new NoSuccessException(e);
+		}
 	}
 	
 }
