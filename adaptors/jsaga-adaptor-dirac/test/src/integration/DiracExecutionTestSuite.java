@@ -29,10 +29,8 @@ public class DiracExecutionTestSuite extends JSAGATestSuite {
         public void test_numberOfProcesses() { super.ignore("not supported"); }
         public void test_processesPerHost() { super.ignore("not supported"); }
         public void test_threadsPerProcess() { super.ignore("not supported"); }
-        public void test_input() { super.ignore("not supported"); }
-        public void test_output() { super.ignore("not supported"); }
-        public void test_error() { super.ignore("not supported"); }
-        public void test_fileTransfer() { super.ignore("not supported"); }
+//        public void test_input() { super.ignore("not supported"); }
+//        public void test_fileTransfer() { super.ignore("not supported"); }
         public void test_cleanup() { super.ignore("not supported"); }
         public void test_totalCPUTime() { super.ignore("not supported"); }
         public void test_totalPhysicalMemory() { super.ignore("not supported"); }
@@ -65,17 +63,17 @@ public class DiracExecutionTestSuite extends JSAGATestSuite {
         public void test_resume_running() { super.ignore("not supported"); }
         public void test_suspend_done() { super.ignore("not supported"); }
         public void test_suspend_running() { super.ignore("not supported"); }
-        public void test_simultaneousShortJob() throws Exception { super.ignore("not working");}
-        public void test_simultaneousLongJob() throws Exception { super.ignore("not working");}
+//        public void test_simultaneousShortJob() throws Exception { super.ignore("not working");}
+//        public void test_simultaneousLongJob() throws Exception { super.ignore("not working");}
     }
     
  	// test cases
-    public static class DiracJobRunDescriptionTest extends JobRunDescriptionTest {
-        public DiracJobRunDescriptionTest() throws Exception {super(TYPE);}
-        public void test_run_queueRequirement() { super.ignore("not supported"); }
-        public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
-        public void test_run_memoryRequirement() { super.ignore("not supported"); }
-    }
+//    public static class DiracJobRunDescriptionTest extends JobRunDescriptionTest {
+//        public DiracJobRunDescriptionTest() throws Exception {super(TYPE);}
+//        public void test_run_queueRequirement() { super.ignore("not supported"); }
+//        public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
+//        public void test_run_memoryRequirement() { super.ignore("not supported"); }
+//    }
     
     // test cases
     public static class DiracJobRunInteractiveTest extends JobRunInteractiveTest {
@@ -86,5 +84,7 @@ public class DiracExecutionTestSuite extends JSAGATestSuite {
     // test cases
     public static class DiracJobRunInfoTest extends JobRunInfoTest {
         public DiracJobRunInfoTest() throws Exception {super(TYPE);}
+        public void test_exitcode() {super.ignore("Not supported");}
+        public void test_execution_hosts() {super.ignore("Not supported");}
     }
 }
