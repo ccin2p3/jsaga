@@ -18,14 +18,18 @@ public class DiracJobStatus extends JobStatus {
 
 	private final static String DIRAC_STATUS_DONE = "Done";
 	private final static String DIRAC_STATUS_WAITING = "Waiting";
+	private final static String DIRAC_STATUS_FAILED = "Failed";
 	private final static String DIRAC_STATUS_DELETED = "Deleted";
 
 //	private final static String DIRAC_MINORSTATUS_EXECUTION_COMPLETE = "Execution Complete";
 //	Waiting / "Pilot Agent Submission";
 //	Deleted / Checking accounting
+// Failed / Maximum of reschedulings reached
 	
-	public DiracJobStatus(String jobId, JSONObject jobInfo) {
-		super(jobId, jobInfo, (String)jobInfo.get(DiracConstants.DIRAC_GET_RETURN_STATUS));
+	public DiracJobStatus(JSONObject jobInfo) {
+		super((String)jobInfo.get(DiracConstants.DIRAC_GET_RETURN_JID), 
+				jobInfo, 
+				(String)jobInfo.get(DiracConstants.DIRAC_GET_RETURN_STATUS));
 	}
 	
     public SubState getSubState() {
@@ -39,7 +43,9 @@ public class DiracJobStatus extends JobStatus {
     		return SubState.RUNNING_SUBMITTED;
         } else if (DIRAC_STATUS_DELETED.equals(status)) {
         	return SubState.CANCELED;
-        } // TODO: ERROR status
+        } else if (DIRAC_STATUS_FAILED.equals(status)) {
+        	return SubState.FAILED_ABORTED;
+        }
     	return null;
     }
 
