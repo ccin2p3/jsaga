@@ -95,17 +95,6 @@ public class DiracJobAdaptorAbstract implements JobAdaptor {
 			throw new NoSuccessException(e);
 		}
 
-        // Get the token
-		
-		// TODO remove this part
-//		try {
-//			DiracRESTClient client = new DiracRESTClient(m_credential, m_accessToken);
-//	        // GET request parameters
-//			resultDict = client.get(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS));
-//			m_logger.debug(resultDict.toJSONString());
-//		} catch (Exception e) {
-//			throw new NoSuccessException(e);
-//		}
 	}
 
 	public void disconnect() throws NoSuccessException {
@@ -157,5 +146,13 @@ public class DiracJobAdaptorAbstract implements JobAdaptor {
 		}
 		return (String)list.get(0);
 				
+	}
+	
+	protected JSONObject getJob(String nativeJobId) throws NoSuccessException, AuthenticationFailedException, 
+															IncorrectURLException, MalformedURLException {
+		if (m_accessToken == null) {
+			throw new NoSuccessException("Need a token first");
+		}
+		return new DiracRESTClient(m_credential, m_accessToken).get(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId));
 	}
 }
