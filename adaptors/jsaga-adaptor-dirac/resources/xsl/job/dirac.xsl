@@ -15,7 +15,7 @@
     <xsl:template match="jsdl:JobDescription">
     
     <xsl:text>
-manifest={ </xsl:text>
+{ </xsl:text>
         <!-- <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Environment">
 <xsl:value-of select="@name"/>='<xsl:value-of select="text()"/><xsl:text>'
 </xsl:text>
