@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -50,23 +51,48 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 			throws PermissionDeniedException, TimeoutException,
 			NoSuccessException, BadResource {
 		try {
-			m_logger.debug(jobDesc);
+			m_logger.debug("Input job desc:\n" + jobDesc);
 			DiracRESTClient submittor = new DiracRESTClient(m_credential, m_accessToken);
-			submittor.addParam("manifest", jobDesc);
 			// parse JSON jobDesc to get input files and write contents to POST data
-			// FIXME: need the local full name to read it. It is not in InputSandbox
-			// possible to add customized JSON fields "LocalInputFile1":
-//            JSONParser parser = new JSONParser();
-//            JSONObject diracJobDesc = (JSONObject) parser.parse(jobDesc);
-//            if (diracJobDesc.containsKey("InputSandbox")) {
-//            	JSONArray inputFiles = (JSONArray)diracJobDesc.get("InputSandbox");
-//	            for (int i=0; i<inputFiles.size(); i++) {
-//	                JSONArray file = new JSONArray();
-//	                file.add(inputFiles.get(i).toString());
-//	                file.add(open(new File(inputFiles.get(i).toString())));
-//	                submittor.addData(file.toJSONString());
-//	            }
-//            }
+            JSONParser parser = new JSONParser();
+            JSONObject diracJobDesc = (JSONObject) parser.parse(jobDesc);
+            if (diracJobDesc.containsKey("JSAGADataStagingIn")) {
+            	JSONArray inputTransfers = (JSONArray)diracJobDesc.get("JSAGADataStagingIn");
+	            for (int i=0; i<inputTransfers.size(); i++) {
+	            	JSONObject transfer = (JSONObject)inputTransfers.get(i);
+	                JSONArray file = new JSONArray();
+	                file.add(transfer.get("Dest").toString());
+	                file.add(open(transfer.get("Source").toString()));
+	                submittor.addData(file.toJSONString());
+	            }
+            }
+            // remove JSAGA internal info from the jobDesc
+            diracJobDesc.remove("JSAGADataStagingIn");
+            // Add sites if requested
+            if (m_sites != null) {
+            	JSONArray sites = new JSONArray();
+            	for (String s: m_sites) {
+            		sites.add(s);
+            	}
+            	diracJobDesc.put("Site", sites);
+            }
+            // Add StdOutput and StdError to OutputSandbox
+            if (diracJobDesc.containsKey("StdOutput") || diracJobDesc.containsKey("StdError")) {
+	            JSONArray outputFiles = (JSONArray)diracJobDesc.get("OutputSandbox");
+	            if (outputFiles == null) {
+	            	outputFiles = new JSONArray();
+//	            } else {
+//	            	diracJobDesc.remove("OutputSandbox");
+	            }
+	            if (diracJobDesc.containsKey("StdOutput"))
+	            	outputFiles.add(diracJobDesc.get("StdOutput"));
+	            if (diracJobDesc.containsKey("StdError"))
+	            	outputFiles.add(diracJobDesc.get("StdError"));
+	            diracJobDesc.put("OutputSandbox", outputFiles);
+            }
+            jobDesc = diracJobDesc.toJSONString();
+			m_logger.debug("Output job desc:\n" + jobDesc);
+			submittor.addParam("manifest", jobDesc);
 			JSONObject submitResult = submittor.post(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS));
 	        // resulting job ID(s) are returned as a list ( e.g. when bulk submission )
 			m_logger.debug(submitResult.toJSONString());
@@ -104,7 +130,7 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 			throws PermissionDeniedException, TimeoutException,
 			NoSuccessException {
 		// no staging IN to do (sent at submission as multipart HTTP post request)
-		return null;
+		return new StagingTransfer[]{};
 	}
 
 	/*------------- StagingTwoPhase ---------------*/
@@ -119,7 +145,7 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 			throws PermissionDeniedException, TimeoutException,
 			NoSuccessException {
 		// no staging IN to do (sent at submission as multipart HTTP post request)
-		return null;
+		return new StagingTransfer[]{};
 	}
 
 	public StagingTransfer[] getOutputStagingTransfer(String nativeJobId)
@@ -127,18 +153,26 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 			NoSuccessException {
 		try {
 			JSONObject diracJobDesc = new DiracRESTClient(m_credential, m_accessToken)
-									.delete(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId + "/manifest"));
-//			return this.getStagingTransfers(nativeJobId, jobDesc, "OutputSandox");
+									.get(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId + "/manifest"));
 			if (!diracJobDesc.containsKey("OutputSandbox")) {
 				return null;
 			}
-			JSONArray files = (JSONArray)diracJobDesc.get("OutputSandbox");
+			Object files = diracJobDesc.get("OutputSandbox");
 	    	ArrayList<StagingTransfer> transfers = new ArrayList<StagingTransfer>();
-			for (Object f: files) {
+			if (files instanceof JSONArray) {
+				for (Object f: (JSONArray)files) {
+					transfers.add(new StagingTransfer(
+							new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId + "/outputsandbox/" + f).toString(),
+							f.toString(),
+							false));
+				}
+			} else {
+				String f = (String)files;
 				transfers.add(new StagingTransfer(
 						new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId + "/outputsandbox/" + f).toString(),
 						f.toString(),
-						false));
+						false
+						));
 			}
 	    	StagingTransfer[] st = new StagingTransfer[]{};
 	    	return (StagingTransfer[]) transfers.toArray(st);
@@ -154,6 +188,7 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 	 * @param sandbox: "InputSandbox" or "OutputSandbox"
 	 * @return an Array of staging transfers for the jobs
 	 * @throws MalformedURLException
+	 * @deprecated
 	 */
 	private StagingTransfer[] getStagingTransfers(String nativeJobId, JSONObject diracJobDesc, String sandbox) throws MalformedURLException {
 		if (!diracJobDesc.containsKey(sandbox)) {
@@ -171,7 +206,20 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
     	return (StagingTransfer[]) transfers.toArray(st);
 	}
 	
-    private static String open(File file) throws IOException {
+	/**
+	 * open a file named as path or URI file:/
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+    private static String open(String filename) throws IOException {
+    	File file = null;
+    	try {
+    		URL url = new URL(filename);
+    		file = new File(url.getPath());
+    	} catch (MalformedURLException e) {
+    		file  = new File(filename);
+    	}
         byte[] buffer = new byte[(int) file.length()];
         DataInputStream stream = new DataInputStream(new FileInputStream(file));
         stream.readFully(buffer);
