@@ -64,12 +64,21 @@ public class DiracJobMonitorAdaptor extends DiracJobAdaptorAbstract implements
 
 	public Date getStarted(String nativeJobId) throws NotImplementedException,
 			NoSuccessException {
-		throw new NotImplementedException();
+		try {
+			return this.getTime(nativeJobId, "startExecution");
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
+		
 	}
 
 	public Date getFinished(String nativeJobId) throws NotImplementedException,
 			NoSuccessException {
-		throw new NotImplementedException();
+		try {
+			return this.getTime(nativeJobId, "endExecution");
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
 	}
 
 	public String[] getExecutionHosts(String nativeJobId)
