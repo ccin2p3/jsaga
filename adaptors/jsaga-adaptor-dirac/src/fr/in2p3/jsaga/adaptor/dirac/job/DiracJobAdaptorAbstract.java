@@ -40,11 +40,14 @@ public class DiracJobAdaptorAbstract implements JobAdaptor {
 
 	private final static String P_GROUP = "Group";
 	private final static String P_SETUP = "Setup";
-	Logger m_logger = Logger.getLogger(this.getClass());
+	private final static String P_SITES = "Sites";
+	
+	protected Logger m_logger = Logger.getLogger(this.getClass());
 
-	X509SecurityCredential m_credential;
-	URL m_url;
-	String m_accessToken;
+	protected X509SecurityCredential m_credential;
+	protected URL m_url;
+	protected String m_accessToken;
+	protected String[] m_sites;
 	
 	public Class[] getSupportedSecurityCredentialClasses() {
 		return new Class[]{X509SecurityCredential.class};
@@ -95,9 +98,16 @@ public class DiracJobAdaptorAbstract implements JobAdaptor {
 			throw new NoSuccessException(e);
 		}
 
+		// Read preferred sites from config
+		if (attributes.containsKey(P_SITES)) {
+			// TODO support list (vector)
+			m_sites = new String[]{(String)attributes.get(P_SITES)};
+		}
+//		m_sites = new String[]{"LCG.CNAF.it"};
 	}
 
 	public void disconnect() throws NoSuccessException {
+		// TODO: disable token?
 	}
 
 	public String getType() {
@@ -113,7 +123,7 @@ public class DiracJobAdaptorAbstract implements JobAdaptor {
 
 
 	public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-		// TODO getDefault
+//		return new Default[]{new Default(SHELLPATH, "/bin/bash")};
 		return null;
 	}
 
