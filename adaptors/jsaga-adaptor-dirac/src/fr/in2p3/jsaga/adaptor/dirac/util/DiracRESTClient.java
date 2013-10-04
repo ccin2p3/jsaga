@@ -96,12 +96,13 @@ public class DiracRESTClient {
 	/**
 	 * Add some POST data
 	 * @param data
+	 * @throws UnsupportedEncodingException 
 	 */
-	public void addData(String data) {
+	public void addData(String data) throws UnsupportedEncodingException {
 		if (m_postData == null) {
 			m_postData = new StringBuffer();
 		}
-		m_postData.append(data);
+		m_postData.append(URLEncoder.encode(data, "UTF-8"));
 		m_postData.append("\n");
 	}
 	
@@ -215,7 +216,7 @@ public class DiracRESTClient {
 
         // set POST message
         if (m_postData != null) {
-        	m_logger.debug("data=" + m_postData.toString());
+        	m_logger.debug("data=\n" + m_postData.toString());
             httpsConnection.setDoOutput(true);
             OutputStream post = httpsConnection.getOutputStream();
             post.write(URLEncoder.encode(m_postData.toString(), "UTF-8").getBytes());
