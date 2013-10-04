@@ -90,6 +90,8 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 	            	outputFiles.add(diracJobDesc.get("StdError"));
 	            diracJobDesc.put("OutputSandbox", outputFiles);
             }
+            // add jobname
+            diracJobDesc.put("JobName", "JSAGA-" + uniqId);
             jobDesc = diracJobDesc.toJSONString();
 			m_logger.debug("Output job desc:\n" + jobDesc);
 			submittor.addParam("manifest", jobDesc);
