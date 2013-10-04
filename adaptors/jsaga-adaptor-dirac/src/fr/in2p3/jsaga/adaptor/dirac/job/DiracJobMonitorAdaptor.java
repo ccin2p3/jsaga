@@ -35,7 +35,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
 public class DiracJobMonitorAdaptor extends DiracJobAdaptorAbstract implements
 		QueryIndividualJob, QueryListJob, ListableJobAdaptor, JobInfoAdaptor {
 
-	private static final String DIRAC_TIME = "yyyy-MM-dd HH:mm:ss";
+	private static final String DIRAC_TIME = "yyyy-MM-dd HH:mm:ss z";
 	
 	/*----------------- QueryIndividualJob -----------------*/
 	public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
@@ -135,12 +135,15 @@ public class DiracJobMonitorAdaptor extends DiracJobAdaptorAbstract implements
 	}
 	
 	/*------------- Private methods ------------------*/
+	// TODO: fix Dirac times are int UTC
 	private Date getTime(String nativeJobId, String whichTime) throws	NoSuccessException, AuthenticationFailedException, 
 															IncorrectURLException, MalformedURLException {
 		DateFormat df = new SimpleDateFormat(DIRAC_TIME);
 		try {
 			JSONObject jobTimes = (JSONObject)this.getJob(nativeJobId).get("times");
 			String time = (String)jobTimes.get(whichTime);
+			// add UTC because Dirac times are in UTC
+			time += " UTC";
 			return df.parse(time);
 		} catch (ParseException e) {
 			throw new NoSuccessException(e);
