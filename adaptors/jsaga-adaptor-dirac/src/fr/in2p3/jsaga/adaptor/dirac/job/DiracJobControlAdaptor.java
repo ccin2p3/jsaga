@@ -1,11 +1,6 @@
 package fr.in2p3.jsaga.adaptor.dirac.job;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -60,10 +55,7 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
             	JSONArray inputTransfers = (JSONArray)diracJobDesc.get("JSAGADataStagingIn");
 	            for (int i=0; i<inputTransfers.size(); i++) {
 	            	JSONObject transfer = (JSONObject)inputTransfers.get(i);
-	                JSONArray file = new JSONArray();
-	                file.add(transfer.get("Dest").toString());
-	                file.add(open(transfer.get("Source").toString()));
-	                submittor.addData(file.toJSONString());
+	            	submittor.addFile(transfer.get("Dest").toString(), transfer.get("Source").toString());
 	            }
             }
             // remove JSAGA internal info from the jobDesc
@@ -208,25 +200,4 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
     	return (StagingTransfer[]) transfers.toArray(st);
 	}
 	
-	/**
-	 * open a file named as path or URI file:/
-	 * @param file
-	 * @return
-	 * @throws IOException
-	 */
-    private static String open(String filename) throws IOException {
-    	File file = null;
-    	try {
-    		URL url = new URL(filename);
-    		file = new File(url.getPath());
-    	} catch (MalformedURLException e) {
-    		file  = new File(filename);
-    	}
-        byte[] buffer = new byte[(int) file.length()];
-        DataInputStream stream = new DataInputStream(new FileInputStream(file));
-        stream.readFully(buffer);
-        stream.close();
-        return new String(buffer);
-    }
-
 }

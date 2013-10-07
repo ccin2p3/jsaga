@@ -1,11 +1,13 @@
 package fr.in2p3.jsaga.adaptor.dirac.util;
 
+import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.KeyManagementException;
@@ -14,7 +16,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-
+import java.util.Hashtable;
+import java.util.Iterator;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -29,6 +32,10 @@ import org.json.simple.parser.ParseException;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.IncorrectURLException;
 import org.ogf.saga.error.NoSuccessException;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
 
 import fr.in2p3.jsaga.adaptor.security.impl.X509SecurityCredential;
 
@@ -47,7 +54,11 @@ public class DiracRESTClient {
 	private X509SecurityCredential m_x509 = null;
 	private JSONObject m_getParams = new JSONObject();
 	private StringBuffer m_postData = null;
+	private Hashtable<String, String> m_files = new Hashtable<String, String>();
 	Logger m_logger = Logger.getLogger(this.getClass());
+	String twoHyphens = "--";
+	String boundary =  "*****";
+	String crlf= "\n";
 	
 	/**
 	 * Constructs a client that will connect with a "access_token"
@@ -102,8 +113,13 @@ public class DiracRESTClient {
 		if (m_postData == null) {
 			m_postData = new StringBuffer();
 		}
-		m_postData.append(URLEncoder.encode(data, "UTF-8"));
+//		m_postData.append(URLEncoder.encode(data, "UTF-8"));
+		m_postData.append(data);
 		m_postData.append("\n");
+	}
+	
+	public void addFile(String filenameToSend, String localFilenameToRead) {
+		m_files.put(filenameToSend, localFilenameToRead);
 	}
 	
 	/**
@@ -215,14 +231,37 @@ public class DiracRESTClient {
         });
 
         // set POST message
-        if (m_postData != null) {
-        	m_logger.debug("data=\n" + m_postData.toString());
-            httpsConnection.setDoOutput(true);
-            OutputStream post = httpsConnection.getOutputStream();
-            post.write(URLEncoder.encode(m_postData.toString(), "UTF-8").getBytes());
-            post.close();
-        }
+        if (m_files.size() > 0) {
+        	httpsConnection.setDoOutput(true);
+        	httpsConnection.setUseCaches(false);
+        	httpsConnection.setRequestProperty("Connection", "Keep-Alive");
 
+
+        	Iterator<String> i=m_files.keySet().iterator();
+        	MultipartEntityBuilder meb = MultipartEntityBuilder.create(); 
+        	while (i.hasNext()) {
+        		String f = i.next();
+            	m_logger.debug("Adding multipart file: " + f);
+            	String local_f = m_files.get(f);
+            	File local_file;
+            	try {
+                	// try to read file as URL file:/
+            		local_file = new File(new URL(local_f).getPath());
+            	} catch (MalformedURLException e) {
+            		// local file
+            		local_file  = new File(local_f);
+            	}
+
+            	meb.addPart(f, new FileBody(local_file));
+        	}
+        	HttpEntity data = meb.build();
+        	httpsConnection.addRequestProperty("Content-length", data.getContentLength()+"");
+        	httpsConnection.addRequestProperty(data.getContentType().getName(), data.getContentType().getValue());
+        	DataOutputStream post = new DataOutputStream(httpsConnection.getOutputStream());
+        	data.writeTo(post);
+        	post.flush();
+        	post.close();
+        }
         // open input stream
         httpsConnection.connect();
         InputStream stream = httpsConnection.getInputStream();
@@ -252,4 +291,5 @@ public class DiracRESTClient {
       	}
     	return query;
     }
+    
 }
