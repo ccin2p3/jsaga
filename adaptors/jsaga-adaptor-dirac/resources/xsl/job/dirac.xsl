@@ -32,16 +32,18 @@ _WorkingDirectory=<xsl:value-of select="."/><xsl:text>
         
         
         <xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Argument">
-            <xsl:text>,"Arguments": [</xsl:text>
+            <xsl:text>,"Arguments": "</xsl:text>
             <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
-                <xsl:text>"</xsl:text>
+                <!-- <xsl:text>"</xsl:text> -->
+                <xsl:text> </xsl:text>
                 <xsl:value-of select="."/>
-                <xsl:text>"</xsl:text>
-                <xsl:if test="position() &lt; last()">
+                <!-- <xsl:text>"</xsl:text> -->
+                <!-- <xsl:if test="position() &lt; last()">
                     <xsl:text>,</xsl:text>
-                </xsl:if>
+                </xsl:if> -->
             </xsl:for-each>
-            <xsl:text>]</xsl:text>
+            <xsl:text>"</xsl:text>
+            <!-- <xsl:text>]</xsl:text> -->
         </xsl:if>
         <!-- needed when job attribute FileTransfer is not set -->
  		<!-- <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Input/text()">
