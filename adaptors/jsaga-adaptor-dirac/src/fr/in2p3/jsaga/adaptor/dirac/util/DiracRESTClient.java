@@ -34,6 +34,7 @@ import org.ogf.saga.error.IncorrectURLException;
 import org.ogf.saga.error.NoSuccessException;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 
@@ -252,7 +253,7 @@ public class DiracRESTClient {
             		local_file  = new File(local_f);
             	}
 
-            	meb.addPart(f, new FileBody(local_file));
+            	meb.addBinaryBody(f, local_file, ContentType.MULTIPART_FORM_DATA, f);
         	}
         	HttpEntity data = meb.build();
         	httpsConnection.addRequestProperty("Content-length", data.getContentLength()+"");
