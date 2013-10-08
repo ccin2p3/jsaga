@@ -92,12 +92,27 @@ _WorkingDirectory=<xsl:value-of select="."/><xsl:text>
 </xsl:if>
 <!-- Output data -->
 <xsl:if test="jsdl:DataStaging/jsdl:Target">
-    <!-- TODO: generate JSAGADataStagingOut -->
     <xsl:text>,"OutputSandbox": [</xsl:text>
     <xsl:for-each select="jsdl:DataStaging/jsdl:Target">
         <xsl:text>"</xsl:text>
         <xsl:value-of select="../jsdl:FileName/text()"/>
         <xsl:text>"</xsl:text>
+        <xsl:if test="position() &lt; last()">
+            <xsl:text>,</xsl:text>
+        </xsl:if>
+    </xsl:for-each>
+    <xsl:text>]</xsl:text>
+    <!-- JSAGA internal data staging info -->
+    <xsl:text>,"JSAGADataStagingOut": [</xsl:text>
+    <xsl:for-each select="jsdl:DataStaging/jsdl:Target">
+        <xsl:text>{"Source": </xsl:text>
+        <xsl:text>"</xsl:text>
+        <xsl:value-of select="../jsdl:FileName/text()"/>
+        <xsl:text>"</xsl:text>
+        <xsl:text>,"Dest": </xsl:text>
+        <xsl:text>"</xsl:text>
+        <xsl:value-of select="./jsdl:URI/text()"/>
+        <xsl:text>"}</xsl:text>
         <xsl:if test="position() &lt; last()">
             <xsl:text>,</xsl:text>
         </xsl:if>

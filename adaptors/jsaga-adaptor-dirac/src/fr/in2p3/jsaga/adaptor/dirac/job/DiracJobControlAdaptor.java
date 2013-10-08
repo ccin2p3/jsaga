@@ -1,5 +1,10 @@
 package fr.in2p3.jsaga.adaptor.dirac.job;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,6 +20,7 @@ import fr.in2p3.jsaga.adaptor.dirac.util.DiracConstants;
 import fr.in2p3.jsaga.adaptor.dirac.util.DiracRESTClient;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
@@ -30,7 +36,9 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
  * Date:   30 sept 2013
  * ***************************************************/
 
-public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements JobControlAdaptor, StagingJobAdaptorOnePhase {
+// TODO: implement JobCleanable to do the remove of the local OSB file transfers description
+public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements JobControlAdaptor, 
+																StagingJobAdaptorOnePhase, CleanableJobAdaptor {
 
 	public JobDescriptionTranslator getJobDescriptionTranslator()
 			throws NoSuccessException {
@@ -48,9 +56,9 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 		try {
 			m_logger.debug("Input job desc:\n" + jobDesc);
 			DiracRESTClient submittor = new DiracRESTClient(m_credential, m_accessToken);
-			// parse JSON jobDesc to get input files and write contents to POST data
             JSONParser parser = new JSONParser();
             JSONObject diracJobDesc = (JSONObject) parser.parse(jobDesc);
+			// parse JSON jobDesc to get input files and write contents to POST data
             if (diracJobDesc.containsKey("JSAGADataStagingIn")) {
             	JSONArray inputTransfers = (JSONArray)diracJobDesc.get("JSAGADataStagingIn");
 	            for (int i=0; i<inputTransfers.size(); i++) {
@@ -60,6 +68,9 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
             }
             // remove JSAGA internal info from the jobDesc
             diracJobDesc.remove("JSAGADataStagingIn");
+            
+            
+            
             // Add sites if requested
             if (m_sites != null) {
             	JSONArray sites = new JSONArray();
@@ -68,22 +79,43 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
             	}
             	diracJobDesc.put("Site", sites);
             }
-            // Add StdOutput and StdError to OutputSandbox
-            if (diracJobDesc.containsKey("StdOutput") || diracJobDesc.containsKey("StdError")) {
-	            JSONArray outputFiles = (JSONArray)diracJobDesc.get("OutputSandbox");
-	            if (outputFiles == null) {
-	            	outputFiles = new JSONArray();
-//	            } else {
-//	            	diracJobDesc.remove("OutputSandbox");
-	            }
-	            if (diracJobDesc.containsKey("StdOutput"))
-	            	outputFiles.add(diracJobDesc.get("StdOutput"));
-	            if (diracJobDesc.containsKey("StdError"))
-	            	outputFiles.add(diracJobDesc.get("StdError"));
-	            diracJobDesc.put("OutputSandbox", outputFiles);
-            }
+            
             // add jobname
             diracJobDesc.put("JobName", "JSAGA-" + uniqId);
+            
+            
+            // parse JSON jobDesc to get output files and dump to local file (Dirac does not accept additionnal JSON fields)
+            if (diracJobDesc.containsKey("JSAGADataStagingOut")) {
+            	JSONArray outputTransfers = (JSONArray)diracJobDesc.get("JSAGADataStagingOut");
+            	try {
+            		// Create file 
+            		String jobName = (String)diracJobDesc.get("JobName");
+            		BufferedWriter out = new BufferedWriter(
+            								new FileWriter(
+            									new File(System.getProperty("java.io.tmpdir"),jobName)));
+            		out.write(outputTransfers.toJSONString());
+            		//Close the output stream
+            		out.close();
+            	} catch (Exception e) {
+            		throw new NoSuccessException(e);
+            	}
+            }
+            diracJobDesc.remove("JSAGADataStagingOut");
+            
+            
+            // Add StdOutput and StdError to OutputSandbox
+            // FIXME: appear twice if defined in file transfers
+//            if (diracJobDesc.containsKey("StdOutput") || diracJobDesc.containsKey("StdError")) {
+//	            JSONArray outputFiles = (JSONArray)diracJobDesc.get("OutputSandbox");
+//	            if (outputFiles == null) {
+//	            	outputFiles = new JSONArray();
+//	            }
+//	            if (diracJobDesc.containsKey("StdOutput"))
+//	            	outputFiles.add(diracJobDesc.get("StdOutput"));
+//	            if (diracJobDesc.containsKey("StdError"))
+//	            	outputFiles.add(diracJobDesc.get("StdError"));
+//	            diracJobDesc.put("OutputSandbox", outputFiles);
+//            }
             jobDesc = diracJobDesc.toJSONString();
 			m_logger.debug("Output job desc:\n" + jobDesc);
 			submittor.addParam("manifest", jobDesc);
@@ -146,28 +178,36 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 			throws PermissionDeniedException, TimeoutException,
 			NoSuccessException {
 		try {
-			JSONObject diracJobDesc = new DiracRESTClient(m_credential, m_accessToken)
-									.get(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId + "/manifest"));
-			if (!diracJobDesc.containsKey("OutputSandbox")) {
-				return null;
+			// Get the jobname
+			JSONObject diracJobDesc = this.getJob(nativeJobId);
+			
+			String jobName = (String)diracJobDesc.get("name");
+			
+			// Read the corresponding local file
+			BufferedReader in;
+			try {
+				in = new BufferedReader(
+									new FileReader(
+										new File(System.getProperty("java.io.tmpdir"),jobName)));
+			} catch (Exception e) {
+				// Nothing to do there was no Output files
+				return new StagingTransfer[]{};
 			}
-			Object files = diracJobDesc.get("OutputSandbox");
+			
+			// Parse file
 	    	ArrayList<StagingTransfer> transfers = new ArrayList<StagingTransfer>();
-			if (files instanceof JSONArray) {
-				for (Object f: (JSONArray)files) {
-					transfers.add(new StagingTransfer(
-							new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId + "/outputsandbox/" + f).toString(),
-							f.toString(),
-							false));
-				}
-			} else {
-				String f = (String)files;
+            JSONParser parser = new JSONParser();
+            JSONArray files = (JSONArray) parser.parse(in.readLine());
+
+			for (Object f: (JSONArray)files) {
+				String source = ((JSONObject)f).get("Source").toString();
+				String dest = ((JSONObject)f).get("Dest").toString();
 				transfers.add(new StagingTransfer(
-						new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId + "/outputsandbox/" + f).toString(),
-						f.toString(),
-						false
-						));
+						this.buildOSBUrl(nativeJobId, source).toString(),
+						dest,
+						false));
 			}
+			in.close();
 	    	StagingTransfer[] st = new StagingTransfer[]{};
 	    	return (StagingTransfer[]) transfers.toArray(st);
 		} catch (Exception e) {
@@ -175,29 +215,29 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 		}
 	}
 
-	/**
-	 * get the list of staging transfers for the jobs
-	 * @param nativeJobId
-	 * @param diracJobDesc: the JSON formatted job description
-	 * @param sandbox: "InputSandbox" or "OutputSandbox"
-	 * @return an Array of staging transfers for the jobs
-	 * @throws MalformedURLException
-	 * @deprecated
-	 */
-	private StagingTransfer[] getStagingTransfers(String nativeJobId, JSONObject diracJobDesc, String sandbox) throws MalformedURLException {
-		if (!diracJobDesc.containsKey(sandbox)) {
-			return null;
-		}
-		JSONArray files = (JSONArray)diracJobDesc.get(sandbox);
-    	ArrayList<StagingTransfer> transfers = new ArrayList<StagingTransfer>();
-		for (Object f: files) {
-			transfers.add(new StagingTransfer(
-					new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId + "/outputsandbox/" + f).toString(),
-					f.toString(),
-					false));
-		}
-    	StagingTransfer[] st = new StagingTransfer[]{};
-    	return (StagingTransfer[]) transfers.toArray(st);
+	private String buildOSBUrl(String nativeJobId, String filename) throws MalformedURLException {
+		return new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId + "/outputsandbox/" + filename)
+						.toString()
+						.replaceAll("https://", "dirac-osb://") 
+						+ "?access_token=" + this.m_accessToken;
 	}
-	
+
+	public void clean(String nativeJobId) throws PermissionDeniedException,
+			TimeoutException, NoSuccessException {
+		try {
+			// Get the jobname
+			JSONObject diracJobDesc = this.getJob(nativeJobId);
+			
+			String jobName = (String)diracJobDesc.get("name");
+			
+			// Read the corresponding local file
+			try {
+				new File(System.getProperty("java.io.tmpdir"),jobName).delete();
+			} catch (Exception e) {
+				// if file does not exist, means that there was no output files
+			}
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
+	}
 }
