@@ -57,9 +57,6 @@ public class DiracRESTClient {
 	private StringBuffer m_postData = null;
 	private Hashtable<String, String> m_files = new Hashtable<String, String>();
 	Logger m_logger = Logger.getLogger(this.getClass());
-	String twoHyphens = "--";
-	String boundary =  "*****";
-	String crlf= "\n";
 	
 	/**
 	 * Constructs a client that will connect with a "access_token"
@@ -209,7 +206,7 @@ public class DiracRESTClient {
      * @throws KeyManagementException
      * @throws IncorrectURLException
      */
-    private InputStream getStream(URL url, String HTTPType) throws IOException, KeyStoreException, NoSuchAlgorithmException, 
+    public InputStream getStream(URL url, String HTTPType) throws IOException, KeyStoreException, NoSuchAlgorithmException, 
     															CertificateException, UnrecoverableKeyException, 
     															KeyManagementException, IncorrectURLException  {
 

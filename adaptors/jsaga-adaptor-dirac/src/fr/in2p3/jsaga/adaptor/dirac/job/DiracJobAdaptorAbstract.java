@@ -20,6 +20,7 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.dirac.DiracAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.dirac.util.DiracConstants;
 import fr.in2p3.jsaga.adaptor.dirac.util.DiracRESTClient;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
@@ -36,42 +37,25 @@ import fr.in2p3.jsaga.adaptor.security.impl.X509SecurityCredential;
  * ***************************************************/
 
 // TODO: autorefresh when token has expired
-public class DiracJobAdaptorAbstract implements JobAdaptor {
+public class DiracJobAdaptorAbstract extends DiracAdaptorAbstract implements JobAdaptor {
 
 	private final static String P_GROUP = "Group";
 	private final static String P_SETUP = "Setup";
 	private final static String P_SITES = "Sites";
 	
-	protected Logger m_logger = Logger.getLogger(this.getClass());
-
-	protected X509SecurityCredential m_credential;
-	protected URL m_url;
-	protected String m_accessToken;
 	protected String[] m_sites;
 	
-	public Class[] getSupportedSecurityCredentialClasses() {
-		return new Class[]{X509SecurityCredential.class};
-	}
-
-	public void setSecurityCredential(SecurityCredential credential) {
-		m_credential = (X509SecurityCredential) credential;
-	}
-
-	public int getDefaultPort() {
-		// TODO default port
-		return 0;
-	}
-
 	public void connect(String userInfo, String host, int port,
 			String basePath, Map attributes) throws NotImplementedException,
 			AuthenticationFailedException, AuthorizationFailedException,
 			IncorrectURLException, BadParameterException, TimeoutException,
 			NoSuccessException {
-		try {
-			m_url = new URL("https",host, port, "/");
-		} catch (MalformedURLException e) {
-			throw new NoSuccessException(e);
-		}
+		super.connect(userInfo, host, port, basePath, attributes);
+//		try {
+//			m_url = new URL("https",host, port, "/");
+//		} catch (MalformedURLException e) {
+//			throw new NoSuccessException(e);
+//		}
         JSONObject resultDict;
 
         // Get the group
@@ -107,7 +91,6 @@ public class DiracJobAdaptorAbstract implements JobAdaptor {
 	}
 
 	public void disconnect() throws NoSuccessException {
-		// TODO: disable token?
 	}
 
 	public String getType() {
@@ -123,7 +106,6 @@ public class DiracJobAdaptorAbstract implements JobAdaptor {
 
 
 	public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-//		return new Default[]{new Default(SHELLPATH, "/bin/bash")};
 		return null;
 	}
 
