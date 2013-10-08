@@ -135,7 +135,6 @@ public class DiracJobMonitorAdaptor extends DiracJobAdaptorAbstract implements
 	}
 	
 	/*------------- Private methods ------------------*/
-	// TODO: fix Dirac times are int UTC
 	private Date getTime(String nativeJobId, String whichTime) throws	NoSuccessException, AuthenticationFailedException, 
 															IncorrectURLException, MalformedURLException {
 		DateFormat df = new SimpleDateFormat(DIRAC_TIME);
