@@ -36,7 +36,6 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
  * Date:   30 sept 2013
  * ***************************************************/
 
-// TODO: implement JobCleanable to do the remove of the local OSB file transfers description
 public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements JobControlAdaptor, 
 																StagingJobAdaptorOnePhase, CleanableJobAdaptor {
 
