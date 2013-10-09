@@ -76,11 +76,11 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
             	for (String s: m_sites) {
             		sites.add(s);
             	}
-            	diracJobDesc.put("Site", sites);
+            	diracJobDesc.put(DiracConstants.DIRAC_MANIFEST_SITE, sites);
             }
             
             // add jobname
-            diracJobDesc.put("JobName", "JSAGA-" + uniqId);
+            diracJobDesc.put(DiracConstants.DIRAC_MANIFEST_JOBNAME, "JSAGA-" + uniqId);
             
             
             // parse JSON jobDesc to get output files and dump to local file (Dirac does not accept additionnal JSON fields)
@@ -88,7 +88,7 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
             	JSONArray outputTransfers = (JSONArray)diracJobDesc.get("JSAGADataStagingOut");
             	try {
             		// Create file 
-            		String jobName = (String)diracJobDesc.get("JobName");
+            		String jobName = (String)diracJobDesc.get(DiracConstants.DIRAC_MANIFEST_JOBNAME);
             		BufferedWriter out = new BufferedWriter(
             								new FileWriter(
             									new File(System.getProperty("java.io.tmpdir"),jobName)));
@@ -103,18 +103,21 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
             
             
             // Add StdOutput and StdError to OutputSandbox
-            // FIXME: appear twice if defined in file transfers
-//            if (diracJobDesc.containsKey("StdOutput") || diracJobDesc.containsKey("StdError")) {
-//	            JSONArray outputFiles = (JSONArray)diracJobDesc.get("OutputSandbox");
-//	            if (outputFiles == null) {
-//	            	outputFiles = new JSONArray();
-//	            }
-//	            if (diracJobDesc.containsKey("StdOutput"))
-//	            	outputFiles.add(diracJobDesc.get("StdOutput"));
-//	            if (diracJobDesc.containsKey("StdError"))
-//	            	outputFiles.add(diracJobDesc.get("StdError"));
-//	            diracJobDesc.put("OutputSandbox", outputFiles);
-//            }
+            if (diracJobDesc.containsKey(DiracConstants.DIRAC_MANIFEST_STDOUTPUT) || diracJobDesc.containsKey(DiracConstants.DIRAC_MANIFEST_STDERROR)) {
+	            JSONArray outputFiles = (JSONArray)diracJobDesc.get(DiracConstants.DIRAC_MANIFEST_OUTPUTSANDBOX);
+	            if (outputFiles == null) {
+	            	outputFiles = new JSONArray();
+	            }
+	            if (diracJobDesc.containsKey(DiracConstants.DIRAC_MANIFEST_STDOUTPUT)) {
+	            	if (!outputFiles.contains(diracJobDesc.get(DiracConstants.DIRAC_MANIFEST_STDOUTPUT)))
+	            		outputFiles.add(diracJobDesc.get(DiracConstants.DIRAC_MANIFEST_STDOUTPUT));
+	            }
+	            if (diracJobDesc.containsKey(DiracConstants.DIRAC_MANIFEST_STDERROR)) {
+	            	if (!outputFiles.contains(diracJobDesc.get(DiracConstants.DIRAC_MANIFEST_STDERROR)))
+	            	outputFiles.add(diracJobDesc.get(DiracConstants.DIRAC_MANIFEST_STDERROR));
+	            }
+	            diracJobDesc.put(DiracConstants.DIRAC_MANIFEST_OUTPUTSANDBOX, outputFiles);
+            }
             jobDesc = diracJobDesc.toJSONString();
 			m_logger.debug("Output job desc:\n" + jobDesc);
 			submittor.addParam("manifest", jobDesc);
@@ -178,9 +181,7 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 			NoSuccessException {
 		try {
 			// Get the jobname
-			JSONObject diracJobDesc = this.getJob(nativeJobId);
-			
-			String jobName = (String)diracJobDesc.get("name");
+			String jobName = this.getJobName(nativeJobId);
 			
 			// Read the corresponding local file
 			BufferedReader in;
@@ -218,16 +219,14 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 		return new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId + "/outputsandbox/" + filename)
 						.toString()
 						.replaceAll("https://", "dirac-osb://") 
-						+ "?access_token=" + this.m_accessToken;
+						+ "?" + DiracConstants.DIRAC_GET_PARAM_ACCESS_TOKEN + "=" + this.m_accessToken;
 	}
 
 	public void clean(String nativeJobId) throws PermissionDeniedException,
 			TimeoutException, NoSuccessException {
 		try {
-			// Get the jobname
-			JSONObject diracJobDesc = this.getJob(nativeJobId);
-			
-			String jobName = (String)diracJobDesc.get("name");
+
+			String jobName = this.getJobName(nativeJobId);
 			
 			// Read the corresponding local file
 			try {

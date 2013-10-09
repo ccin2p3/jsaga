@@ -168,6 +168,11 @@ public class DiracJobAdaptorAbstract extends DiracAdaptorAbstract implements Job
 						.get(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId));
 	}
 	
+	protected String getJobName(String nativeJobId) throws NoSuccessException, AuthenticationFailedException, 
+															IncorrectURLException, MalformedURLException {
+		return (String)this.getJob(nativeJobId).get("name");
+	}
+	
 	/**
 	 * get the list of jobs from Dirac
 	 * @return the list of jobs in JSON format

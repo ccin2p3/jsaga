@@ -12,6 +12,12 @@ public final class DiracConstants {
 	public final static String DIRAC_GET_RETURN_MINOR_STATUS = "minorStatus";
 	public final static String DIRAC_GRANT_TYPE_CLIENT_CREDENTIALS = "client_credentials";
 	
+	public final static String DIRAC_MANIFEST_OUTPUTSANDBOX = "OutputSandbox";
+	public final static String DIRAC_MANIFEST_STDOUTPUT = "StdOutput";
+	public final static String DIRAC_MANIFEST_STDERROR = "StdError";
+	public final static String DIRAC_MANIFEST_JOBNAME = "JobName";
+	public final static String DIRAC_MANIFEST_SITE = "Site";
+
 	public final static String DIRAC_PATH_AUTH = "/oauth2";
 	public final static String DIRAC_PATH_TOKEN = DIRAC_PATH_AUTH + "/token";
 	public final static String DIRAC_PATH_GROUPS = DIRAC_PATH_AUTH + "/groups";
