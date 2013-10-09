@@ -10,6 +10,9 @@
     <artifactId>jsaga-adaptor-batchssh</artifactId>
     <name>Adaptor for accessing clusters via SSH</name>
     <description>This module provides support for accessing cluster systems through ssh.</description>
+    <properties>
+        <nonOfficial/>
+    </properties>
     <developers>
         <developer>
             <name>Taha Benyezza</name>
