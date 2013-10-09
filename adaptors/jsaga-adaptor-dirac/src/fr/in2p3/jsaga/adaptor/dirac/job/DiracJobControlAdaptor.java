@@ -119,6 +119,7 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
             }
             jobDesc = diracJobDesc.toJSONString();
 			m_logger.debug("Output job desc:\n" + jobDesc);
+//			if (true==true) throw new NoSuccessException("END");
 			submittor.addParam("manifest", jobDesc);
 			JSONObject submitResult = submittor.post(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS));
 	        // resulting job ID(s) are returned as a list ( e.g. when bulk submission )
