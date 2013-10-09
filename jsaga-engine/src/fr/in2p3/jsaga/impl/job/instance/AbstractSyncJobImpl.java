@@ -422,6 +422,10 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             throw new NoSuccessException(e);
         } catch (DoesNotExistException e) {
             throw new NoSuccessException(e);
+        } catch (NotImplementedException e){
+        	// In case of read-only data adaptor for example.
+        	// continue to be able to clean job
+        	s_logger.info("Could not clean staged files:" + e.getMessage());
         }
         try {
             // adaptor's cleanup
