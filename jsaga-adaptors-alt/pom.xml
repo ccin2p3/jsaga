@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <parent>
+        <groupId>fr.in2p3.jsaga</groupId>
+        <artifactId>jsaga</artifactId>
+        <version>0.9.17-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fr.in2p3.jsaga.poms</groupId>
+    <artifactId>jsaga-adaptors-alt</artifactId>
+    <packaging>pom</packaging>
+    <name>List of non-official adaptors</name>
+    <dependencies>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-ourgrid</artifactId>
+            <version>0.9.17-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-ourgrid</artifactId>
+            <version>0.9.17-SNAPSHOT</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
