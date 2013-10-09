@@ -40,7 +40,7 @@ public class ServiceAdaptorFactory {
         if (query != null) {
             String[] pairs = query.split("&");
             for (int i=0; pairs!=null && i<pairs.length; i++) {
-                String[] pair = pairs[i].split("=");
+                String[] pair = pairs[i].split("=", 2);
                 switch (pair.length) {
                     case 1:
                         attributes.put(pair[0], null);

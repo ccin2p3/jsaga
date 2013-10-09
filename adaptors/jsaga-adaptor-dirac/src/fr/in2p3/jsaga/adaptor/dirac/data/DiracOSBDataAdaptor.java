@@ -74,8 +74,7 @@ public class DiracOSBDataAdaptor extends DiracAdaptorAbstract implements FileRea
 		super.connect(userInfo, host, port, basePath, attributes);
         // Get the access_token
 		if (attributes.containsKey(DiracConstants.DIRAC_GET_PARAM_ACCESS_TOKEN)) {
-			// TODO: fix this
-			this.m_accessToken = (String)attributes.get(DiracConstants.DIRAC_GET_PARAM_ACCESS_TOKEN) + "=";
+			this.m_accessToken = (String)attributes.get(DiracConstants.DIRAC_GET_PARAM_ACCESS_TOKEN);
 			m_logger.debug("Token="+this.m_accessToken);
 		} else {
 			throw new AuthenticationFailedException("Missing " + DiracConstants.DIRAC_GET_PARAM_ACCESS_TOKEN);
