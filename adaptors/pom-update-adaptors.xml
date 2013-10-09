@@ -5,7 +5,7 @@
     <artifactId>pom-update-adaptors</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
-    <description>Run "mvn -f pom-update-adaptors.xml validate" when pom.xml is modified.</description>
+    <description>Run "mvn -f pom-update-adaptors.xml validate" when pom.xml is modified or when adaptor property "nonOfficial" changes.</description>
     <build>
         <plugins>
             <plugin>
@@ -27,6 +27,12 @@
 		              <stylesheet>src/aggregate.xsl</stylesheet>
 		              <outputDir>../jsaga-adaptors/</outputDir>
 		            </transformationSet>
+                    <transformationSet>
+                      <dir>.</dir>
+                      <includes><include>pom.xml</include></includes>
+                      <stylesheet>src/aggregate-alt.xsl</stylesheet>
+                      <outputDir>../jsaga-adaptors-alt/</outputDir>
+                    </transformationSet>
 		          </transformationSets>
 		        </configuration>
 		      </plugin>

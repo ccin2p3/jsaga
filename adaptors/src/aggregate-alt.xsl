@@ -14,9 +14,9 @@
             </parent>
             <modelVersion>4.0.0</modelVersion>
             <groupId>fr.in2p3.jsaga.poms</groupId>
-            <artifactId>jsaga-adaptors</artifactId>
+            <artifactId>jsaga-adaptors-alt</artifactId>
             <packaging>pom</packaging>
-            <name>List of adaptors</name>
+            <name>List of non-official adaptors</name>
             <dependencies>
                 <xsl:apply-templates select="pom:modules/pom:module"/>
             </dependencies>
@@ -25,7 +25,7 @@
 
     <xsl:template match="pom:module">
         <xsl:variable name="module" select="document(concat('../',text(),'/pom.xml'))/pom:project"/>
-        <xsl:if test="not($module/pom:properties/pom:nonOfficial)">
+        <xsl:if test="$module/pom:properties/pom:nonOfficial">
 	        <dependency>
 	            <groupId><xsl:value-of select="$module/pom:parent/pom:groupId/text()"/></groupId>
 	            <artifactId><xsl:value-of select="$module/pom:artifactId/text()"/></artifactId>
