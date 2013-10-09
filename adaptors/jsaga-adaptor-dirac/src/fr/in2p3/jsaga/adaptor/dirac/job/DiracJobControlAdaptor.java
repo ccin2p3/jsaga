@@ -17,7 +17,6 @@ import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
 import fr.in2p3.jsaga.adaptor.dirac.util.DiracConstants;
-import fr.in2p3.jsaga.adaptor.dirac.util.DiracRESTClient;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
@@ -54,7 +53,7 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 			NoSuccessException, BadResource {
 		try {
 			m_logger.debug("Input job desc:\n" + jobDesc);
-			DiracRESTClient submittor = new DiracRESTClient(m_credential, m_accessToken);
+			DiracRESTClient submittor = new DiracRESTClient();
             JSONParser parser = new JSONParser();
             JSONObject diracJobDesc = (JSONObject) parser.parse(jobDesc);
 			// parse JSON jobDesc to get input files and write contents to POST data
@@ -135,7 +134,7 @@ public class DiracJobControlAdaptor extends DiracJobAdaptorAbstract implements J
 			TimeoutException, NoSuccessException {
 		JSONObject result;
 		try {
-			result = new DiracRESTClient(m_credential, m_accessToken)
+			result = new DiracRESTClient()
 					.delete(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId));
 		} catch (Exception e) {
 			throw new NoSuccessException(e);

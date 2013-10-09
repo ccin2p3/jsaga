@@ -32,7 +32,6 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.dirac.DiracAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.dirac.util.DiracConstants;
-import fr.in2p3.jsaga.adaptor.dirac.util.DiracRESTClient;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -48,14 +47,14 @@ public class DiracOSBDataAdaptor extends DiracAdaptorAbstract implements FileRea
 	public boolean exists(String absolutePath, String additionalArgs)
 			throws PermissionDeniedException, TimeoutException,
 			NoSuccessException {
-		// TODO Auto-generated method stub
+		// not used
 		return true;
 	}
 
 	public FileAttributes getAttributes(String absolutePath,
 			String additionalArgs) throws PermissionDeniedException,
 			DoesNotExistException, TimeoutException, NoSuccessException {
-		// TODO Auto-generated method stub
+		// not used
 		return null;
 	}
 
@@ -63,7 +62,7 @@ public class DiracOSBDataAdaptor extends DiracAdaptorAbstract implements FileRea
 			String additionalArgs) throws PermissionDeniedException,
 			BadParameterException, DoesNotExistException, TimeoutException,
 			NoSuccessException {
-		// TODO Auto-generated method stub
+		// not used
 		return null;
 	}
 
@@ -108,7 +107,7 @@ public class DiracOSBDataAdaptor extends DiracAdaptorAbstract implements FileRea
 		String path = absolutePath.substring(0, absolutePath.lastIndexOf("/"));
 		
 		// Get all files in OSB in a bzip2 TAR
-		DiracRESTClient client = new DiracRESTClient(m_credential, m_accessToken);
+		DiracRESTClient client = new DiracRESTClient();
 		InputStream tarbzInputFile;
 		try {
 			tarbzInputFile = client.getStream(new URL(m_url, path), "GET");

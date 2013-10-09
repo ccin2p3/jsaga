@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.ogf.saga.error.AuthenticationFailedException;
@@ -22,10 +21,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.dirac.DiracAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.dirac.util.DiracConstants;
-import fr.in2p3.jsaga.adaptor.dirac.util.DiracRESTClient;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
-import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
-import fr.in2p3.jsaga.adaptor.security.impl.X509SecurityCredential;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -51,11 +47,6 @@ public class DiracJobAdaptorAbstract extends DiracAdaptorAbstract implements Job
 			IncorrectURLException, BadParameterException, TimeoutException,
 			NoSuccessException {
 		super.connect(userInfo, host, port, basePath, attributes);
-//		try {
-//			m_url = new URL("https",host, port, "/");
-//		} catch (MalformedURLException e) {
-//			throw new NoSuccessException(e);
-//		}
         JSONObject resultDict;
 
         // Get the group
@@ -70,7 +61,7 @@ public class DiracJobAdaptorAbstract extends DiracAdaptorAbstract implements Job
         
     	// get the Dirac token
 		try {
-			DiracRESTClient client = new DiracRESTClient(m_credential);
+			DiracRESTClient client = new DiracRESTClient();
 	        // GET request parameters
 			client.addParam(DiracConstants.DIRAC_GET_PARAM_GRANT_TYPE, DiracConstants.DIRAC_GRANT_TYPE_CLIENT_CREDENTIALS);
 			client.addParam(DiracConstants.DIRAC_GET_PARAM_GROUP, group);
@@ -87,7 +78,6 @@ public class DiracJobAdaptorAbstract extends DiracAdaptorAbstract implements Job
 			// TODO support list (vector)
 			m_sites = new String[]{(String)attributes.get(P_SITES)};
 		}
-//		m_sites = new String[]{"LCG.CNAF.it"};
 	}
 
 	public void disconnect() throws NoSuccessException {
@@ -134,7 +124,7 @@ public class DiracJobAdaptorAbstract extends DiracAdaptorAbstract implements Job
 		}
 		JSONObject resultDict;
 		try {
-			resultDict = new DiracRESTClient(m_credential).get(new URL(m_url, path));
+			resultDict = new DiracRESTClient().get(new URL(m_url, path));
 		} catch (MalformedURLException e1) {
 			throw new IncorrectURLException(e1);
 		}
@@ -164,8 +154,7 @@ public class DiracJobAdaptorAbstract extends DiracAdaptorAbstract implements Job
 		if (m_accessToken == null) {
 			throw new NoSuccessException("Need a token first");
 		}
-		return new DiracRESTClient(m_credential, m_accessToken)
-						.get(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId));
+		return new DiracRESTClient().get(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS + "/" + nativeJobId));
 	}
 	
 	protected String getJobName(String nativeJobId) throws NoSuccessException, AuthenticationFailedException, 
@@ -200,7 +189,7 @@ public class DiracJobAdaptorAbstract extends DiracAdaptorAbstract implements Job
 		if (m_accessToken == null) {
 			throw new NoSuccessException("Need a token first");
 		}
-		DiracRESTClient client = new DiracRESTClient(m_credential, m_accessToken);
+		DiracRESTClient client = new DiracRESTClient();
 		client.addParam(args);
 		return (JSONArray) client.get(new URL(m_url, DiracConstants.DIRAC_PATH_JOBS)).get("jobs");
 		
