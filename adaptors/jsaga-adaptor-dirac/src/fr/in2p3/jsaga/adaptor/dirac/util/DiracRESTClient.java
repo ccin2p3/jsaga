@@ -49,7 +49,11 @@ import fr.in2p3.jsaga.adaptor.security.impl.X509SecurityCredential;
  * Date:   30 sept 2013
  * ***************************************************/
 
-// TODO: make this class an internal of AbstractAdaptor
+/**
+ * @deprecated
+ * @author schwarz
+ *
+ */
 public class DiracRESTClient {
 
 	private X509SecurityCredential m_x509 = null;
