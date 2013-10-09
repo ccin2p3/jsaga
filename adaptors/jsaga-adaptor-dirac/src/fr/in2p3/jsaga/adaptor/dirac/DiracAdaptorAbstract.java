@@ -74,8 +74,7 @@ public abstract class DiracAdaptorAbstract implements ClientAdaptor {
 	}
 
 	public int getDefaultPort() {
-		// TODO default port
-		return 0;
+		return NO_DEFAULT;
 	}
 
 	public void connect(String userInfo, String host, int port,

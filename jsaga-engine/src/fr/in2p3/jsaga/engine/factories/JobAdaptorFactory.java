@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.engine.factories;
 
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.engine.descriptors.AdaptorDescriptors;
@@ -62,6 +63,10 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
     }
 
     public static void connect(JobControlAdaptor jobAdaptor, SecurityCredential credential, URL url, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
+        // check port
+        if (url.getPort()<=0 && jobAdaptor.getDefaultPort() == ClientAdaptor.NO_DEFAULT) {
+        	throw new BadParameterException("Missing PORT in URL:" + url.getString());
+        }
         jobAdaptor.setSecurityCredential(credential);
         jobAdaptor.connect(
                 url.getUserInfo(),

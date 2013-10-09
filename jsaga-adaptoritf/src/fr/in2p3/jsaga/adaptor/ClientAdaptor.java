@@ -19,6 +19,7 @@ import java.util.Map;
  */
 public interface ClientAdaptor extends Adaptor {
     static final int NO_PORT = -1;
+    static final int NO_DEFAULT = -2;
 
     /**
      * @return the array of supported SecurityCredential classes.

@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.engine.factories;
 
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
@@ -97,6 +98,10 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
         SecurityCredential credential = getCredential(url, context, dataAdaptor);
         dataAdaptor.setSecurityCredential(credential);
 
+        // check port
+        if (url.getPort()<=0 && dataAdaptor.getDefaultPort() == ClientAdaptor.NO_DEFAULT) {
+        	throw new BadParameterException("Missing PORT in URL:" + url.getString());
+        }
         // connect
         dataAdaptor.connect(
                 url.getUserInfo(),
