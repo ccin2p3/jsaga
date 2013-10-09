@@ -75,8 +75,7 @@ public class DiracJobAdaptorAbstract extends DiracAdaptorAbstract implements Job
 
 		// Read preferred sites from config
 		if (attributes.containsKey(P_SITES)) {
-			// TODO support list (vector)
-			m_sites = new String[]{(String)attributes.get(P_SITES)};
+			m_sites = ((String)attributes.get(P_SITES)).split(",");
 		}
 	}
 
