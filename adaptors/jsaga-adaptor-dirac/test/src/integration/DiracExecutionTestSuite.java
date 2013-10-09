@@ -54,6 +54,7 @@ public class DiracExecutionTestSuite extends JSAGATestSuite {
     // test cases
     public static class DiracJobRunSandboxTest extends JobRunSandboxTest {
         public DiracJobRunSandboxTest() throws Exception {super(TYPE);}
+        public void test_output_workingDirectory() { super.ignore("not supported"); }
     }
     
     // test cases
