@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <contexts>
+         <context type="VOMS">
+            <attribute name="UserProxy" value="${user.home}/.jsaga/contexts/rOCCI/proxy"/>
+            <!-- <attribute name="UserCert" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI.pub"/> -->
+            <!-- <attribute name="UserKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI"/> -->
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
+            <job type="rocci"/>
+        </context>
+    </contexts>
+    <session>
+        <context type="VOMS"/>
+    </session>
+</jsaga-default>
