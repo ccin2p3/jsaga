@@ -8,8 +8,17 @@
             <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
             <job type="rocci"/>
         </context>
+        <context type="SSH">
+            <attribute name="UserID" value="root"/>
+            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI"/>
+            <attribute name="UserCert" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI.pub"/>
+            <data type="sftp">
+                <attribute name="KnownHosts" value=""/>
+            </data>
+        </context>
     </contexts>
     <session>
         <context type="VOMS"/>
+        <context type="SSH"/>
     </session>
 </jsaga-default>
