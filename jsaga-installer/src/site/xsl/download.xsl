@@ -50,7 +50,7 @@
                     </ul>
                 </subsection>
                 <subsection name="Current Release">
-                    <xsl:variable name="dir">s/fr/in2p3/jsaga/jsaga-installer/<xsl:value-of select="$project.version"/></xsl:variable>
+                    <xsl:variable name="dir">http://maven.in2p3.fr/fr/in2p3/jsaga/jsaga-installer/<xsl:value-of select="$project.version"/></xsl:variable>
                     <xsl:choose>
                         <xsl:when test="contains($project.version, 'SNAPSHOT')">
                             <p>Download the latest snapshot from this <a href="{$dir}/">directory</a>:</p>
@@ -81,7 +81,7 @@
                     <p>See <a href="changes-report.html">release notes</a>.</p>
                 </subsection>
                 <subsection name="Previous Releases">
-                    <p>Previous releases of JSAGA can be downloaded from the <a href="http://grid.in2p3.fr/software/archives/jsaga/">archives</a>.</p>
+                    <p>Previous releases of JSAGA can be downloaded from the <a href="http://grid.in2p3.fr/maven2/fr/in2p3/jsaga/jsaga-installer/">archives</a>.</p>
                 </subsection>
             </section>
         </body></document>
