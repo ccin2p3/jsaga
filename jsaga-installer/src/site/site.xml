@@ -30,7 +30,7 @@
             <item name="Deviations from SAGA" href="SAGA-delta.html"/>
             <item name="Wiki" href="https://forge.in2p3.fr/projects/jsaga/wiki"/>
             <item name="FAQ" href="users-faq.html"/>
-            <item name="Forum" href="https://forge.in2p3.fr/projects/jsaga/boards/show/11"/>
+            <item name="Forum" href="https://forge.in2p3.fr/projects/jsaga/boards/11"/>
         </menu>
         <menu name="Contributor Documentation">
             <item name="Developing Adaptors" href="contributors-guide.html"/>
@@ -38,7 +38,7 @@
             <item name="Adaptors Test Suite" href="saga-api-test/xref/overview-summary.html"/>
             <item name="JSDL Specification" href="http://www.ogf.org/documents/GFD.56.pdf"/>
             <item name="FAQ" href="contributors-faq.html"/>
-            <item name="Forum" href="https://forge.in2p3.fr/projects/jsaga/boards/show/12"/>
+            <item name="Forum" href="https://forge.in2p3.fr/projects/jsaga/boards/12"/>
         </menu>
         <menu name="Developer Documentation">
             <item name="Dependencies Tree" href="dependencies-tree.html"/>
