@@ -1,17 +1,5 @@
 Presentations
 
-    * Visit of Japanese grid site managers, Lyon, 04/07/2007
-    
-      {{{http://indico.in2p3.fr/getFile.py/access?contribId=4&amp;resId=0&amp;materialId=slides&amp;confId=304}Grids interoperability}}
-
-    * Workshop KEK - CC-IN2P3, Lyon, 29/11/2007
-
-      {{{http://indico.in2p3.fr/getFile.py/access?contribId=11&amp;resId=0&amp;materialId=slides&amp;confId=512}Development on Grid interoperability at CC-IN2P3}}
-
-    * International Symposium on Grid Computing, Taiwan, 11/04/2008
-
-      {{{http://event.twgrid.org/isgc2008/Presentation%20Meterial/Grid%20Middleware/Middleware_Sylvain%20Reynaud_1.pdf}Uniform access to heterogeneous grid infrastructures with JSAGA}}
-
     * Seminar CC-IN2P3, Lyon, 16/05/2008 (in french, restricted access)
 
       {{{http://cc.in2p3.fr/IMG/JSAGA.pdf}Interoperabilite de grilles au CC-IN2P3 avec JSAGA}}
@@ -20,21 +8,9 @@ Presentations
 
       {{{http://www.ogf.org/OGF23/materials/1291/jsaga.pdf}JSAGA: using SAGA for uniform access to heterogeneous grid infrastructures}}
 
-    * Tutorial grilles et EGEE, Montpellier, 18/06/2008 (in french)
-
-      {{{http://indico.in2p3.fr/materialDisplay.py?sessionId=29&amp;materialId=2&amp;confId=907}Utilisation uniforme des grilles avec SAGA et JSAGA}}
-
     * IGTMD project meeting, Lyon, 30/06/2008
 
       {{{http://indico.in2p3.fr/conferenceDisplay.py?confId=986}Current status of JSAGA}}
-
-    * Journees Informatique de l'IN2P3-IRFU, Obernai, 30/09/2008 (in french)
-
-      {{{http://indico.in2p3.fr/getFile.py/access?contribId=65&amp;sessionId=8&amp;resId=0&amp;materialId=slides&amp;confId=653}Acces uniforme aux infrastructures de grilles avec JSAGA}}
-
-    * Workshop at KEK, Tsukuba, 27/11/2008
-
-      {{{http://kds.kek.jp/conferenceDisplay.py?confId=2387}JSAGA - JJS / JUX / NAREGI}}
 
     * Workshop at KISTI, Daejeon, 01/12/2008
 
@@ -47,10 +23,6 @@ Presentations
     * Réunion CIRA (Calcul Intensif en Rhône Alpes), Grenoble, 02/06/2009 (in french)
 
       {{{https://ciment.ujf-grenoble.fr/ragrid/comites/presentations-du-gt-grilles-du-02-06-2009/JSAGA.ppt}Utilisation uniforme des grilles avec JSAGA}}
-
-    * Formation utilisateurs EGEE, Lyon, 17/03/2010 (in french)
-
-      {{{http://indico.in2p3.fr/sessionDisplay.py?sessionId=17&amp;slotId=0&amp;confId=2743}JSAGA}}
 
     * EGI Technical Forum, Amsterdam, 16/09/2010
 
