@@ -13,7 +13,6 @@
                 <table border="1">
                     <xsl:call-template name="HEADERS"/>
                     <xsl:apply-templates select="pom:dependencies/pom:dependency[not(pom:classifier)]">
-                        <xsl:sort select="pom:artifactId/text()" order="ascending"/>
                     </xsl:apply-templates>
                 </table>
             </section>
