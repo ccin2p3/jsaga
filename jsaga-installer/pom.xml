@@ -45,6 +45,37 @@
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xml-maven-plugin</artifactId>
+                <configuration>
+                    <transformationSets>
+                        <transformationSet>
+                            <dir>../jsaga-adaptors-alt</dir>
+                            <includes>
+                                <include>pom.xml</include>
+                            </includes>
+                            <outputDir>${project.build.directory}/generated-site/xdoc</outputDir>
+                            <stylesheet>src/site/xsl/adaptors-alt.xsl</stylesheet>
+						    <fileMappers>
+						      <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
+						          <pattern>pom.xml</pattern>
+						          <replacement>adaptors-alt.xml</replacement>
+						      </fileMapper>
+						    </fileMappers>
+                        </transformationSet>
+                    </transformationSets>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate-adaptors-alt-web-page</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xslt-maven-plugin</artifactId>
                 <version>1.0</version>
                 <configuration>
@@ -245,7 +276,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
+            <!-- <plugin>
                 <groupId>org.codehaus.izpack</groupId>
                 <artifactId>izpack-maven-plugin</artifactId>
                 <version>1.0-alpha-5</version>
@@ -271,7 +302,7 @@
                         <version>4.2.1</version>
                     </dependency>
                 </dependencies>
-            </plugin>
+            </plugin> -->
         </plugins>
         <pluginManagement>
         	<plugins>

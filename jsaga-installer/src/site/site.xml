@@ -24,6 +24,7 @@
         <menu name="User Documentation">
             <item name="Quick Start Guide" href="quickstart.html"/>
             <item name="Adaptors" href="adaptors.html"/>
+            <item name="Alternative adaptors" href="adaptors-alt.html"/>
             <item name="SAGA Specification" href="http://www.ogf.org/documents/GFD.90.pdf"/>
             <item name="SAGA Java Binding API" href="saga-apidocs/index.html"/>
             <item name="Code Examples" href="jsaga-engine/xref/fr/in2p3/jsaga/command/package-summary.html"/>
