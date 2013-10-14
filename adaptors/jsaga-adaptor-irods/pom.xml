@@ -16,8 +16,6 @@
             <organizationUrl>http://cc.in2p3.fr/</organizationUrl>
             <properties>
                 <organizationLogoUrl>http://cc.in2p3.fr/plugins/kitcnrs/images/logoCC72.gif</organizationLogoUrl>
-                <project>JUX</project>
-                <projectUrl>http://cc.in2p3.fr/docenligne/821</projectUrl>
             </properties>
         </developer>
     </developers>
