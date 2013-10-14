@@ -52,10 +52,10 @@ Deviations from SAGA specifications
     * Job description attributes
 
         * JobStartTime: not supported
-          <(NOTE: this attribute is �not supported by JSDL and might disappear in future versions of the SAGA API)>
+          <(NOTE: this attribute is not supported by JSDL and might disappear in future versions of the SAGA API)>
 
         * JobContact: not supported
-          <(NOTE: this attribute is �not supported by JSDL and might disappear in future versions of the SAGA API)>
+          <(NOTE: this attribute is not supported by JSDL and might disappear in future versions of the SAGA API)>
 
         * CPUArchitecture: defined as scalar attribute
           <(NOTE: for compliance with JSDL)>
