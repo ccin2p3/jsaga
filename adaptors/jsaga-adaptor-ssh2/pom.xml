@@ -23,6 +23,15 @@
     <!-- ************************************************************* -->
 
     <name>Adaptors for SSH (based on ganymed library)</name>
+    <description>This module provides support for SSH components;
+security mecanism (SSH asymmetric keys),
+data management protocol (SFTP),
+execution management technology (SSH).</description>
+    <developers>
+        <developer>
+            <name>Romain Reuillon</name>
+        </developer>
+    </developers>
 
     <!-- ************************************************************* -->
     <!-- *** Build Settings ****************************************** -->

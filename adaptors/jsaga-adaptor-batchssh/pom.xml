@@ -15,31 +15,7 @@
     </properties>
     <developers>
         <developer>
-            <name>Taha Benyezza</name>
-            <email>benyezza@poste.isima.fr</email>
-            <organization>ISIMA</organization>
-            <organizationUrl>http://www.isima.fr/</organizationUrl>
-            <properties>
-                <organizationLogoUrl>http://www.cdefi.fr/images/photos/0004/img_1251465429479.jpg</organizationLogoUrl>
-            </properties>
-        </developer>
-        <developer>
-            <name>Yassine Bachar</name>
-            <email>bachar@poste.isima.fr</email>
-            <organization>ISIMA</organization>
-            <organizationUrl>http://www.isima.fr/</organizationUrl>
-            <properties>
-                <organizationLogoUrl>http://www.cdefi.fr/images/photos/0004/img_1251465429479.jpg</organizationLogoUrl>
-            </properties>
-        </developer>
-        <developer>
-            <name>Lionel Schwarz</name>
-            <email>lionel.schwarz@in2p3.fr</email>
-            <organization>CC-IN2P3</organization>
-            <organizationUrl>http://cc.in2p3.fr/</organizationUrl>
-            <properties>
-                <organizationLogoUrl>http://cc.in2p3.fr/plugins/kitcnrs/images/logoCC72.gif</organizationLogoUrl>
-            </properties>
+            <name>Romain Reuillon</name>
         </developer>
     </developers>
     <dependencies>
