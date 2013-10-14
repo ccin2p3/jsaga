@@ -32,7 +32,7 @@
         <xsl:variable name="module" select="document(concat('../adaptors/',pom:artifactId/text(),'/pom.xml'))/pom:project"/>
         
         <tr>
-            <td><xsl:value-of select="$module/pom:name/text()"/></td>
+            <td><a href="http://maven.in2p3.fr/fr/in2p3/jsaga/adaptor/{pom:artifactId/text()}/{pom:version/text()}/?C=M;O=D"><xsl:value-of select="$module/pom:name/text()"/></a></td>
             <td><xsl:value-of select="$module/pom:description/text()"/></td>
             <td>
                 <xsl:for-each select="$module/pom:developers/pom:developer">
