@@ -14,38 +14,25 @@
     </part>
     <part id="security">
         <title>Security</title>
-        <faq id="known-hosts">
-            <question>How to establish the authenticity of hosts ?</question>
-            <answer>Connect to this host from a linux or cygwin machine, then
-                copy the ~/.ssh/known_hosts file to your Windows home.</answer>
-        </faq>
-        <faq id="daemon-on-cygwin">
-            <question>How to setup SSH daemon on Cygwin ?</question>
-            <answer>
-                <pre>ssh-host-config -y      # answers: ntsec tty
-net start sshd
-ssh-keygen -t rsa
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-ssh localhost -i ~/.ssh/id_rsa</pre>
-            </answer>
+        <faq id="which">
+            <question>Which security context should I use with this adaptor ?</question>
+            <answer>Use a context of type "X509", giving your p12 certificate and your password. Your DN should be registered in the Dirac
+            remote system and you should upload your proxy to the Dirac portal.</answer>
         </faq>
     </part>
     <part id="execution">
         <title>Execution management</title>
         <faq id="url">
-            <question>What is the URL syntax understood by this plug-in ?</question>
+            <question>What is the URL syntax understood by this adaptor ?</question>
             <answer>The URL must be:
-                <pre><![CDATA[ssh://<HOSTNAME>[:<PORT>]/
+                <pre><![CDATA[dirac://<HOSTNAME>:<PORT>/[?[Group=<GROUP>][&Setup=<SETUP>][&Sites=<LIST_OF_SITES>]]
 Where:
-    <HOSTNAME> is the name of the host running the SSH daemon,
-    <PORT> is 22 by default.
+    <HOSTNAME> is the name of the host running the Dirac REST service,
+    <PORT> is the port of the Dirac REST service,
+    <GROUP> is the Dirac group your DN is allowed in (this parameter is optional if your DN is allowed in only 1 group),
+    <SETUP> is the Dirac setup your DN is allowed in (this parameter is optional if your DN is allowed in only 1 setup),
+    <LIST_OF_SITES> is a comma-delimited list of Dirac sites you want your job to be sent to.
 ]]></pre>
-            </answer>
-        </faq>
-        <faq id="encoding">
-            <question>What encoding is used for remote filenames ?</question>
-            <answer>The plug-in does not explicitly set any filename encoding, so the default on the server is used. If
-            you want to force a particular encoding for filenames, please use the "FilenameEncoding" parameter.
             </answer>
         </faq>
     </part>
