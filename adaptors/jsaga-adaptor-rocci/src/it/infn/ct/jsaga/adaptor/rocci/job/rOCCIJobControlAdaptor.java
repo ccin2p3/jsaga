@@ -49,6 +49,7 @@ import org.ogf.saga.error.PermissionDeniedException;
 
 import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -69,7 +70,6 @@ import java.util.regex.Matcher;
 import org.apache.log4j.Logger;
 
 import org.apache.commons.net.telnet.TelnetClient;
-
 
 /* *********************************************
  * *** Istituto Nazionale di Fisica Nucleare ***
@@ -100,14 +100,15 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
     
   private SSHJobControlAdaptor sshControlAdaptor = 
             new SSHJobControlAdaptor();
-  
+
+  private String prefix = "";  
   private String action = "";
   private String resource = "";  
   private String auth = "";
   private String attributes_title = "";
   private String mixin_os_tpl = "";
   private String mixin_resource_tpl = "";  
-  private String proxy_path = "";
+  //private String proxy_path = "";
   private String publickey_filename = "";
   private String privatekey_filename = "";
   private String Endpoint = "";
@@ -142,7 +143,8 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
     String line;
     List<String> list_rOCCI = new ArrayList();
 
-    Process p = Runtime.getRuntime().exec("/home/schwarz/.rvm/gems/ruby-1.9.3-p429/bin/" + action);
+    //Process p = Runtime.getRuntime().exec("/home/schwarz/.rvm/gems/ruby-1.9.3-p429/bin/" + action);
+    Process p = Runtime.getRuntime().exec(action);
 
     BufferedReader in = new BufferedReader(
                         new InputStreamReader(p.getInputStream()) 
@@ -203,9 +205,10 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                  
        log.info("");
        log.info("Trying to connect to the cloud host [ " + host + " ] ");
-            
+     
+       prefix = (String) attributes.get("prefix");       
        action = (String) attributes.get("action");
-       resource = (String) attributes.get("resource");
+       //resource = (String) attributes.get("resource");
        String resourceID = (String) attributes.get("resourceID");
        auth = (String) attributes.get("auth");
        attributes_title = (String) attributes.get("attributes_title");
@@ -213,23 +216,42 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
        mixin_resource_tpl = (String) attributes.get("mixin_resource_tpl");
        publickey_filename = (String) attributes.get("publickey_file");
        privatekey_filename = (String) attributes.get("privatekey_file");
-       proxy_path = (String) attributes.get("proxy_path");
+       //proxy_path = (String) attributes.get("proxy_path");
+
+       // Check if OCCI path is set                
+       if ((prefix != null) && (new File((prefix)).exists()))
+       	prefix += System.getProperty("file.separator");
+       else prefix = "";
             
        Endpoint = "https://" 
                   + host 
                   + ":" 
                   + port 
                   + System.getProperty("file.separator");
-            
+
+       if (attributes.containsKey(AUTH) &&
+          (attributes.get(AUTH) != null))
+            auth = (String) attributes.get(AUTH);
+
+       if (attributes.containsKey(RESOURCE) &&
+          (attributes.get(RESOURCE) != null))
+            resource = (String) attributes.get(RESOURCE);
+
+       if ((action == null) &&
+           attributes.containsKey(ACTION) &&
+           (attributes.get(ACTION) != null))
+            action = (String) attributes.get(ACTION);
+
        log.info("");
        log.info("See below the details: ");
        log.info("");
+       log.info("PREFIX    = " + prefix);
        log.info("ACTION    = " + action);
        log.info("RESOURCE  = " + resource);
        
        log.info("");
        log.info("AUTH       = " + auth);       
-       log.info("PROXY_PATH = " + proxy_path);
+       log.info("PROXY_PATH = " + user_cred);
        log.info("CA_PATH    = " + ca_path);
        
        log.info("");
@@ -251,12 +273,13 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
             if (resource.equals("resource_tpl"))
                 log.info("Listing active OCCI flavours... ");                
 
-            String Execute = "occi --endpoint " + Endpoint +
+            String Execute = prefix +
+			     "occi --endpoint " + Endpoint +
                              " --action " + action +
                              " --resource " + resource +
                              " --auth " + auth +
-                             //" --user-cred " + user_cred +
-                             " --user-cred " + proxy_path +
+                             " --user-cred " + user_cred +
+                             //" --user-cred " + proxy_path +
                              " --voms --ca-path " + ca_path;
             
             log.info(Execute);            
@@ -276,13 +299,14 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                 log.info("ResourceID = " + resourceID);
                 
 
-            String Execute = "occi --endpoint " + Endpoint +
+            String Execute = prefix +
+			     "occi --endpoint " + Endpoint +
                              " --action " + action +
                              " --resource " + resource +
                              " --resource " + resourceID +
                              " --auth " + auth +
-                             //" --user-cred " + user_cred +
-                             " --user-cred " + proxy_path +
+                             " --user-cred " + user_cred +
+                             //" --user-cred " + proxy_path +
                              " --voms --ca-path " + ca_path;
 
             log.info(Execute);        
@@ -301,14 +325,15 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
            if (resourceID.trim().length() > 0)
                 log.info("ResourceID = " + resourceID);
 
-           String Execute = "occi --endpoint " + Endpoint +
-                             " --action " + action +
-                             " --resource " + resource +
-                             " --resource " + resourceID +
-                             " --auth " + auth +
-                             //" --user-cred " + user_cred +
-                             " --user-cred " + proxy_path +
-                             " --voms --ca-path " + ca_path;
+           String Execute = prefix +
+			    "occi --endpoint " + Endpoint +
+                            " --action " + action +
+                            " --resource " + resource +
+                            " --resource " + resourceID +
+                            " --auth " + auth +
+                            " --user-cred " + user_cred +
+                            //" --user-cred " + proxy_path +
+                            " --voms --ca-path " + ca_path;
 
            log.info(Execute);           
 
@@ -380,7 +405,8 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
         String _nativeJobId = nativeJobId.substring(0, nativeJobId.indexOf("@"));
         String _resourceId = nativeJobId.substring(nativeJobId.indexOf("#")+1);
         
-        String Execute = "occi --endpoint " + Endpoint +
+        String Execute = prefix + 
+			 "occi --endpoint " + Endpoint +
                          " --action " + "delete" +
                          " --resource " + "compute" +
                          " --resource " + _resourceId +
@@ -443,15 +469,17 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                 if (mixin_resource_tpl.trim().length() > 0)
                     log.info("Flavour   = " + mixin_resource_tpl);
                     
-                String Execute = "occi --endpoint " + Endpoint +
-                                 " --action " + action +
+                String Execute = prefix +
+				 "occi --endpoint " + Endpoint +
+                                 //" --action " + action +
+                                 " --action " + "create" +
                                  " --resource " + resource +
                                  " --attributes title=" + attributes_title +
                                  " --mixin os_tpl#" + mixin_os_tpl +
                                  " --mixin resource_tpl#" + mixin_resource_tpl +
-                                 " --auth " + auth +
-                                 //" --user-cred " + user_cred +
-                                 " --user-cred " + proxy_path +
+                                 " --auth " + "x509" +
+                                 " --user-cred " + user_cred +
+                                 //" --user-cred " + proxy_path +
                                  " --voms --ca-path " + ca_path;
                 
                 log.info("");
@@ -469,14 +497,15 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                     
                     resourceID = results.get(0);
                     
-                    Execute = "occi --endpoint " + Endpoint +
-                               " --action " + "describe" +
-                               " --resource " + resource +
-                               " --resource " + resourceID +
-                               " --auth " + auth +
-                               //" --user-cred " + user_cred +
-                               " --user-cred " + proxy_path +
-                               " --voms --ca-path " + ca_path;
+                    Execute = prefix +
+			      "occi --endpoint " + Endpoint +
+                              " --action " + "describe" +
+                              " --resource " + resource +
+                              " --resource " + resourceID +
+                              " --auth " + auth +
+                              " --user-cred " + user_cred +
+                              //" --user-cred " + proxy_path +
+                              " --voms --ca-path " + ca_path;
                     
                     int k=0; int j=0;
                     boolean check = false;
