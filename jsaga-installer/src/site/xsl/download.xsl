@@ -53,9 +53,8 @@
                     <xsl:variable name="dir">http://maven.in2p3.fr/fr/in2p3/jsaga/jsaga-installer/<xsl:value-of select="$project.version"/></xsl:variable>
                     <xsl:choose>
                         <xsl:when test="contains($project.version, 'SNAPSHOT')">
-                            <p>Download the latest snapshot from this <a href="{$dir}/">directory</a>:</p>
+                            <p>Download the latest snapshot from this <a href="{$dir}/?C=M;O=D">directory</a>:</p>
                             <ul>
-                                <li>Sort by column "Last modified"</li>
                                 <li>Choose one of the 3 biggest files: tar.gz, zip or the Graphical Installer (jar)</li>
                                 <li>Download it</li>
                             </ul>
