@@ -24,6 +24,7 @@ public class DiracJobStatus extends JobStatus {
 	private final static String DIRAC_STATUS_RUNNING = "Running";
 	private final static String DIRAC_STATUS_FAILED = "Failed";
 	private final static String DIRAC_STATUS_DELETED = "Deleted";
+	private final static String DIRAC_STATUS_COMPLETED = "Completed";
 	private final static String DIRAC_STATUS_DONE = "Done";
 
 //	private final static String DIRAC_MINORSTATUS_EXECUTION_COMPLETE = "Execution Complete";
@@ -44,6 +45,8 @@ public class DiracJobStatus extends JobStatus {
     	if (DIRAC_STATUS_DONE.equals(status)) {
     		if ("Execution Complete".equals(minorStatus)) 
     			return SubState.DONE;
+    	} else if (DIRAC_STATUS_COMPLETED.equals(status)) {
+    		return SubState.DONE;
     	} else if (DIRAC_STATUS_RECEIVED.equals(status)) {
     		return SubState.NEW_CREATED;
     	} else if (DIRAC_STATUS_WAITING.equals(status)) {
