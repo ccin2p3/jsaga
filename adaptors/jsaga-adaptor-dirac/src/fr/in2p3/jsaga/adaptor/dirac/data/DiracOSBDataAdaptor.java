@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.dirac.data;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -125,6 +126,8 @@ public class DiracOSBDataAdaptor extends DiracAdaptorAbstract implements FileRea
 		} catch (MalformedURLException e) {
 			throw new BadParameterException(e);
 		} catch (IOException e) {
+			// the following line allows to create an empty file if the output sandbox does not exist
+//			return new ByteArrayInputStream("".getBytes());
 			throw new DoesNotExistException(e);
 		}
 		
@@ -167,6 +170,8 @@ public class DiracOSBDataAdaptor extends DiracAdaptorAbstract implements FileRea
 			tarInputStream.close();
 		} catch (IOException e1) {
 		}
-		throw new DoesNotExistException(filename);
+		// the following line allows to create an empty file if the remote file does not exist in the sandbox
+		return new ByteArrayInputStream("".getBytes());
+//		throw new DoesNotExistException(filename);
 	}
 }

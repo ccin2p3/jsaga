@@ -31,8 +31,18 @@ public class DiracOSBTest extends AbstractTest {
         Buffer buffer = BufferFactory.createBuffer(1024);
         File reader = (File) NSFactory.createNSEntry(m_session, m_file.getURL(), Flags.READ.getValue());
         int len = reader.read(buffer);
-        System.out.println(new String(buffer.getData()));
+        System.out.println("Content=\"" + new String(buffer.getData()).trim() + "\"");
         reader.close();
 	}
 
+	public void test_OSB_empty() throws Exception {
+        Buffer buffer = BufferFactory.createBuffer(1024);
+        // modify filename: add "dummy" at the end
+        URL ghostOSBUrl = URLFactory.createURL(getRequiredProperty("dirac-osb", "url").replace("?", "dummy?"));
+        NSEntry ghost = NSFactory.createNSEntry(m_session, ghostOSBUrl);
+        File reader = (File) NSFactory.createNSEntry(m_session, ghost.getURL(), Flags.READ.getValue());
+        int len = reader.read(buffer);
+        assertEquals("", new String(buffer.getData()).trim());
+        reader.close();
+	}
 }
