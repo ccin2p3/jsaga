@@ -25,7 +25,7 @@
         <menu name="Module developed by..."/>
     </body>
     <poweredBy>
-        <logo name="INFN Catania" href="http://www.ct.infn.it" img=""/>
-        <logo name="CHAIN-REDS" href="http://www.chain-project.eu/" img=""/>
+        <logo name="INFN Catania" href="http://www.ct.infn.it" img="http://www.infn.it/logo/weblogo5.gif"/>
+        <logo name="CHAIN-REDS" href="http://www.chain-project.eu/" img="http://www.chain-project.eu/documents/3456180/3536332/Logo"/>
     </poweredBy>
 </project>
