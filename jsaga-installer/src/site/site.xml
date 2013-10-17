@@ -7,6 +7,8 @@
     </skin>
     <bannerLeft><src>images/logo-jsaga.png</src><alt>JSAGA</alt></bannerLeft>
     <bannerRight><src>images/logo-cc.png</src><alt>CC-IN2P3</alt></bannerRight>
+    <publishDate position="right"/>
+    <version position="right"/>
     <body>
         <links>
             <item name="ANR" href="http://www.agence-nationale-recherche.fr"/>
