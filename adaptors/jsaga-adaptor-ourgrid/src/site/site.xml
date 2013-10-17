@@ -7,20 +7,31 @@
     </skin>
     <bannerLeft><src>images/logo-jsaga.png</src><alt>JSAGA</alt></bannerLeft>
     <bannerRight><src>images/logo-cc.png</src><alt>CC-IN2P3</alt></bannerRight>
+    <publishDate position="right"/>
+    <version position="right"/>
     <body>
         <links>
             <item name="ANR" href="http://www.agence-nationale-recherche.fr"/>
             <item name="CNRS" href="http://www.cnrs.fr"/>
             <item name="CC-IN2P3" href="http://cc.in2p3.fr"/>
         </links>
+        <breadcrumbs>
+            <item name="JSAGA" href="../../index.html"/>
+            <item name="Adaptors" href="../../adaptors.html"/>
+            <item name="${project.name}"/>
+        </breadcrumbs>
         <menu name="JSAGA">
-            <item name="Project Home" href="../../index.html"/>
+            <item name="Welcome" href="../../index.html"/>
         </menu>
-        <menu name="User Documentation">
-            <item name="Module Home" href="index.html"/>
+        <menu name="${project.name}">
+            <item name="Features" href="index.html"/>
             <item name="FAQ" href="faq.html"/>
             <item name="Example" href="example.html"/>
         </menu>
-        <menu name="Module Documentation" ref="reports"/>
+        <menu name="About" ref="reports"/>
     </body>
+    <poweredBy>
+        <logo name="Distributed Systems Lab(LSD)-UFCG" href="http://www.lsd.ufcg.edu.br" img="http://www.dsc.ufcg.edu.br/~opi/images/lsd-ufcg.jpg"/>
+        <logo name="OurGrid" href="http://www.ourgrid.org" img="http://code.google.com/p/worker5/logo?cct=1308679013"/>
+    </poweredBy>
 </project>
