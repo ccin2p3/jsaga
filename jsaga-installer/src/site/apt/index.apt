@@ -1,10 +1,10 @@
-JSAGA
+Walecome to JSAGA
 
  JSAGA is a Java implementation of the
  Simple API for Grid Applications ({{{http://www.ogf.org/documents/GFD.90.pdf}SAGA}})
  specification from the Open Grid Forum ({{{http://www.ogf.org/}OGF}}).
 
- JSAGA features comprises:
+ JSAGA features includes:
 
     * enable uniform data management and execution management across
       existing grid infrastructures.
@@ -13,7 +13,7 @@ JSAGA
       effort for integrating support of new technologies.
       See list of currently {{{./adaptors.html}supported technologies}}.
 
-    * operating system indenpendancy: most of the provided adaptors are
+    * operating system independent: most of the provided adaptors are
       written in full Java, and they are tested on Windows and Linux.
 
  JSAGA can also be used from Python applications, thanks to the
