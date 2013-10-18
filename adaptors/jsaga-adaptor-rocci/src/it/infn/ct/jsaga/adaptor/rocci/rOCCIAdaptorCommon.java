@@ -28,6 +28,8 @@ package it.infn.ct.jsaga.adaptor.rocci;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
@@ -61,6 +63,10 @@ public class rOCCIAdaptorCommon extends Object implements ClientAdaptor {
   protected String sshHost = null;
   protected String user_cred = "";
   protected String ca_path = "";
+
+  protected static final String AUTH = "x509";
+  protected static final String RESOURCE = "compute";
+  protected static final String ACTION = "create";
   
   public Class[] getSupportedSecurityCredentialClasses() 
   {    
@@ -130,11 +136,22 @@ public class rOCCIAdaptorCommon extends Object implements ClientAdaptor {
   
   public void disconnect() throws NoSuccessException {  } 
 
-  public Usage getUsage() { return null; }
+  public Usage getUsage() 
+  { 
+	return new UAnd(
+                 new Usage[]{
+                         new UOptional(AUTH),
+                         new UOptional(RESOURCE),
+                         new UOptional(ACTION)
+                 });
+  }
 
   public Default[] getDefaults(Map map) throws IncorrectStateException 
   {
-    return null;
+	return new Default[] {
+        	new Default (AUTH, "x509"),
+	        new Default (RESOURCE, "compute"),
+        	new Default (ACTION, "create")
+    	};
   }
 }
-        
