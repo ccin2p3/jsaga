@@ -19,6 +19,7 @@ import fr.in2p3.jsaga.adaptor.orionssh.SSHExecutionChannel;
 import org.ogf.saga.error.*;
 
 import com.trilead.ssh2.SFTPException;
+import com.trilead.ssh2.SFTPv3Client;
 import com.trilead.ssh2.Session;
 import com.trilead.ssh2.sftp.AttribPermissions;
 import com.trilead.ssh2.sftp.ErrorCodes;
@@ -72,35 +73,45 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
     		BadParameterException, TimeoutException, NoSuccessException {
     	super.connect(userInfo, host, port, basePath, attributes);
 		String fullUrl = "";
+    	SFTPv3Client sftp;
+		try {
+			sftp = new SFTPv3Client(m_conn);
+		} catch (IOException e1) {
+			throw new NoSuccessException(e1);
+		}
 		for (String d: SSHJobProcess.getRootDir().split("/")) {
 			fullUrl += d + "/";
 			try {
-				m_sftp.mkdir(fullUrl, AttribPermissions.S_IRUSR	| AttribPermissions.S_IWUSR	| AttribPermissions.S_IXUSR);
+				sftp.mkdir(fullUrl, AttribPermissions.S_IRUSR	| AttribPermissions.S_IWUSR	| AttribPermissions.S_IXUSR);
 			} catch (SFTPException e) {
 				if (e.getServerErrorCode() == ErrorCodes.SSH_FX_FAILURE) { // Already Exists
 					// ignore
 				} else if (e.getServerErrorCode() == ErrorCodes.SSH_FX_PERMISSION_DENIED) {
-//					m_sftp.disconnect();
+					sftp.close();
 					throw new AuthorizationFailedException(e);
 				} else {
-//					m_sftp.disconnect();
+					sftp.close();
 					throw new NoSuccessException(e); 
 				}
 			} catch (IOException e) {
+				sftp.close();
 				throw new NoSuccessException(e); 
 			}
 		}
+		sftp.close();
     }
     
     private SSHJobProcess submit(String jobDesc, String uniqId)
 			throws PermissionDeniedException, TimeoutException, BadResource, NoSuccessException {
     	SSHJobProcess sjp = null;
+    	SFTPv3Client sftp = null;
 		try {
-	    	sjp = new SSHJobProcess(uniqId, jobDesc, m_conn.getHostname(), m_conn.getPort(), m_sftp.canonicalPath("."));
+			sftp = new SFTPv3Client(m_conn);
+	    	sjp = new SSHJobProcess(uniqId, jobDesc, m_conn.getHostname(), m_conn.getPort(), sftp.canonicalPath("."));
 	    	sjp.checkResources();
 	    	// create user working directory only if not specified
 			if (!sjp.isUserWorkingDirectory()) {
-				m_sftp.mkdir(sjp.getWorkingDirectory(), 
+				sftp.mkdir(sjp.getWorkingDirectory(), 
 						AttribPermissions.S_IRUSR
 						| AttribPermissions.S_IWUSR
 						| AttribPermissions.S_IXUSR);
@@ -109,14 +120,14 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			if (e.getServerErrorCode() == ErrorCodes.SSH_FX_FAILURE) { // Already Exists
 				// ignore
 			} else if (e.getServerErrorCode() == ErrorCodes.SSH_FX_PERMISSION_DENIED) {
-//				m_sftp.disconnect();
 				throw new PermissionDeniedException(e);
 			} else {
-//				m_sftp.disconnect();
 				throw new NoSuccessException(e); 
 			}
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
+		} finally {
+			if (sftp != null) sftp.close();
 		}
         sjp.setCreated(new Date());
 		try {

@@ -136,8 +136,10 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) 
     		throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
 		Vector<SFTPv3DirectoryEntry> vv;
+		SFTPv3Client sftp = null;
 		try {
-			vv = m_sftp.ls(absolutePath);
+			sftp = new SFTPv3Client(m_conn);
+			vv = sftp.ls(absolutePath);
 		} catch (SFTPException e) {
 			if (e.getServerErrorCode() == ErrorCodes.SSH_FX_NO_SUCH_FILE)
 				throw new DoesNotExistException(e);
@@ -146,6 +148,8 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			throw new NoSuccessException(e);
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
+		} finally {
+			if (sftp!=null) sftp.close();
 		}
 		if (vv != null && vv.size() > 2) {
 			// remove . and .. in the list
@@ -171,22 +175,24 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			ParentDoesNotExist, TimeoutException, NoSuccessException {
 		byte[] buffer = new byte[SSHAdaptorAbstract.READ_BUFFER_LEN];
 		long offset = 0;
+		SFTPv3Client sftp = null;
 		SFTPv3FileHandle f;
 		try {
-			f = m_sftp.openFileRW(absolutePath);
+			sftp = new SFTPv3Client(m_conn);
+			f = sftp.openFileRW(absolutePath);
 			// The file already exists
 			if (append) {
-				SFTPv3FileAttributes attrs = m_sftp.fstat(f);
+				SFTPv3FileAttributes attrs = sftp.fstat(f);
 				offset = attrs.size;
 			} else {
-				m_sftp.closeFile(f);
-				f = m_sftp.createFileTruncate(absolutePath);
+				sftp.closeFile(f);
+				f = sftp.createFileTruncate(absolutePath);
 			}
 		} catch (SFTPException sftpe) {
 			switch (sftpe.getServerErrorCode()) {
 			case ErrorCodes.SSH_FX_NO_SUCH_FILE:
 				try {
-					f = m_sftp.createFile(absolutePath);
+					f = sftp.createFile(absolutePath);
 				} catch (SFTPException e) {
 					throw new NoSuccessException(e);
 				} catch (IOException e) {
@@ -206,21 +212,24 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 				int rsz = stream.read(buffer, 0, buffer.length);
 				if (rsz < 0)
 					break;
-				m_sftp.write(f, offset, buffer, 0, rsz);
+				sftp.write(f, offset, buffer, 0, rsz);
 				// shift offset
 				offset += rsz;
 			}
 		} catch (IOException ex) {
 			throw new NoSuccessException(ex);
 		}
+		if (sftp != null) sftp.close();
 	}
 
 	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) 
 			throws PermissionDeniedException, BadParameterException, AlreadyExistsException, 
 			ParentDoesNotExist, TimeoutException, NoSuccessException {
+		SFTPv3Client sftp = null;
         String absolutePath = parentAbsolutePath+"/"+directoryName;
         try {
-			m_sftp.mkdir(absolutePath, AttribPermissions.S_IRGRP
+			sftp = new SFTPv3Client(m_conn);
+			sftp.mkdir(absolutePath, AttribPermissions.S_IRGRP
 					| AttribPermissions.S_IROTH
 					| AttribPermissions.S_IRUSR
 					| AttribPermissions.S_IWUSR
@@ -257,18 +266,21 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
             	default:
             		throw new NoSuccessException(e);
             }
-		}
-        catch (IOException e) {
+		} catch (IOException e) {
             throw new NoSuccessException(e);
+		} finally {
+			if (sftp != null) sftp.close();
 		}
  	}
 
 	public void removeDir(String parentAbsolutePath, String directoryName,	String additionalArgs) 
 			throws PermissionDeniedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
+		SFTPv3Client sftp = null;
         String absolutePath = parentAbsolutePath+"/"+directoryName;
         try {
-			m_sftp.rmdir(absolutePath);
+			sftp = new SFTPv3Client(m_conn);
+			sftp.rmdir(absolutePath);
 		} catch (SFTPException e) {
 			switch (e.getServerErrorCode()) {
 			case ErrorCodes.SSH_FX_PERMISSION_DENIED:
@@ -292,15 +304,19 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			}
 		} catch (IOException e) {
             throw new NoSuccessException(e);
+		} finally {
+			if (sftp != null) sftp.close();
 		}
 	}
 
 	public void removeFile(String parentAbsolutePath, String fileName,	String additionalArgs) 
 			throws PermissionDeniedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
+		SFTPv3Client sftp = null;
         String absolutePath = parentAbsolutePath+"/"+fileName;
         try {
-			m_sftp.rm(absolutePath);
+			sftp = new SFTPv3Client(m_conn);
+			sftp.rm(absolutePath);
 		} catch (SFTPException e) {
 			switch (e.getServerErrorCode()) {
 			case ErrorCodes.SSH_FX_PERMISSION_DENIED:
@@ -312,15 +328,19 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			}
 		} catch (IOException e) {
         	throw new NoSuccessException(e);
+		} finally {
+			if (sftp != null) sftp.close();
 		}
 	}
 
 	public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) 
 			throws PermissionDeniedException, BadParameterException, DoesNotExistException, 
 			AlreadyExistsException, TimeoutException, NoSuccessException {
+		SFTPv3Client sftp = null;
 
 		try {
-			m_sftp.mv(sourceAbsolutePath, targetAbsolutePath);
+			sftp = new SFTPv3Client(m_conn);
+			sftp.mv(sourceAbsolutePath, targetAbsolutePath);
 		} catch (SFTPException e) {
 			switch (e.getServerErrorCode()) {
 			case ErrorCodes.SSH_FX_PERMISSION_DENIED:
@@ -332,6 +352,8 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			}
 		} catch (IOException e) {
         	throw new NoSuccessException(e);
+		} finally {
+			if (sftp != null) sftp.close();
 		}
 	}
 }

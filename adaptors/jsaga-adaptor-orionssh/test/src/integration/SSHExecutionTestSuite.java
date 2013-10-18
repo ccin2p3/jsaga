@@ -65,8 +65,8 @@ public class SSHExecutionTestSuite extends JSAGATestSuite {
         public void test_resume_running() { super.ignore("not supported"); }
         public void test_suspend_done() { super.ignore("not supported"); }
         public void test_suspend_running() { super.ignore("not supported"); }
-        public void test_simultaneousShortJob() throws Exception { super.ignore("not working");}
-        public void test_simultaneousLongJob() throws Exception { super.ignore("not working");}
+//        public void test_simultaneousShortJob() throws Exception { super.ignore("not working");}
+//        public void test_simultaneousLongJob() throws Exception { super.ignore("not working");}
     }
     
  	// test cases
@@ -80,7 +80,7 @@ public class SSHExecutionTestSuite extends JSAGATestSuite {
     // test cases
     public static class SSHJobRunInteractiveTest extends JobRunInteractiveTest {
         public SSHJobRunInteractiveTest() throws Exception {super(TYPE);}
-        public void test_simultaneousStdin()  { super.ignore("Not supported");}
+//        public void test_simultaneousStdin()  { super.ignore("Not supported");}
     }
 
     // test cases

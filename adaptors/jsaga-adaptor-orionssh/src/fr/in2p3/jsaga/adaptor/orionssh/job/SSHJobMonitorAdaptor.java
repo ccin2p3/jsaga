@@ -25,6 +25,7 @@ import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
 import com.trilead.ssh2.SFTPException;
+import com.trilead.ssh2.SFTPv3Client;
 import com.trilead.ssh2.SFTPv3DirectoryEntry;
 import com.trilead.ssh2.SFTPv3FileHandle;
 import com.trilead.ssh2.sftp.ErrorCodes;
@@ -58,8 +59,10 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
     }        
 
 	public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
+		SFTPv3Client sftp = null;
 		try {
-			Vector<SFTPv3DirectoryEntry> v = m_sftp.ls(SSHJobProcess.getRootDir());
+			sftp = new SFTPv3Client(m_conn);
+			Vector<SFTPv3DirectoryEntry> v = sftp.ls(SSHJobProcess.getRootDir());
 			List<String> processes = new ArrayList<String>();
 			String suffix = "." + SSHJobProcess.PROCESS_SUFFIX;
 			for (int i=0; i<v.size(); i++) {
@@ -79,6 +82,8 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
     		throw new NoSuccessException(e);
 		} catch (IOException e) {
     		throw new NoSuccessException(e);
+		} finally {
+			if (sftp!=null) sftp.close();
 		}
 	}
 
@@ -104,21 +109,29 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 
 	public Date getStarted(String nativeJobId) throws NotImplementedException, NoSuccessException {
 		String filename = new SSHJobProcess(nativeJobId).getPidFile();
+		SFTPv3Client sftp = null;
 		try {
-			SFTPFileAttributes attrs = new SFTPFileAttributes(filename, m_sftp.stat(filename));
+			sftp = new SFTPv3Client(m_conn);
+			SFTPFileAttributes attrs = new SFTPFileAttributes(filename, sftp.stat(filename));
 			return new Date(attrs.getLastModified());
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
+		} finally {
+			if (sftp!=null) sftp.close();
 		}
 	}
 
 	public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException {
 		String filename = new SSHJobProcess(nativeJobId).getEndcodeFile();
+		SFTPv3Client sftp = null;
 		try {
-			SFTPFileAttributes attrs = new SFTPFileAttributes(filename, m_sftp.stat(filename));
+			sftp = new SFTPv3Client(m_conn);
+			SFTPFileAttributes attrs = new SFTPFileAttributes(filename, sftp.stat(filename));
 			return new Date(attrs.getLastModified());
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
+		} finally {
+			if (sftp!=null) sftp.close();
 		}
 	}
 
@@ -127,11 +140,13 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 	}
 
 	private Integer getReturnCode(String nativeJobId) throws NoSuccessException {
+		SFTPv3Client sftp = null;
     	try {    	
-			SFTPv3FileHandle f = m_sftp.openFileRO(new SSHJobProcess(nativeJobId).getEndcodeFile());
+			sftp = new SFTPv3Client(m_conn);
+			SFTPv3FileHandle f = sftp.openFileRO(new SSHJobProcess(nativeJobId).getEndcodeFile());
 	    	byte[] buf = new byte[4];
-			int len = m_sftp.read(f, 0, buf, 0, buf.length);
-			m_sftp.closeFile(f);
+			int len = sftp.read(f, 0, buf, 0, buf.length);
+			sftp.closeFile(f);
     		return new Integer(new String(buf).trim());
     	} catch (SFTPException sftpe) {
     		// try first to get serialized object
@@ -145,6 +160,8 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
     		return SSHJobProcess.PROCESS_RUNNING;
     	} catch (IOException e) {
     		throw new NoSuccessException(e);
+		} finally {
+			if (sftp!=null) sftp.close();
 		}
 	}
 
