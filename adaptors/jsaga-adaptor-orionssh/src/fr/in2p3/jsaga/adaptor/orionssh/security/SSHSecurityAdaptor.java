@@ -26,6 +26,7 @@ import java.util.Map;
 public class SSHSecurityAdaptor implements SecurityAdaptor {
 
 	public static final String USER_PUBLICKEY = "UserPublicKey";
+	public static final String USER_PRIVATEKEY = "UserPrivateKey";
 	
 	public String getType() {
     	return "SSH";
@@ -38,7 +39,7 @@ public class SSHSecurityAdaptor implements SecurityAdaptor {
     public Usage getUsage() {
     	return new UAnd(
    			 new Usage[]{
-   					 new UFile(Context.USERKEY),
+   					 new UFile(USER_PRIVATEKEY),
    					 new UOptional(USER_PUBLICKEY),
    					 new U(Context.USERID),
    					 new UOptional(Context.USERPASS)});
@@ -46,7 +47,7 @@ public class SSHSecurityAdaptor implements SecurityAdaptor {
 
     public Default[] getDefaults(Map map) throws IncorrectStateException {
     	return new Default[]{
-       		new Default(Context.USERKEY, new File[]{
+       		new Default(USER_PRIVATEKEY, new File[]{
                         new File(System.getProperty("user.home")+"/.ssh/id_rsa"),
                         new File(System.getProperty("user.home")+"/.ssh/id_dsa")}), 
             new Default(USER_PUBLICKEY, new File[]{
@@ -60,7 +61,7 @@ public class SSHSecurityAdaptor implements SecurityAdaptor {
     public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
         try {
         	// load private key
-        	String privateKeyPath = (String) attributes.get(Context.USERKEY);
+        	String privateKeyPath = (String) attributes.get(USER_PRIVATEKEY);
 			String publicKeyPath = null;
 			if (attributes.containsKey(USER_PUBLICKEY)) {
 	        	publicKeyPath = (String) attributes.get(USER_PUBLICKEY);

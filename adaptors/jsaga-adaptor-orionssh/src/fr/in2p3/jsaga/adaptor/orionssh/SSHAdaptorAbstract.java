@@ -159,7 +159,7 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 
     	} catch (Exception e) {
 			m_conn.close();
-    		if(e.getMessage().equals("Auth fail"))
+    		if("Auth fail".equals(e.getMessage()) )
     			throw new AuthenticationFailedException(e);
     		throw new NoSuccessException("Unable to connect to server", e);
 		}
