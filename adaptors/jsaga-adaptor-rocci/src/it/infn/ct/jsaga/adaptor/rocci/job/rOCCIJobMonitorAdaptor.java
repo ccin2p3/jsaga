@@ -81,19 +81,20 @@ public class rOCCIJobMonitorAdaptor extends rOCCIAdaptorCommon
       
     super.connect(userInfo, host, port, basePath, attributes);    
     
-    String publickey_filename = 
-            (String) attributes.get("publickey_file");
+//    String publickey_filename = 
+//            (String) attributes.get("publickey_file");
+//    
+//    String privatekey_filename = 
+//            (String) attributes.get("privatekey_file");
     
-    String privatekey_filename = 
-            (String) attributes.get("privatekey_file");
-    
-    sshMonitorAdaptor.setSecurityCredential(
-            new SSHSecurityCredential (
-                    privatekey_filename,
-                    publickey_filename,                                       
-                    "", 
-                    "root")
-            );
+//    sshMonitorAdaptor.setSecurityCredential(
+//            new SSHSecurityCredential (
+//                    privatekey_filename,
+//                    publickey_filename,                                       
+//                    "", 
+//                    "root")
+//            );
+    	sshMonitorAdaptor.setSecurityCredential(credential.getSSHCredential());
   }
     
   @Override

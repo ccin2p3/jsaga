@@ -109,8 +109,6 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
   private String mixin_os_tpl = "";
   private String mixin_resource_tpl = "";  
   //private String proxy_path = "";
-  private String publickey_filename = "";
-  private String privatekey_filename = "";
   private String Endpoint = "";
          
   enum ACTION_TYPE { list, delete, describe, create; }
@@ -207,15 +205,16 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
        log.info("Trying to connect to the cloud host [ " + host + " ] ");
      
        prefix = (String) attributes.get("prefix");       
-       action = (String) attributes.get("action");
        //resource = (String) attributes.get("resource");
        String resourceID = (String) attributes.get("resourceID");
-       auth = (String) attributes.get("auth");
+       action = (String) attributes.get(ACTION);
+       auth = (String) attributes.get(AUTH);
+       resource = (String) attributes.get(RESOURCE);
        attributes_title = (String) attributes.get("attributes_title");
        mixin_os_tpl = (String) attributes.get("mixin_os_tpl");
        mixin_resource_tpl = (String) attributes.get("mixin_resource_tpl");
-       publickey_filename = (String) attributes.get("publickey_file");
-       privatekey_filename = (String) attributes.get("privatekey_file");
+//       publickey_filename = (String) attributes.get("publickey_file");
+//       privatekey_filename = (String) attributes.get("privatekey_file");
        //proxy_path = (String) attributes.get("proxy_path");
 
        // Check if OCCI path is set                
@@ -229,18 +228,6 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                   + port 
                   + System.getProperty("file.separator");
 
-       if (attributes.containsKey(AUTH) &&
-          (attributes.get(AUTH) != null))
-            auth = (String) attributes.get(AUTH);
-
-       if (attributes.containsKey(RESOURCE) &&
-          (attributes.get(RESOURCE) != null))
-            resource = (String) attributes.get(RESOURCE);
-
-       if ((action == null) &&
-           attributes.containsKey(ACTION) &&
-           (attributes.get(ACTION) != null))
-            action = (String) attributes.get(ACTION);
 
        log.info("");
        log.info("See below the details: ");
@@ -258,8 +245,8 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
        log.info("HOST        = " + host);
        log.info("PORT        = " + port);
        log.info("ENDPOINT    = " + Endpoint);
-       log.info("PUBLIC KEY  = " + publickey_filename);
-       log.info("PRIVATE KEY = " + privatekey_filename);
+       log.info("PUBLIC KEY  = " + credential.getSSHCredential().getPublicKeyFile().getPath());
+       log.info("PRIVATE KEY = " + credential.getSSHCredential().getPrivateKeyFile().getPath());
        
        log.info("");
        if  (action.equals("list")) 
@@ -344,13 +331,14 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
             }
         } // end deleting 
        
-        sshControlAdaptor.setSecurityCredential(
-            new SSHSecurityCredential (
-                    privatekey_filename,
-                    publickey_filename,                                       
-                    "", 
-                    "root")
-            );
+//        sshControlAdaptor.setSecurityCredential(
+//            new SSHSecurityCredential (
+//                    privatekey_filename,
+//                    publickey_filename,                                       
+//                    "", 
+//                    "root")
+//            );
+       sshControlAdaptor.setSecurityCredential(credential.getSSHCredential());
     }
             
     public void start(String nativeJobId) throws PermissionDeniedException, 
@@ -573,14 +561,14 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                         ex.printStackTrace(System.out);                         
                     }
                     
-                    sshControlAdaptor.setSecurityCredential(
-                                      new SSHSecurityCredential (
-                                          privatekey_filename, 
-                                          publickey_filename,                                           
-                                          "", 
-                                          "root")
-                    );                    
-                   
+//                    sshControlAdaptor.setSecurityCredential(
+//                                      new SSHSecurityCredential (
+//                                          privatekey_filename, 
+//                                          publickey_filename,                                           
+//                                          "", 
+//                                          "root")
+//                    );                    
+                    sshControlAdaptor.setSecurityCredential(credential.getSSHCredential());
                     log.info("");
                     log.info("Starting VM [ " 
                                + publicIP
@@ -665,14 +653,14 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
         String _nativeJobId = nativeJobId.substring(0, nativeJobId.indexOf("@"));
         
         try {
-            sshControlAdaptor.setSecurityCredential(
-                        new SSHSecurityCredential (
-                            privatekey_filename, 
-                            publickey_filename,
-                            "", 
-                            "root")
-                    );
-
+//            sshControlAdaptor.setSecurityCredential(
+//                        new SSHSecurityCredential (
+//                            privatekey_filename, 
+//                            publickey_filename,
+//                            "", 
+//                            "root")
+//                    );
+        	sshControlAdaptor.setSecurityCredential(credential.getSSHCredential());
             sshControlAdaptor.connect(null, _publicIP, 22, null, new HashMap());
             result = sshControlAdaptor.getInputStagingTransfer(_nativeJobId);
                         

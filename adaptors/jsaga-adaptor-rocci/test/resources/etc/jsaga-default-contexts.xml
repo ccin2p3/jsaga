@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <contexts>
+         <context type="rocci">
+            <attribute name="UserProxy" value="${user.home}/.jsaga/contexts/rOCCI/proxy"/>
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
+            <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
+            <attribute name="UserID" value="root"/>
+            <attribute name="UserPrivateKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI"/>
+            <attribute name="UserPublicKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI.pub"/>
+            <attribute name="UserPass" value=""/>
+            <data type="sftp">
+                <attribute name="KnownHosts" value=""/>
+            </data>
+            <job type="rocci">
+                <attribute name="attributes_title" value="MyDebianROCCITest"/>
+                <attribute name="mixin_os_tpl" value="generic_vm"/>
+                <attribute name="mixin_resource_tpl" value="small"/>
+            </job>
+         </context>
          <context type="VOMS">
             <attribute name="UserProxy" value="${user.home}/.jsaga/contexts/rOCCI/proxy"/>
             <!-- <attribute name="UserCert" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI.pub"/> -->
@@ -10,7 +27,7 @@
         </context>
         <context type="SSH">
             <attribute name="UserID" value="root"/>
-            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI"/>
+            <attribute name="UserPrivateKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI"/>
             <attribute name="UserCert" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI.pub"/>
             <data type="sftp">
                 <attribute name="KnownHosts" value=""/>
@@ -18,7 +35,8 @@
         </context>
     </contexts>
     <session>
-        <context type="VOMS"/>
-        <context type="SSH"/>
+        <!-- <context type="VOMS"/> -->
+        <!-- <context type="SSH"/> -->
+        <context type="rocci"/>
     </session>
 </jsaga-default>

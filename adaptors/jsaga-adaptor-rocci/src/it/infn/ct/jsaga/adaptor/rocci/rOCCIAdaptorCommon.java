@@ -42,6 +42,8 @@ import org.ogf.saga.session.SessionFactory;
 
 import org.ogf.saga.error.*;
 
+import it.infn.ct.jsaga.adaptor.rocci.security.rOCCISecurityCredential;
+
 import java.util.Map;
        
 /* *********************************************
@@ -58,66 +60,35 @@ import java.util.Map;
 
 public class rOCCIAdaptorCommon extends Object implements ClientAdaptor {
             
-  protected SecurityCredential credential = null;
-  protected SecurityCredential sshCredential = null;  
+  protected rOCCISecurityCredential credential = null;
+//  protected SecurityCredential sshCredential = null;  
   protected String sshHost = null;
   protected String user_cred = "";
   protected String ca_path = "";
 
-  protected static final String AUTH = "x509";
-  protected static final String RESOURCE = "compute";
-  protected static final String ACTION = "create";
-  
+  protected static final String AUTH = "auth";
+  protected static final String RESOURCE = "resource";
+  protected static final String ACTION = "action";
+
   public Class[] getSupportedSecurityCredentialClasses() 
   {    
       return new Class[] {         
-          GSSCredentialSecurityCredential.class,
-          SSHSecurityCredential.class
+//          GSSCredentialSecurityCredential.class,
+//          SSHSecurityCredential.class
+    		  rOCCISecurityCredential.class
       };
   }
 
-  public void setSecurityCredential(SecurityCredential sc) 
-  { 
-      credential = sc;
-      
-      Session session = null;
-      Context context = null;
-      
+  public void setSecurityCredential(SecurityCredential sc) { 
+      credential = (rOCCISecurityCredential)sc;
       try {
-    	  // FIXME
-            session = SessionFactory.createSession(false);
-            context = ContextFactory.createContext("VOMS"); 
-            
-            //Put here your proxy file path
-            user_cred = context.getAttribute(Context.USERPROXY);            
-            
-            //Put here your CRL directory path
-            ca_path = context.getAttribute(Context.CERTREPOSITORY);                       
-            
-        } catch (NotImplementedException ex) {            
-            ex.printStackTrace(System.out);
-        } 
-        catch (AuthenticationFailedException ex) {             
-            ex.printStackTrace(System.out);
-        }
-        catch (AuthorizationFailedException ex) {             
-            ex.printStackTrace(System.out);
-        } 
-        catch (PermissionDeniedException ex) {             
-            ex.printStackTrace(System.out);
-        }           
-        catch (DoesNotExistException ex) {             
-            ex.printStackTrace(System.out);
-        } 
-        catch (IncorrectStateException ex) {             
-            ex.printStackTrace(System.out);
-        } 
-        catch (TimeoutException ex) {             
-            ex.printStackTrace(System.out);
-        } 
-        catch (NoSuccessException ex) {             
-            ex.printStackTrace(System.out);
-        }
+		user_cred = (String)credential.getProxy().getAttribute(Context.USERPROXY);
+		ca_path = (String)credential.getProxy().getCertRepository().getPath();
+	} catch (NotImplementedException e) {
+		e.printStackTrace();
+	} catch (NoSuccessException e) {
+		e.printStackTrace();
+	}
   }
   
   public String getType() { return "rocci"; }
@@ -132,7 +103,7 @@ public class rOCCIAdaptorCommon extends Object implements ClientAdaptor {
                 BadParameterException, 
                 TimeoutException, 
                 NoSuccessException 
-  { }
+  {  }
   
   public void disconnect() throws NoSuccessException {  } 
 
