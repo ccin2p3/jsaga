@@ -141,7 +141,6 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
     String line;
     List<String> list_rOCCI = new ArrayList();
 
-    //Process p = Runtime.getRuntime().exec("/home/schwarz/.rvm/gems/ruby-1.9.3-p429/bin/" + action);
     Process p = Runtime.getRuntime().exec(action);
 
     BufferedReader in = new BufferedReader(
@@ -213,9 +212,6 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
        attributes_title = (String) attributes.get("attributes_title");
        mixin_os_tpl = (String) attributes.get("mixin_os_tpl");
        mixin_resource_tpl = (String) attributes.get("mixin_resource_tpl");
-//       publickey_filename = (String) attributes.get("publickey_file");
-//       privatekey_filename = (String) attributes.get("privatekey_file");
-       //proxy_path = (String) attributes.get("proxy_path");
 
        // Check if OCCI path is set                
        if ((prefix != null) && (new File((prefix)).exists()))
@@ -331,13 +327,6 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
             }
         } // end deleting 
        
-//        sshControlAdaptor.setSecurityCredential(
-//            new SSHSecurityCredential (
-//                    privatekey_filename,
-//                    publickey_filename,                                       
-//                    "", 
-//                    "root")
-//            );
        sshControlAdaptor.setSecurityCredential(credential.getSSHCredential());
     }
             
@@ -561,13 +550,6 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                         ex.printStackTrace(System.out);                         
                     }
                     
-//                    sshControlAdaptor.setSecurityCredential(
-//                                      new SSHSecurityCredential (
-//                                          privatekey_filename, 
-//                                          publickey_filename,                                           
-//                                          "", 
-//                                          "root")
-//                    );                    
                     sshControlAdaptor.setSecurityCredential(credential.getSSHCredential());
                     log.info("");
                     log.info("Starting VM [ " 
@@ -624,16 +606,16 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
         try {            
             sshControlAdaptor.connect(null, publicIP, 22, null, new HashMap());            
         } catch (NotImplementedException ex) { 
-            ex.printStackTrace(System.out);             
+            throw new NoSuccessException(ex);             
         } 
         catch (AuthenticationFailedException ex) { 
-              ex.printStackTrace(System.out);               
+            throw new PermissionDeniedException(ex);             
         } 
         catch (AuthorizationFailedException ex) { 
-            ex.printStackTrace(System.out);             
+            throw new PermissionDeniedException(ex);             
         } 
         catch (BadParameterException ex) { 
-            ex.printStackTrace(System.out);             
+            throw new NoSuccessException(ex);             
         }
                 
         return sshControlAdaptor.submit(jobDesc, checkMatch, uniqId) 
@@ -653,22 +635,16 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
         String _nativeJobId = nativeJobId.substring(0, nativeJobId.indexOf("@"));
         
         try {
-//            sshControlAdaptor.setSecurityCredential(
-//                        new SSHSecurityCredential (
-//                            privatekey_filename, 
-//                            publickey_filename,
-//                            "", 
-//                            "root")
-//                    );
         	sshControlAdaptor.setSecurityCredential(credential.getSSHCredential());
             sshControlAdaptor.connect(null, _publicIP, 22, null, new HashMap());
             result = sshControlAdaptor.getInputStagingTransfer(_nativeJobId);
-                        
+            
         } catch (Exception ex) { 
             ex.printStackTrace(System.out);             
         } 
              
-        return result;
+        // change URL sftp:// tp rocci://
+        return sftp2rocci(result);
     }
     
     public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) 
@@ -688,7 +664,22 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
             ex.printStackTrace(System.out);             
         } 
                         
-        return result;
+        // change URL sftp:// tp rocci://
+        return sftp2rocci(result);
+    }
+    
+    private StagingTransfer[] sftp2rocci(StagingTransfer[] transfers) {
+    	int index=0;
+    	StagingTransfer[] newTransfers = new StagingTransfer[transfers.length];
+    	for (StagingTransfer tr: transfers) {
+    		StagingTransfer newTr = new StagingTransfer(
+    				tr.getFrom().replace("sftp://", "rocci://"),
+    				tr.getTo().replace("sftp://", "rocci://"),
+    				tr.isAppend()
+    		);
+    		newTransfers[index++] = newTr;
+    	}
+    	return newTransfers;
     }
     
     public String getStagingDirectory(String nativeJobId) 

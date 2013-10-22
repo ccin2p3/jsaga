@@ -9,6 +9,15 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.VOMSSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential;
 
+/* ***************************************************
+* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+* ***             http://cc.in2p3.fr/             ***
+* ***************************************************
+* File:   rOCCISecurityCredential
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   22 oct 2013
+* ***************************************************/
+
 public class rOCCISecurityCredential implements SecurityCredential {
 
 	private SSHSecurityCredential m_sshCred;

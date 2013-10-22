@@ -10,19 +10,22 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.orionssh.security.SSHSecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.VOMSSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.VOMSSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential;
 
+/* ***************************************************
+* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+* ***             http://cc.in2p3.fr/             ***
+* ***************************************************
+* File:   rOCCISecurityAdaptor
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   22 oct 2013
+* ***************************************************/
+
 public class rOCCISecurityAdaptor extends VOMSSecurityAdaptor {
 
-//	private SSHSecurityAdaptor m_sshAdaptor;
-	
-//	public rOCCISecurityAdaptor() {
-//		this.m_sshAdaptor = new SSHSecurityAdaptor();
-//	}
 	public String getType() {
 		return "rocci";
 	}
