@@ -61,7 +61,6 @@ import java.util.Map;
 public class rOCCIAdaptorCommon extends Object implements ClientAdaptor {
             
   protected rOCCISecurityCredential credential = null;
-//  protected SecurityCredential sshCredential = null;  
   protected String sshHost = null;
   protected String user_cred = "";
   protected String ca_path = "";
@@ -73,8 +72,6 @@ public class rOCCIAdaptorCommon extends Object implements ClientAdaptor {
   public Class[] getSupportedSecurityCredentialClasses() 
   {    
       return new Class[] {         
-//          GSSCredentialSecurityCredential.class,
-//          SSHSecurityCredential.class
     		  rOCCISecurityCredential.class
       };
   }
