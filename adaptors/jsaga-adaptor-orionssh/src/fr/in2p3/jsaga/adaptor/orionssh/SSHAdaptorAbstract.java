@@ -142,7 +142,7 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
         	}
     		if (!isAuthenticated) {
     			m_conn.close();
-        		throw new AuthenticationFailedException();
+        		throw new AuthenticationFailedException("Auth fail");
     		}
     		
     		// TODO
