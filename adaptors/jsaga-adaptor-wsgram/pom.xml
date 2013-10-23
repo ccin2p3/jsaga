@@ -10,6 +10,9 @@
     <description>This module provides support for Globus WS-GRAM (Web Service - Grid Resource Allocation Management)
         execution management technology from Globus Toolkit 4.0.
     </description>
+    <properties>
+        <nonOfficial/>
+    </properties>
     <developers>
         <developer>
             <name>Nicolas Demesy</name>
