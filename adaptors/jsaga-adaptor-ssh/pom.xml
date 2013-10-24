@@ -10,7 +10,7 @@
     <description>This module provides support for SSH components;
 security mecanism (SSH asymmetric keys),
 data management protocol (SFTP),
-execution management technology (SSH).</description>
+execution management technology (SSH). CAUTION: THIS ADAPTOR IS DEPRECATED</description>
     <developers>
         <developer>
             <name>Nicolas Demesy</name>

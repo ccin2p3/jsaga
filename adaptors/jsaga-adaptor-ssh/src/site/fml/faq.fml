@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <faqs title="Frequently Asked Questions">
+    <part id="intro">
+        <title>CAUTION</title>
+        <faq id="deprecated">
+            <question>This adaptor is deprecated</question>
+            <answer>Please use <a href="../jsaga-adaptor-orionssh/faq.html">this new adaptor</a>
+            </answer>
+        </faq>
+    </part>
     <part id="module">
         <title>Adaptor module</title>
         <faq id="jsaga-help">
