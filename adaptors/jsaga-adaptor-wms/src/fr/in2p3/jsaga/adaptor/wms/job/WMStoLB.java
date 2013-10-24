@@ -77,8 +77,12 @@ public class WMStoLB {
         if (lbHost != null) {
             return lbHost;
         } else {
-        	//TODO: check the BDII ?
-            return null;
+        	//Try the WMS host as this is the recommended installation
+        	try {
+				return new URL(wmsServerUrl).getHost();
+			} catch (MalformedURLException e) {
+				return null;
+			}
         }
     }
 }

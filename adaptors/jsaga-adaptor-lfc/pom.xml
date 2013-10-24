@@ -15,7 +15,7 @@
 			<organization>gnúbila France</organization>
 			<organizationUrl>http://gnubila.fr/</organizationUrl>
 			<properties>
-				<organizationLogoUrl>http://gnubila.fr/documents/10157/96198/Gnubila-Cloud-1000.png</organizationLogoUrl>
+				<organizationLogoUrl>https://www.gnubila.fr/documents/10157/0/Gnubila-Cloud-1000.png</organizationLogoUrl>
 			</properties>
 		</developer>
 	</developers>
@@ -57,7 +57,7 @@
 		<dependency>
 			<groupId>org.italiangrid</groupId>
 			<artifactId>voms-api-java</artifactId>
-			<version>3.0-SNAPSHOT</version>
+			<version>3.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
