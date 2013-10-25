@@ -49,6 +49,10 @@
         </file>
         <file>
             <outputDirectory>/</outputDirectory>
+            <source>assembly/licenses/License-Apachev2.0.txt</source>
+        </file>
+        <file>
+            <outputDirectory>/</outputDirectory>
             <source>assembly/Readme.txt</source>
         </file>
         <file>
