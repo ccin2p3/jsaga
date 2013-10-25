@@ -6,7 +6,7 @@
     <xsl:variable name="scripts" select="document('scripts.xml')/*"/>
 
     <xsl:template match="/project">
-        <installation version="1.0">
+        <installation version="5.0">
             <info>
                 <appname>JSAGA</appname>
                 <appversion><xsl:value-of select="@version"/></appversion>
@@ -22,6 +22,9 @@
                 <xsl:call-template name="LICENSED_PACKAGE_SELECTION">
                     <xsl:with-param name="licenseType">CDDL</xsl:with-param>
                 </xsl:call-template>
+                <xsl:call-template name="LICENSED_PACKAGE_SELECTION">
+                    <xsl:with-param name="licenseType">Apache</xsl:with-param>
+                </xsl:call-template>
             </conditions>
             <guiprefs width="700" height="520" resizable="yes"/>
             <locale>
@@ -35,7 +38,9 @@
                 <!-- installer resources -->
                 <res id="Installer.image" src="../../../assembly/logo-jsaga.png"/>
                 <res id="LicencePanel.licence" src="../../../assembly/licenses/License-LGPLv3.txt"/>
-                <res id="LicencePanel.licence.CDDL" src="../../../assembly/licenses/License-CDDLv1.0.txt"/>
+                <!-- <res id="LicencePanel.licence.CDDL" src="../../../assembly/licenses/License-CDDLv1.0.txt"/> -->
+                <res id="HTMLLicencePanel.licence.CDDL" src="../../../assembly/licenses/License-CDDLv1.0.txt"/>
+                <res id="HTMLLicencePanel.licence.Apache" src="../../../assembly/licenses/License-Apachev2.0.txt"/>
                 <res id="InfoPanel.info" src="../../../src/site/apt/index.apt"/>
                 <res id="XInfoPanel.info" src="../../../assembly/Readme.txt"/>
             </resources>
@@ -47,7 +52,10 @@
                 <!-- Bug with OpenJDK, panel too small. Should be fixed in izpack-4.3.5 but does not work -->
                 <!-- http://jira.codehaus.org/browse/IZPACK-682 -->
                 <panel classname="TreePacksPanel"/>
-                <panel classname="OptionalLicencePanel" id="CDDL" condition="show_CDDL"/>
+                <!-- class not found izpack5 -->
+                <!-- <panel classname="OptionalLicencePanel" jar="../../classes/fr/in2p3/izpack/panels/OptionalLicencePanel.class" id="CDDL" condition="show_CDDL"/> -->
+                <panel classname="HTMLLicencePanel" id="CDDL" condition="show_CDDL"/>
+                <panel classname="HTMLLicencePanel" id="Apache" condition="show_Apache"/>
                 <panel classname="SummaryPanel"/>
                 <panel classname="InstallPanel"/>
                 <panel classname="XInfoPanel"/>
@@ -70,6 +78,7 @@
             <description>The core engine (required).</description>
             <file src="License-LGPLv3.txt" targetdir="$INSTALL_PATH"/>
             <file src="License-CDDLv1.0.txt" targetdir="$INSTALL_PATH" condition="show_CDDL"/>
+            <file src="License-Apachev2.0.txt" targetdir="$INSTALL_PATH" condition="show_Apache"/>
             <file src="Readme.txt" targetdir="$INSTALL_PATH"/>
             <parsable targetfile="$INSTALL_PATH/Readme.txt" type="plain"/>
             <file src="etc/" targetdir="$INSTALL_PATH"/>
@@ -136,23 +145,23 @@
     <!-- set condition "show_${licenseType}" if one or more packages under license "${licenseType}" is selected -->
     <xsl:template name="LICENSED_PACKAGE_SELECTION">
         <xsl:param name="licenseType"/>
-        <xsl:variable name="nbPacks" select="count(artifact[contains(@license,$licenseType)])"/>
+        <xsl:variable name="nbPacks" select="count(artifact[@id='jsaga-adaptors']/artifact[contains(@license,$licenseType)])"/>
         <xsl:choose>
             <xsl:when test="$nbPacks = 1">
-                <xsl:for-each select="artifact[contains(@license,$licenseType)]">
+                <xsl:for-each select="artifact[@id='jsaga-adaptors']/artifact[contains(@license,$licenseType)]">
                     <condition type="packselection" id="show_{$licenseType}">
-                        <packid><xsl:call-template name="PACKAGE_NAME"/></packid>
+                        <name><xsl:call-template name="PACKAGE_NAME"/></name>
                     </condition>
                 </xsl:for-each>
             </xsl:when>
             <xsl:when test="$nbPacks > 1">
-                <xsl:for-each select="artifact[contains(@license,$licenseType)]">
+                <xsl:for-each select="artifact[@id='jsaga-adaptors']/artifact[contains(@license,$licenseType)]">
                     <condition type="packselection" id="${@id}_SELECTED">
-                        <packid><xsl:call-template name="PACKAGE_NAME"/></packid>
+                        <name><xsl:call-template name="PACKAGE_NAME"/></name>
                     </condition>
                 </xsl:for-each>
                 <condition type="or" id="show_{$licenseType}">
-                    <xsl:for-each select="artifact[contains(@license,$licenseType)]">
+                    <xsl:for-each select="artifact[@id='jsaga-adaptors']/artifact[contains(@license,$licenseType)]">
                         <condition type="ref" refid="${@id}_SELECTED"/>
                     </xsl:for-each>
                 </condition>

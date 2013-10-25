@@ -276,15 +276,16 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- <plugin>
+            <plugin>
                 <groupId>org.codehaus.izpack</groupId>
                 <artifactId>izpack-maven-plugin</artifactId>
-                <version>1.0-alpha-5</version>
+                <version>5.0.0-rc1</version>
                 <configuration>
-                    <descriptor>${project.build.directory}/izpack.xml</descriptor>
-                    <izpackBasedir>${project.build.directory}/${project.artifactId}-${project.version}-bin.dir/jsaga-${project.version}/</izpackBasedir>
-                    <installerFile>${project.build.directory}/${project.build.finalName}.jar</installerFile>
-                    <attach>false</attach>
+                    <installFile>${project.build.directory}/izpack.xml</installFile>
+                    <baseDir>${project.build.directory}/${project.artifactId}-${project.version}-bin.dir/jsaga-${project.version}/</baseDir>
+                    <finalName>${project.build.finalName}</finalName>
+                    <!-- <attach>false</attach> -->
+                    <enableAttachArtifact>false</enableAttachArtifact>
                 </configuration>
                 <executions>
                     <execution>
@@ -295,14 +296,7 @@
                         </goals>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.izpack</groupId>
-                        <artifactId>izpack-standalone-compiler</artifactId>
-                        <version>4.2.1</version>
-                    </dependency>
-                </dependencies>
-            </plugin> -->
+            </plugin>
         </plugins>
         <pluginManagement>
         	<plugins>
@@ -388,12 +382,6 @@
         </plugins>
     </reporting>
     <dependencies>
-        <!-- for installer itself (for compiling custom panels) -->
-        <dependency>
-            <groupId>org.codehaus.izpack</groupId>
-            <artifactId>izpack-standalone-compiler</artifactId>
-            <version>4.2.1</version>
-        </dependency>
 
         <!-- test -->
         <dependency>
