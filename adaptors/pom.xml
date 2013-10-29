@@ -26,7 +26,6 @@
         <module>jsaga-adaptor-unicore</module>
         <module>jsaga-adaptor-batchssh</module>
         <module>jsaga-adaptor-irods</module>
-        <module>jsaga-adaptor-mail</module>
         <module>jsaga-adaptor-secretservice</module>
         <module>jsaga-adaptor-ourgrid</module>
         <module>jsaga-adaptor-dirac</module>
