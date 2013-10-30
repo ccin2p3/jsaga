@@ -24,6 +24,7 @@
             <excludes>
                 <exclude>fr.in2p3.jsaga:jsaga-engine:zip:config</exclude>
                 <exclude>org.codehaus.izpack:izpack-standalone-compiler:jar</exclude>
+                <exclude>fr.in2p3.jsaga:jsaga-installer:jar</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>
