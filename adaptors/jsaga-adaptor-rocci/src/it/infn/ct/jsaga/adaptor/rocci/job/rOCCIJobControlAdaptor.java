@@ -126,8 +126,8 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
         result = inet4Address.isSiteLocalAddress();
     }
     catch (UnknownHostException ex) {        
-        log.error("See below the stack trace... ");
-        ex.printStackTrace(System.out);        
+        //ex.printStackTrace(System.out);        
+        log.error(ex);
     }
     
     return result;
@@ -135,57 +135,61 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
 
   
   private List<String> run_OCCI (String action_type, String action) 
-            throws Exception
   {
-    
-    String line;
-    List<String> list_rOCCI = new ArrayList();
+      String line;
+      List<String> list_rOCCI = new ArrayList();
 
-    Process p = Runtime.getRuntime().exec(action);
+      try
+      {
+    	Process p = Runtime.getRuntime().exec(action);
 
-    BufferedReader in = new BufferedReader(
-                        new InputStreamReader(p.getInputStream()) 
-                        );
+    	BufferedReader in = new BufferedReader(
+        	            new InputStreamReader(p.getInputStream()));
 
-     ACTION_TYPE type = ACTION_TYPE.valueOf(action_type);        
+     	ACTION_TYPE type = ACTION_TYPE.valueOf(action_type);
      
-     while ((line = in.readLine()) != null) 
-     {         
-        // Skip blank lines.
-        if (line.trim().length() > 0) {
+	while ((line = in.readLine()) != null) 
+	{         
+            // Skip blank lines.
+            if (line.trim().length() > 0) {
             
-            switch (type) {
-		case list:
+            	switch (type) {
+		    case list:
                         list_rOCCI.add(line.trim());                        
 			break;
 
-		case create:
+		    case create:
                         list_rOCCI.add(line.trim());
                         log.info("");
                         log.info("A new OCCI compute location has been created with the following ID:");
                         break;
 
-		case describe:
+		    case describe:
                         list_rOCCI.add(line.trim());                        
                         break;
 	
-		case delete:
+		    case delete:
                         break;
-            } // end switch
-	} // end if
-     } // end while
+            	} // end switch
+	    } // end if
+        } // end while
 
-     in.close();
+        in.close();
      
-     if (action_type.equals("describe") || 
-         action_type.equals("list") ||
-         action_type.equals("delete")) 
-             log.info("\n");         
+        if (action_type.equals("describe") || 
+            action_type.equals("list") ||
+            action_type.equals("delete")) 
+            log.info("\n");         
                      
-     for (int i = 0; i < list_rOCCI.size(); i++)         
-        log.info(list_rOCCI.get(i));
+        for (int i = 0; i < list_rOCCI.size(); i++)         
+            log.info(list_rOCCI.get(i));
+   
+        } catch (IOException ex) { 
+		//ex.printStackTrace(System.out); 
+		log.error(ex);
+	}
                         
-     return list_rOCCI;
+        return list_rOCCI;
     }
                         
     public void connect (String userInfo, String host, int port, String basePath, Map attributes) 
@@ -269,8 +273,13 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
             
             try {
                 results = run_OCCI("list", Execute);
+		if (results.isEmpty())
+                    throw new NoSuccessException(
+                    "Some problems occurred while contacting the server. "
+                    + "Please check your settings.");
             } catch (Exception ex) { 
-                ex.printStackTrace(System.out);                
+                //ex.printStackTrace(System.out);
+                log.error(ex);
             }
        } // end listing
        
@@ -296,8 +305,13 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
 
             try {
                 results = run_OCCI("describe", Execute);
+		if (results.isEmpty())
+                    throw new NoSuccessException(
+                    "Some problems occurred while contacting the server. "
+                    + "Please check your settings.");
             } catch (Exception ex) { 
-                ex.printStackTrace(System.out);                 
+                //ex.printStackTrace(System.out);
+                log.error(ex);
             }
        } // end describing
        
@@ -323,7 +337,8 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
            try {
                 results = run_OCCI("delete", Execute);
            } catch (Exception ex) { 
-                ex.printStackTrace(System.out);                 
+                //ex.printStackTrace(System.out);
+                log.error(ex);
             }
         } // end deleting 
        
@@ -340,10 +355,11 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
         try {                        
             sshControlAdaptor.connect(null, _publicIP, 22, null, new HashMap());            
             sshControlAdaptor.start(_nativeJobId);                         
-            
-        } catch (Exception ex) { 
-            ex.printStackTrace(System.out);             
-        }
+    
+	} catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
+          catch (AuthenticationFailedException ex) { throw new PermissionDeniedException(ex); }
+          catch (AuthorizationFailedException ex) { throw new PermissionDeniedException(ex); }
+          catch (BadParameterException ex) { throw new NoSuccessException(ex); }        
     }
     
     public void cancel(String nativeJobId) throws PermissionDeniedException, 
@@ -356,18 +372,10 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
         try {                        
             sshControlAdaptor.connect(null, _publicIP, 22, null, new HashMap());            
             sshControlAdaptor.cancel(_nativeJobId);
-        } catch (NotImplementedException ex) { 
-            ex.printStackTrace(System.out);            
-        } 
-          catch (AuthenticationFailedException ex) { 
-              ex.printStackTrace(System.out);               
-          } 
-          catch (AuthorizationFailedException ex) { 
-              ex.printStackTrace(System.out);               
-          } 
-          catch (BadParameterException ex) { 
-              ex.printStackTrace(System.out);               
-          }
+	} catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
+          catch (AuthenticationFailedException ex) { throw new PermissionDeniedException(ex); }
+          catch (AuthorizationFailedException ex) { throw new PermissionDeniedException(ex); }
+          catch (BadParameterException ex) { throw new NoSuccessException(ex); }
         
         log.info("Calling the cancel() method");        
     }
@@ -387,7 +395,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                          " --action " + "delete" +
                          " --resource " + "compute" +
                          " --resource " + _resourceId +
-                         " --auth " + "x509" +
+                         " --auth " + auth +
                          " --user-cred " + user_cred +                            
                          " --voms --ca-path " + ca_path;                
         
@@ -404,22 +412,11 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
             
             // Stopping the VM Server
             results = run_OCCI("delete", Execute);
-            
-        } catch (NotImplementedException ex) { 
-            ex.printStackTrace(System.out);             
-        } 
-        catch (AuthenticationFailedException ex) { 
-              ex.printStackTrace(System.out);               
-        } 
-        catch (AuthorizationFailedException ex) { 
-            ex.printStackTrace(System.out);             
-        } 
-        catch (BadParameterException ex) { 
-            ex.printStackTrace(System.out);             
-        }
-        catch (Exception ex) { 
-            ex.printStackTrace(System.out);             
-        }
+    
+	 } catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
+          catch (AuthenticationFailedException ex) { throw new PermissionDeniedException(ex); }
+          catch (AuthorizationFailedException ex) { throw new PermissionDeniedException(ex); }
+          catch (BadParameterException ex) { throw new NoSuccessException(ex); }        
     }
     
     public String submit (String jobDesc, boolean checkMatch, String uniqId) 
@@ -454,7 +451,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                                  " --attributes title=" + attributes_title +
                                  " --mixin os_tpl#" + mixin_os_tpl +
                                  " --mixin resource_tpl#" + mixin_resource_tpl +
-                                 " --auth " + "x509" +
+                                 " --auth " + auth +
                                  " --user-cred " + user_cred +
                                  //" --user-cred " + proxy_path +
                                  " --voms --ca-path " + ca_path;
@@ -463,9 +460,14 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                 log.info(Execute);               
                  
                 try {                        
-                        results = run_OCCI("create", Execute);                        
+                        results = run_OCCI("create", Execute);
+			if (results.isEmpty())
+                            throw new NoSuccessException(
+                            "Some problems occurred while contacting the server. "
+                            + "Please check your settings.");
                 } catch (Exception ex) { 
-                     ex.printStackTrace(System.out); 
+                     //ex.printStackTrace(System.out);
+                     log.error(ex);
                 }
                                                    
                 // Getting info about the VM
@@ -547,7 +549,8 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                             } // end for  
                             } // end while
                     } catch (Exception ex) { 
-                        ex.printStackTrace(System.out);                         
+                        //ex.printStackTrace(System.out);
+                        log.error(ex);
                     }
                     
                     sshControlAdaptor.setSecurityCredential(credential.getSSHCredential());
@@ -599,30 +602,24 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                     date = new Date();
                     log.info(ft.format(date));
                 }              
-        } // end creating
             
-        rOCCIJobMonitorAdaptor.setSSHHost(publicIP);
+	        rOCCIJobMonitorAdaptor.setSSHHost(publicIP);
         
-        try {            
-            sshControlAdaptor.connect(null, publicIP, 22, null, new HashMap());            
-        } catch (NotImplementedException ex) { 
-            throw new NoSuccessException(ex);             
-        } 
-        catch (AuthenticationFailedException ex) { 
-            throw new PermissionDeniedException(ex);             
-        } 
-        catch (AuthorizationFailedException ex) { 
-            throw new PermissionDeniedException(ex);             
-        } 
-        catch (BadParameterException ex) { 
-            throw new NoSuccessException(ex);             
-        }
-                
-        return sshControlAdaptor.submit(jobDesc, checkMatch, uniqId) 
-                + "@" 
-                + publicIP
-                + "#"
-                + resourceID;
+        	try {            
+	            sshControlAdaptor.connect(null, publicIP, 22, null, new HashMap());            
+                } catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
+                  catch (AuthenticationFailedException ex) { throw new PermissionDeniedException(ex); }
+                  catch (AuthorizationFailedException ex) { throw new PermissionDeniedException(ex); }
+                  catch (BadParameterException ex) { throw new NoSuccessException(ex); }
+		 
+        	return sshControlAdaptor.submit(jobDesc, checkMatch, uniqId) 
+                	+ "@" 
+	                + publicIP
+        	        + "#"
+                	+ resourceID;
+	   } // end creating
+
+	else return null;
     }
     
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) 
@@ -639,9 +636,10 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
             sshControlAdaptor.connect(null, _publicIP, 22, null, new HashMap());
             result = sshControlAdaptor.getInputStagingTransfer(_nativeJobId);
             
-        } catch (Exception ex) { 
-            ex.printStackTrace(System.out);             
-        } 
+	} catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
+          catch (AuthenticationFailedException ex) { throw new PermissionDeniedException(ex); }
+          catch (AuthorizationFailedException ex) { throw new PermissionDeniedException(ex); }
+          catch (BadParameterException ex) { throw new NoSuccessException(ex); }
              
         // change URL sftp:// tp rocci://
         return sftp2rocci(result);
@@ -660,10 +658,11 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
         try {            
             sshControlAdaptor.connect(null, _publicIP, 22, null, new HashMap());            
             result = sshControlAdaptor.getOutputStagingTransfer(_nativeJobId);
-        } catch (Exception ex) { 
-            ex.printStackTrace(System.out);             
-        } 
-                        
+        } catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
+          catch (AuthenticationFailedException ex) { throw new PermissionDeniedException(ex); }
+          catch (AuthorizationFailedException ex) { throw new PermissionDeniedException(ex); }
+          catch (BadParameterException ex) { throw new NoSuccessException(ex); }               
+	 
         // change URL sftp:// tp rocci://
         return sftp2rocci(result);
     }
@@ -694,9 +693,10 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
         try {            
             sshControlAdaptor.connect(null, _publicIP, 22, null, new HashMap());            
             result = sshControlAdaptor.getStagingDirectory(_nativeJobId);
-        } catch (Exception ex) { 
-            ex.printStackTrace(System.out);             
-        } 
+	} catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
+          catch (AuthenticationFailedException ex) { throw new PermissionDeniedException(ex); }
+          catch (AuthorizationFailedException ex) { throw new PermissionDeniedException(ex); }
+          catch (BadParameterException ex) { throw new NoSuccessException(ex); }
                 
         return result;
     }

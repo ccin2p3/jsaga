@@ -7,6 +7,7 @@
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
             <attribute name="UserID" value="root"/>
             <attribute name="UserPrivateKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI"/>
+            <!--attribute name="UserKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI"/-->
             <attribute name="UserPublicKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI.pub"/>
             <data type="rocci"/>
             <job type="rocci">

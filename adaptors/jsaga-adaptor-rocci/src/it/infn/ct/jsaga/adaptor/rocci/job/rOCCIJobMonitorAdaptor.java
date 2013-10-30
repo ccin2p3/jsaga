@@ -39,6 +39,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 import org.ogf.saga.error.*;
@@ -79,9 +80,8 @@ public class rOCCIJobMonitorAdaptor extends rOCCIAdaptorCommon
                      NoSuccessException 
   {
       
-    super.connect(userInfo, host, port, basePath, attributes);    
-    
-    	sshMonitorAdaptor.setSecurityCredential(credential.getSSHCredential());
+    super.connect(userInfo, host, port, basePath, attributes);
+    sshMonitorAdaptor.setSecurityCredential(credential.getSSHCredential());
   }
     
   @Override
@@ -103,9 +103,15 @@ public class rOCCIJobMonitorAdaptor extends rOCCIAdaptorCommon
     try {                    
           sshMonitorAdaptor.connect(null, _publicIP, 22, null, new HashMap());
           result = sshMonitorAdaptor.getStatus(_nativeJobId);
-      } catch (Exception ex) { 
-          ex.printStackTrace(System.out);
-      }
+    } catch (NotImplementedException ex) {
+            java.util.logging.Logger.getLogger(rOCCIJobMonitorAdaptor.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (AuthenticationFailedException ex) {
+            java.util.logging.Logger.getLogger(rOCCIJobMonitorAdaptor.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (AuthorizationFailedException ex) {
+            java.util.logging.Logger.getLogger(rOCCIJobMonitorAdaptor.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (BadParameterException ex) {
+            java.util.logging.Logger.getLogger(rOCCIJobMonitorAdaptor.class.getName()).log(Level.SEVERE, null, ex);
+    }
        
     log.info("");
     log.info("Calling the getStatus() method");    
@@ -125,13 +131,10 @@ public class rOCCIJobMonitorAdaptor extends rOCCIAdaptorCommon
     String _publicIP = nativeJobId.substring(nativeJobId.indexOf("@")+1, nativeJobId.indexOf("#"));
     String _nativeJobId = nativeJobId.substring(0, nativeJobId.indexOf("@"));
     
-    try {
-        sshMonitorAdaptor.connect(null, _publicIP, 22, null, new HashMap());
-        result = sshMonitorAdaptor.getCreated(_nativeJobId);
-      } catch (Exception ex) { 
-          ex.printStackTrace(System.out);         
-      }
-       
+    //try {
+    //sshMonitorAdaptor.connect(null, _publicIP, 22, null, new HashMap());
+    result = sshMonitorAdaptor.getCreated(_nativeJobId);
+    //} catch (Exception ex) { ex.printStackTrace(System.out); }
     log.info("Calling the getCreated() method");
     
     return result;
@@ -144,13 +147,10 @@ public class rOCCIJobMonitorAdaptor extends rOCCIAdaptorCommon
     String _publicIP = nativeJobId.substring(nativeJobId.indexOf("@")+1, nativeJobId.indexOf("#"));
     String _nativeJobId = nativeJobId.substring(0, nativeJobId.indexOf("@"));
     
-    try {
-        sshMonitorAdaptor.connect(null, _publicIP, 22, null, new HashMap());
-        result = sshMonitorAdaptor.getStarted(_nativeJobId);
-      } catch (Exception ex) { 
-          ex.printStackTrace(System.out);        
-      }
-            
+    //try {
+    //sshMonitorAdaptor.connect(null, _publicIP, 22, null, new HashMap());
+    result = sshMonitorAdaptor.getStarted(_nativeJobId);
+    //} catch (Exception ex) { ex.printStackTrace(System.out); }
     log.info("Calling the getStarted() method");
     
     return result;
@@ -163,13 +163,10 @@ public class rOCCIJobMonitorAdaptor extends rOCCIAdaptorCommon
     String _publicIP = nativeJobId.substring(nativeJobId.indexOf("@")+1, nativeJobId.indexOf("#"));
     String _nativeJobId = nativeJobId.substring(0, nativeJobId.indexOf("@"));
     
-    try {
-        sshMonitorAdaptor.connect(null, _publicIP, 22, null, new HashMap());
-        result = sshMonitorAdaptor.getFinished(_nativeJobId);
-      } catch (Exception ex) { 
-          ex.printStackTrace(System.out);
-      }
-   
+    //try {
+    //sshMonitorAdaptor.connect(null, _publicIP, 22, null, new HashMap());
+    result = sshMonitorAdaptor.getFinished(_nativeJobId);
+    //} catch (Exception ex) { ex.printStackTrace(System.out); }
     log.info("Calling the getFinished() method");
     
     return result;
@@ -182,13 +179,10 @@ public class rOCCIJobMonitorAdaptor extends rOCCIAdaptorCommon
     String _publicIP = nativeJobId.substring(nativeJobId.indexOf("@")+1, nativeJobId.indexOf("#"));
     String _nativeJobId = nativeJobId.substring(0, nativeJobId.indexOf("@"));
     
-    try {
-        sshMonitorAdaptor.connect(null, _publicIP, 22, null, new HashMap());
-        result = sshMonitorAdaptor.getExitCode(_nativeJobId);
-      } catch (Exception ex) {           
-          ex.printStackTrace(System.out);
-      }
-    
+    //try {
+    //sshMonitorAdaptor.connect(null, _publicIP, 22, null, new HashMap());
+    result = sshMonitorAdaptor.getExitCode(_nativeJobId);
+    //} catch (Exception ex) { ex.printStackTrace(System.out); }
     log.info("Calling the getExitCode() method");
     
     return result;
@@ -201,12 +195,10 @@ public class rOCCIJobMonitorAdaptor extends rOCCIAdaptorCommon
     String _publicIP = nativeJobId.substring(nativeJobId.indexOf("@")+1, nativeJobId.indexOf("#"));
     String _nativeJobId = nativeJobId.substring(0, nativeJobId.indexOf("@"));
     
-    try {
-        sshMonitorAdaptor.connect(null, _publicIP, 22, null, new HashMap());
-        result = sshMonitorAdaptor.getExecutionHosts(_nativeJobId);
-      } catch (Exception ex) {           
-          ex.printStackTrace(System.out);
-      }        
+    //try {
+    //sshMonitorAdaptor.connect(null, _publicIP, 22, null, new HashMap());
+    result = sshMonitorAdaptor.getExecutionHosts(_nativeJobId);
+    //} catch (Exception ex) { ex.printStackTrace(System.out); }        
         
     return result;
   }
