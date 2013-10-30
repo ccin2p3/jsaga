@@ -260,8 +260,9 @@
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2-beta-2</version><!-- WARNING: regression with 2.2-beta-4 -->
+                <version>2.4</version><!-- WARNING: regression with 2.2-beta-4 -->
                 <configuration>
+                    <ignoreDirFormatExtensions>false</ignoreDirFormatExtensions>
                     <descriptors>
                         <descriptor>assembly/examples.xml</descriptor>
                     </descriptors>
@@ -271,7 +272,7 @@
                         <id>prepare-izPack</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>attached</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
