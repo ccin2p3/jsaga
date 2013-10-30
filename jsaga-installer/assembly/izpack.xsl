@@ -38,8 +38,8 @@
                 <!-- installer resources -->
                 <res id="Installer.image" src="../../../assembly/logo-jsaga.png"/>
                 <res id="LicencePanel.licence" src="../../../assembly/licenses/License-LGPLv3.txt"/>
-                <res id="HTMLLicencePanel.licence.CDDL" src="../../../assembly/licenses/License-CDDLv1.0.txt"/>
-                <res id="HTMLLicencePanel.licence.Apache" src="../../../assembly/licenses/License-Apachev2.0.txt"/>
+                <res id="LicencePanel.licence.CDDL" src="../../../assembly/licenses/License-CDDLv1.0.txt"/>
+                <res id="LicencePanel.licence.Apache" src="../../../assembly/licenses/License-Apachev2.0.txt"/>
                 <res id="InfoPanel.info" src="../../../src/site/apt/index.apt"/>
                 <res id="XInfoPanel.info" src="../../../assembly/Readme.txt"/>
             </resources>
@@ -51,8 +51,10 @@
                 <!-- Bug with OpenJDK, panel too small. Should be fixed in izpack-4.3.5 but does not work -->
                 <!-- http://jira.codehaus.org/browse/IZPACK-682 -->
                 <panel classname="TreePacksPanel"/>
-                <panel classname="HTMLLicencePanel" id="CDDL" condition="show_CDDL"/>
-                <panel classname="HTMLLicencePanel" id="Apache" condition="show_Apache"/>
+                <!-- TODO: display optional licenses -->
+                <!-- Cannot compile OptionalLicencePanel anymore -->
+                <!-- <panel classname="OptionalLicencePanel" id="CDDL" condition="show_CDDL"/> -->
+                <!-- <panel classname="OptionalLicencePanel" id="Apache" condition="show_Apache"/> -->
                 <panel classname="SummaryPanel"/>
                 <panel classname="InstallPanel"/>
                 <panel classname="XInfoPanel"/>

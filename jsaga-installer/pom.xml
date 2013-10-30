@@ -258,7 +258,7 @@
                 </executions>
             </plugin>
 
-            <plugin>
+             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.4</version><!-- WARNING: regression with 2.2-beta-4 -->
                 <configuration>
@@ -285,9 +285,9 @@
                     <installFile>${project.build.directory}/izpack.xml</installFile>
                     <baseDir>${project.build.directory}/${project.artifactId}-${project.version}-bin.dir/jsaga-${project.version}/</baseDir>
                     <finalName>${project.build.finalName}</finalName>
-                    <!-- <attach>false</attach> -->
                     <enableAttachArtifact>false</enableAttachArtifact>
-                </configuration>
+                    <!-- <customPanelDirectory>${project.build.directory}/${project.artifactId}-${project.version}-bin.dir/jsaga-${project.version}</customPanelDirectory> -->
+                 </configuration>
                 <executions>
                     <execution>
                         <id>izpack</id>
@@ -383,7 +383,6 @@
         </plugins>
     </reporting>
     <dependencies>
-
         <!-- test -->
         <dependency>
             <groupId>org.ogf.saga</groupId>

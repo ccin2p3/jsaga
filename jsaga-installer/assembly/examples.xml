@@ -35,11 +35,11 @@
         </fileSet>
     </fileSets>
     <files>
-        <file>
-            <outputDirectory>/examples/panels</outputDirectory>
+        <!-- <file>
+            <outputDirectory>/bin/panels</outputDirectory>
             <destName>OptionalLicencePanel.jar</destName>
             <source>${project.build.directory}/${project.build.finalName}.jar</source>
-        </file>
+        </file> -->
         <file>
             <outputDirectory>/</outputDirectory>
             <source>assembly/licenses/License-LGPLv3.txt</source>
