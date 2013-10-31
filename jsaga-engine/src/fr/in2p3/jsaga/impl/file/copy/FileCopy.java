@@ -80,10 +80,17 @@ public class FileCopy {
         } else if (m_adaptor instanceof FileReaderGetter && !source.getScheme().equals(effectiveTarget.getScheme())) {
             AbstractSyncFileImpl targetFile = this.createTargetFile(effectiveTarget, flags);
             try {
-                ((FileReaderGetter)m_adaptor).getToStream(
-                        source.getPath(),
-                        source.getQuery(),
-                        new MonitoredOutputStream(targetFile.getFileOutputStream(), progressMonitor));
+            	if (progressMonitor == null) {
+	                ((FileReaderGetter)m_adaptor).getToStream(
+	                        source.getPath(),
+	                        source.getQuery(),
+	                        targetFile.getFileOutputStream());
+            	} else {
+	                ((FileReaderGetter)m_adaptor).getToStream(
+	                        source.getPath(),
+	                        source.getQuery(),
+	                        new MonitoredOutputStream(targetFile.getFileOutputStream(), progressMonitor));
+            	}
             } catch (DoesNotExistException doesNotExist) {
                 targetFile.removeSync();
                 throw new IncorrectStateException("Source file does not exist: "+source, doesNotExist);
