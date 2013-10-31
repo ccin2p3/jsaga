@@ -83,7 +83,8 @@ public class FileCopy {
                 ((FileReaderGetter)m_adaptor).getToStream(
                         source.getPath(),
                         source.getQuery(),
-                        targetFile.getFileOutputStream());
+                        new MonitoredOutputStream(targetFile.getFileOutputStream(), progressMonitor));
+//                        targetFile.getFileOutputStream());
             } catch (DoesNotExistException doesNotExist) {
                 targetFile.removeSync();
                 throw new IncorrectStateException("Source file does not exist: "+source, doesNotExist);
