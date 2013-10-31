@@ -5,6 +5,15 @@ import java.io.OutputStream;
 
 import org.ogf.saga.file.FileOutputStream;
 
+/* ***************************************************
+ * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+ * ***             http://cc.in2p3.fr/             ***
+ * ***************************************************
+ * File:   MonitoredOutputStream
+ * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+ * Date:   Halloween 2013
+ * ***************************************************/
+
 public class MonitoredOutputStream extends OutputStream {
 
 	private FileOutputStream out;
