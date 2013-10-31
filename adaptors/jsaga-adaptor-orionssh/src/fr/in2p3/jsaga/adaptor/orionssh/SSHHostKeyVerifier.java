@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import com.trilead.ssh2.KnownHosts;
-import com.trilead.ssh2.ServerHostKeyVerifier;
+import ch.ethz.ssh2.KnownHosts;
+import ch.ethz.ssh2.ServerHostKeyVerifier;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

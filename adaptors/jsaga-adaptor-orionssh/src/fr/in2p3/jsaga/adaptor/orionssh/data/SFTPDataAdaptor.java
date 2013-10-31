@@ -1,13 +1,14 @@
 package fr.in2p3.jsaga.adaptor.orionssh.data;
 
-import com.trilead.ssh2.SCPClient;
-import com.trilead.ssh2.SFTPException;
-import com.trilead.ssh2.SFTPv3Client;
-import com.trilead.ssh2.SFTPv3DirectoryEntry;
-import com.trilead.ssh2.SFTPv3FileAttributes;
-import com.trilead.ssh2.SFTPv3FileHandle;
-import com.trilead.ssh2.sftp.AttribPermissions;
-import com.trilead.ssh2.sftp.ErrorCodes;
+import ch.ethz.ssh2.SCPClient;
+import ch.ethz.ssh2.SFTPException;
+import ch.ethz.ssh2.SFTPInputStream;
+import ch.ethz.ssh2.SFTPv3Client;
+import ch.ethz.ssh2.SFTPv3DirectoryEntry;
+import ch.ethz.ssh2.SFTPv3FileAttributes;
+import ch.ethz.ssh2.SFTPv3FileHandle;
+import ch.ethz.ssh2.sftp.AttribPermissions;
+import ch.ethz.ssh2.sftp.ErrorCodes;
 
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
@@ -26,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -75,16 +77,25 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 //			}
 //			throw new NoSuccessException(ioe);
 //		}
+
 		try {
 			SFTPv3Client cl = new SFTPv3Client(m_conn);
+//			cl.setRequestParallelism(10);
 			SFTPv3FileHandle f = cl.openFileRO(absolutePath);
 			byte[] buffer = new byte[SSHAdaptorAbstract.READ_BUFFER_LEN];
 			int len = 0;
-			int offset = 0;
-			while ((len=cl.read(f, offset, buffer, 0, buffer.length)) > 0) {
+			// ~5s for Musique/soul-sacrifice.avi
+//			int offset = 0;
+//			while ((len=cl.read(f, offset, buffer, 0, buffer.length)) > 0) {
+//				stream.write(buffer, 0, len);
+//				offset += len;
+//			}
+			// ~5S 
+			SFTPInputStream is = new SFTPInputStream(f);
+			while ((len=is.read(buffer, 0, READ_BUFFER_LEN)) > 0) {
 				stream.write(buffer, 0, len);
-				offset += len;
 			}
+			is.close();
 			stream.flush();
 			cl.closeFile(f);
 			cl.close();
@@ -102,6 +113,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		} finally {
 			
 		}
+		
 	}
 
 	public boolean exists(String absolutePath, String additionalArgs)
@@ -147,7 +159,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) 
     		throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-		Vector<SFTPv3DirectoryEntry> vv;
+		List<SFTPv3DirectoryEntry> vv;
 		SFTPv3Client sftp = null;
 		try {
 			sftp = new SFTPv3Client(m_conn);
@@ -168,7 +180,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			FileAttributes[] list = new SFTPFileAttributes[vv.size() - 2];
 			int index=0;
 			for (int ii = 0; ii < vv.size(); ii++) {
-				Object obj = vv.elementAt(ii);
+				Object obj = vv.get(ii);
 				if (obj instanceof SFTPv3DirectoryEntry) {
 					SFTPv3DirectoryEntry entry = (SFTPv3DirectoryEntry) obj;
                     if (!".".equals(entry.filename) && !"..".equals(entry.filename)) {
