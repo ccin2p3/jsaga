@@ -70,7 +70,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			int len = 0;
 			int offset = 0;
 			while ((len=cl.read(f, offset, buffer, 0, buffer.length)) > 0) {
-				stream.write(buffer, offset, len);
+				stream.write(buffer);
 				stream.flush();
 				offset += len;
 			}
