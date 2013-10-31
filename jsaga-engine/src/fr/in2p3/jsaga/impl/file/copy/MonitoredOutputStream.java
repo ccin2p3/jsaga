@@ -32,12 +32,14 @@ public class MonitoredOutputStream extends OutputStream {
 	@Override
 	public void write(byte b[]) throws IOException {
 		this.out.write(b);
-		this.monitor.increment(b.length);
+		if (this.monitor != null)
+			this.monitor.increment(b.length);
 	}
 	
 	@Override
 	public void write(byte b[], int off, int len) throws IOException {
 		this.out.write(b, off, len);
-		this.monitor.increment(len);
+		if (this.monitor != null)
+			this.monitor.increment(len);
 	}
 }
