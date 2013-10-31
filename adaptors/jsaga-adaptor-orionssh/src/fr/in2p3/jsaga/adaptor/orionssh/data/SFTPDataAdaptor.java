@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.orionssh.data;
 
+import com.trilead.ssh2.SCPClient;
 import com.trilead.ssh2.SFTPException;
 import com.trilead.ssh2.SFTPv3Client;
 import com.trilead.ssh2.SFTPv3DirectoryEntry;
@@ -63,6 +64,17 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 	public void getToStream(String absolutePath, String additionalArgs, OutputStream stream) 
 			throws PermissionDeniedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
+		// SCPClient is fast but requires the command 'scp' to be on the PATH on server side!!!
+//		try {
+//			SCPClient scp = m_conn.createSCPClient();
+//			scp.get(absolutePath, stream);
+//			stream.flush();
+//		} catch (IOException ioe) {
+//			if (ioe.getMessage().contains("No such file")) {
+//				throw new DoesNotExistException(ioe);
+//			}
+//			throw new NoSuccessException(ioe);
+//		}
 		try {
 			SFTPv3Client cl = new SFTPv3Client(m_conn);
 			SFTPv3FileHandle f = cl.openFileRO(absolutePath);
