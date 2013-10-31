@@ -46,7 +46,7 @@ fi
 if test -z "$JAVA_HOME" ; then
   JAVA=java
 else
-  JAVA="$JAVA_HOME/examples/java"
+  JAVA="$JAVA_HOME/bin/java"
 fi
 
 # run command
