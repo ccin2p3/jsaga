@@ -76,7 +76,6 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
     }
     public static class SFTPFileWriteTest extends FileWriteTest {
         public SFTPFileWriteTest() throws Exception {super(TYPE);}
-        public void test_write_encoded_filename() {super.ignore("TODO");}
     }
     public static class SFTPNSCopyTest extends NSCopyTest {
         public SFTPNSCopyTest() throws Exception {super(TYPE, TYPE);}
