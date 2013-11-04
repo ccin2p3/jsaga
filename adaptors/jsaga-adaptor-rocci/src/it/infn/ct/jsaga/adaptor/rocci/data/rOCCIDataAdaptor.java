@@ -11,7 +11,7 @@ import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 
-import com.trilead.ssh2.Connection;
+import ch.ethz.ssh2.Connection;
 import fr.in2p3.jsaga.adaptor.orionssh.data.SFTPDataAdaptor;
 
 /* ***************************************************
