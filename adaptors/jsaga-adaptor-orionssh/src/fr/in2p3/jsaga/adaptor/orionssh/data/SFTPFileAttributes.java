@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.orionssh.data;
 
-import com.trilead.ssh2.SFTPv3FileAttributes;
+import ch.ethz.ssh2.SFTPv3FileAttributes;
 
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;

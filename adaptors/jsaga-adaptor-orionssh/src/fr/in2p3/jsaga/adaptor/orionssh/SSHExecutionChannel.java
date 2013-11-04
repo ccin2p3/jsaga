@@ -5,9 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import com.trilead.ssh2.Connection;
-import com.trilead.ssh2.Session;
-import com.trilead.ssh2.StreamGobbler;
+import ch.ethz.ssh2.Connection;
+import ch.ethz.ssh2.Session;
+import ch.ethz.ssh2.StreamGobbler;
+import ch.ethz.ssh2.channel.Channel;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -59,12 +60,13 @@ public class SSHExecutionChannel {
 	}
 
 	public boolean isClosed() {
-		try {
-			m_session.ping();
-		} catch (IOException e) {
-			return true;
-		}
-		return false;
+//		try {
+//			m_session.ping();
+//		} catch (IOException e) {
+//			return true;
+//		}
+//		return false;
+		return (m_session.getState() == Channel.STATE_CLOSED);
 	}
 	
 	protected void finalize() throws Throwable {

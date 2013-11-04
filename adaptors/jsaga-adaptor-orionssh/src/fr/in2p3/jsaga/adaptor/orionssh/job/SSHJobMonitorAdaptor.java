@@ -24,11 +24,11 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
-import com.trilead.ssh2.SFTPException;
-import com.trilead.ssh2.SFTPv3Client;
-import com.trilead.ssh2.SFTPv3DirectoryEntry;
-import com.trilead.ssh2.SFTPv3FileHandle;
-import com.trilead.ssh2.sftp.ErrorCodes;
+import ch.ethz.ssh2.SFTPException;
+import ch.ethz.ssh2.SFTPv3Client;
+import ch.ethz.ssh2.SFTPv3DirectoryEntry;
+import ch.ethz.ssh2.SFTPv3FileHandle;
+import ch.ethz.ssh2.sftp.ErrorCodes;
 
 
 /* ***************************************************
@@ -62,11 +62,11 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 		SFTPv3Client sftp = null;
 		try {
 			sftp = new SFTPv3Client(m_conn);
-			Vector<SFTPv3DirectoryEntry> v = sftp.ls(SSHJobProcess.getRootDir());
+			List<SFTPv3DirectoryEntry> v = sftp.ls(SSHJobProcess.getRootDir());
 			List<String> processes = new ArrayList<String>();
 			String suffix = "." + SSHJobProcess.PROCESS_SUFFIX;
 			for (int i=0; i<v.size(); i++) {
-				String file = ((SFTPv3DirectoryEntry)v.elementAt(i)).filename;
+				String file = ((SFTPv3DirectoryEntry)v.get(i)).filename;
 				if (file.endsWith(suffix)) {
 					processes.add(file.substring(0, file.length()-suffix.length()));
 				}

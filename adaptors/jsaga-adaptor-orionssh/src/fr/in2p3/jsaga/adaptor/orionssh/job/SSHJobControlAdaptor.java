@@ -18,11 +18,11 @@ import fr.in2p3.jsaga.adaptor.orionssh.SSHExecutionChannel;
 
 import org.ogf.saga.error.*;
 
-import com.trilead.ssh2.SFTPException;
-import com.trilead.ssh2.SFTPv3Client;
-import com.trilead.ssh2.Session;
-import com.trilead.ssh2.sftp.AttribPermissions;
-import com.trilead.ssh2.sftp.ErrorCodes;
+import ch.ethz.ssh2.SFTPException;
+import ch.ethz.ssh2.SFTPv3Client;
+import ch.ethz.ssh2.Session;
+import ch.ethz.ssh2.sftp.AttribPermissions;
+import ch.ethz.ssh2.sftp.ErrorCodes;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
