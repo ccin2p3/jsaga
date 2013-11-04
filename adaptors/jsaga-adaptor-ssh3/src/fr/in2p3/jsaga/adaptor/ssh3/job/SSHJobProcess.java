@@ -1,11 +1,11 @@
-package fr.in2p3.jsaga.adaptor.orionssh.job;
+package fr.in2p3.jsaga.adaptor.ssh3.job;
 
 import java.io.IOException;
 import org.ogf.saga.error.NoSuccessException;
 
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.local.LocalJobProcess;
-import fr.in2p3.jsaga.adaptor.orionssh.data.SFTPDataAdaptor;
+import fr.in2p3.jsaga.adaptor.ssh3.data.SFTPDataAdaptor;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

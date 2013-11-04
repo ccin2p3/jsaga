@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.orionssh.job;
+package fr.in2p3.jsaga.adaptor.ssh3.job;
 
 
 import fr.in2p3.jsaga.adaptor.job.BadResource;
@@ -13,8 +13,8 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.local.LocalAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.job.local.LocalJobProcess;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
-import fr.in2p3.jsaga.adaptor.orionssh.SSHAdaptorAbstract;
-import fr.in2p3.jsaga.adaptor.orionssh.SSHExecutionChannel;
+import fr.in2p3.jsaga.adaptor.ssh3.SSHAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.ssh3.SSHExecutionChannel;
 
 import org.ogf.saga.error.*;
 

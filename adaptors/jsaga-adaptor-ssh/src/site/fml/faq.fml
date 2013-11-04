@@ -4,7 +4,7 @@
         <title>CAUTION</title>
         <faq id="deprecated">
             <question>This adaptor is deprecated</question>
-            <answer>Please use <a href="../jsaga-adaptor-orionssh/faq.html">this new adaptor</a>
+            <answer>Please use <a href="../jsaga-adaptor-ssh3/faq.html">this new adaptor</a>
             </answer>
         </faq>
     </part>

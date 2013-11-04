@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.orionssh.job;
+package fr.in2p3.jsaga.adaptor.ssh3.job;
 
 import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;

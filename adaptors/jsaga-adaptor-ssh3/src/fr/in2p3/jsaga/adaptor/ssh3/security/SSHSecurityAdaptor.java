@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.orionssh.security;
+package fr.in2p3.jsaga.adaptor.ssh3.security;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;

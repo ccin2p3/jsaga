@@ -12,7 +12,7 @@ import org.ogf.saga.error.TimeoutException;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.orionssh.security.SSHSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.ssh3.security.SSHSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.VOMSSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.VOMSSecurityCredential;

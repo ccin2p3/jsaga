@@ -1,12 +1,12 @@
-package fr.in2p3.jsaga.adaptor.orionssh;
+package fr.in2p3.jsaga.adaptor.ssh3;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.orionssh.data.SFTPFileAttributes;
-import fr.in2p3.jsaga.adaptor.orionssh.job.SSHJobProcess;
+import fr.in2p3.jsaga.adaptor.ssh3.data.SFTPFileAttributes;
+import fr.in2p3.jsaga.adaptor.ssh3.job.SSHJobProcess;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;

@@ -37,7 +37,7 @@
     <dependencies>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-orionssh</artifactId>
+            <artifactId>jsaga-adaptor-ssh3</artifactId>
             <version>0.9.17-SNAPSHOT</version>
            <scope>compile</scope>
         </dependency>

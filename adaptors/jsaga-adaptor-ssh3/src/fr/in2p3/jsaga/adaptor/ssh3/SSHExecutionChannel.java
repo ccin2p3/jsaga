@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.orionssh;
+package fr.in2p3.jsaga.adaptor.ssh3;
 
 import java.io.BufferedReader;
 import java.io.IOException;

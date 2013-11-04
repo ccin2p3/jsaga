@@ -1,5 +1,6 @@
 package it.infn.ct.jsaga.adaptor.rocci.data;
 
+import fr.in2p3.jsaga.adaptor.ssh3.data.SFTPDataAdaptor;
 import it.infn.ct.jsaga.adaptor.rocci.security.rOCCISecurityCredential;
 
 import java.util.Map;
@@ -12,7 +13,6 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 
 import ch.ethz.ssh2.Connection;
-import fr.in2p3.jsaga.adaptor.orionssh.data.SFTPDataAdaptor;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

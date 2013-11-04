@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.orionssh.data;
+package fr.in2p3.jsaga.adaptor.ssh3.data;
 
 import ch.ethz.ssh2.SFTPv3FileAttributes;
 

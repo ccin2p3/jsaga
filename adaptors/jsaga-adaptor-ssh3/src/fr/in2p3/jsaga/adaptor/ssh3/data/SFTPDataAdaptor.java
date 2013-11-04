@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.orionssh.data;
+package fr.in2p3.jsaga.adaptor.ssh3.data;
 
 import ch.ethz.ssh2.SFTPException;
 import ch.ethz.ssh2.SFTPInputStream;
@@ -18,8 +18,7 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
-import fr.in2p3.jsaga.adaptor.orionssh.SSHAdaptorAbstract;
-import fr.in2p3.jsaga.adaptor.orionssh.data.SFTPFileAttributes;
+import fr.in2p3.jsaga.adaptor.ssh3.SSHAdaptorAbstract;
 import fr.in2p3.jsaga.helpers.EntryPath;
 import org.ogf.saga.error.*;
 

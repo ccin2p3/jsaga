@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.orionssh.job;
+package fr.in2p3.jsaga.adaptor.ssh3.job;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,8 +12,8 @@ import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
-import fr.in2p3.jsaga.adaptor.orionssh.SSHAdaptorAbstract;
-import fr.in2p3.jsaga.adaptor.orionssh.data.SFTPFileAttributes;
+import fr.in2p3.jsaga.adaptor.ssh3.SSHAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.ssh3.data.SFTPFileAttributes;
 
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;

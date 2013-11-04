@@ -28,7 +28,6 @@ package it.infn.ct.jsaga.adaptor.rocci.job;
 
 import it.infn.ct.jsaga.adaptor.rocci.rOCCIAdaptorCommon;
 
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
@@ -40,10 +39,8 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
-import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential;
-import fr.in2p3.jsaga.adaptor.orionssh.job.SSHJobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.ssh3.job.SSHJobControlAdaptor;
 
-import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.AuthenticationFailedException;

@@ -32,8 +32,7 @@ import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
-import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential;
-import fr.in2p3.jsaga.adaptor.orionssh.job.SSHJobMonitorAdaptor;
+import fr.in2p3.jsaga.adaptor.ssh3.job.SSHJobMonitorAdaptor;
 
 import java.util.Date;
 import java.util.HashMap;
