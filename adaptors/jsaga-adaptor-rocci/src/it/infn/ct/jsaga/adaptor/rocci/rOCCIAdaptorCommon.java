@@ -28,6 +28,7 @@ package it.infn.ct.jsaga.adaptor.rocci;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
@@ -108,9 +109,9 @@ public class rOCCIAdaptorCommon extends Object implements ClientAdaptor {
   { 
 	return new UAnd(
                  new Usage[]{
-                         new UOptional(AUTH),
-                         new UOptional(RESOURCE),
-                         new UOptional(ACTION)
+                         new U(AUTH),
+                         new U(RESOURCE),
+                         new U(ACTION)
                  });
   }
 

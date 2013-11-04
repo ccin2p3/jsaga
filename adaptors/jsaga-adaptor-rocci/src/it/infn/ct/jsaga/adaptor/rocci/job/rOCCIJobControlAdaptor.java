@@ -28,6 +28,11 @@ package it.infn.ct.jsaga.adaptor.rocci.job;
 
 import it.infn.ct.jsaga.adaptor.rocci.rOCCIAdaptorCommon;
 
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
@@ -38,6 +43,7 @@ import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential;
 import fr.in2p3.jsaga.adaptor.orionssh.job.SSHJobControlAdaptor;
 
+import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.AuthenticationFailedException;
@@ -88,7 +94,13 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                                                StagingJobAdaptorTwoPhase, 
                                                CleanableJobAdaptor
 {     
-    
+
+  protected static final String ATTRIBUTES_TITLE = "attributes_title";
+  protected static final String MIXIN_OS_TPL = "mixin_os_tpl";
+  protected static final String MIXIN_RESOURCE_TPL = "mixin_resource_tpl";
+  protected static final String PREFIX = "prefix";
+  
+
   // MAX tentatives before to gave up to connect the VM server.
   private final int MAX_CONNECTIONS = 10;
   
@@ -115,6 +127,18 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
     
   String[] IP = new String[2];
   
+  public Usage getUsage() 
+  { 
+	return new UAnd(
+                 new Usage[]{
+                		 super.getUsage(),
+                         new U(ATTRIBUTES_TITLE),
+                         new U(MIXIN_OS_TPL),
+                         new U(MIXIN_RESOURCE_TPL),
+                         new UOptional(PREFIX)
+                 });
+  }
+
   public boolean testIpAddress(byte[] testAddress)
   {
     Inet4Address inet4Address;
@@ -207,15 +231,15 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
        log.info("");
        log.info("Trying to connect to the cloud host [ " + host + " ] ");
      
-       prefix = (String) attributes.get("prefix");       
+       prefix = (String) attributes.get(PREFIX);       
        //resource = (String) attributes.get("resource");
        String resourceID = (String) attributes.get("resourceID");
        action = (String) attributes.get(ACTION);
        auth = (String) attributes.get(AUTH);
        resource = (String) attributes.get(RESOURCE);
-       attributes_title = (String) attributes.get("attributes_title");
-       mixin_os_tpl = (String) attributes.get("mixin_os_tpl");
-       mixin_resource_tpl = (String) attributes.get("mixin_resource_tpl");
+       attributes_title = (String) attributes.get(ATTRIBUTES_TITLE);
+       mixin_os_tpl = (String) attributes.get(MIXIN_OS_TPL);
+       mixin_resource_tpl = (String) attributes.get(MIXIN_RESOURCE_TPL);
 
        // Check if OCCI path is set                
        if ((prefix != null) && (new File((prefix)).exists()))

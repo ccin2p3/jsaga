@@ -1,5 +1,8 @@
 package it.infn.ct.jsaga.adaptor.rocci.security;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.ogf.saga.error.IncorrectStateException;
@@ -26,6 +29,13 @@ import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential;
 
 public class rOCCISecurityAdaptor extends VOMSSecurityAdaptor {
 
+	private SSHSecurityAdaptor m_sshAdaptor;
+	
+	public rOCCISecurityAdaptor() {
+		super();
+		m_sshAdaptor = new SSHSecurityAdaptor();
+	}
+	
 	public String getType() {
 		return "rocci";
 	}
@@ -39,8 +49,12 @@ public class rOCCISecurityAdaptor extends VOMSSecurityAdaptor {
 	}
 
 	public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-		// TODO Auto-generated method stub
-		return null;
+		Default[] vomsDefault = super.getDefaults(attributes);
+		Default[] sshDefault = m_sshAdaptor.getDefaults(attributes);
+		List<Default> both = new ArrayList<Default>(vomsDefault.length+sshDefault.length);
+		Collections.addAll(both, vomsDefault);
+		Collections.addAll(both, sshDefault);
+		return both.toArray(new Default[both.size()]);
 	}
 
 	public Class getSecurityCredentialClass() {
@@ -51,7 +65,7 @@ public class rOCCISecurityAdaptor extends VOMSSecurityAdaptor {
 			Map attributes, String contextId) throws IncorrectStateException,
 			TimeoutException, NoSuccessException {
 		VOMSSecurityCredential proxy = (VOMSSecurityCredential)super.createSecurityCredential(usage, attributes, contextId);
-		SSHSecurityCredential sshCred = (SSHSecurityCredential)new SSHSecurityAdaptor().createSecurityCredential(usage, attributes, contextId);
+		SSHSecurityCredential sshCred = (SSHSecurityCredential)m_sshAdaptor.createSecurityCredential(usage, attributes, contextId);
 		return new rOCCISecurityCredential(proxy, sshCred);
 	}
 
