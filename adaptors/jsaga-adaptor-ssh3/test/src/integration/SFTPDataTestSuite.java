@@ -4,7 +4,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.Test;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+//import junit.framework.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
@@ -17,26 +23,38 @@ import org.ogf.saga.url.URLFactory;
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
 * File:   SFTPDataTestSuite
-* Author: Nicolas DEMESY (nicolas.demesy@bt.com)
-* Date:   15 avril 2008
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   5 NOV 2013
 ****************************************************/
 
-public class SFTPDataTestSuite extends JSAGATestSuite {
+@RunWith(Suite.class)
+@SuiteClasses({
+	SFTPDataTestSuite.SFTPNSEntryTest.class, 
+	SFTPDataTestSuite.SFTPDirTest.class, 
+	SFTPDataTestSuite.SFTPDirectoryMakeTest.class, 
+//	SFTPDataTestSuite.SFTPDirectoryTest.class, 
+	SFTPDataTestSuite.SFTPFileReadTest.class, 
+	SFTPDataTestSuite.SFTPFileWriteTest.class, 
+//	SFTPDataTestSuite.SFTPNSCopyTest.class, 
+//	SFTPDataTestSuite.SFTPNSCopyRecursiveTest.class, 
+//	SFTPDataTestSuite.SFTPNSMoveTest.class, 
+//	SFTPDataTestSuite.SFTP_to_EmulatorNSCopyTest.class, 
+//	SFTPDataTestSuite.SFTP_to_EmulatorNSCopyRecursiveTest.class, 
+//	SFTPDataTestSuite.SFTP_to_EmulatorNSMoveTest.class
+	})
+public class SFTPDataTestSuite {
 	
 	private final static String TYPE = "sftp";
 	
-    /** create test suite */
-    public static Test suite() throws Exception {return new SFTPDataTestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(SFTPDataTestSuite.class);}}
-
     /** test cases */
     public static class SFTPNSEntryTest extends NSEntryTest {
         public SFTPNSEntryTest() throws Exception {super(TYPE);}
     }
-    public static class SFTPDirectoryListTest extends DirectoryListTest {
-        public SFTPDirectoryListTest() throws Exception {super(TYPE);}
+    public static class SFTPDirTest extends DirTest {
+        public SFTPDirTest() throws Exception {super(TYPE);}
 
+        @Test
+        @Ignore
         public void test_list_and_getAttributes() throws Exception {
             if (m_file instanceof File) {
                 List <URL> dirContent = m_subDir.list();
@@ -59,7 +77,7 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
                        f.close();
 	            }
             } else {
-                fail("Not an instance of class: File");
+                Assert.fail("Not an instance of class: File");
             }
             
         }
@@ -67,9 +85,6 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
     }
     public static class SFTPDirectoryMakeTest extends DirectoryMakeTest {
         public SFTPDirectoryMakeTest() throws Exception {super(TYPE);}
-    }
-    public static class SFTPDirectoryTest extends DirectoryTest {
-        public SFTPDirectoryTest() throws Exception {super(TYPE);}
     }
     public static class SFTPFileReadTest extends FileReadTest {
         public SFTPFileReadTest() throws Exception {super(TYPE);}
