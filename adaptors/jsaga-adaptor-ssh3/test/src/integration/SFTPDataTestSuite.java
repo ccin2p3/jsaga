@@ -16,6 +16,9 @@ import org.ogf.saga.file.File;
 import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.file.FileReadTest;
 import org.ogf.saga.file.FileWriteTest;
+import org.ogf.saga.file.MakeDirTest;
+import org.ogf.saga.file.ReadTest;
+import org.ogf.saga.file.WriteTest;
 import org.ogf.saga.namespace.DataMovementTest;
 import org.ogf.saga.namespace.EntryTest;
 import org.ogf.saga.permissions.Permission;
@@ -82,13 +85,13 @@ public class SFTPDataTestSuite {
         }
 
     }
-    public static class SFTPDirectoryMakeTest extends DirectoryMakeTest {
+    public static class SFTPDirectoryMakeTest extends MakeDirTest {
         public SFTPDirectoryMakeTest() throws Exception {super(TYPE);}
     }
-    public static class SFTPFileReadTest extends FileReadTest {
+    public static class SFTPFileReadTest extends ReadTest {
         public SFTPFileReadTest() throws Exception {super(TYPE);}
     }
-    public static class SFTPFileWriteTest extends FileWriteTest {
+    public static class SFTPFileWriteTest extends WriteTest {
         public SFTPFileWriteTest() throws Exception {super(TYPE);}
     }
     public static class SFTPDataMovementTest extends DataMovementTest {
