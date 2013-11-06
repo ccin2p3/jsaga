@@ -77,6 +77,7 @@ public abstract class DataBaseTest extends BaseTest {
     }
 
     /** Implicitely invoked before executing each test method */
+    @Before
     public void setUp() throws Exception {
         try {
             // read-write protocol
@@ -116,6 +117,7 @@ public abstract class DataBaseTest extends BaseTest {
     }
 
     /** Implicitely invoked after executing each test method */
+    @After
     public void tearDown() throws Exception {
         if (m_file instanceof LogicalFile &&  m_physicalDir != null) {
             m_physicalDir.remove(Flags.RECURSIVE.getValue());

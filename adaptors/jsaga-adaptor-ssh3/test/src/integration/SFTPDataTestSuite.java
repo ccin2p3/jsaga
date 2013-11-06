@@ -7,13 +7,18 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-//import junit.framework.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import org.ogf.saga.file.*;
-import org.ogf.saga.namespace.*;
+import org.ogf.saga.file.DirTest;
+import org.ogf.saga.file.DirectoryMakeTest;
+import org.ogf.saga.file.File;
+import org.ogf.saga.file.FileFactory;
+import org.ogf.saga.file.FileReadTest;
+import org.ogf.saga.file.FileWriteTest;
+import org.ogf.saga.namespace.DataMovementTest;
+import org.ogf.saga.namespace.EntryTest;
 import org.ogf.saga.permissions.Permission;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
@@ -32,22 +37,17 @@ import org.ogf.saga.url.URLFactory;
 	SFTPDataTestSuite.SFTPNSEntryTest.class, 
 	SFTPDataTestSuite.SFTPDirTest.class, 
 	SFTPDataTestSuite.SFTPDirectoryMakeTest.class, 
-//	SFTPDataTestSuite.SFTPDirectoryTest.class, 
 	SFTPDataTestSuite.SFTPFileReadTest.class, 
 	SFTPDataTestSuite.SFTPFileWriteTest.class, 
-//	SFTPDataTestSuite.SFTPNSCopyTest.class, 
-//	SFTPDataTestSuite.SFTPNSCopyRecursiveTest.class, 
-//	SFTPDataTestSuite.SFTPNSMoveTest.class, 
-//	SFTPDataTestSuite.SFTP_to_EmulatorNSCopyTest.class, 
-//	SFTPDataTestSuite.SFTP_to_EmulatorNSCopyRecursiveTest.class, 
-//	SFTPDataTestSuite.SFTP_to_EmulatorNSMoveTest.class
+	SFTPDataTestSuite.SFTPDataMovementTest.class, 
+	SFTPDataTestSuite.SFTPEmulatorDataMovementTest.class, 
 	})
 public class SFTPDataTestSuite {
 	
 	private final static String TYPE = "sftp";
 	
     /** test cases */
-    public static class SFTPNSEntryTest extends NSEntryTest {
+    public static class SFTPNSEntryTest extends EntryTest {
         public SFTPNSEntryTest() throws Exception {super(TYPE);}
     }
     public static class SFTPDirTest extends DirTest {
@@ -92,22 +92,10 @@ public class SFTPDataTestSuite {
     public static class SFTPFileWriteTest extends FileWriteTest {
         public SFTPFileWriteTest() throws Exception {super(TYPE);}
     }
-    public static class SFTPNSCopyTest extends NSCopyTest {
-        public SFTPNSCopyTest() throws Exception {super(TYPE, TYPE);}
+    public static class SFTPDataMovementTest extends DataMovementTest {
+        public SFTPDataMovementTest() throws Exception {super(TYPE, TYPE);}
     }
-    public static class SFTPNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public SFTPNSCopyRecursiveTest() throws Exception {super(TYPE, TYPE);}
-    }
-    public static class SFTPNSMoveTest extends NSMoveTest {
-        public SFTPNSMoveTest() throws Exception {super(TYPE, TYPE);}
-    }
-    public static class SFTP_to_EmulatorNSCopyTest extends NSCopyTest {
-        public SFTP_to_EmulatorNSCopyTest() throws Exception {super(TYPE, "test");}
-    }
-    public static class SFTP_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public SFTP_to_EmulatorNSCopyRecursiveTest() throws Exception {super(TYPE, "test");}
-    }
-    public static class SFTP_to_EmulatorNSMoveTest extends NSMoveTest {
-        public SFTP_to_EmulatorNSMoveTest() throws Exception {super(TYPE, "test");}
+    public static class SFTPEmulatorDataMovementTest extends DataMovementTest {
+        public SFTPEmulatorDataMovementTest() throws Exception {super(TYPE, "test");}
     }
 }
