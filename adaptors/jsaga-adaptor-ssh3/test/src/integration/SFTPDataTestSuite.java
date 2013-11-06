@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,7 +76,7 @@ public class SFTPDataTestSuite {
                        f.close();
 	            }
             } else {
-                Assert.fail("Not an instance of class: File");
+                fail("Not an instance of class: File");
             }
             
         }
