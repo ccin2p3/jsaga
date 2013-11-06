@@ -1,6 +1,5 @@
 package org.ogf.saga.namespace.base;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /* ***************************************************
@@ -15,7 +14,6 @@ import org.junit.Test;
 /**
  *
  */
-// TODO: run setUp once before all tests
 public abstract class ReadBaseTest extends DataBaseTest {
     public ReadBaseTest(String protocol) throws Exception {
         super(protocol);
@@ -23,11 +21,11 @@ public abstract class ReadBaseTest extends DataBaseTest {
 
     @Test
     public void test_isDirectory() throws Exception {
-        Assert.assertFalse(m_file.isDir());
+        assertFalse(m_file.isDir());
     }
 
     @Test
     public void test_isEntry() throws Exception {
-    	Assert.assertTrue(m_file.isEntry());
+    	assertTrue(m_file.isEntry());
     }
 }

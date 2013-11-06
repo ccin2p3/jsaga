@@ -1,9 +1,7 @@
 package org.ogf.saga.namespace.base;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
-import org.ogf.saga.AbstractTest;
 import org.ogf.saga.BaseTest;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
@@ -12,7 +10,10 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.file.Directory;
 import org.ogf.saga.file.File;
 import org.ogf.saga.logicalfile.LogicalFile;
-import org.ogf.saga.namespace.*;
+import org.ogf.saga.namespace.Flags;
+import org.ogf.saga.namespace.NSDirectory;
+import org.ogf.saga.namespace.NSEntry;
+import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
@@ -22,9 +23,9 @@ import org.ogf.saga.url.URLFactory;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   AbstractNSEntryTest
-* Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   2 juil. 2007
+* File:   DataBaseTest.java
+* Author: L Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   5 NOV 2013
 * ***************************************************
 * Description:                                      */
 /**
@@ -142,7 +143,7 @@ public abstract class DataBaseTest extends BaseTest {
         Buffer buffer = BufferFactory.createBuffer(1024);
         File reader = (File) NSFactory.createNSEntry(m_session, url, Flags.READ.getValue());
         int len = reader.read(buffer);
-        Assert.assertEquals(
+        assertEquals(
                 expected,
                 new String(buffer.getData(), 0, len));
         reader.close();

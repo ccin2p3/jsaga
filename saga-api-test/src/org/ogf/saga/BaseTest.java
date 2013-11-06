@@ -4,6 +4,7 @@ package org.ogf.saga;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
@@ -28,7 +29,7 @@ import java.util.*;
 /**
  *
  */
-public abstract class BaseTest {
+public abstract class BaseTest extends Assert {
     /** jobservice.url (required): for testing job service */
     protected static final String CONFIG_JOBSERVICE_URL = "jobservice.url";
     /** base.url (required): for testing any protocol */

@@ -1,7 +1,6 @@
 package org.ogf.saga.namespace.base;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
@@ -119,18 +118,18 @@ public abstract class DataMovementBaseTest extends DirBaseTest {
         File reader;
         if (entry instanceof LogicalFile) {
             List<URL> physicalUrls = ((LogicalFile)entry).listLocations();
-            Assert.assertNotNull(physicalUrls);
-            Assert.assertTrue(physicalUrls.size() > 0);
+            assertNotNull(physicalUrls);
+            assertTrue(physicalUrls.size() > 0);
             reader = (File) NSFactory.createNSEntry(m_session, physicalUrls.get(0), Flags.READ.getValue());
         } else {
             reader = (File) entry;
         }
         Buffer buffer = BufferFactory.createBuffer(bufferSize);
         int len = reader.read(buffer);
-        Assert.assertEquals(
+        assertEquals(
                 expectedContent.length(),
                 len);
-        Assert.assertEquals(
+        assertEquals(
                 expectedContent,
                 new String(buffer.getData(), 0, len));
         reader.close();

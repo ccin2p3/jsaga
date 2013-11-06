@@ -1,9 +1,7 @@
 package org.ogf.saga.namespace;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.ogf.saga.error.*;
-import org.ogf.saga.namespace.abstracts.AbstractNSCopyTest;
 import org.ogf.saga.namespace.base.DataMovementBaseTest;
 import org.ogf.saga.url.URL;
 
@@ -57,18 +55,18 @@ public abstract class DataMovementTest extends DataMovementBaseTest {
         try {
             entry = NSFactory.createNSEntry(m_session, createURL(m_subDirUrl, "unexisting.txt"), FLAGS_BYPASSEXIST);
         } catch(DoesNotExistException e) {
-            Assert.fail("Unexpected exception: "+ DoesNotExistException.class);
+            fail("Unexpected exception: "+ DoesNotExistException.class);
         }
         try {
             entry.copy(m_subDirUrl2, Flags.NONE.getValue());
-            Assert.fail("Expected exception: "+ IncorrectStateException.class);
+            fail("Expected exception: "+ IncorrectStateException.class);
         } catch(IncorrectStateException e) {
         } finally {
         	entry.close();
         }
         try {
             NSFactory.createNSEntry(m_session, createURL(m_subDirUrl2, "unexisting.txt"), Flags.NONE.getValue());
-            Assert.fail("Expected exception: "+ DoesNotExistException.class);
+            fail("Expected exception: "+ DoesNotExistException.class);
         } catch(DoesNotExistException e) {
         }
     }
@@ -78,12 +76,12 @@ public abstract class DataMovementTest extends DataMovementBaseTest {
         URL target = createURL(m_subDirUrl2, DEFAULT_SUBDIRNAME);
         try {
             m_subDir.copy(m_subDirUrl2, Flags.NONE.getValue());
-            Assert.fail("Expected exception: "+ BadParameterException.class);
+            fail("Expected exception: "+ BadParameterException.class);
         } catch(BadParameterException e) {
         }
         try {
             NSFactory.createNSDirectory(m_session, target, Flags.NONE.getValue());
-            Assert.fail("Expected exception: "+ DoesNotExistException.class);
+            fail("Expected exception: "+ DoesNotExistException.class);
         } catch(DoesNotExistException e) {
         }
     }
@@ -100,12 +98,12 @@ public abstract class DataMovementTest extends DataMovementBaseTest {
         URL target = createURL(m_dirUrl2, DEFAULT_SUBDIRNAME +DEFAULT_FILENAME);
         try {
             m_subDir.copy(m_dirUrl2, Flags.RECURSIVE.getValue());
-            Assert.fail("Expected exception: "+ AlreadyExistsException.class);
+            fail("Expected exception: "+ AlreadyExistsException.class);
         } catch(AlreadyExistsException e) {
         }
         try {
             NSFactory.createNSEntry(m_session, target, Flags.NONE.getValue());
-            Assert.fail("Expected exception: "+ DoesNotExistException.class);
+            fail("Expected exception: "+ DoesNotExistException.class);
         } catch(DoesNotExistException e) {
         }
     }

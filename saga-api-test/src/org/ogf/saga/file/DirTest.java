@@ -1,11 +1,11 @@
 package org.ogf.saga.file;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
-import org.ogf.saga.namespace.*;
-import org.ogf.saga.namespace.abstracts.AbstractNSDirectoryTest;
+import org.ogf.saga.namespace.Flags;
+import org.ogf.saga.namespace.NSDirectory;
+import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.namespace.base.DirBaseTest;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
@@ -15,8 +15,8 @@ import org.ogf.saga.url.URLFactory;
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
 * File:   DirectoryTest
-* Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   2 juil. 2007
+* Author: lionel.Schwarz@in2p3.fr
+* Date:   5 NOV 2013
 * ***************************************************
 * Description:                                      */
 /**
@@ -30,15 +30,15 @@ public abstract class DirTest extends DirBaseTest {
     @Test
     public void test_open() throws Exception {
         NSDirectory dir = m_subDir.openDir(URLFactory.createURL(".."), Flags.NONE.getValue());
-        Assert.assertTrue(
+        assertTrue(
                 dir instanceof Directory);
-        Assert.assertEquals(
+        assertEquals(
                 DEFAULT_DIRNAME,
                 dir.getName().getPath()+"/");
         NSEntry entry = m_subDir.open(URLFactory.createURL(DEFAULT_FILENAME), Flags.NONE.getValue());
-        Assert.assertTrue(
+        assertTrue(
                 entry instanceof File);
-        Assert.assertEquals(
+        assertEquals(
                 DEFAULT_FILENAME,
                 entry.getName().getPath());
     }
@@ -48,11 +48,11 @@ public abstract class DirTest extends DirBaseTest {
     @Test
     public void test_getSizeUrl() throws Exception {
         if (m_file instanceof File) {
-            Assert.assertEquals(
+            assertEquals(
                     DEFAULT_CONTENT.length(),
                     ((Directory)m_subDir).getSize(m_fileUrl));
         } else {
-            Assert.fail("Not an instance of class: File");
+            fail("Not an instance of class: File");
         }
     }
 
@@ -69,13 +69,13 @@ public abstract class DirTest extends DirBaseTest {
             checkWrited(file2Url, new_content);
             // check size of root directory: should be size of both files in subDir
             // use SAGA compliant getSize(URL) instead of JSAGA getSize()
-            Assert.assertEquals(
+            assertEquals(
                     DEFAULT_CONTENT.length() + new_content.length(),
                     ((Directory)m_dir).getSize(m_dirUrl));
             // delete created file
             file.remove();
         } else {
-            Assert.fail("Not an instance of class: File");
+            fail("Not an instance of class: File");
         }
         
     }

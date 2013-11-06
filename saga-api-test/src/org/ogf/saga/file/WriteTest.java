@@ -1,20 +1,14 @@
 package org.ogf.saga.file;
 
-import org.junit.Assert;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.AlreadyExistsException;
 import org.ogf.saga.error.DoesNotExistException;
-import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.namespace.NSFactory;
-import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 import org.ogf.saga.namespace.base.WriteBaseTest;
-import org.ogf.saga.session.Session;
-import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -22,7 +16,8 @@ import org.ogf.saga.url.URLFactory;
 * ***************************************************
 * File:   FileWriteTest
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   2 juil. 2007
+* Author: lionel.schwarz@in2p3.fr
+* Date:   5 NOV 2013
 * ***************************************************
 * Description:                                      */
 /**
@@ -41,11 +36,11 @@ public abstract class WriteTest extends WriteBaseTest {
         if (m_file instanceof File) {
             try {
                 NSFactory.createNSEntry(m_session, createURL(m_dirUrl, "ThisFileDoesNotExist"), Flags.WRITE.getValue()).close();
-                Assert.fail("Expected DoesNotExist exception");
+                fail("Expected DoesNotExist exception");
             } catch(DoesNotExistException e) {
             }
         } else {
-        	Assert.fail("Not an instance of class: File");
+        	fail("Not an instance of class: File");
         }
     }
 
@@ -53,12 +48,12 @@ public abstract class WriteTest extends WriteBaseTest {
         if (m_file instanceof File) {
             try {
                 NSFactory.createNSEntry(m_session, m_fileUrl, Flags.WRITE.or(Flags.EXCL)).close();
-                Assert.fail("Expected AlreadyExist exception");
+                fail("Expected AlreadyExist exception");
             } catch(AlreadyExistsException e) {
                 checkWrited(m_fileUrl, DEFAULT_CONTENT);
             }
         } else {
-        	Assert.fail("Not an instance of class: File");
+        	fail("Not an instance of class: File");
         }
     }
 
@@ -70,7 +65,7 @@ public abstract class WriteTest extends WriteBaseTest {
         file.close();
         try {
             NSFactory.createNSEntry(m_session, createURL(m_subDirUrl, DEFAULT_ENCODED_FILENAME), Flags.WRITE.or(Flags.EXCL)).close();
-            Assert.fail("Expected AlreadyExist exception");
+            fail("Expected AlreadyExist exception");
         } catch(AlreadyExistsException e) {
         }
         checkWrited(fileUrl, DEFAULT_CONTENT2);
@@ -84,7 +79,7 @@ public abstract class WriteTest extends WriteBaseTest {
             writer.close();
             checkWrited(m_fileUrl, DEFAULT_CONTENT2);
         } else {
-        	Assert.fail("Not an instance of class: File");
+        	fail("Not an instance of class: File");
         }
     }
 
@@ -96,7 +91,7 @@ public abstract class WriteTest extends WriteBaseTest {
             writer.close();
             checkWrited(m_fileUrl, DEFAULT_CONTENT+DEFAULT_CONTENT2);
         } else {
-        	Assert.fail("Not an instance of class: File");
+        	fail("Not an instance of class: File");
         }
     }
     
@@ -113,12 +108,12 @@ public abstract class WriteTest extends WriteBaseTest {
             buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
             reader.write(buffer);
             // check new size
-            Assert.assertEquals(DEFAULT_CONTENT2.length(), reader.getSize());
+            assertEquals(DEFAULT_CONTENT2.length(), reader.getSize());
             // check new content
             reader.close();
             checkWrited(m_fileUrl, DEFAULT_CONTENT2);
         } else {
-        	Assert.fail("Not an instance of class: File");
+        	fail("Not an instance of class: File");
         }
     }
 }

@@ -3,10 +3,8 @@ package org.ogf.saga.namespace.base;
 import java.util.List;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSDirectory;
 import org.ogf.saga.url.URLFactory;
@@ -48,7 +46,7 @@ public abstract class DirBaseTest extends DataBaseTest {
     @Test
     public void test_changeDir() throws Exception {
         m_subDir.changeDir(URLFactory.createURL(".."));
-        Assert.assertEquals(
+        assertEquals(
                 DEFAULT_DIRNAME,
                 m_subDir.getName().getPath()+"/");
     }
@@ -56,10 +54,10 @@ public abstract class DirBaseTest extends DataBaseTest {
     @Test
     public void test_list() throws Exception {
         List list = m_subDir.list(DEFAULT_FILEPATTERN, Flags.NONE.getValue());
-        Assert.assertEquals(
+        assertEquals(
                 1,
                 list.size());
-        Assert.assertEquals(
+        assertEquals(
                 DEFAULT_FILENAME,
                 list.get(0).toString());
     }
@@ -68,7 +66,7 @@ public abstract class DirBaseTest extends DataBaseTest {
     public void test_list_empty() throws Exception {
         m_subDir.remove(DEFAULT_FILENAME);
         List list = m_subDir.list();
-        Assert.assertEquals(
+        assertEquals(
                 0,
                 list.size());
     }
@@ -76,10 +74,10 @@ public abstract class DirBaseTest extends DataBaseTest {
     @Test
     public void test_list_file() throws Exception {
         List list = m_subDir.list(DEFAULT_FILENAME, Flags.NONE.getValue());
-        Assert.assertEquals(
+        assertEquals(
                 1,
                 list.size());
-        Assert.assertEquals(
+        assertEquals(
                 DEFAULT_FILENAME,
                 list.get(0).toString());
     }
@@ -87,13 +85,13 @@ public abstract class DirBaseTest extends DataBaseTest {
     @Test
     public void test_list_directories() throws Exception {
         List list = m_dir.list("*/", Flags.NONE.getValue());
-        Assert.assertEquals(
+        assertEquals(
                 1,
                 list.size());
-        Assert.assertEquals(DEFAULT_SUBDIRNAME,
+        assertEquals(DEFAULT_SUBDIRNAME,
                 list.get(0).toString());
         list = m_subDir.list("*/", Flags.NONE.getValue());
-        Assert.assertEquals(
+        assertEquals(
                 0,
                 list.size());
     }
@@ -101,14 +99,14 @@ public abstract class DirBaseTest extends DataBaseTest {
     @Test
     public void test_find() throws Exception {
         List list = m_subDir.find(DEFAULT_FILEPATTERN, Flags.NONE.getValue());
-        Assert.assertEquals(
+        assertEquals(
                 1,
                 list.size());
-        Assert.assertEquals(
+        assertEquals(
                 DEFAULT_FILENAME,
                 list.get(0).toString());
         list = m_dir.find(DEFAULT_FILEPATTERN, Flags.NONE.getValue());
-        Assert.assertEquals(
+        assertEquals(
                 0,
                 list.size());
     }
@@ -116,24 +114,24 @@ public abstract class DirBaseTest extends DataBaseTest {
     @Test
     public void test_find_recurse() throws Exception {
         List list = m_dir.find(DEFAULT_FILEPATTERN, Flags.RECURSIVE.getValue());
-        Assert.assertEquals(
+        assertEquals(
                 1,
                 list.size());
-        Assert.assertEquals(
+        assertEquals(
                 DEFAULT_SUBDIRNAME +DEFAULT_FILENAME,
                 list.get(0).toString());
     }
 
     @Test
     public void test_getNumEntries() throws Exception {
-    	Assert.assertEquals(
+    	assertEquals(
                 1,
                 m_subDir.getNumEntries());
     }
 
     @Test
     public void test_getEntry() throws Exception {
-    	Assert.assertEquals(
+    	assertEquals(
                 DEFAULT_FILENAME,
                 m_subDir.getEntry(0).toString());
     }
@@ -142,11 +140,11 @@ public abstract class DirBaseTest extends DataBaseTest {
 
     @Test
     public void test_isDir() throws Exception {
-    	Assert.assertTrue(m_subDir.isDir());
+    	assertTrue(m_subDir.isDir());
     }
 
     @Test
     public void test_isEntry() throws Exception {
-    	Assert.assertFalse(m_subDir.isEntry());
+    	assertFalse(m_subDir.isEntry());
     }
 }
