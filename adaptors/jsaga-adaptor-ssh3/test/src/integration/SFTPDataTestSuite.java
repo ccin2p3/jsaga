@@ -11,11 +11,8 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import org.ogf.saga.file.DirTest;
-import org.ogf.saga.file.DirectoryMakeTest;
 import org.ogf.saga.file.File;
 import org.ogf.saga.file.FileFactory;
-import org.ogf.saga.file.FileReadTest;
-import org.ogf.saga.file.FileWriteTest;
 import org.ogf.saga.file.MakeDirTest;
 import org.ogf.saga.file.ReadTest;
 import org.ogf.saga.file.WriteTest;
