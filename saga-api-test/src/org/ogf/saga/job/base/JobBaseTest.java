@@ -1,8 +1,5 @@
 package org.ogf.saga.job.base;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.ogf.saga.AbstractTest;
 import org.ogf.saga.BaseTest;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
@@ -176,7 +173,7 @@ public abstract class JobBaseTest extends BaseTest {
      */
     protected void checkStatus(State jobState, State wantedStatus) throws Exception {
     	if(jobState != wantedStatus) {
-        	Assert.fail("Invalid status "+jobState+": must be "+wantedStatus+".");
+        	fail("Invalid status "+jobState+": must be "+wantedStatus+".");
         }
 	}    
     

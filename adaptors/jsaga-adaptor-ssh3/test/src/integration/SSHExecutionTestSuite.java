@@ -1,15 +1,18 @@
 package integration;
 
-//import junit.framework.Test;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.ogf.saga.job.*;
 import org.ogf.saga.job.description.DescriptionTest;
-import org.ogf.saga.job.run.*;
+import org.ogf.saga.job.run.InfoTest;
+import org.ogf.saga.job.run.InteractiveTest;
+import org.ogf.saga.job.run.MinimalTest;
+import org.ogf.saga.job.run.OptionalTest;
+import org.ogf.saga.job.run.RequiredTest;
+import org.ogf.saga.job.run.RequirementsTest;
+import org.ogf.saga.job.run.SandboxTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -30,7 +33,7 @@ import org.ogf.saga.job.run.*;
 	SSHExecutionTestSuite.SSHJobRunDescriptionTest.class,
 	SSHExecutionTestSuite.SSHJobRunInteractiveTest.class,
 	SSHExecutionTestSuite.SSHJobRunInfoTest.class})
-public class SSHExecutionTestSuite /*extends JSAGATestSuite*/ {
+public class SSHExecutionTestSuite {
 	
 	private final static String TYPE = "ssh";
 
@@ -74,7 +77,7 @@ public class SSHExecutionTestSuite /*extends JSAGATestSuite*/ {
     }
 
     // test cases
-    public static class SSHJobRunSandboxTest extends JobRunSandboxTest {
+    public static class SSHJobRunSandboxTest extends SandboxTest {
         public SSHJobRunSandboxTest() throws Exception {super(TYPE);}
     }
     
@@ -103,21 +106,26 @@ public class SSHExecutionTestSuite /*extends JSAGATestSuite*/ {
     }
     
  	// test cases
-    public static class SSHJobRunDescriptionTest extends JobRunDescriptionTest {
+    public static class SSHJobRunDescriptionTest extends RequirementsTest {
         public SSHJobRunDescriptionTest() throws Exception {super(TYPE);}
-        public void test_run_queueRequirement() { super.ignore("not supported"); }
-        public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
-        public void test_run_memoryRequirement() { super.ignore("not supported"); }
+        @Override
+        @Test
+        @Ignore
+        public void test_run_queueRequirement() {}
+
+        @Override
+        @Test
+        @Ignore
+        public void test_run_cpuTimeRequirement() {}
     }
     
     // test cases
-    public static class SSHJobRunInteractiveTest extends JobRunInteractiveTest {
+    public static class SSHJobRunInteractiveTest extends InteractiveTest {
         public SSHJobRunInteractiveTest() throws Exception {super(TYPE);}
-//        public void test_simultaneousStdin()  { super.ignore("Not supported");}
     }
 
     // test cases
-    public static class SSHJobRunInfoTest extends JobRunInfoTest {
+    public static class SSHJobRunInfoTest extends InfoTest {
         public SSHJobRunInfoTest() throws Exception {super(TYPE);}
     }
 }
