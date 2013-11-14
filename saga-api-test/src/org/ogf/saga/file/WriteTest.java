@@ -133,4 +133,17 @@ public abstract class WriteTest extends WriteBaseTest {
         }
     }
 
+    @Test
+    public void test_outputStream_append() throws Exception {
+        if (m_file instanceof File) {
+        	FileOutputStream fos = FileFactory.createFileOutputStream(m_session, m_fileUrl, true);
+        	fos.write(DEFAULT_CONTENT2.getBytes());
+        	fos.flush();
+        	fos.close();
+            checkWrited(m_fileUrl, DEFAULT_CONTENT+DEFAULT_CONTENT2);
+        } else {
+        	fail("Not an instance of class: File");
+        }
+    }
+    
 }
