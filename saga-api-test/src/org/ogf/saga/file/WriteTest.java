@@ -1,5 +1,6 @@
 package org.ogf.saga.file;
 
+import org.junit.Test;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.AlreadyExistsException;
@@ -32,18 +33,16 @@ public abstract class WriteTest extends WriteBaseTest {
         super(protocol);
     }
 
+    @Test(expected = DoesNotExistException.class)
     public void test_write_nocreate()throws Exception {
         if (m_file instanceof File) {
-            try {
-                NSFactory.createNSEntry(m_session, createURL(m_dirUrl, "ThisFileDoesNotExist"), Flags.WRITE.getValue()).close();
-                fail("Expected DoesNotExist exception");
-            } catch(DoesNotExistException e) {
-            }
+            NSFactory.createNSEntry(m_session, createURL(m_dirUrl, "ThisFileDoesNotExist"), Flags.WRITE.getValue()).close();
         } else {
         	fail("Not an instance of class: File");
         }
     }
 
+    @Test
     public void test_write_nooverwrite() throws Exception {
         if (m_file instanceof File) {
             try {
@@ -57,6 +56,7 @@ public abstract class WriteTest extends WriteBaseTest {
         }
     }
 
+    @Test
     public void test_write_encoded_filename() throws Exception {
         URL fileUrl = createURL(m_subDirUrl, DEFAULT_ENCODED_FILENAME);
         NSEntry file = m_dir.open(fileUrl, FLAGS_FILE);
@@ -71,6 +71,7 @@ public abstract class WriteTest extends WriteBaseTest {
         checkWrited(fileUrl, DEFAULT_CONTENT2);
     }
     
+    @Test
     public void test_write_overwrite() throws Exception {
         if (m_file instanceof File) {
             Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
@@ -83,6 +84,7 @@ public abstract class WriteTest extends WriteBaseTest {
         }
     }
 
+    @Test
     public void test_write_append() throws Exception {
         if (m_file instanceof File) {
             Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
@@ -95,6 +97,7 @@ public abstract class WriteTest extends WriteBaseTest {
         }
     }
     
+    @Test
     public void test_read_and_write() throws Exception {
         if (m_file instanceof File) {
             Buffer buffer;
@@ -116,4 +119,18 @@ public abstract class WriteTest extends WriteBaseTest {
         	fail("Not an instance of class: File");
         }
     }
+
+    @Test
+    public void test_outputStream() throws Exception {
+        if (m_file instanceof File) {
+        	FileOutputStream fos = FileFactory.createFileOutputStream(m_session, m_fileUrl, false);
+        	fos.write(DEFAULT_CONTENT2.getBytes());
+        	fos.flush();
+        	fos.close();
+            checkWrited(m_fileUrl, DEFAULT_CONTENT2);
+        } else {
+        	fail("Not an instance of class: File");
+        }
+    }
+
 }

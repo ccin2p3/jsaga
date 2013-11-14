@@ -1,5 +1,9 @@
 package org.ogf.saga.file;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStreamReader;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.ogf.saga.buffer.Buffer;
@@ -63,6 +67,21 @@ public abstract class ReadTest extends ReadBaseTest {
         }
     }
 
+    @Test
+    public void test_inputStream() throws Exception {
+    	FileInputStream fis = FileFactory.createFileInputStream(m_session, m_fileUrl);
+    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    	int read;
+    	while ((read=fis.read()) != -1) {
+    		baos.write(read);
+    	}
+    	fis.close();
+    	assertEquals(
+    			DEFAULT_CONTENT,
+    			baos.toString());
+    	baos.close();
+    }
+    
     @Test
     @Ignore
     public void test_seek() throws Exception {
