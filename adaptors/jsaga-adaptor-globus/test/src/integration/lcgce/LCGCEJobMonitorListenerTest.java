@@ -45,4 +45,9 @@ public class LCGCEJobMonitorListenerTest implements JobStatusNotifier {
     public void notifyChange(JobStatus status) {
         System.out.println(status.getNativeJobId()+": "+status.getSagaState());
     }
+    
+    // For JUnit4
+    public void test_void() throws Exception {
+    }
+    
 }
