@@ -65,7 +65,7 @@ public abstract class AbstractCopyTask<T extends SagaObject,E> extends AbstractT
         }
     }
 
-    void increment(long writtenBytes) {
+    public void increment(long writtenBytes) {
         m_totalWrittenBytes += writtenBytes;
         m_metric_Progress.setValue(m_totalWrittenBytes);
     }

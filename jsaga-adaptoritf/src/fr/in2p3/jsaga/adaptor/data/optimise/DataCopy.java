@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.data.optimise;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import org.ogf.saga.error.*;
+import org.ogf.saga.task.Task;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,12 +26,19 @@ public interface DataCopy extends DataAdaptor {
      * @param targetAbsolutePath the path of the file to copy to.
      * @param overwrite if true, then target is overwrited if it exists.
      * @param additionalArgs adaptor specific arguments
+     * @param progressMonitor progress monitor
      * @throws BadParameterException if sourceAbsolutePath is not a file.
      * @throws AlreadyExistsException if targetAbsolutePath already exists and overwrite is false.
      * @throws DoesNotExistException if sourceAbsolutePath does not exist.
      * @throws ParentDoesNotExist if parent of targetAbsolutePath does not exist.
      */
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs)
+    public void copy(String sourceAbsolutePath, 
+    					String targetHost, 
+    					int targetPort, 
+    					String targetAbsolutePath, 
+    					boolean overwrite, 
+    					String additionalArgs,
+    					Task progressMonitor)
         throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException;
 
     /**

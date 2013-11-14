@@ -11,6 +11,7 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.globus.ftp.FeatureList;
 import org.globus.ftp.exception.ServerException;
 import org.ogf.saga.error.*;
+import org.ogf.saga.task.Task;
 
 import java.io.*;
 import java.util.Map;
@@ -114,8 +115,8 @@ public class GsiftpDataAdaptor implements DataCopy, DataRename, FileReaderStream
         return m_adaptor.getOutputStream(parentAbsolutePath, fileName, exclusive, append, additionalArgs);
     }
 
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
-        m_adaptor.copy(sourceAbsolutePath, targetHost, targetPort, targetAbsolutePath, overwrite, additionalArgs);
+    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs, Task progressMonitor) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+        m_adaptor.copy(sourceAbsolutePath, targetHost, targetPort, targetAbsolutePath, overwrite, additionalArgs, progressMonitor);
     }
 
     public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {

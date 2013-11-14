@@ -69,7 +69,8 @@ public class FileCopy {
                 ((DataCopy)m_adaptor).copy(
                         source.getPath(),
                         targetHost, targetPort, targetPath,
-                        overwrite, source.getQuery());
+                        overwrite, source.getQuery(),
+                        progressMonitor);
             } catch (ParentDoesNotExist parentDoesNotExist) {
                 throw new DoesNotExistException("Target parent directory does not exist: "+effectiveTarget.resolve(URLFactory.createURL(JSAGA_FACTORY, ".")), parentDoesNotExist);
             } catch (DoesNotExistException doesNotExist) {
