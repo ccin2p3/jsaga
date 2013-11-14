@@ -1,6 +1,8 @@
 package fr.in2p3.jsaga.impl.task;
 
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
+
+import org.junit.Test;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.task.*;
@@ -29,5 +31,9 @@ public class AsyncTest extends AbstractSagaObjectImpl implements SagaObject, Asy
                 return AsyncTest.this.getHello(name);
             }
         };
+    }
+    // For JUnit4
+    @Test
+    public void test_void() throws Exception {
     }
 }
