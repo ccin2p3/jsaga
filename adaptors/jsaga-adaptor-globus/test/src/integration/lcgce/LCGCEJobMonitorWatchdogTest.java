@@ -1,5 +1,7 @@
 package integration.lcgce;
 
+import org.junit.Test;
+
 import fr.in2p3.jsaga.adaptor.job.LCGCEJobMonitorWatchdog;
 
 /* ***************************************************
@@ -17,5 +19,10 @@ import fr.in2p3.jsaga.adaptor.job.LCGCEJobMonitorWatchdog;
 public class LCGCEJobMonitorWatchdogTest {
     public static void main(String[] args) throws Exception {
         new LCGCEJobMonitorWatchdog(Proxy.get(), "cclcgceli01.in2p3.fr", 2119);
+    }
+
+    // For JUnit4
+    @Test
+    public void test_void() throws Exception {
     }
 }

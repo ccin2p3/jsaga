@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatusNotifier;
 import org.globus.common.CoGProperties;
 import org.globus.io.gass.server.GassServer;
 import org.globus.io.gass.server.JobOutputStream;
+import org.junit.Test;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -47,6 +48,7 @@ public class LCGCEJobMonitorListenerTest implements JobStatusNotifier {
     }
     
     // For JUnit4
+    @Test
     public void test_void() throws Exception {
     }
     
