@@ -39,8 +39,7 @@ import org.ogf.saga.url.URLFactory;
 	SFTPDataTestSuite.SFTPFileReadTest.class, 
 	SFTPDataTestSuite.SFTPFileWriteTest.class, 
 	SFTPDataTestSuite.SFTPDataMovementTest.class, 
-	SFTPDataTestSuite.SFTPEmulatorDataMovementTest.class, 
-	})
+	SFTPDataTestSuite.SFTPEmulatorDataMovementTest.class})
 public class SFTPDataTestSuite {
 	
 	private final static String TYPE = "sftp";
