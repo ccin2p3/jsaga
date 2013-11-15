@@ -107,7 +107,8 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
         List files = new ArrayList();
         for (int i=0; i<v.size(); i++) {
             MlsxEntry entry = (MlsxEntry) v.get(i);
-            if (absolutePath.equals(entry.getFileName())) {
+            // remove trailing '/'
+            if (absolutePath.matches(entry.getFileName() + "/*")) {
                 // ignore this entry: absolutePath
                 continue;
             }
