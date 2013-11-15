@@ -67,7 +67,7 @@ public class LogicalFileCopy {
                 ((DataCopy)m_adaptor).copy(
                         source.getPath(),
                         effectiveTarget.getHost(), effectiveTarget.getPort(), effectiveTarget.getPath(),
-                        overwrite, source.getQuery());
+                        overwrite, source.getQuery(), null);
             } catch (ParentDoesNotExist parentDoesNotExist) {
                 throw new DoesNotExistException("Target parent directory does not exist: "+effectiveTarget.resolve(URLFactory.createURL(JSAGA_FACTORY, ".")), parentDoesNotExist);
             } catch (DoesNotExistException doesNotExist) {

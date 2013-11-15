@@ -3,11 +3,13 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.data.impl.DataEmulatorConnection;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyMonitor;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.*;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.ogf.saga.error.*;
+import org.ogf.saga.task.Task;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,7 +32,13 @@ public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements
         return "otest";
     }
 
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+    public void copy(String sourceAbsolutePath, 
+    		String targetHost, 
+    		int targetPort, 
+    		String targetAbsolutePath, 
+    		boolean overwrite, 
+    		String additionalArgs,
+    		DataCopyMonitor progressMonitor) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         File file = m_server.getFile(sourceAbsolutePath);
         DataEmulatorConnection targetServer = new DataEmulatorConnection(this.getType(), targetHost, targetPort);
 

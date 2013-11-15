@@ -3,12 +3,14 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyMonitor;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
+
 import org.apache.log4j.Logger;
 import org.globus.common.ChainedIOException;
 import org.globus.ftp.DataChannelAuthentication;
@@ -166,7 +168,14 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         }
     }
 
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+    public void copy(String sourceAbsolutePath, 
+    					String targetHost, 
+    					int targetPort, 
+    					String targetAbsolutePath, 
+    					boolean overwrite, 
+    					String additionalArgs,
+    					DataCopyMonitor progressMonitor) 
+    		throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         // connect to peer server
         GsiftpDataAdaptorAbstract targetAdaptor;
         String type = this.getType();
@@ -204,7 +213,11 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
             m_client.setMode(GridFTPSession.MODE_EBLOCK);
             targetAdaptor.m_client.setMode(GridFTPSession.MODE_EBLOCK);
             m_client.setStripedActive(targetAdaptor.m_client.setStripedPassive());
-            m_client.extendedTransfer(sourceAbsolutePath, targetAdaptor.m_client, targetAbsolutePath, null);
+            if (progressMonitor == null) {
+            	m_client.extendedTransfer(sourceAbsolutePath, targetAdaptor.m_client, targetAbsolutePath, null);
+            } else {
+            	m_client.extendedTransfer(sourceAbsolutePath, targetAdaptor.m_client, targetAbsolutePath, new CopyListener(progressMonitor));
+            }
         } catch (Exception e) {
             throw rethrowExceptionFull(e);
         } finally {

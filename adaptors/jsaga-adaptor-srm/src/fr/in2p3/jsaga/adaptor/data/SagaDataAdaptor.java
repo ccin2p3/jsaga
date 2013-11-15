@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyMonitor;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
@@ -18,6 +19,7 @@ import org.ogf.saga.file.File;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.task.Task;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
@@ -145,7 +147,7 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         }
     }
 
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs, DataCopyMonitor progressMonitor) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         URL targetUrl;
         try {
             String protocol = m_rootUrl.getScheme();
