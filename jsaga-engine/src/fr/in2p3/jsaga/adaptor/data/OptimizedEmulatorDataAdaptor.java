@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.data.impl.DataEmulatorConnection;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyMonitor;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.*;
 import org.exolab.castor.xml.Marshaller;
@@ -37,7 +38,7 @@ public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements
     		String targetAbsolutePath, 
     		boolean overwrite, 
     		String additionalArgs,
-    		Task progressMonitor) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+    		DataCopyMonitor progressMonitor) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         File file = m_server.getFile(sourceAbsolutePath);
         DataEmulatorConnection targetServer = new DataEmulatorConnection(this.getType(), targetHost, targetPort);
 

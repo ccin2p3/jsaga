@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.file.copy;
 
+import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyMonitor;
 import fr.in2p3.jsaga.impl.monitoring.*;
 import fr.in2p3.jsaga.impl.task.AbstractTaskImpl;
 import org.ogf.saga.SagaObject;
@@ -20,7 +21,7 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public abstract class AbstractCopyTask<T extends SagaObject,E> extends AbstractTaskImpl<T,E> implements Task<T,E> {
+public abstract class AbstractCopyTask<T extends SagaObject,E> extends AbstractTaskImpl<T,E> implements Task<T,E>, DataCopyMonitor {
     public static final String FILE_COPY_PROGRESS = "file.copy.progress";
     // internal
     private URL m_target;
@@ -66,7 +67,11 @@ public abstract class AbstractCopyTask<T extends SagaObject,E> extends AbstractT
     }
 
     public void increment(long writtenBytes) {
-        m_totalWrittenBytes += writtenBytes;
+    	this.setTotal(m_totalWrittenBytes + writtenBytes);
+    }
+
+    public void setTotal(long writtenBytes) {
+        m_totalWrittenBytes = writtenBytes;
         m_metric_Progress.setValue(m_totalWrittenBytes);
     }
 

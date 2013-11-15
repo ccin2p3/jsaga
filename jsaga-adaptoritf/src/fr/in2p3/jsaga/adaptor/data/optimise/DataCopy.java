@@ -3,7 +3,6 @@ package fr.in2p3.jsaga.adaptor.data.optimise;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import org.ogf.saga.error.*;
-import org.ogf.saga.task.Task;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -38,7 +37,7 @@ public interface DataCopy extends DataAdaptor {
     					String targetAbsolutePath, 
     					boolean overwrite, 
     					String additionalArgs,
-    					Task progressMonitor)
+    					DataCopyMonitor progressMonitor)
         throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException;
 
     /**

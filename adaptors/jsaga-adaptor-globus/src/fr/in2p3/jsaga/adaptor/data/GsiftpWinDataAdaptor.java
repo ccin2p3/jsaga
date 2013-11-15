@@ -1,10 +1,11 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import fr.in2p3.jsaga.adaptor.security.GlobusSecurityCredential;
-import fr.in2p3.jsaga.adaptor.security.MyProxySecurityCredential;
 import org.globus.ftp.DataChannelAuthentication;
 import org.globus.ftp.exception.ServerException;
 import org.ogf.saga.error.*;
+
+import fr.in2p3.jsaga.adaptor.security.GlobusSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.MyProxySecurityCredential;
 
 import java.io.IOException;
 import java.util.Map;
