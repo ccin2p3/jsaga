@@ -12,17 +12,17 @@
         </context>
     </contexts>
     <session>
-        <context type="Globus" id="DemoCert">
+        <!-- <context type="Globus" id="DemoCert">
             <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/globus/certificates/"/>
             <attribute name="UserCert" value="${user.home}/.jsaga/contexts/globus/usercert.pem"/>
             <attribute name="UserKey" value="${user.home}/.jsaga/contexts/globus/userkey.pem"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/perso_cred.txt"/>
             <job type="gatekeeper">
                 <attribute name="TcpPortRange" value="30000,31000"/>
-                <!-- <attribute name="ShellPath" value="c:\cygwin\bin\sh.exe"/>-->
+                <attribute name="ShellPath" value="c:\cygwin\bin\sh.exe"/>
             </job>
             <include host="localhost"/>
-        </context>
+        </context>-->
         <context type="Globus">
             <data type="gsiftp"/>
             <job type="gk"/>
