@@ -158,7 +158,8 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 //    		m_sftp = new SFTPv3Client(m_conn);
 
     	} catch (Exception e) {
-			m_conn.close();
+			if (m_conn != null)
+			    m_conn.close();
     		if("Auth fail".equals(e.getMessage()) )
     			throw new AuthenticationFailedException(e);
     		throw new NoSuccessException("Unable to connect to server", e);
