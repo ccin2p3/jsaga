@@ -28,7 +28,7 @@ public class SSHSecurityAdaptor implements SecurityAdaptor {
 	public static final String USER_PUBLICKEY = "UserPublicKey";
 	
 	public String getType() {
-    	return "SSH";
+    	return "DEPRECATED-SSH";
     }
 	
     public Class getSecurityCredentialClass() {

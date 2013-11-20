@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <contexts>
-        <context type="SSH">
+        <context type="DEPRECATED-SSH">
             <!-- <attribute name="UserID" value="${user.name}"/>--><!-- optional -->
             <attribute name="UserKey" value="${user.home}/.jsaga/contexts/ssh/id_rsa"/>
             <attribute name="UserPass" value="${SSHKEY_PASSPHRASE}"/>
@@ -11,8 +11,8 @@
         </context>
     </contexts>
     <session>
-        <context type="SSH"/>
-	    <context type="SSH" id="sreynaud">
+        <context type="DEPRECATED-SSH"/>
+	    <context type="DEPRECATED-SSH" id="sreynaud">
             <attribute name="UserID" value="sreynaud"/>
             <attribute name="UserKey" value="${user.home}/.jsaga/contexts/ssh/sreynaud"/>
             <data type="deprecated-sftp">
