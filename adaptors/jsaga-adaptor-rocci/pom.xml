@@ -45,6 +45,7 @@
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-voms</artifactId>
             <version>0.9.17-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>commons-net</groupId>

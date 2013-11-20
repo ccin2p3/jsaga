@@ -75,7 +75,11 @@
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
-	<repositories>
+    <repositories>
+        <repository>
+            <id>maatg-snapshots</id>
+            <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
+        </repository>
 		<repository>
 			<id>emi-infn-repo</id>
 			<url>http://www.pd.infn.it/~andreett/pub/maven/repository/</url>
