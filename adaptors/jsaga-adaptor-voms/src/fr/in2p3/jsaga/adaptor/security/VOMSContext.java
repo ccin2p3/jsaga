@@ -19,6 +19,7 @@ public class VOMSContext {
     public static final String USERFQAN = "UserFQAN";
     public static final String DELEGATION = "Delegation";
     public static final String PROXYTYPE = "ProxyType";
+    public static final String INITIALPROXY = "InitialProxy";
 
     // MyProxy attributes
     public static final String MYPROXYSERVER = "MyProxyServer";

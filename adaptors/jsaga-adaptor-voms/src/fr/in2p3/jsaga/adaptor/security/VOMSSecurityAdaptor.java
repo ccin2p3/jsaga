@@ -55,6 +55,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
     protected static final int USAGE_INIT_PEM = 2;
     protected static final int USAGE_MEMORY = 3;
     protected static final int USAGE_LOAD = 4;
+    protected static final int USAGE_INIT_PROXY = 5;
 
     public String getType() {
         return "VOMS";
@@ -69,6 +70,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                 new UOr(new Usage[]{
                         new UAnd(new Usage[]{
                                 new UOr(new Usage[]{
+                                        new UFilePath(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY),
                                         new UFilePath(USAGE_INIT_PKCS12, VOMSContext.USERCERTKEY),
                                         new UAnd(USAGE_INIT_PEM, new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)})
                                 }),
@@ -190,6 +192,27 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                     }
                     return this.createSecurityAdaptor(cred, attributes);
                 }
+                case USAGE_INIT_PROXY:
+                {
+                    // TODO: use GlobusSecurityAdaptor.createSecurityCredential()
+                    CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
+                    GSSCredential globusCred = null;
+                    File initialProxy = new File((String) attributes.get(VOMSContext.INITIALPROXY));
+//                    byte [] proxyBytes = new byte[(int) initialProxy.length()];
+//                    FileInputStream in = new FileInputStream(initialProxy);
+//                    in.read(proxyBytes);
+//                    in.close();
+//                    ExtendedGSSManager manager = (ExtendedGSSManager) ExtendedGSSManager.getInstance();
+//                    cred = manager.createCredential(
+//                            proxyBytes,
+//                            ExtendedGSSCredential.IMPEXP_OPAQUE,
+//                            GSSCredential.DEFAULT_LIFETIME,
+//                            null, // use default mechanism: GSI
+//                            GSSCredential.INITIATE_AND_ACCEPT);
+                    globusCred = load(initialProxy);
+                    GSSCredential cred = new VOMSProxyFactory(attributes, globusCred).createProxy();
+                    return this.createSecurityAdaptor(cred, attributes);
+                }
                 default:
                     throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
             }
@@ -242,7 +265,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
         if (cred instanceof GlobusGSSCredentialImpl) {
             X509Credential globusProxy = ((GlobusGSSCredentialImpl)cred).getX509Credential();
 	        try {
-				if (!VOMSACUtils.getACsFromCertificate(globusProxy.getCertificateChain()[0]).isEmpty()) {
+                if (!VOMSACUtils.getACsFromCertificate(globusProxy.getCertificateChain()[0]).isEmpty()) {
 				    return new VOMSSecurityCredential(cred, attributes);
 				} else {
 				    throw new IncorrectStateException("Security context is not of type: "+this.getType());
