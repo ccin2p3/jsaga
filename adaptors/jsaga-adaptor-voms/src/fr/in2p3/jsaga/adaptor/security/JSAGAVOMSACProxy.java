@@ -5,6 +5,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.security.cert.CertificateParsingException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
@@ -85,9 +86,11 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
 
     public X509Credential getVOMSProxyCertificate(X509Credential credential, VOMSACRequest vomsacRequest) throws CredentialException, VOMSException{
         eu.emi.security.authn.x509.X509Credential emiCred;
+        X509Certificate[] chain;
         try {
-            emiCred = new KeyAndCertCredential(credential.getPrivateKey(),
-                    credential.getCertificateChain());
+            chain = new X509Certificate[credential.getCertificateChain().length-1];
+            System.arraycopy(credential.getCertificateChain(), 1, chain, 0, chain.length);
+            emiCred = new KeyAndCertCredential(credential.getPrivateKey(), credential.getCertificateChain());
         } catch (KeyStoreException e) {
             throw new CredentialException(e);
         }
@@ -99,7 +102,7 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
                 throw new VOMSException("Unable to get a single requested VOMSAttribute");
             }
         }
-        ProxyCertificateOptions proxyOptions = new ProxyCertificateOptions(emiCred.getCertificateChain());
+        ProxyCertificateOptions proxyOptions = new ProxyCertificateOptions(chain);
         if(attributeCertificate != null){
             proxyOptions.setAttributeCertificates(new AttributeCertificate[] {attributeCertificate});
         }
