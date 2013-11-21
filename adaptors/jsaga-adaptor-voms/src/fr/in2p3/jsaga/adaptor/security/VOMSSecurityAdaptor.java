@@ -198,18 +198,9 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                     CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
                     GSSCredential globusCred = null;
                     File initialProxy = new File((String) attributes.get(VOMSContext.INITIALPROXY));
-//                    byte [] proxyBytes = new byte[(int) initialProxy.length()];
-//                    FileInputStream in = new FileInputStream(initialProxy);
-//                    in.read(proxyBytes);
-//                    in.close();
-//                    ExtendedGSSManager manager = (ExtendedGSSManager) ExtendedGSSManager.getInstance();
-//                    cred = manager.createCredential(
-//                            proxyBytes,
-//                            ExtendedGSSCredential.IMPEXP_OPAQUE,
-//                            GSSCredential.DEFAULT_LIFETIME,
-//                            null, // use default mechanism: GSI
-//                            GSSCredential.INITIATE_AND_ACCEPT);
                     globusCred = load(initialProxy);
+                    if (globusCred.getRemainingLifetime() <= 0)
+                        throw new NoSuccessException("the initial proxy has expired");
                     GSSCredential cred = new VOMSProxyFactory(attributes, globusCred).createProxy();
                     return this.createSecurityAdaptor(cred, attributes);
                 }
