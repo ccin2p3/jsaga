@@ -1,16 +1,26 @@
 package fr.in2p3.jsaga.adaptor.security;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.bouncycastle.asn1.x509.AttributeCertificate;
+import org.bouncycastle.openssl.PasswordFinder;
 import org.globus.gsi.CredentialException;
 import org.globus.gsi.X509Credential;
+import org.globus.gsi.util.CertificateLoadUtil;
 import org.italiangrid.voms.VOMSError;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSESLookupStrategy;
@@ -24,6 +34,7 @@ import org.italiangrid.voms.request.impl.DefaultVOMSServerInfoStore;
 import org.italiangrid.voms.request.impl.LegacyProtocol;
 import org.italiangrid.voms.request.impl.RESTProtocol;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
+import org.italiangrid.voms.util.CredentialsUtils;
 import org.italiangrid.voms.util.NullListener;
 
 import eu.emi.security.authn.x509.impl.KeyAndCertCredential;
@@ -86,14 +97,21 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
 
     public X509Credential getVOMSProxyCertificate(X509Credential credential, VOMSACRequest vomsacRequest) throws CredentialException, VOMSException{
         eu.emi.security.authn.x509.X509Credential emiCred;
-        X509Certificate[] chain;
-        try {
-            chain = new X509Certificate[credential.getCertificateChain().length-1];
-            System.arraycopy(credential.getCertificateChain(), 1, chain, 0, chain.length);
-            emiCred = new KeyAndCertCredential(credential.getPrivateKey(), credential.getCertificateChain());
-        } catch (KeyStoreException e) {
-            throw new CredentialException(e);
-        }
+//      X509Certificate[] chain;
+      try {
+          for (X509Certificate c: credential.getCertificateChain()) {
+              System.out.println(c.getSubjectDN());
+          }
+//          chain = new X509Certificate[credential.getCertificateChain().length-1];
+//          System.arraycopy(credential.getCertificateChain(), 1, chain, 0, chain.length);
+          emiCred = new KeyAndCertCredential(credential.getPrivateKey(), credential.getCertificateChain());
+      } catch (KeyStoreException e) {
+          throw new CredentialException(e);
+      }
+      return this.getVOMSProxyCertificate(emiCred, vomsacRequest);
+    }
+    
+    public X509Credential getVOMSProxyCertificate(eu.emi.security.authn.x509.X509Credential emiCred, VOMSACRequest vomsacRequest) throws CredentialException, VOMSException{
         AttributeCertificate attributeCertificate = null;
         if(vomsacRequest != null){
             attributeCertificate = getVOMSAttributeCertificate(emiCred, vomsacRequest);
@@ -102,7 +120,7 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
                 throw new VOMSException("Unable to get a single requested VOMSAttribute");
             }
         }
-        ProxyCertificateOptions proxyOptions = new ProxyCertificateOptions(chain);
+        ProxyCertificateOptions proxyOptions = new ProxyCertificateOptions(emiCred.getCertificateChain());
         if(attributeCertificate != null){
             proxyOptions.setAttributeCertificates(new AttributeCertificate[] {attributeCertificate});
         }
@@ -115,6 +133,13 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
         }
         ProxyCertificate proxyCert;
         try {
+            // avec la clé originale ça marche
+//            PrivateKey privateKey = CertificateLoadUtil.loadPrivateKey("/home/schwarz/.globus/userkey.pem", new PasswordFinder() {
+//                public char[] getPassword() {
+//                    return "xxx".toCharArray();
+//                }
+//            });
+//            proxyCert = ProxyGenerator.generate(proxyOptions, privateKey);
             proxyCert = ProxyGenerator.generate(proxyOptions, emiCred.getKey());
         } catch (InvalidKeyException e) {
             throw new CredentialException(e);
@@ -124,6 +149,40 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
             throw new CredentialException(e);
         } catch (NoSuchAlgorithmException e) {
             throw new CredentialException(e);
+//        } catch (IOException e) {
+//            throw new CredentialException(e);
+//        } catch (GeneralSecurityException e) {
+//            throw new CredentialException(e);
+        }
+        try {
+            CredentialsUtils.saveProxyCredentials(new FileOutputStream("/tmp/lsz"), proxyCert.getCredential());
+        } catch (UnrecoverableKeyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         return new X509Credential(proxyCert.getPrivateKey(), proxyCert.getCertificateChain());
     }
