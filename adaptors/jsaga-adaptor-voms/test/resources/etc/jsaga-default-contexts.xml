@@ -8,7 +8,8 @@
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
             <attribute name="UserVO" value="dteam"/>
             <attribute name="InitialProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>
-            <attribute name="ProxyType" value="old"/>
+            <attribute name="UserPass" value="dummy"/>
+            <!-- <attribute name="ProxyType" value="old"/> -->
         </context>
 <!-- FIXME: this does not work anymore
         <context type="VOMS">

@@ -59,7 +59,7 @@ public class VOMSProxyFactory {
     public static final String DEFAULTLIFE_TIME = "PT12H";
     private JSAGAVOMSACProxy m_jsagaVomsACProxy;
     private DefaultVOMSACRequest m_vomsACRequest;
-    private X509Credential m_userCredential;
+    private Object m_userCredential;
     private final String m_userProxyFile;
     private final String vomsdir;
     private final String cadir;
@@ -78,7 +78,14 @@ public class VOMSProxyFactory {
         this(attributes, CERTIFICATE_PEM, cred);
     }
 
-    private VOMSProxyFactory(Map attributes, int certificateFormat, GSSCredential cred) throws BadParameterException, ParseException, URISyntaxException {
+    /**
+     * constructor for creating VOMS proxies from globus proxy
+     */
+    public VOMSProxyFactory(Map attributes, eu.emi.security.authn.x509.X509Credential cred) throws BadParameterException, ParseException, URISyntaxException {
+        this(attributes, CERTIFICATE_PEM, cred);
+    }
+
+    private VOMSProxyFactory(Map attributes, int certificateFormat, Object cred) throws BadParameterException, ParseException, URISyntaxException {
         // required attributes
         cadir = (String) attributes.get(Context.CERTREPOSITORY);
         vomsdir = (String) attributes.get(VOMSContext.VOMSDIR);
@@ -123,6 +130,8 @@ public class VOMSProxyFactory {
         if (cred != null) {
             if (cred instanceof GlobusGSSCredentialImpl) {
             	m_userCredential = ((GlobusGSSCredentialImpl) cred).getX509Credential();
+            } else if (cred instanceof eu.emi.security.authn.x509.X509Credential){
+                m_userCredential = (eu.emi.security.authn.x509.X509Credential)cred;
             } else {
                 throw new BadParameterException("Not a globus proxy");
             }
@@ -259,13 +268,25 @@ public class VOMSProxyFactory {
         if ("NOVO".equals(m_vomsACRequest.getVoName())) {
             // TEST to create gridProxy :
             try {
-				globusProxy = m_jsagaVomsACProxy.getVOMSProxyCertificate(m_userCredential, null);
+                if (m_userCredential instanceof X509Credential) {
+                    globusProxy = m_jsagaVomsACProxy.getVOMSProxyCertificate((X509Credential)m_userCredential, null);
+                } else if (m_userCredential instanceof eu.emi.security.authn.x509.X509Credential) {
+                    globusProxy = m_jsagaVomsACProxy.getVOMSProxyCertificate((eu.emi.security.authn.x509.X509Credential)m_userCredential, null);
+                } else {
+                    throw new NoSuccessException("Internal error type of user credential");
+                }
 			} catch (CredentialException e) {
 				throw new NoSuccessException("Unable to generate the requested Grid proxy (NOVO)", e);
 			}
         } else {
             try {
-				globusProxy = m_jsagaVomsACProxy.getVOMSProxyCertificate(m_userCredential, m_vomsACRequest);
+                if (m_userCredential instanceof X509Credential) {
+                    globusProxy = m_jsagaVomsACProxy.getVOMSProxyCertificate((X509Credential)m_userCredential, m_vomsACRequest);
+                } else if (m_userCredential instanceof eu.emi.security.authn.x509.X509Credential) {
+                    globusProxy = m_jsagaVomsACProxy.getVOMSProxyCertificate((eu.emi.security.authn.x509.X509Credential)m_userCredential, m_vomsACRequest);
+                } else {
+                    throw new NoSuccessException("Internal error type of user credential");
+                }
 			} catch (CredentialException e) {
 				throw new NoSuccessException("Unable to generate the requested VOMS proxy", e);
 			}
