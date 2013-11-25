@@ -35,10 +35,6 @@
                 <checksumPolicy>fail</checksumPolicy>
             </snapshots>
         </repository>
-        <repository>
-            <id>CNAF-repo</id>
-            <url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-releases</url>
-        </repository>
     </repositories>
     <dependencies>
         <dependency><!-- for security context (WARNING: order of dependencies matters) -->
