@@ -37,13 +37,17 @@
         <dependency>
 			<groupId>org.italiangrid</groupId>
 			<artifactId>voms-api-java</artifactId>
-			<version>3.0.0</version>
+			<version>3.0.2</version>
 		</dependency>
     </dependencies>
     <repositories>
         <repository>
             <id>maatg-snapshots</id>
             <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
+        </repository>
+        <repository>
+            <id>CNAF-repo</id>
+            <url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-releases</url>
         </repository>
     </repositories>
 </project>

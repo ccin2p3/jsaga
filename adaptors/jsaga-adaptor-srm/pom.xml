@@ -3,12 +3,12 @@
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
         <version>0.9.17-SNAPSHOT</version>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>jsaga-adaptor-srm</artifactId>
-	<name>Adaptors for SRM</name>
-	<description>This module provides support for version 2.2 of the data management protocol SRM (Storage Resource Manager).</description>
-	<developers>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>jsaga-adaptor-srm</artifactId>
+    <name>Adaptors for SRM</name>
+    <description>This module provides support for version 2.2 of the data management protocol SRM (Storage Resource Manager).</description>
+    <developers>
         <developer>
             <name>Sylvain Reynaud</name>
             <email>sreynaud@in2p3.fr</email>
@@ -27,88 +27,92 @@
                 <organizationLogoUrl>http://cc.in2p3.fr/plugins/kitcnrs/images/logoCC72.gif</organizationLogoUrl>
             </properties>
         </developer>
-		<developer>
-			<name>Jérôme Revillard</name>
-			<email>jrevillard@gnubila.fr</email>
-			<organization>gnúbila France</organization>
-			<organizationUrl>http://gnubila.fr/</organizationUrl>
-			<properties>
-				<organizationLogoUrl>https://www.gnubila.fr/documents/10157/0/Gnubila-Cloud-1000.png</organizationLogoUrl>
-			</properties>
-		</developer>
-	</developers>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>axistools-maven-plugin</artifactId>
-				<!--<version>1.0</version>--><!-- axis 1.2.1 -->
-				<version>1.1</version><!-- axis 1.4 -->
-				<executions>
-					<execution>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>wsdl2java</goal>
-						</goals>
-						<configuration>
-							<sourceDirectory>${basedir}/resources/wsdl</sourceDirectory>
-							<fileNamespaceToPackage>${basedir}/resources/wsdl/NStoPkg.properties</fileNamespaceToPackage>
-							<outputDirectory>${project.build.directory}/generated-sources/src</outputDirectory>
-							<timestampDirectory>${project.build.directory}</timestampDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-	<dependencies>
-		<dependency><!-- needed for security context -->
-			<groupId>fr.in2p3.jsaga.adaptor</groupId>
-			<artifactId>jsaga-adaptor-voms</artifactId>
-			<version>0.9.17-SNAPSHOT</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency><!-- needed for gsiftp (WARNING: order of dependencies matters) -->
-			<groupId>fr.in2p3.jsaga.adaptor</groupId>
-			<artifactId>jsaga-adaptor-globus</artifactId>
-			<version>0.9.17-SNAPSHOT</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.italiangrid</groupId>
-			<artifactId>voms-api-java</artifactId>
-			<version>3.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jglobus</groupId>
-			<artifactId>gss</artifactId>
-			<version>2.0-Beta6-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>axis</groupId>
-			<artifactId>axis</artifactId>
-			<version>1.4-patched</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.globus</groupId>
-			<artifactId>cog-axis</artifactId>
-			<version>gt4</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency><!-- needed for registering httpg protocol -->
-			<groupId>org.globus</groupId>
-			<artifactId>cog-url</artifactId>
-			<version>1.4</version>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.8</version>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
-    <repositories>
+        <developer>
+            <name>Jérôme Revillard</name>
+            <email>jrevillard@gnubila.fr</email>
+            <organization>gnúbila France</organization>
+            <organizationUrl>http://gnubila.fr/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>https://www.gnubila.fr/documents/10157/0/Gnubila-Cloud-1000.png</organizationLogoUrl>
+            </properties>
+        </developer>
+    </developers>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>axistools-maven-plugin</artifactId>
+                <!--<version>1.0</version>--><!-- axis 1.2.1 -->
+                <version>1.1</version><!-- axis 1.4 -->
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${basedir}/resources/wsdl</sourceDirectory>
+                            <fileNamespaceToPackage>${basedir}/resources/wsdl/NStoPkg.properties</fileNamespaceToPackage>
+                            <outputDirectory>${project.build.directory}/generated-sources/src</outputDirectory>
+                            <timestampDirectory>${project.build.directory}</timestampDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency><!-- needed for security context -->
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-voms</artifactId>
+            <version>0.9.17-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency><!-- needed for gsiftp (WARNING: order of dependencies matters) -->
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-globus</artifactId>
+            <version>0.9.17-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.italiangrid</groupId>
+            <artifactId>voms-api-java</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jglobus</groupId>
+            <artifactId>gss</artifactId>
+            <version>2.0-Beta6-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4-patched</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>cog-axis</artifactId>
+            <version>gt4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency><!-- needed for registering httpg protocol -->
+            <groupId>org.globus</groupId>
+            <artifactId>cog-url</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.8</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+     <repositories>
+        <repository>
+            <id>CNAF-repo</id>
+            <url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-releases</url>
+        </repository>
         <repository>
             <id>maatg-snapshots</id>
             <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>

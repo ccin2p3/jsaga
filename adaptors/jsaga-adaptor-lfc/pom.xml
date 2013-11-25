@@ -3,73 +3,77 @@
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
         <version>0.9.17-SNAPSHOT</version>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>jsaga-adaptor-lfc</artifactId>
-	<name>Adaptors for LFC</name>
-	<description>This module provides support for gLite Logical File Catalog (LFC).</description>
-	<developers>
-		<developer>
-			<name>Jérôme Revillard</name>
-			<email>jrevillard@gnubila.fr</email>
-			<organization>gnúbila France</organization>
-			<organizationUrl>http://gnubila.fr/</organizationUrl>
-			<properties>
-				<organizationLogoUrl>https://www.gnubila.fr/documents/10157/0/Gnubila-Cloud-1000.png</organizationLogoUrl>
-			</properties>
-		</developer>
-	</developers>
-	<repositories>
-		<repository>
-			<id>maatg-fr-releases</id>
-			<name>maatG France Releases</name>
-			<url>http://nexus.maatg.fr/content/repositories/maatg-fr-releases</url>
-		</repository>
-		<repository>
-			<id>maatg-fr-snapshots</id>
-			<name>maatG France Snapshots</name>
-			<url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</repository>
-	</repositories>
-	<dependencies>
-		<dependency><!-- for security context (WARNING: order of dependencies matters) -->
-			<groupId>fr.in2p3.jsaga.adaptor</groupId>
-			<artifactId>jsaga-adaptor-voms</artifactId>
-			<version>0.9.17-SNAPSHOT</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.16</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>fr.maatg</groupId>
-			<artifactId>glite.dm</artifactId>
-			<version>0.5.4-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.italiangrid</groupId>
-			<artifactId>voms-api-java</artifactId>
-			<version>3.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>fr.in2p3.jsaga.adaptor</groupId>
-			<artifactId>jsaga-adaptor-classic</artifactId>
-			<version>0.9.17-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>fr.in2p3.jsaga.adaptor</groupId>
-			<artifactId>jsaga-adaptor-srm</artifactId>
-			<version>0.9.17-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>jsaga-adaptor-lfc</artifactId>
+    <name>Adaptors for LFC</name>
+    <description>This module provides support for gLite Logical File Catalog (LFC).</description>
+    <developers>
+        <developer>
+            <name>Jérôme Revillard</name>
+            <email>jrevillard@gnubila.fr</email>
+            <organization>gnúbila France</organization>
+            <organizationUrl>http://gnubila.fr/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>https://www.gnubila.fr/documents/10157/0/Gnubila-Cloud-1000.png</organizationLogoUrl>
+            </properties>
+        </developer>
+    </developers>
+    <repositories>
+        <repository>
+            <id>maatg-fr-releases</id>
+            <name>maatG France Releases</name>
+            <url>http://nexus.maatg.fr/content/repositories/maatg-fr-releases</url>
+        </repository>
+        <repository>
+            <id>maatg-fr-snapshots</id>
+            <name>maatG France Snapshots</name>
+            <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>CNAF-repo</id>
+            <url>http://radiohead.cnaf.infn.it:8081/nexus/content/repositories/cnaf-releases</url>
+        </repository>
+    </repositories>
+    <dependencies>
+        <dependency><!-- for security context (WARNING: order of dependencies matters) -->
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-voms</artifactId>
+            <version>0.9.17-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.maatg</groupId>
+            <artifactId>glite.dm</artifactId>
+            <version>0.5.4-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.italiangrid</groupId>
+            <artifactId>voms-api-java</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-classic</artifactId>
+            <version>0.9.17-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-srm</artifactId>
+            <version>0.9.17-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
