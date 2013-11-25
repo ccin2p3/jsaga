@@ -24,7 +24,7 @@
         <module>concurrent</module>
         <module>dbus-java</module>
         <!--<module>file-system</module>-->
-        <module>ganymed-ssh-2</module>
+        <!--<module>ganymed-ssh-2</module>-->
         <module>glite</module>
         <module>jargon</module>
         <module>jeldoclet</module>
