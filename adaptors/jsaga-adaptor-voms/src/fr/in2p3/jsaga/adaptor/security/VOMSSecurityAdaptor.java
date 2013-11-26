@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.globus.common.CoGProperties;
@@ -16,12 +18,18 @@ import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.italiangrid.voms.asn1.VOMSACUtils;
+import org.italiangrid.voms.clients.ProxyInitParams;
+import org.italiangrid.voms.clients.impl.DefaultVOMSCommandsParser;
+import org.italiangrid.voms.clients.impl.DefaultVOMSProxyInitBehaviour;
+import org.italiangrid.voms.clients.strategies.ProxyInitStrategy;
+import org.italiangrid.voms.request.impl.DefaultVOMSServerInfo;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.TimeoutException;
 
+import eu.emi.security.authn.x509.proxy.ProxyType;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.U;
@@ -70,7 +78,6 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                 new UOr(new Usage[]{
                         new UAnd(new Usage[]{
                                 new UOr(new Usage[]{
-                                        new UFilePath(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY),
                                         new UFilePath(USAGE_INIT_PKCS12, VOMSContext.USERCERTKEY),
                                         new UAnd(USAGE_INIT_PEM, new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)})
                                 }),
@@ -102,12 +109,14 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                         }),
                         new UNoPrompt(USAGE_MEMORY, VOMSContext.USERPROXYOBJECT),
                         new UOr(new Usage[]{
+                                new UFilePath(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY),
                         		new UFile(USAGE_LOAD, Context.USERPROXY),
                         		new UProxyValue(USAGE_LOAD,  Context.USERPROXY)
                         })
                 }),
                 new UFile(Context.CERTREPOSITORY),
                 new UFile(VOMSContext.VOMSDIR)
+//                new UFile(VOMSContext.VOMSES)
         });
     }
 
@@ -139,6 +148,10 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                         new File(env.getProperty("X509_VOMS_DIR")+""),
                         new File(System.getProperty("user.home")+"/.globus/vomsdir/"),
                         new File("/etc/grid-security/vomsdir/")}),
+//                new Default(VOMSContext.VOMSES, new File[]{
+//                        new File(System.getProperty("user.home")+"/.glite/vomses/"),
+//                        new File("/etc/vomses/")}),
+                // TODO: remove VomsesFile
                 new Default(Context.SERVER, new VomsesFile().getDefaultServer()),
                 new Default(Context.USERVO, new VomsesFile().getDefaultVO()),
                 new Default(Context.LIFETIME, "PT12H"),
@@ -194,15 +207,34 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                 }
                 case USAGE_INIT_PROXY:
                 {
-                    // TODO: use GlobusSecurityAdaptor.createSecurityCredential()
-                    CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
-                    GSSCredential globusCred = null;
-                    File initialProxy = new File((String) attributes.get(VOMSContext.INITIALPROXY));
-                    globusCred = load(initialProxy);
-                    if (globusCred.getRemainingLifetime() <= 0)
-                        throw new NoSuccessException("the initial proxy has expired");
-                    GSSCredential cred = new VOMSProxyFactory(attributes, globusCred).createProxy();
-                    return this.createSecurityAdaptor(cred, attributes);
+                    ProxyInitParams params = new ProxyInitParams();
+                    params.setCertFile((String)attributes.get(VOMSContext.INITIALPROXY));
+                    params.setGeneratedProxyFile((String)attributes.get(Context.USERPROXY));
+                    params.setNoRegen(true);
+                    params.setProxyType(ProxyType.LEGACY);
+                    params.setVomsdir((String) attributes.get(VOMSContext.VOMSDIR));
+                    params.setTrustAnchorsDir((String) attributes.get(Context.CERTREPOSITORY));
+
+//                    String serverUrl = (String) attributes.get(Context.SERVER);
+//                    URI uri = new URI(serverUrl.replaceAll(" ", "%20"));
+//                    if (uri.getHost() == null) {
+//                        throw new BadParameterException("Attribute Server has no host name: " + uri.toString());
+//                    }
+//                    DefaultVOMSServerInfo server = new DefaultVOMSServerInfo();
+//                    server.setURL(uri);
+//                    server.setVOMSServerDN(uri.getPath());
+//                    server.setVoName((String) attributes.get(Context.USERVO));
+
+                    params.setVerifyAC(true);
+                    params.setVomsCommands(Arrays.asList((String) attributes.get(Context.USERVO)));
+                    params.setVomsesLocations(Arrays.asList((String) attributes.get(VOMSContext.VOMSES)));
+                    VOMSProxyListener creation_listener = new VOMSProxyListener();
+
+                    ProxyInitStrategy proxyInitBehaviour = 
+                            new DefaultVOMSProxyInitBehaviour(new DefaultVOMSCommandsParser(), creation_listener);
+                    proxyInitBehaviour.initProxy(params);
+
+                    return new VOMSSecurityCredential(creation_listener.getProxy(), attributes);
                 }
                 default:
                     throw new NoSuccessException("INTERNAL ERROR: unexpected exception");

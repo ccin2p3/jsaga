@@ -45,8 +45,8 @@
         </dependency>
         <dependency>
             <groupId>org.italiangrid</groupId>
-            <artifactId>voms-api-java</artifactId>
-            <version>3.0.2</version>
+            <artifactId>voms-clients</artifactId>
+            <version>3.0.4</version>
         </dependency>
     </dependencies>
     <repositories>
