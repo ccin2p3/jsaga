@@ -23,23 +23,30 @@ import org.italiangrid.voms.store.LSCInfo;
 import eu.emi.security.authn.x509.ValidationError;
 import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 
+/* ***************************************************
+ * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+ * ***             http://cc.in2p3.fr/             ***
+ * ***************************************************
+ * File:   VOMSProxyListener
+ * Author: lionel.schwarz@in2p3.fr
+ * Date:   27 nov 2013
+ * ***************************************************
+ * Description: */
+
 public class VOMSProxyListener implements InitListenerAdapter {
 
     private GlobusGSSCredentialImpl m_proxy = null;
     private static final Logger logger = Logger.getLogger(VOMSProxyListener.class);
     
-    public void proxyCreated(String proxyPath, ProxyCertificate proxy,
-            List<String> warnings) {
+    public void proxyCreated(String proxyPath, ProxyCertificate proxy, List<String> warnings) {
         try {
             this.m_proxy = new GlobusGSSCredentialImpl(
                     new X509Credential(proxy.getPrivateKey(), proxy.getCertificateChain()),
                     GSSCredential.INITIATE_AND_ACCEPT);
         } catch (IllegalStateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Could not build GSSCredential", e);
         } catch (GSSException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Could not build GSSCredential", e);
         }
     }
 
@@ -77,16 +84,15 @@ public class VOMSProxyListener implements InitListenerAdapter {
     }
 
     public void notifyVOMSESInformationLoaded(String path, VOMSServerInfo endpoint) {
-        logger.info("VOMS information loaded : \n\t- path:" + path + "\n\t- endpoint: " + endpoint);
+        logger.debug("VOMS information loaded : \n\t- path:" + path + "\n\t- endpoint: " + endpoint);
     }
 
     public void notifyVOMSESlookup(String path) {
-        logger.info("VOMS information loading : \n\t- path:" + path);
+        logger.debug("VOMS information loading : \n\t- path:" + path);
     }
 
-    public void notifyCredentialLookup(String... arg0) {
-        // TODO Auto-generated method stub
-        
+    public void notifyCredentialLookup(String... locations) {
+        logger.error("Looking for credential in : " + Arrays.toString(locations));
     }
 
     public void notifyLoadCredentialFailure(Throwable error, String... locations) {
@@ -97,50 +103,44 @@ public class VOMSProxyListener implements InitListenerAdapter {
         logger.info("Loaded credential : \n\t -locations: " + Arrays.toString(locations));
     }
 
-    public boolean onValidationError(ValidationError arg0) {
-        // TODO Auto-generated method stub
+    public boolean onValidationError(ValidationError error) {
+        logger.error("Validation error : " + error.getMessage());
         return false;
     }
 
-    public void notifyCertficateLookupEvent(String arg0) {
-        // TODO Auto-generated method stub
-        
+    public void notifyCertficateLookupEvent(String dir) {
+        logger.debug("Looking certificates in : " + dir);
     }
 
-    public void notifyCertificateLoadEvent(X509Certificate arg0, File arg1) {
-        // TODO Auto-generated method stub
-        
+    public void notifyCertificateLoadEvent(X509Certificate cert, File file) {
+        logger.debug("AA Certificate for " + cert.getSubjectDN() + " has been loaded from " + file.getAbsolutePath());
     }
 
-    public void notifyLSCLoadEvent(LSCInfo arg0, File arg1) {
-        // TODO Auto-generated method stub
-        
+    public void notifyLSCLoadEvent(LSCInfo info, File file) {
+        logger.debug("LSC info for " + info.toString() + " has been loaded from " + file.getAbsolutePath());
     }
 
-    public void notifyLSCLookupEvent(String arg0) {
-        // TODO Auto-generated method stub
-        
+    public void notifyLSCLookupEvent(String dir) {
+        logger.debug("Looking LSCInfo in : " + dir);
     }
 
-    public void notifyHTTPRequest(String arg0) {
-        // TODO Auto-generated method stub
-        
+    public void notifyHTTPRequest(String url) {
+        logger.debug("HTTP request is : " + url);
     }
 
-    public void notifyLegacyRequest(String arg0) {
-        // TODO Auto-generated method stub
-        
+    public void notifyLegacyRequest(String req) {
+        logger.debug("Legacy request is : " + req);
     }
 
-    public void notifyReceivedResponse(VOMSResponse arg0) {
-        // TODO Auto-generated method stub
-        
+    public void notifyReceivedResponse(VOMSResponse response) {
+        logger.debug("Received VOMS response : " + response.getXMLAsString());
     }
 
-    public void loadingNotification(String arg0, String arg1, Severity arg2,
-            Exception arg3) {
-        // TODO Auto-generated method stub
-        
+    public void loadingNotification(String location, String type, Severity severity, Exception error) {
+        logger.debug("Updated " + type + " from " + location);
+        if (error != null) {
+            logger.warn("[" + severity.name() + "] " + error.getMessage());
+        }
     }
 
 }
