@@ -54,9 +54,6 @@ import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.italiangrid.voms.util.CredentialsUtils;
 import org.italiangrid.voms.util.VOMSFQANNamingScheme;
-import org.ogf.saga.context.Context;
-import org.ogf.saga.error.BadParameterException;
-
 import eu.emi.security.authn.x509.StoreUpdateListener;
 import eu.emi.security.authn.x509.ValidationErrorListener;
 import eu.emi.security.authn.x509.ValidationResult;
