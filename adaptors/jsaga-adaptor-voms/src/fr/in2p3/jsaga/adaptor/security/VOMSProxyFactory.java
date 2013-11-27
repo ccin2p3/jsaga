@@ -51,6 +51,7 @@ import fr.in2p3.jsaga.adaptor.security.JSAGAVOMSACProxy.VOMSException;
 /**
  *
  */
+@Deprecated
 public class VOMSProxyFactory {
 	private static final Logger logger = Logger.getLogger(VOMSProxyFactory.class);
 	

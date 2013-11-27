@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 /**
  *
  */
+@Deprecated
 public class VomsesFile {
     private Matcher m_vomses;
 

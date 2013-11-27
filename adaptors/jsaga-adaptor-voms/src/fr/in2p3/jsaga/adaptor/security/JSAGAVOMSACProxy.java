@@ -48,6 +48,7 @@ import eu.emi.security.authn.x509.proxy.ProxyType;
 /**
  * custom based on {@link DefaultVOMSACService} which ease the VOMS Credential creation
  */
+@Deprecated
 public class JSAGAVOMSACProxy extends DefaultVOMSACService {
 
     private int proxyLifetime = 86400;
