@@ -25,29 +25,16 @@ import org.ogf.saga.error.TimeoutException;
  * Description: a ProxyInitParams with the user password */
 public class JSAGAProxyInitParams extends ProxyInitParams {
 
-//    private String userPass;
-//    private String server;
     private Map m_attributes;
     
     public void setContext(Map a) {
         this.m_attributes = a;
     }
     
-    @Deprecated
-    public void setUserPass(String p){
-//        this.userPass = p;
-    }
-    
     public String getUserPass() {
-//        return this.userPass;
         return ((String)m_attributes.get(Context.USERPASS));
     }
     
-    @Deprecated
-    public void setServer(String s) {
-//        this.server = s;
-    }
-
     public String getServer() {
         return ((String)m_attributes.get(Context.SERVER));
     }
