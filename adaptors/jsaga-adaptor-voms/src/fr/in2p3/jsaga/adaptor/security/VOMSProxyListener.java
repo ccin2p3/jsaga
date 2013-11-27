@@ -26,7 +26,7 @@ import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 public class VOMSProxyListener implements InitListenerAdapter {
 
     private GlobusGSSCredentialImpl m_proxy = null;
-    private static final Logger logger = Logger.getLogger(VOMSProxyFactory.class);
+    private static final Logger logger = Logger.getLogger(VOMSProxyListener.class);
     
     public void proxyCreated(String proxyPath, ProxyCertificate proxy,
             List<String> warnings) {
