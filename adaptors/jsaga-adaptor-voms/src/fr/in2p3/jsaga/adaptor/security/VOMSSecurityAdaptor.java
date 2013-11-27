@@ -112,7 +112,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                 }),
                 new UFile(Context.CERTREPOSITORY),
                 new UFile(VOMSContext.VOMSDIR),
-                new UFile(VOMSContext.VOMSES)
+                new UOptional(VOMSContext.VOMSES)
         });
     }
 
@@ -169,19 +169,19 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
 
     public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, TimeoutException, NoSuccessException {
         try {
-            System.out.println("Usage: " + usage);
             switch(usage) {
                 case USAGE_INIT_PKCS12:
                 case USAGE_INIT_PEM:
                 case USAGE_INIT_PROXY:
                 {
                     JSAGAProxyInitParams params = new JSAGAProxyInitParams();
+                    params.setContext(attributes);
                     if (usage == USAGE_INIT_PROXY) {
                         params.setCertFile((String)attributes.get(VOMSContext.INITIALPROXY));
                         params.setNoRegen(true);
                     } else {
                         params.setNoRegen(false);
-                        params.setUserPass((String)attributes.get(Context.USERPASS));
+//                        params.setUserPass((String)attributes.get(Context.USERPASS));
                         if (usage == USAGE_INIT_PKCS12) {
                             params.setCertFile((String)attributes.get(VOMSContext.USERCERTKEY));
                         } else if (usage == USAGE_INIT_PEM) {
@@ -199,7 +199,9 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                     // TODO: is this useful?
                     params.setVerifyAC(true);
                     params.setVomsCommands(Arrays.asList((String) attributes.get(Context.USERVO)));
-                    params.setVomsesLocations(Arrays.asList((String) attributes.get(VOMSContext.VOMSES)));
+                    if (attributes.containsKey(VOMSContext.VOMSES)) {
+                        params.setVomsesLocations(Arrays.asList((String) attributes.get(VOMSContext.VOMSES)));
+                    }
                     VOMSProxyListener creation_listener = new VOMSProxyListener();
 
                     ProxyInitStrategy proxyInitBehaviour = 
