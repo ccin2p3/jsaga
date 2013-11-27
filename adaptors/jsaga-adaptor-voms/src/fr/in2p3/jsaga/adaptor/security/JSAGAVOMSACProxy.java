@@ -154,36 +154,6 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
 //        } catch (GeneralSecurityException e) {
 //            throw new CredentialException(e);
         }
-        try {
-            CredentialsUtils.saveProxyCredentials(new FileOutputStream("/tmp/lsz"), proxyCert.getCredential());
-        } catch (UnrecoverableKeyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         return new X509Credential(proxyCert.getPrivateKey(), proxyCert.getCertificateChain());
     }
 

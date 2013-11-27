@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -18,18 +17,14 @@ import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.italiangrid.voms.asn1.VOMSACUtils;
-import org.italiangrid.voms.clients.ProxyInitParams;
 import org.italiangrid.voms.clients.impl.DefaultVOMSCommandsParser;
-import org.italiangrid.voms.clients.impl.DefaultVOMSProxyInitBehaviour;
 import org.italiangrid.voms.clients.strategies.ProxyInitStrategy;
-import org.italiangrid.voms.request.impl.DefaultVOMSServerInfo;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.TimeoutException;
 
-import eu.emi.security.authn.x509.proxy.ProxyType;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.U;
@@ -43,7 +38,6 @@ import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.UOr;
 import fr.in2p3.jsaga.adaptor.base.usage.UProxyValue;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.security.JSAGAVOMSACProxy.VOMSException;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
 
 /* ***************************************************
@@ -52,7 +46,8 @@ import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
  * ***************************************************
  * File:   VOMSSecurityAdaptor
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
- * Date:   11 ao�t 2007
+ * Author: lionel.schwarz@in2p3.fr
+ * Date:   27 nov 2013
  * ***************************************************
  * Description:                                      */
 /**
@@ -115,8 +110,8 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                         })
                 }),
                 new UFile(Context.CERTREPOSITORY),
-                new UFile(VOMSContext.VOMSDIR)
-//                new UFile(VOMSContext.VOMSES)
+                new UFile(VOMSContext.VOMSDIR),
+                new UFile(VOMSContext.VOMSES)
         });
     }
 
@@ -148,9 +143,9 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                         new File(env.getProperty("X509_VOMS_DIR")+""),
                         new File(System.getProperty("user.home")+"/.globus/vomsdir/"),
                         new File("/etc/grid-security/vomsdir/")}),
-//                new Default(VOMSContext.VOMSES, new File[]{
-//                        new File(System.getProperty("user.home")+"/.glite/vomses/"),
-//                        new File("/etc/vomses/")}),
+                new Default(VOMSContext.VOMSES, new File[]{
+                        new File(System.getProperty("user.home")+"/.glite/vomses/"),
+                        new File("/etc/vomses/")}),
                 // TODO: remove VomsesFile
                 new Default(Context.SERVER, new VomsesFile().getDefaultServer()),
                 new Default(Context.USERVO, new VomsesFile().getDefaultVO()),
@@ -172,17 +167,44 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
 
     public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, TimeoutException, NoSuccessException {
         try {
+            System.out.println("Usage: " + usage);
             switch(usage) {
                 case USAGE_INIT_PKCS12:
-                {
-                    GSSCredential cred = new VOMSProxyFactory(attributes, VOMSProxyFactory.CERTIFICATE_PKCS12).createProxy();
-                    SecurityCredential s = this.createSecurityAdaptor(cred, attributes);
-                    return s;
-                }
                 case USAGE_INIT_PEM:
+                case USAGE_INIT_PROXY:
                 {
-                    GSSCredential cred = new VOMSProxyFactory(attributes, VOMSProxyFactory.CERTIFICATE_PEM).createProxy();
-                    return this.createSecurityAdaptor(cred, attributes);
+                    JSAGAProxyInitParams params = new JSAGAProxyInitParams();
+                    if (usage == USAGE_INIT_PROXY) {
+                        params.setCertFile((String)attributes.get(VOMSContext.INITIALPROXY));
+                        params.setNoRegen(true);
+                    } else {
+                        params.setNoRegen(false);
+                        params.setUserPass((String)attributes.get(Context.USERPASS));
+                        if (usage == USAGE_INIT_PKCS12) {
+                            params.setCertFile((String)attributes.get(VOMSContext.USERCERTKEY));
+                        } else if (usage == USAGE_INIT_PEM) {
+                            params.setCertFile((String)attributes.get(Context.USERCERT));
+                            params.setKeyFile((String)attributes.get(Context.USERKEY));
+                        }
+                    }
+                    
+                    params.setGeneratedProxyFile((String)attributes.get(Context.USERPROXY));
+                    // TODO: handle Proxy Type
+//                  params.setProxyType(ProxyType.RFC3820);
+                    params.setVomsdir((String) attributes.get(VOMSContext.VOMSDIR));
+                    params.setTrustAnchorsDir((String) attributes.get(Context.CERTREPOSITORY));
+                    
+                    // TODO: is this useful?
+                    params.setVerifyAC(true);
+                    params.setVomsCommands(Arrays.asList((String) attributes.get(Context.USERVO)));
+                    params.setVomsesLocations(Arrays.asList((String) attributes.get(VOMSContext.VOMSES)));
+                    VOMSProxyListener creation_listener = new VOMSProxyListener();
+
+                    ProxyInitStrategy proxyInitBehaviour = 
+                            new JSAGAVOMSProxyInitBehaviour(new DefaultVOMSCommandsParser(), creation_listener);
+                    proxyInitBehaviour.initProxy(params);
+
+                    return this.createSecurityAdaptor(creation_listener.getProxy(), attributes);
                 }
                 case USAGE_MEMORY:
                 {
@@ -205,37 +227,6 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                     }
                     return this.createSecurityAdaptor(cred, attributes);
                 }
-                case USAGE_INIT_PROXY:
-                {
-                    ProxyInitParams params = new ProxyInitParams();
-                    params.setCertFile((String)attributes.get(VOMSContext.INITIALPROXY));
-                    params.setGeneratedProxyFile((String)attributes.get(Context.USERPROXY));
-                    params.setNoRegen(true);
-                    params.setProxyType(ProxyType.LEGACY);
-                    params.setVomsdir((String) attributes.get(VOMSContext.VOMSDIR));
-                    params.setTrustAnchorsDir((String) attributes.get(Context.CERTREPOSITORY));
-
-//                    String serverUrl = (String) attributes.get(Context.SERVER);
-//                    URI uri = new URI(serverUrl.replaceAll(" ", "%20"));
-//                    if (uri.getHost() == null) {
-//                        throw new BadParameterException("Attribute Server has no host name: " + uri.toString());
-//                    }
-//                    DefaultVOMSServerInfo server = new DefaultVOMSServerInfo();
-//                    server.setURL(uri);
-//                    server.setVOMSServerDN(uri.getPath());
-//                    server.setVoName((String) attributes.get(Context.USERVO));
-
-                    params.setVerifyAC(true);
-                    params.setVomsCommands(Arrays.asList((String) attributes.get(Context.USERVO)));
-                    params.setVomsesLocations(Arrays.asList((String) attributes.get(VOMSContext.VOMSES)));
-                    VOMSProxyListener creation_listener = new VOMSProxyListener();
-
-                    ProxyInitStrategy proxyInitBehaviour = 
-                            new DefaultVOMSProxyInitBehaviour(new DefaultVOMSCommandsParser(), creation_listener);
-                    proxyInitBehaviour.initProxy(params);
-
-                    return new VOMSSecurityCredential(creation_listener.getProxy(), attributes);
-                }
                 default:
                     throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
             }
@@ -243,48 +234,11 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
             throw e;
         } catch(NoSuccessException e) {
             throw e;
-        } catch(VOMSException e) {
-            String msg = e.getMessage();
-            if (msg!=null && msg.endsWith("Connection timed out: connect")) {
-                throw new TimeoutException(e);
-            } else {
-                throw new NoSuccessException(e);
-            }
         } catch(Exception e) {
             throw new NoSuccessException(e);
         }
     }
     protected SecurityCredential createSecurityAdaptor(GSSCredential cred, Map attributes) throws IncorrectStateException {
-        // check if proxy contains extension
-        /*GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)cred).getGlobusCredential();        
-        if(hasNonCriticalExtensions(cred)) {
-    		if(CertUtil.isGsi3Proxy(globusProxy.getProxyType())){
-        		// check for Globus proxy
-        		System.out.println("Is a VOMSGlobus proxy");    		
-        	}
-        	else if(CertUtil.isGsi2Proxy(globusProxy.getProxyType())){
-        		// check for Globus proxy
-        		System.out.println("Is a VOMSGlobusLegacy proxy");    		
-        	}
-        	else if(CertUtil.isGsi4Proxy(globusProxy.getProxyType())){
-        		// check for Globus proxy
-        		System.out.println("Is a VOMSGlobusRFC820 proxy");    		
-        	} 
-    	}
-    	else {
-    		if(CertUtil.isGsi3Proxy(globusProxy.getProxyType())){
-    			// check for Globus proxy
-	    		System.out.println("Is a Globus proxy");    		
-	    	}
-	    	else if(CertUtil.isGsi2Proxy(globusProxy.getProxyType())){
-	    		// check for Globus proxy
-	    		System.out.println("Is a GlobusLegacy proxy");    		
-	    	}
-	    	else if(CertUtil.isGsi4Proxy(globusProxy.getProxyType())){
-	    		// check for Globus proxy
-	    		System.out.println("Is a GlobusRFC820 proxy");    		
-	    	}
-    	}*/
         if (cred instanceof GlobusGSSCredentialImpl) {
             X509Credential globusProxy = ((GlobusGSSCredentialImpl)cred).getX509Credential();
 	        try {

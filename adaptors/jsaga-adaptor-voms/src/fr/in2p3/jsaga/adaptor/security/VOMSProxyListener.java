@@ -2,8 +2,10 @@ package fr.in2p3.jsaga.adaptor.security;
 
 import java.io.File;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.globus.gsi.X509Credential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSCredential;
@@ -24,6 +26,7 @@ import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 public class VOMSProxyListener implements InitListenerAdapter {
 
     private GlobusGSSCredentialImpl m_proxy = null;
+    private static final Logger logger = Logger.getLogger(VOMSProxyFactory.class);
     
     public void proxyCreated(String proxyPath, ProxyCertificate proxy,
             List<String> warnings) {
@@ -44,42 +47,33 @@ public class VOMSProxyListener implements InitListenerAdapter {
         return this.m_proxy;
     }
     
-    public void notifyValidationResult(VOMSValidationResult arg0) {
-        // TODO Auto-generated method stub
-        
+    public void notifyValidationResult(VOMSValidationResult result) {
+        logger.info("VOMSValidation results: " + result.isValid());
     }
 
-    public void notifyErrorsInVOMSReponse(VOMSACRequest arg0,
-            VOMSServerInfo arg1, VOMSErrorMessage[] arg2) {
-        // TODO Auto-generated method stub
-        
+    public void notifyErrorsInVOMSReponse(VOMSACRequest request, VOMSServerInfo si, VOMSErrorMessage[] errors) {
+        logger.error("Errors In VOMS Reponse : \n\t- req:" + Arrays.toString(request.getRequestedFQANs().toArray()) + "\n\t- si: " + si + "\n\t- errors: " + Arrays.toString(errors));
     }
 
-    public void notifyVOMSRequestFailure(VOMSACRequest arg0,
-            VOMSServerInfo arg1, Throwable arg2) {
-        // TODO Auto-generated method stub
-        
+    public void notifyVOMSRequestFailure(VOMSACRequest request, VOMSServerInfo endpoint, Throwable error) {
+        logger.error("Errors In VOMS Reponse : \n\t- req:" + Arrays.toString(request.getRequestedFQANs().toArray()) + "\n\t- endpoint: " + endpoint + "\n\t- errors: " + error);
     }
 
-    public void notifyVOMSRequestStart(VOMSACRequest arg0, VOMSServerInfo arg1) {
-        // TODO Auto-generated method stub
-        
+    public void notifyVOMSRequestStart(VOMSACRequest request, VOMSServerInfo si) {
+        logger.debug("VOMS Request Start : \n\t- req:" + Arrays.toString(request.getRequestedFQANs().toArray()) + "\n\t- si: " + si);
     }
 
-    public void notifyVOMSRequestSuccess(VOMSACRequest arg0, VOMSServerInfo arg1) {
-        // TODO Auto-generated method stub
-        
+    public void notifyVOMSRequestSuccess(VOMSACRequest request, VOMSServerInfo endpoint) {
+        logger.info("VOMS Request Success : \n\t- req:" + Arrays.toString(request.getRequestedFQANs().toArray()) + "\n\t- endpoint: " + endpoint);
     }
 
-    public void notifyWarningsInVOMSResponse(VOMSACRequest arg0,
-            VOMSServerInfo arg1, VOMSWarningMessage[] arg2) {
-        // TODO Auto-generated method stub
+    public void notifyWarningsInVOMSResponse(VOMSACRequest request, VOMSServerInfo si, VOMSWarningMessage[] warnings) {
+        logger.warn("Warnings In VOMS Response : \n\t- req:" + Arrays.toString(request.getRequestedFQANs().toArray()) + "\n\t- si: " + si + "\n\t- warnings: " + Arrays.toString(warnings));
         
     }
 
     public void notifyNoValidVOMSESError(List<String> arg0) {
-        // TODO Auto-generated method stub
-        
+        logger.error("No valid VOMSES information found");
     }
 
     public void notifyVOMSESInformationLoaded(String arg0, VOMSServerInfo arg1) {
@@ -97,14 +91,12 @@ public class VOMSProxyListener implements InitListenerAdapter {
         
     }
 
-    public void notifyLoadCredentialFailure(Throwable arg0, String... arg1) {
-        // TODO Auto-generated method stub
-        
+    public void notifyLoadCredentialFailure(Throwable error, String... locations) {
+        logger.error("Could not load credential : \n\t -locations: " + Arrays.toString(locations) + "\n\t -error: " + error);
     }
 
-    public void notifyLoadCredentialSuccess(String... arg0) {
-        // TODO Auto-generated method stub
-        
+    public void notifyLoadCredentialSuccess(String... locations) {
+        logger.info("Loaded credential : \n\t -locations: " + Arrays.toString(locations));
     }
 
     public boolean onValidationError(ValidationError arg0) {
