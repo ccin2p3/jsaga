@@ -72,18 +72,16 @@ public class VOMSProxyListener implements InitListenerAdapter {
         
     }
 
-    public void notifyNoValidVOMSESError(List<String> arg0) {
-        logger.error("No valid VOMSES information found");
+    public void notifyNoValidVOMSESError(List<String> paths) {
+        logger.error("No valid VOMSES information found : \n\t" + Arrays.toString(paths.toArray()));
     }
 
-    public void notifyVOMSESInformationLoaded(String arg0, VOMSServerInfo arg1) {
-        // TODO Auto-generated method stub
-        
+    public void notifyVOMSESInformationLoaded(String path, VOMSServerInfo endpoint) {
+        logger.info("VOMS information loaded : \n\t- path:" + path + "\n\t- endpoint: " + endpoint);
     }
 
-    public void notifyVOMSESlookup(String arg0) {
-        // TODO Auto-generated method stub
-        
+    public void notifyVOMSESlookup(String path) {
+        logger.info("VOMS information loading : \n\t- path:" + path);
     }
 
     public void notifyCredentialLookup(String... arg0) {
