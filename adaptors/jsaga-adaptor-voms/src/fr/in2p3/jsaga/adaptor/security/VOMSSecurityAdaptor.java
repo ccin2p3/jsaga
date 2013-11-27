@@ -59,6 +59,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
     protected static final int USAGE_MEMORY = 3;
     protected static final int USAGE_LOAD = 4;
     protected static final int USAGE_INIT_PROXY = 5;
+    public static final String DEFAULT_LIFETIME = "PT12H";
 
     public String getType() {
         return "VOMS";
@@ -149,7 +150,8 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                 // TODO: remove VomsesFile
                 new Default(Context.SERVER, new VomsesFile().getDefaultServer()),
                 new Default(Context.USERVO, new VomsesFile().getDefaultVO()),
-                new Default(Context.LIFETIME, "PT12H"),
+                new Default(Context.LIFETIME, DEFAULT_LIFETIME),
+                // TODO: use constants
                 new Default(VOMSContext.PROXYTYPE, "RFC3820")
         };
     }
