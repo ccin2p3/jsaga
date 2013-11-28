@@ -85,8 +85,8 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                                     protected Object throwExceptionIfInvalid(Object value) throws Exception {
                                         if (super.throwExceptionIfInvalid(value) != null) {
                                             String v = (String) value;
-                                            if (!v.equalsIgnoreCase("none") && !v.equalsIgnoreCase("limited") && !v.equalsIgnoreCase("full")) {
-                                                throw new BadParameterException("Expected: none | limited | full");
+                                            if (!DelegationTypeMap.isValid(v)) {
+                                                throw new BadParameterException(DelegationTypeMap.getExpected());
                                             }
                                         }
                                         return value;
@@ -166,13 +166,11 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
 
     public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, TimeoutException, NoSuccessException {
         try {
-            System.out.println("case="+usage);
+//            System.out.println("case="+usage);
             switch(usage) {
                 case USAGE_INIT_PKCS12:
                 case USAGE_INIT_PEM:
                 case USAGE_INIT_PROXY:
-                    // TODO: handle USERFQAN
-                    // TODO: handle DELEGATION
                 {
                     JSAGAProxyInitParams params = new JSAGAProxyInitParams();
                     params.setContext(attributes);
@@ -209,8 +207,9 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                     // TODO: what about AcLifeTime ?
                     params.setProxyLifetimeInSeconds(UDuration.toInt(attributes.get(Context.LIFETIME)));
 
+                    params.setLimited(DelegationTypeMap.toLimitedValue((String)attributes.get(VOMSContext.DELEGATION)));
+                    
                     VOMSProxyListener creation_listener = new VOMSProxyListener();
-
                     ProxyInitStrategy proxyInitBehaviour = 
                             new JSAGAVOMSProxyInitBehaviour(new DefaultVOMSCommandsParser(), creation_listener);
                     proxyInitBehaviour.initProxy(params);
