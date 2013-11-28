@@ -97,28 +97,21 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 //			}
 //			throw new NoSuccessException(ioe);
 //		}
-
+	    SFTPv3Client sftp = null;
+	    SFTPInputStream is = null;
 		try {
-			SFTPv3Client cl = new SFTPv3Client(m_conn);
-//			cl.setRequestParallelism(10);
-			SFTPv3FileHandle f = cl.openFileRO(absolutePath);
+			sftp = new SFTPv3Client(m_conn);
+			SFTPv3FileHandle f = sftp.openFileRO(absolutePath);
 			byte[] buffer = new byte[SSHAdaptorAbstract.READ_BUFFER_LEN];
 			int len = 0;
-			// ~5s for Musique/soul-sacrifice.avi
-//			int offset = 0;
-//			while ((len=cl.read(f, offset, buffer, 0, buffer.length)) > 0) {
-//				stream.write(buffer, 0, len);
-//				offset += len;
-//			}
-			// ~5S 
-			SFTPInputStream is = new SFTPInputStream(f);
+			is = new SFTPInputStream(f);
 			while ((len=is.read(buffer, 0, READ_BUFFER_LEN)) > 0) {
 				stream.write(buffer, 0, len);
 			}
 			is.close();
 			stream.flush();
-			cl.closeFile(f);
-			cl.close();
+			sftp.closeFile(f);
+			sftp.close();
 		} catch (SFTPException sftpe) {
 			switch (sftpe.getServerErrorCode()) {
 				case ErrorCodes.SSH_FX_NO_SUCH_FILE:
@@ -131,16 +124,25 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		} catch (IOException ioe) {
 			throw new NoSuccessException(ioe);
 		} finally {
-			
+		    if (is != null)
+                try {
+                    is.close();
+                } catch (IOException e) {
+                }
+            if (sftp!=null) sftp.close();
 		}
 		
 	}
 
 	public boolean exists(String absolutePath, String additionalArgs)
 			throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        SFTPv3Client sftp = null;
 		try {
-			// if m_sftp.stat(...) is used, test_list_and_getAttributes fails with "the server sent an invalid id field" ...
-			return (new SFTPv3Client(m_conn).stat(absolutePath) != null);
+            sftp = new SFTPv3Client(m_conn);
+            sftp.setCharset(m_charset);
+            Boolean exists = (sftp.stat(absolutePath) != null);
+            sftp.close();
+			return exists;
 		} catch (SFTPException sftpe) {
 			switch (sftpe.getServerErrorCode()) {
 				case ErrorCodes.SSH_FX_NO_SUCH_FILE:
@@ -152,16 +154,20 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			}
 		} catch (IOException ioe) {
 			throw new NoSuccessException(ioe);
+        } finally {
+            if (sftp!=null) sftp.close();
 		}
 	}
 
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) 
     		throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         String filename = new EntryPath(absolutePath).getEntryName();
+        SFTPv3Client sftp = null;
         SFTPv3FileAttributes attrs;
 		try {
-			// if m_sftp.stat(...) is used, test_list_and_getAttributes fails with "the server sent an invalid id field" ...
-			attrs = new SFTPv3Client(m_conn).stat(absolutePath);
+            sftp = new SFTPv3Client(m_conn);
+            sftp.setCharset(m_charset);
+			attrs = sftp.stat(absolutePath);
 		} catch (SFTPException sftpe) {
 			switch (sftpe.getServerErrorCode()) {
 				case ErrorCodes.SSH_FX_NO_SUCH_FILE:
@@ -173,6 +179,8 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			}
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
+        } finally {
+            if (sftp!=null) sftp.close();
 		}
         return new SFTPFileAttributes(filename, attrs);
     }
