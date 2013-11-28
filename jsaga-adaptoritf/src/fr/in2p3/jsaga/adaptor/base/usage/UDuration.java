@@ -53,7 +53,7 @@ public class UDuration extends U {
         try {
             return new Long(toLong((String) super.throwExceptionIfInvalid(value)));
         } catch (ParseException e) {
-            throw new BadParameterException(e);
+            throw new BadParameterException("\"" + m_name + "\": " + e.getMessage());
         }
     }
 
