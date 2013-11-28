@@ -7,11 +7,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import org.globus.common.CoGProperties;
 import org.globus.gsi.X509Credential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
@@ -100,12 +97,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                                         if (super.throwExceptionIfInvalid(value) != null) {
                                             String v = (String) value;
                                             if (!ProxyTypeMap.isValid(v)) {
-                                                Set<String> valids = ProxyTypeMap.getValidTypes();
-                                                String msg = "Expected: ";
-                                                for (Iterator<String> i = valids.iterator(); i.hasNext();) {
-                                                    msg += i.next() + " | ";
-                                                }
-                                                throw new BadParameterException(msg);
+                                                throw new BadParameterException(ProxyTypeMap.getExpected());
                                             }
                                         }
                                         return value;
