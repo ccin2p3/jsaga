@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
 
 import java.util.Map;
@@ -37,7 +38,7 @@ public interface Usage {
      * @return the first matching usage
      * @throws DoesNotExistException if no usage matches the attributes
      */
-    public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException;
+    public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException, BadParameterException;
 
     /**
      * Build a usage instance containing missing attributes only

@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.ogf.saga.error.BadParameterException;
+
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 
 /* ***************************************************
@@ -46,8 +48,13 @@ public class UDuration extends U {
         super(name);
     }
 
+    @Override
     protected Object throwExceptionIfInvalid(Object value) throws Exception {
-        return new Long(toLong((String) super.throwExceptionIfInvalid(value)));
+        try {
+            return new Long(toLong((String) super.throwExceptionIfInvalid(value)));
+        } catch (ParseException e) {
+            throw new BadParameterException(e);
+        }
     }
 
     public static int toInt(Object value) throws ParseException {
@@ -61,6 +68,7 @@ public class UDuration extends U {
     }
 
     private static long toLong(String value) throws ParseException {
+        NumberFormatException j;
         Matcher matcher = REGEXP.matcher(value);
         if (!matcher.matches()) {
             throw new ParseException("Value is not a XSD duration: "+value, 0);

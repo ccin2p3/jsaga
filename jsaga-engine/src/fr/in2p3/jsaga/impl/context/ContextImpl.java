@@ -278,6 +278,8 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             } else {
                 throw new NoSuccessException("[INTERNAL ERROR] Unexpected exception", this);
             }
+        } catch (BadParameterException e) {
+            throw new IncorrectStateException("Invalid attribute(s): ", e);
         }
         m_credential = m_adaptor.createSecurityCredential(
                 matching, attributes, m_attributes.m_type.getValue());

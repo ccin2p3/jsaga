@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
+import org.ogf.saga.error.BadParameterException;
+
 /* 
 * ***************************************************
 * File:   UProxyValue
@@ -23,10 +25,11 @@ public class UProxyValue extends U {
         return "@"+m_name+"@";
     }
 
+    @Override
     protected Object throwExceptionIfInvalid(Object value) throws Exception {
         String proxyValue = (String) super.throwExceptionIfInvalid(value);
         if (!proxyValue.startsWith("-----") && proxyValue.endsWith("-----")) {
-            throw new Exception("Not a proxy content value: "+ proxyValue);
+            throw new BadParameterException("Not a proxy content value: "+ proxyValue);
         }
         return value;
     }

@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
 
 import java.util.*;
@@ -48,7 +49,7 @@ public class UAnd implements Usage {
         throw new DoesNotExistException("Attribute not found: "+attributeName);
     }
 
-    public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException {
+    public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException, BadParameterException {
         int firstMatchingUsage = -1;
         for (int i=0; m_and!=null && i<m_and.length; i++) {
             int id = m_and[i].getFirstMatchingUsage(attributes);

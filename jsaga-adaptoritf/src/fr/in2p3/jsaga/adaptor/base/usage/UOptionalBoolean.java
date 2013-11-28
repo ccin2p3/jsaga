@@ -17,6 +17,7 @@ public class UOptionalBoolean extends UOptional {
         super(name);
     }
 
+    @Override
     protected Object throwExceptionIfInvalid(Object value) throws Exception {
         if (value != null) {
             return Boolean.valueOf((String) value);

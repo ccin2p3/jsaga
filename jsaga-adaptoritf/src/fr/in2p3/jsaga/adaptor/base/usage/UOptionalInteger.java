@@ -17,6 +17,7 @@ public class UOptionalInteger extends UOptional {
         super(name);
     }
 
+    @Override
     protected Object throwExceptionIfInvalid(Object value) throws Exception {
         if (value != null) {
             return Integer.valueOf((String) value);

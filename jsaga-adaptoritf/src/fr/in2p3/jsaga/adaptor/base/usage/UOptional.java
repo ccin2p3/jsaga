@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
 
 import java.util.Map;
@@ -25,10 +26,15 @@ public class UOptional extends U {
         return "["+m_name+"]";
     }
 
-    public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException {
+    @Override
+    public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException, BadParameterException {
+        try {
+            super.getFirstMatchingUsage(attributes);
+        } catch (DoesNotExistException e) {}
         return m_id;
     }
-
+    
+    @Override
     protected Object throwExceptionIfInvalid(Object value) throws Exception {
         return value;   // value is always valid (even if null)
     }

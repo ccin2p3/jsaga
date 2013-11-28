@@ -28,6 +28,7 @@ public class UFile extends UFilePath {
         return "<"+m_name+">";
     }
 
+    @Override
     protected Object throwExceptionIfInvalid(Object value) throws Exception {
         File file = (File) super.throwExceptionIfInvalid(value);
         if (!file.exists()) {
