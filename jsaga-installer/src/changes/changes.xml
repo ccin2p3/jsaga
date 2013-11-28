@@ -17,8 +17,7 @@
             "deprecated-ssh" and "deprecated-sftp". "jsaga-adaptor-ssh" is deprecated and will be removed in a future release.</action>
             <action dev="lschwarz" type="add">New adaptor for Dirac</action>
             <action dev="lschwarz" type="add">New adaptor for rOCCI</action>
-            <action dev="lschwarz" type="update">VOMS: New default value for "ProxyType": "RFC3820" instead of "old". WARNING: "RFC3820" proxy may not
-            work with some SRM implementations (DPM and possibly dCache-SRM). If you use a VOMS context to connect to such systems, add the "ProxyType" attribute 
+            <action dev="lschwarz" type="update">VOMS: New default value for "ProxyType": "RFC3820" instead of "old".
             with "old" value in it.</action>
             <action dev="lschwarz" type="update">Globus, VOMS and MyProxy: JSAGA first uses the local proxy if it exists instead of generating it at context 
             creation. See the FAQ of appropriate adaptors.</action>
