@@ -6,7 +6,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.globus.common.CoGProperties;
 import org.globus.gsi.X509Credential;
@@ -78,7 +80,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                                         new UAnd(USAGE_INIT_PEM, new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)})
                                 }),
                                 new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS),
-                                new U(Context.SERVER), new U(Context.USERVO), new UOptional(VOMSContext.USERFQAN),
+                                new UOptional(Context.SERVER), new U(Context.USERVO), new UOptional(VOMSContext.USERFQAN),
                                 new UDuration(Context.LIFETIME),
                                 new UOptional(VOMSContext.DELEGATION) {
                                     protected Object throwExceptionIfInvalid(Object value) throws Exception {
@@ -95,8 +97,13 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                                     protected Object throwExceptionIfInvalid(Object value) throws Exception {
                                         if (super.throwExceptionIfInvalid(value) != null) {
                                             String v = (String) value;
-                                            if (!v.equalsIgnoreCase("old") && !v.equalsIgnoreCase("globus") && !v.equalsIgnoreCase("RFC3820")) {
-                                                throw new BadParameterException("Expected: old | globus | RFC3820");
+                                            if (!ProxyTypeMap.isValid(v)) {
+                                                Set<String> valids = ProxyTypeMap.getValidTypes();
+                                                String msg = "Expected: ";
+                                                for (Iterator<String> i = valids.iterator(); i.hasNext();) {
+                                                    msg += i.next() + " | ";
+                                                }
+                                                throw new BadParameterException(msg);
                                             }
                                         }
                                         return value;
@@ -147,12 +154,10 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                 new Default(VOMSContext.VOMSES, new File[]{
                         new File(System.getProperty("user.home")+"/.glite/vomses/"),
                         new File("/etc/vomses/")}),
-                // TODO: remove VomsesFile
-                new Default(Context.SERVER, new VomsesFile().getDefaultServer()),
-                new Default(Context.USERVO, new VomsesFile().getDefaultVO()),
+//                new Default(Context.SERVER, new VomsesFile().getDefaultServer()),
+//                new Default(Context.USERVO, new VomsesFile().getDefaultVO()),
                 new Default(Context.LIFETIME, DEFAULT_LIFETIME),
-                // TODO: use constants
-                new Default(VOMSContext.PROXYTYPE, "RFC3820")
+                new Default(VOMSContext.PROXYTYPE, ProxyTypeMap.TYPE_RFC3820)
         };
     }
     protected static String getUnixUID() throws IncorrectStateException {
@@ -169,6 +174,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
 
     public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, TimeoutException, NoSuccessException {
         try {
+            System.out.println("case="+usage);
             switch(usage) {
                 case USAGE_INIT_PKCS12:
                 case USAGE_INIT_PEM:
@@ -181,7 +187,6 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                         params.setNoRegen(true);
                     } else {
                         params.setNoRegen(false);
-//                        params.setUserPass((String)attributes.get(Context.USERPASS));
                         if (usage == USAGE_INIT_PKCS12) {
                             params.setCertFile((String)attributes.get(VOMSContext.USERCERTKEY));
                         } else if (usage == USAGE_INIT_PEM) {
@@ -192,7 +197,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                     
                     params.setGeneratedProxyFile((String)attributes.get(Context.USERPROXY));
                     // TODO: handle Proxy Type
-//                  params.setProxyType(ProxyType.RFC3820);
+                    params.setProxyType(ProxyTypeMap.toProxyType((String)attributes.get(VOMSContext.PROXYTYPE)));
                     params.setVomsdir((String) attributes.get(VOMSContext.VOMSDIR));
                     params.setTrustAnchorsDir((String) attributes.get(Context.CERTREPOSITORY));
                     
