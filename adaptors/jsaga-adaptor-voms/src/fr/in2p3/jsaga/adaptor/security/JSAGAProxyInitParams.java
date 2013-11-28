@@ -1,5 +1,9 @@
 package fr.in2p3.jsaga.adaptor.security;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.bouncycastle.openssl.PasswordFinder;
@@ -14,6 +18,8 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
+import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
+
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
@@ -22,13 +28,40 @@ import org.ogf.saga.error.TimeoutException;
  * Author: lionel.schwarz@in2p3.fr
  * Date:   27 nov 2013
  * ***************************************************
- * Description: a ProxyInitParams with the user password */
+ * Description: a ProxyInitParams with some more params */
 public class JSAGAProxyInitParams extends ProxyInitParams {
 
     private Map m_attributes;
     
-    public void setContext(Map a) {
-        this.m_attributes = a;
+    public JSAGAProxyInitParams(Map attributes) {
+        super();
+        this.m_attributes = attributes;
+        
+        setGeneratedProxyFile((String)attributes.get(Context.USERPROXY));
+        setProxyType(ProxyTypeMap.toProxyType((String)attributes.get(VOMSContext.PROXYTYPE)));
+        setVomsdir((String) attributes.get(VOMSContext.VOMSDIR));
+        setTrustAnchorsDir((String) attributes.get(Context.CERTREPOSITORY));
+        
+        setVomsCommands(Arrays.asList((String) attributes.get(Context.USERVO)));
+        if (attributes.containsKey(VOMSContext.VOMSES)) {
+            setVomsesLocations(Arrays.asList((String) attributes.get(VOMSContext.VOMSES)));
+        }
+        
+        // TODO: test this
+        if (attributes.containsKey(VOMSContext.USERFQAN)) {
+            List<String> fqans = new ArrayList<String>();
+            fqans.add((String) attributes.get(VOMSContext.USERFQAN));
+            setFqanOrder(fqans);
+        }
+        
+        // TODO: what about AcLifeTime ?
+        try {
+            setProxyLifetimeInSeconds(UDuration.toInt(attributes.get(Context.LIFETIME)));
+        } catch (ParseException e) {
+        }
+
+        setLimited(DelegationTypeMap.toLimitedValue((String)attributes.get(VOMSContext.DELEGATION)));
+        
     }
     
     public String getUserPass() {

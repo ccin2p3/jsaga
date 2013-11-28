@@ -149,6 +149,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                         new File(System.getProperty("user.home")+"/.glite/vomses/"),
                         new File("/etc/vomses/")}),
                 new Default(Context.LIFETIME, DEFAULT_LIFETIME),
+                new Default(VOMSContext.DELEGATION, DelegationTypeMap.NONE),
                 new Default(VOMSContext.PROXYTYPE, ProxyTypeMap.TYPE_RFC3820)
         };
     }
@@ -172,8 +173,10 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                 case USAGE_INIT_PEM:
                 case USAGE_INIT_PROXY:
                 {
-                    JSAGAProxyInitParams params = new JSAGAProxyInitParams();
-                    params.setContext(attributes);
+                    // Initialize params with attributes
+                    JSAGAProxyInitParams params = new JSAGAProxyInitParams(attributes);
+                    
+                    // Additional params depending on usage
                     if (usage == USAGE_INIT_PROXY) {
                         params.setCertFile((String)attributes.get(VOMSContext.INITIALPROXY));
                         params.setNoRegen(true);
@@ -186,28 +189,6 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                             params.setKeyFile((String)attributes.get(Context.USERKEY));
                         }
                     }
-                    
-                    params.setGeneratedProxyFile((String)attributes.get(Context.USERPROXY));
-                    params.setProxyType(ProxyTypeMap.toProxyType((String)attributes.get(VOMSContext.PROXYTYPE)));
-                    params.setVomsdir((String) attributes.get(VOMSContext.VOMSDIR));
-                    params.setTrustAnchorsDir((String) attributes.get(Context.CERTREPOSITORY));
-                    
-                    params.setVomsCommands(Arrays.asList((String) attributes.get(Context.USERVO)));
-                    if (attributes.containsKey(VOMSContext.VOMSES)) {
-                        params.setVomsesLocations(Arrays.asList((String) attributes.get(VOMSContext.VOMSES)));
-                    }
-                    
-                    // TODO: test this
-                    if (attributes.containsKey(VOMSContext.USERFQAN)) {
-                        List<String> fqans = new ArrayList<String>();
-                        fqans.add((String) attributes.get(VOMSContext.USERFQAN));
-                        params.setFqanOrder(fqans);
-                    }
-                    
-                    // TODO: what about AcLifeTime ?
-                    params.setProxyLifetimeInSeconds(UDuration.toInt(attributes.get(Context.LIFETIME)));
-
-                    params.setLimited(DelegationTypeMap.toLimitedValue((String)attributes.get(VOMSContext.DELEGATION)));
                     
                     VOMSProxyListener creation_listener = new VOMSProxyListener();
                     ProxyInitStrategy proxyInitBehaviour = 
