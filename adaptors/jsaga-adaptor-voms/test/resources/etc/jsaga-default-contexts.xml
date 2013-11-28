@@ -2,15 +2,18 @@
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <contexts>
         <context type="VOMS" id="PEM">
-            <attribute name="Server" value="voms://voms.hellasgrid.gr:15004/C=GR/O=HellasGrid/OU=hellasgrid.gr/CN=voms.hellasgrid.gr"/>
+            <!-- <attribute name="Server" value="voms://voms.hellasgrid.gr:15004/C=GR/O=HellasGrid/OU=hellasgrid.gr/CN=voms.hellasgrid.gr"/> -->
             <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
             <attribute name="Vomses" value="${user.home}/.jsaga/contexts/voms/vomses/"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
             <attribute name="UserVO" value="dteam"/>
-            <!-- <attribute name="ProxyType" value="old"/> -->
+            <attribute name="ProxyType" value="RFC3820"/>
+            <!--  PEM -->
+            <!-- <attribute name="UserCert" value="${user.home}/.jsaga/contexts/globus/usercert.pem"/> -->
+            <!-- <attribute name="UserKey" value="${user.home}/.jsaga/contexts/globus/userkey.pem"/> -->
             <!--  InitialProxy -->
-            <attribute name="InitialProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>
+            <!-- <attribute name="InitialProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/> -->
             <!-- <attribute name="UserPass" value="dummy"/> -->
             <!--  PKCS12 -->
             <!-- <attribute name="UserCertKey" value="${user.home}/.jsaga/contexts/globus/grid2.p12"/> -->
