@@ -117,7 +117,7 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
         if(vomsacRequest != null){
             attributeCertificate = getVOMSAttributeCertificate(emiCred, vomsacRequest);
             if(attributeCertificate == null){
-                //TODO: manage if we have only a sub-set of the requested FQANs
+                //TODO_OLD: manage if we have only a sub-set of the requested FQANs
                 throw new VOMSException("Unable to get a single requested VOMSAttribute");
             }
         }
@@ -134,13 +134,6 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
         }
         ProxyCertificate proxyCert;
         try {
-            // avec la clé originale ça marche
-//            PrivateKey privateKey = CertificateLoadUtil.loadPrivateKey("/home/schwarz/.globus/userkey.pem", new PasswordFinder() {
-//                public char[] getPassword() {
-//                    return "xxx".toCharArray();
-//                }
-//            });
-//            proxyCert = ProxyGenerator.generate(proxyOptions, privateKey);
             proxyCert = ProxyGenerator.generate(proxyOptions, emiCred.getKey());
         } catch (InvalidKeyException e) {
             throw new CredentialException(e);
@@ -150,10 +143,6 @@ public class JSAGAVOMSACProxy extends DefaultVOMSACService {
             throw new CredentialException(e);
         } catch (NoSuchAlgorithmException e) {
             throw new CredentialException(e);
-//        } catch (IOException e) {
-//            throw new CredentialException(e);
-//        } catch (GeneralSecurityException e) {
-//            throw new CredentialException(e);
         }
         return new X509Credential(proxyCert.getPrivateKey(), proxyCert.getCertificateChain());
     }
