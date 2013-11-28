@@ -54,9 +54,10 @@ public class JSAGAProxyInitParams extends ProxyInitParams {
             setFqanOrder(fqans);
         }
         
-        // TODO: what about AcLifeTime ?
         try {
-            setProxyLifetimeInSeconds(UDuration.toInt(attributes.get(Context.LIFETIME)));
+            int sec = UDuration.toInt(attributes.get(Context.LIFETIME));
+            setProxyLifetimeInSeconds(sec);
+            setAcLifetimeInSeconds(sec);
         } catch (ParseException e) {
         }
 
