@@ -20,10 +20,11 @@
         </breadcrumbs>
         <menu name="JSAGA">
             <item name="Welcome" href="http://software.in2p3.fr/jsaga/index.html"/>
-            <item name="Contributors" href="contributors.html"/>
-            <item name="Presentations" href="presentations.html"/>
             <item name="Download" href="download.html"/>
+            <item name="Presentations" href="presentations.html"/>
+            <item name="They are using JSAGA" href="projects.html"/>
             <item name="Dependencies" href="dependencies-licenses.html"/>
+            <item name="Contributors" href="contributors.html"/>
             <item name="Development Release" href="http://software.in2p3.fr/jsaga-dev/index.html"/>
         </menu>
         <menu name="User Documentation">
