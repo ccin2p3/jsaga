@@ -2,7 +2,7 @@ They are using JSAGA
 
     * {{{http://www.chain-project.eu/}CHAIN-REDS}}
 
-[images/chain.jpg] Chain Science Gateway
+[images/chain.jpg] CHAIN Science Gateway
 
     The CHAIN Science Gateway has been built in the context of the EU CHAIN and CHAIN-REDS projects to demonstrate how the 
     Science Gateway paradigm and standard adoption can make e-Infrastructures worldwide, based on different middleware and 
@@ -12,3 +12,28 @@ They are using JSAGA
     
     The Data Avenue is a file commander tool for data transfer, enabling easy data moving between various storages services 
     (such as grid, cloud, cluster, supercomputers) by various protocols: http, https, sftp, gsiftp, srm.
+    
+    * {{{http://www.md-paedigree.eu/}MD-PAEDIGREE}}
+    
+[images/md-paedigree-ok.png]
+
+    MD-Paedigree is a Model-Driven Paediatric European Digital Repository
+    
+    * {{{http://e-ginseng.org/}The GINSENG Project}}
+    
+[images/ginseng.png]
+
+    GINSENG project goal is to create a safe distributed database between medical sites.
+    
+    * {{{https://neugrid4you.eu/}neuGRID for you}}
+
+[images/neugrid4you.png]
+
+    neuGRID is a web portal aimed to help neuroscientists do high-throughput imaging research, and provide clinical 
+    neurologists automated diagnostic imaging markers of neurodegenerative diseases for individual patient diagnosis.
+    
+    * {{{http://www.wenmr.eu/}WeNMR}}
+    
+[images/wenmr.png]
+
+    WeNMR is a worldwide e-Infrastructure for NMR and structural biology.
