@@ -19,26 +19,35 @@
             </properties>
         </developer>
         <developer>
-			<name>Jérôme Revillard</name>
-			<email>jrevillard@gnubila.fr</email>
-			<organization>gnúbila France</organization>
-			<organizationUrl>http://gnubila.fr/</organizationUrl>
-			<properties>
-				<organizationLogoUrl>https://www.gnubila.fr/documents/10157/0/Gnubila-Cloud-1000.png</organizationLogoUrl>
-			</properties>
-		</developer>
+            <name>Lionel Schwarz</name>
+            <email>lionel.schwarz@in2p3.fr</email>
+            <organization>CC-IN2P3</organization>
+            <organizationUrl>http://cc.in2p3.fr/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://cc.in2p3.fr/plugins/kitcnrs/images/logoCC72.gif</organizationLogoUrl>
+            </properties>
+        </developer>
+        <developer>
+            <name>Jérôme Revillard</name>
+            <email>jrevillard@gnubila.fr</email>
+            <organization>gnúbila France</organization>
+            <organizationUrl>http://gnubila.fr/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>https://www.gnubila.fr/gnubila-theme/images/custom/logo.png</organizationLogoUrl>
+            </properties>
+        </developer>
     </developers>
     <dependencies>
-		<dependency>
-			<groupId>org.jglobus</groupId>
-			<artifactId>myproxy</artifactId>
-			<version>2.0-Beta6-SNAPSHOT</version>
-		</dependency>
         <dependency>
-			<groupId>org.italiangrid</groupId>
-			<artifactId>voms-api-java</artifactId>
-			<version>3.0.2</version>
-		</dependency>
+            <groupId>org.jglobus</groupId>
+            <artifactId>myproxy</artifactId>
+            <version>2.0-Beta6-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.italiangrid</groupId>
+            <artifactId>voms-api-java</artifactId>
+            <version>3.0.2</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
