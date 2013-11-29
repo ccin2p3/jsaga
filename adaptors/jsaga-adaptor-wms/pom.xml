@@ -3,12 +3,12 @@
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
         <version>0.9.17-SNAPSHOT</version>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>jsaga-adaptor-wms</artifactId>
-	<name>Adaptors for gLite-WMS</name>
-	<description>This module provides support for WMS (Workload Management System) execution management technology.</description>
-	<developers>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>jsaga-adaptor-wms</artifactId>
+    <name>Adaptors for gLite-WMS</name>
+    <description>This module provides support for WMS (Workload Management System) execution management technology.</description>
+    <developers>
         <developer>
             <name>Nicolas Demesy</name>
             <email>nicolas.demesy@bt.com</email>
@@ -18,71 +18,71 @@
                 <organizationLogoUrl>http://www.bt.com/static/wa/homepage/images/logo_75x36.gif</organizationLogoUrl>
             </properties>
         </developer>
-		<developer>
-			<name>Jérôme Revillard</name>
-			<email>jrevillard@gnubila.fr</email>
-			<organization>gnúbila France</organization>
-			<organizationUrl>http://gnubila.fr/</organizationUrl>
-			<properties>
+        <developer>
+            <name>Jérôme Revillard</name>
+            <email>jrevillard@gnubila.fr</email>
+            <organization>gnúbila France</organization>
+            <organizationUrl>http://gnubila.fr/</organizationUrl>
+            <properties>
                 <organizationLogoUrl>https://www.gnubila.fr/gnubila-theme/images/custom/logo.png</organizationLogoUrl>
-			</properties>
-		</developer>
-	</developers>
-	<dependencies>
-		<dependency><!-- for security context (WARNING: order of dependencies matters) -->
-			<groupId>fr.in2p3.jsaga.adaptor</groupId>
-			<artifactId>jsaga-adaptor-voms</artifactId>
-			<version>0.9.17-SNAPSHOT</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency><!-- for data staging -->
-			<groupId>fr.in2p3.jsaga.adaptor</groupId>
-			<artifactId>jsaga-adaptor-globus</artifactId>
-			<version>0.9.17-SNAPSHOT</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>fr.in2p3.jsaga.adaptor</groupId>
-			<artifactId>jsaga-adaptor-classic</artifactId>
-			<version>0.9.17-SNAPSHOT</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jglobus</groupId>
-			<artifactId>gridftp</artifactId>
-			<version>2.0-Beta6-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glite.jdl</groupId>
-			<artifactId>jdl-api-java</artifactId>
-			<version>3.3.1</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.glite</groupId>
-			<artifactId>glite-wms-wmproxy-api-java</artifactId>
-			<version>3.3.2-1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glite</groupId>
-			<artifactId>glite-lb-api-java</artifactId>
-			<version>3.3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.condor</groupId>
-			<artifactId>classad</artifactId>
-			<version>2.4</version>
-			<scope>compile</scope>
-		</dependency>
-	</dependencies>
+            </properties>
+        </developer>
+    </developers>
+    <dependencies>
+        <dependency><!-- for security context (WARNING: order of dependencies matters) -->
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-voms</artifactId>
+            <version>0.9.17-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency><!-- for data staging -->
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-globus</artifactId>
+            <version>0.9.17-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-classic</artifactId>
+            <version>0.9.17-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jglobus</groupId>
+            <artifactId>gridftp</artifactId>
+            <version>2.0-Beta6-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glite.jdl</groupId>
+            <artifactId>jdl-api-java</artifactId>
+            <version>3.3.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glite</groupId>
+            <artifactId>glite-wms-wmproxy-api-java</artifactId>
+            <version>3.3.2-1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glite</groupId>
+            <artifactId>glite-lb-api-java</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.condor</groupId>
+            <artifactId>classad</artifactId>
+            <version>2.4</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
     <repositories>
         <repository>
             <id>maatg-snapshots</id>
             <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
         </repository>
-		<repository>
-			<id>emi-infn-repo</id>
-			<url>http://www.pd.infn.it/~andreett/pub/maven/repository/</url>
-		</repository>
-	</repositories>
+        <repository>
+            <id>emi-infn-repo</id>
+            <url>http://ci-01.cnaf.infn.it:8081/nexus/content/repositories/releases</url>
+        </repository>
+    </repositories>
 </project>
