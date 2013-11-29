@@ -1,38 +1,14 @@
-Related Projects
+They are using JSAGA
 
-    * {{{http://elara.c-s.fr/elisaportal/servlet/Bienvenue}Enterprise grid with Local Infrastructure and Services for @pplications}}
+    * {{{http://www.chain-project.eu/}CHAIN-REDS}}
 
-[images/elisa.jpg] Elis@
+[images/chain.jpg] Chain Science Gateway
 
-      A portal to industrial and research grid infrastructures, by British Telecom
+    The CHAIN Science Gateway has been built in the context of the EU CHAIN and CHAIN-REDS projects to demonstrate how the 
+    Science Gateway paradigm and standard adoption can make e-Infrastructures worldwide, based on different middleware and 
+    architectures (Grid, HPC, Cloud or simply local clusters), interoperable amongst each other, at user application level.
 
-    * {{{http://cc.in2p3.fr/docenligne/269}Java Jobs Submission}} 
-
-[images/jjs.jpg] JJS
-
-      A tool to efficiently submit collections of short-life jobs to EGEE, by CC-IN2P3
-
-    * {{{http://cc.in2p3.fr/docenligne/821}Java Universal eXplorer}} JUX
-
-      A multi-protocol file browser, by CC-IN2P3
-
-    * {{{http://www.simexplorer.org/}SimExplorer}}
-
-[images/simexplorer.jpg] SimExplorer
-
-      SimExplorer is a software designed for managing simulation experiments and to some extent the
-      scientific quality of the modeling process. It provides an environment with a set of tools to
-      help to build experimental design on complex models. It provides transparent distribution of
-      the computational load on multi-core computers, clusters and grid environments thanks to JSAGA.
-
-    * {{{http://jcae.sourceforge.net/}jCAE}}
-
-[images/jcae.jpg] jCAE
-
-      jCAE is a tool for Computer Aided Engineering with support for distributed computing facilities,
-      developed by EADS Research Center in India.
-
-    * {{{http://www.maatg.com//}Pandora Gateway}}
-
-      Pandora Gateway is a platform developed by maatG company, for using grid infrastructures.
-      This platform is used for several grid projects, including Health-e-Child and neuGRID.
+    * {{{https://data-avenue.eu/}Data avenue}}
+    
+    The Data Avenue is a file commander tool for data transfer, enabling easy data moving between various storages services 
+    (such as grid, cloud, cluster, supercomputers) by various protocols: http, https, sftp, gsiftp, srm.
