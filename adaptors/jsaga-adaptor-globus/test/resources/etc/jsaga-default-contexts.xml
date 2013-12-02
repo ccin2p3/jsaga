@@ -6,9 +6,10 @@
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>
         </context>
         <context type="MyProxy">
-            <attribute name="CertRepository" value="${user.home}/.globus/certificates/"/>
-            <attribute name="Server" value="cclcgsrvli02.in2p3.fr:7512"/>
+            <!-- <attribute name="CertRepository" value="${user.home}/.globus/certificates/"/> -->
+            <attribute name="Server" value="myproxy.cern.ch:7512"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/myproxy_cred.txt"/>
+            <attribute name="DelegationLifeTime" value="PT17H"/>
         </context>
     </contexts>
     <session>
@@ -24,9 +25,8 @@
             <include host="localhost"/>
         </context>-->
         <context type="Globus">
-            <data type="gsiftp"/>
-            <job type="gk"/>
-            <include domain="in2p3.fr"/>
+        </context>
+        <context type="MyProxy">
         </context>
     </session>
 </jsaga-default>
