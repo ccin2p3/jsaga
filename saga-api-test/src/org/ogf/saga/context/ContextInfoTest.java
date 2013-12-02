@@ -17,28 +17,37 @@ import org.ogf.saga.session.SessionFactory;
  *
  */
 public abstract class ContextInfoTest extends AbstractTest {
+    private String m_type = null;
+    
     protected ContextInfoTest() throws Exception {
         super();
     }
 
+    protected ContextInfoTest(String contextType) throws Exception {
+        super();
+        this.m_type = contextType;
+    }
+    
     public void test_info() throws Exception {
         Session session = SessionFactory.createSession();
         Context[] contexts = session.listContexts();
         for (int i=0; i<contexts.length; i++) {
-            Context context = contexts[i];
-
-            // print title
-            System.out.println("Security context: "+context.getAttribute(Context.TYPE));
-
-            // trigger initialization of context
-            try {
-            	session.addContext(context);
-            } catch(Exception e) {
-                System.out.println("  Context not initialized ["+e.getMessage()+"]");
+            if (this.m_type == null || this.m_type.equals((String)contexts[i].getAttribute(Context.TYPE))) {
+                Context context = contexts[i];
+    
+                // print title
+                System.out.println("Security context: "+context.getAttribute(Context.TYPE));
+    
+                // trigger initialization of context
+                try {
+                	session.addContext(context);
+                } catch(Exception e) {
+                    System.out.println("  Context not initialized ["+e.getMessage()+"]");
+                }
+    
+                // print context
+                System.out.println(context);
             }
-
-            // print context
-            System.out.println(context);
         }
         session.close();
     }

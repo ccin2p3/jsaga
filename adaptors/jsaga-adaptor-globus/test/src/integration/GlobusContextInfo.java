@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextInfoTest;
  */
 public class GlobusContextInfo extends ContextInfoTest {
     public GlobusContextInfo() throws Exception {
-        super();
+        super("Globus");
     }
 }
