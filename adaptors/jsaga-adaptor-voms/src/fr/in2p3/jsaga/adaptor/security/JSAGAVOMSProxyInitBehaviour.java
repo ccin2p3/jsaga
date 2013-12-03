@@ -54,6 +54,10 @@ import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.italiangrid.voms.util.CredentialsUtils;
 import org.italiangrid.voms.util.VOMSFQANNamingScheme;
+
+import eu.emi.security.authn.x509.CrlCheckingMode;
+import eu.emi.security.authn.x509.NamespaceCheckingMode;
+import eu.emi.security.authn.x509.OCSPCheckingMode;
 import eu.emi.security.authn.x509.StoreUpdateListener;
 import eu.emi.security.authn.x509.ValidationErrorListener;
 import eu.emi.security.authn.x509.ValidationResult;
@@ -219,7 +223,10 @@ public class JSAGAVOMSProxyInitBehaviour implements ProxyInitStrategy {
             directorySanityChecks(trustAnchorsDir, "Invalid trust anchors location");
         
             certChainValidator = CertificateValidatorBuilder.buildCertificateValidator(trustAnchorsDir, 
-                    certChainValidationErrorListener, storeUpdateListener);
+                    certChainValidationErrorListener, storeUpdateListener, 0L, 
+                    CertificateValidatorBuilder.DEFAULT_NS_CHECKS,
+                    CrlCheckingMode.IF_VALID, 
+                    CertificateValidatorBuilder.DEFAULT_OCSP_CHECKS);
             
         }
     }
