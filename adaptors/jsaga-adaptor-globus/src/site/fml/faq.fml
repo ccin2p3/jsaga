@@ -37,6 +37,18 @@ DoesNotExist: File does not exist: &lt;FILE_URL&gt;
     </part>
     <part id="security">
         <title>Globus Security Infrastructure</title>
+        <faq id="globus_proxy">
+            <question>How to use the "Globus" context ?</question>
+            <answer>Depending on attributes set in the context, JSAGA will behave differently:
+            <ul>
+            <li>If "UserProxyObject" is set, JSAGA will load this object and use it as the credential.</li>
+            <li>Else, if "UserProxy" is set to an existing file, JSAGA will load the file content as the credential.
+            Although JSAGA checks that this file exists, it does not do any validation on it. It is your business 
+            to make sure it's valid.</li>
+            <li>Else, JSAGA will try to generate the proxy for you as soon as you provide all necessary attributes for that.</li>
+            </ul>
+            </answer>
+        </faq>
         <faq id="p12_to_pem">
             <question>How to convert certificate from PKCS12 to PEM ?</question>
             <answer>Use the "openssl" command line interface from Linux/Cygwin distribution:
@@ -68,13 +80,27 @@ chmod 664 $HASH.signing_policy]]></pre>
         </faq>
         <faq id="myproxy">
             <question>How to use the MyProxy adaptor ?</question>
-            <answer>
-                <ul>
-                    <li><i>LifeTime</i>: activate initializing the proxy and storing it on MyProxy server,</li>
-                    <li><i>DelegationLifeTime</i>: activate retrieving a delegated proxy from MyProxy server,</li>
-                    <li>else the local proxy file is loaded.</li>
-                </ul>
-                <p>For more details about usage, please use command "jsaga-help -s usage".</p>
+            <answer>Depending on attributes set in the context, JSAGA will behave differently:
+            <ul>
+            <li>If both "UserProxyObject" and "DelegationLifeTime" are set, 
+            JSAGA will load this object and use it as the credential to get a delegated proxy from the MyProxy server.</li>
+            <li>Else, if both "UserProxy" and "DelegationLifeTime" are set and "UserProxy" is set to an existing file, 
+            JSAGA will load the file content as the credential to get a delegated proxy from the MyProxy server.
+            Although JSAGA checks that this file exists, it does not do any validation on it. It is your business 
+            to make sure it's valid.</li>
+            <li>Else, if "UserProxyObject" is set and it's content is a proxy that is still valid for at least 3 hours,
+            JSAGA will load it as a delegated proxy.</li>
+            <li>Else, if "UserProxy" is set to an existing file whose content is a proxy that is still valid for at least 3 hours,
+            JSAGA will load it as a delegated proxy.</li>
+            <li>Else, JSAGA will try to generate the proxy for you as soon as you provide all necessary attributes for that,
+            and will store it to the MyProxy server.</li>
+            </ul>
+            Note that:
+            <ul>
+            <li>if "Server" is not set JSAGA will use in the environment variable "$MYPROXY_SERVER"</li>
+            <li>if "UserID" is not set, JSAGA will use the identity DN provided by the proxy</li>
+            <li>if "MyProxyPass" is not set, JSAGA will try to store the delegated proxy without any passphrase, which might be refused by the MyProxy server.</li>
+            </ul>
             </answer>
         </faq>
     </part>

@@ -64,13 +64,6 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
     public Usage getUsage() {
         return new UAnd(new Usage[]{
                 new UOr(new Usage[]{
-                        // create and store proxy
-                        new UAnd(USAGE_INIT_PEM, new Usage[]{
-                                new UFile(Context.USERCERT), new UFile(Context.USERKEY),
-                                new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS),
-                                new UDuration(Context.LIFETIME),
-                        }),
-
                         // get delegated proxy from server
                         new UAnd(USAGE_GET_DELEGATED_MEMORY, new Usage[]{
                                 new UNoPrompt(GlobusContext.USERPROXYOBJECT),
@@ -84,6 +77,14 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
                         // local proxy
                         new UProxyObject(USAGE_LOCAL_MEMORY, GlobusContext.USERPROXYOBJECT, MIN_LIFETIME_FOR_USING),
                         new UProxyFile(USAGE_LOCAL_LOAD, Context.USERPROXY, MIN_LIFETIME_FOR_USING),
+
+                        // create and store proxy
+                        new UAnd(USAGE_INIT_PEM, new Usage[]{
+                                new UFile(Context.USERCERT), new UFile(Context.USERKEY),
+                                new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS),
+                                new UDuration(Context.LIFETIME),
+                        }),
+
                 }),
                 new U(Context.SERVER),
                 new UOptional(Context.USERID),

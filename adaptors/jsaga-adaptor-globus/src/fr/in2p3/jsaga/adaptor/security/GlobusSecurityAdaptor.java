@@ -50,6 +50,8 @@ public abstract class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor 
     public Usage getUsage() {
         return new UAnd(new Usage[]{
                 new UOr(new Usage[]{
+                        new UNoPrompt(USAGE_MEMORY, GlobusContext.USERPROXYOBJECT),
+                        new UFile(USAGE_LOAD, Context.USERPROXY),
                         new UAnd(new Usage[]{
                                 new UOr(new Usage[]{
                                         new UFile(USAGE_INIT_PKCS12, GlobusContext.USERCERTKEY),
@@ -68,9 +70,7 @@ public abstract class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor 
                                         return value;
                                     }
                                 }
-                        }),
-                        new UNoPrompt(USAGE_MEMORY, GlobusContext.USERPROXYOBJECT),
-                        new UFile(USAGE_LOAD, Context.USERPROXY)
+                        })
                 }),
                 new UFile(Context.CERTREPOSITORY)
         });
