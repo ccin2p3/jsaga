@@ -73,6 +73,10 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
     public Usage getUsage() {
         return new UAnd(new Usage[]{
                 new UOr(new Usage[]{
+                        new UNoPrompt(USAGE_MEMORY, VOMSContext.USERPROXYOBJECT),
+                        new UProxyValue(USAGE_LOAD,  VOMSContext.USERPROXYSTRING),
+                        new UFile(USAGE_LOAD, Context.USERPROXY),
+                        new UFile(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY),
                         new UAnd(new Usage[]{
                                 new UOr(new Usage[]{
                                         new UFilePath(USAGE_INIT_PKCS12, VOMSContext.USERCERTKEY),
@@ -104,12 +108,6 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                                     }
                                 }
                         }),
-                        new UNoPrompt(USAGE_MEMORY, VOMSContext.USERPROXYOBJECT),
-                        new UOr(new Usage[]{
-                                new UFilePath(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY),
-                        		new UFile(USAGE_LOAD, Context.USERPROXY),
-                        		new UProxyValue(USAGE_LOAD,  Context.USERPROXY)
-                        })
                 }),
                 new UFile(Context.CERTREPOSITORY),
                 new UFile(VOMSContext.VOMSDIR),
@@ -167,7 +165,6 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
 
     public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, TimeoutException, NoSuccessException {
         try {
-//            System.out.println("case="+usage);
             switch(usage) {
                 case USAGE_INIT_PKCS12:
                 case USAGE_INIT_PEM:
@@ -206,12 +203,11 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                 case USAGE_LOAD:
                 {
                     CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
-                    String userProxy = (String) attributes.get(Context.USERPROXY);
                     GSSCredential cred = null;
-                    if(userProxy.startsWith("-----")){
-                    	//Proxy value
-                    	cred = load(userProxy);
-                    }else{
+                    if (attributes.containsKey(VOMSContext.USERPROXYSTRING)) {
+                        cred = load((String)attributes.get(VOMSContext.USERPROXYSTRING));
+                    } else {
+                        String userProxy = (String) attributes.get(Context.USERPROXY);
                     	//Proxy File
                     	File proxyFile = new File(userProxy);
                         cred = load(proxyFile);
