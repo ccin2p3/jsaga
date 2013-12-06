@@ -249,7 +249,7 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     public void _addReadOnlyAttribute(String key, String[] constantValues) {
         m_attributes.put(key, new DefaultAttributeVector(key, true, true, constantValues));
     }
-    protected Map _getAttributesMap() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+    public Map _getAttributesMap() throws NotImplementedException, IncorrectStateException, NoSuccessException {
         Map<String,String> map = new HashMap<String,String>();
         for (Map.Entry<String, Attribute> entry : m_attributes.entrySet()) {
             String key = entry.getKey();
