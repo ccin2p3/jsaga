@@ -124,28 +124,22 @@ public class VOMSContextUsage {
     
     @Test(expected=DoesNotExistException.class)
     public void missingVO() throws Exception {
-        prepareContextForProxyInit();
-        m_context.removeAttribute(Context.USERVO);
-        getMatchingUsage();
+        missing(Context.USERVO);
     }
     
     @Test(expected=DoesNotExistException.class)
     public void missingPassword() throws Exception {
-        prepareContextForProxyInit();
-        m_context.removeAttribute(Context.USERPASS);
-        getMatchingUsage();
+        missing(Context.USERPASS);
     }
     
     @Test(expected=DoesNotExistException.class)
     public void missingCertRepository() throws Exception {
-        m_context.removeAttribute(Context.CERTREPOSITORY);
-        getMatchingUsage();
+        missing(Context.CERTREPOSITORY);
     }
     
     @Test(expected=DoesNotExistException.class)
     public void missingVomsDir() throws Exception {
-        m_context.removeAttribute(VOMSContext.VOMSDIR);
-        getMatchingUsage();
+        missing(VOMSContext.VOMSDIR);
     }
     
     ///////////////////////////////////////////////////
@@ -174,6 +168,11 @@ public class VOMSContextUsage {
         m_context.setAttribute(Context.USERPROXY, "/tmp/doesNotExist");
     }
 
+    private void missing(String attr) throws Exception {
+        prepareContextForProxyInit();
+        m_context.removeAttribute(attr);
+        getMatchingUsage();
+    }
     private int getMatchingUsage() throws Exception {
         Map<String, String> attributes = ((ContextImpl)m_context)._getAttributesMap();
         return m_adaptor_usage.getFirstMatchingUsage(attributes);
