@@ -29,14 +29,17 @@ import fr.in2p3.jsaga.impl.context.ContextImpl;
 
 public class VOMSContextUsage {
 
-    private static Usage m_adaptor_usage;
-    private static File m_tmpFile;
-    private Context m_context;
+    protected static Usage m_adaptor_usage;
+    protected static File m_tmpFile;
+    protected Context m_context;
+    protected static String m_type;
     
     @BeforeClass
     public static void createUsage() throws Exception {
-        m_adaptor_usage = new VOMSSecurityAdaptor().getUsage();
-        m_tmpFile = File.createTempFile("jsaga-VOMS-test", ".tmp");
+        SecurityAdaptor a = new VOMSSecurityAdaptor();
+        m_adaptor_usage = a.getUsage();
+        m_type = a.getType();
+        m_tmpFile = File.createTempFile("jsaga-test-" + m_type, ".tmp");
     }
     
     @AfterClass
@@ -46,7 +49,7 @@ public class VOMSContextUsage {
     
     @Before
     public void createContext() throws Exception {
-        m_context = ContextFactory.createContext("VOMS");
+        m_context = ContextFactory.createContext(m_type);
         initAttributes();
     }
     
@@ -146,7 +149,7 @@ public class VOMSContextUsage {
     // Private methods
     ///////////////////////////////////////////////////
     
-    private void initAttributes() throws Exception {
+    protected void initAttributes() throws Exception {
         String exists = m_tmpFile.getAbsolutePath();
         m_context.setAttribute(VOMSContext.USERPROXYOBJECT, "");
         m_context.setAttribute(Context.USERPROXY, exists);
@@ -160,7 +163,7 @@ public class VOMSContextUsage {
         m_context.setAttribute(VOMSContext.VOMSDIR, exists);
     }
     
-    private void prepareContextForProxyInit() throws Exception {
+    protected void prepareContextForProxyInit() throws Exception {
         // Prepare for PKCS12 and check all attributes for building proxy
         m_context.removeAttribute(VOMSContext.USERPROXYOBJECT);
         m_context.removeAttribute(VOMSContext.INITIALPROXY);
@@ -168,12 +171,13 @@ public class VOMSContextUsage {
         m_context.setAttribute(Context.USERPROXY, "/tmp/doesNotExist");
     }
 
-    private void missing(String attr) throws Exception {
+    protected void missing(String attr) throws Exception {
         prepareContextForProxyInit();
         m_context.removeAttribute(attr);
         getMatchingUsage();
     }
-    private int getMatchingUsage() throws Exception {
+    
+    protected int getMatchingUsage() throws Exception {
         Map<String, String> attributes = ((ContextImpl)m_context)._getAttributesMap();
         return m_adaptor_usage.getFirstMatchingUsage(attributes);
     }

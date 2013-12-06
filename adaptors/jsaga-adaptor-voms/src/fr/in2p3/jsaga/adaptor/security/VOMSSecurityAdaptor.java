@@ -5,9 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import org.globus.common.CoGProperties;
 import org.globus.gsi.X509Credential;
@@ -77,42 +74,55 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                         new UProxyValue(USAGE_LOAD,  VOMSContext.USERPROXYSTRING),
                         new UFile(USAGE_LOAD, Context.USERPROXY),
                         new UFile(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY),
-                        new UAnd(new Usage[]{
-                                new UOr(new Usage[]{
-                                        new UFile(USAGE_INIT_PKCS12, VOMSContext.USERCERTKEY),
-                                        new UAnd(USAGE_INIT_PEM, new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)})
-                                }),
-                                new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS),
-                                new UOptional(Context.SERVER), new U(Context.USERVO), new UOptional(VOMSContext.USERFQAN),
-                                new UDuration(Context.LIFETIME),
-                                new UOptional(VOMSContext.DELEGATION) {
-                                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
-                                        if (super.throwExceptionIfInvalid(value) != null) {
-                                            String v = (String) value;
-                                            if (!DelegationTypeMap.isValid(v)) {
-                                                throw new BadParameterException(DelegationTypeMap.getExpected());
-                                            }
-                                        }
-                                        return value;
-                                    }
-                                },
-                                new UOptional(VOMSContext.PROXYTYPE) {
-                                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
-                                        if (super.throwExceptionIfInvalid(value) != null) {
-                                            String v = (String) value;
-                                            if (!ProxyTypeMap.isValid(v)) {
-                                                throw new BadParameterException(ProxyTypeMap.getExpected());
-                                            }
-                                        }
-                                        return value;
-                                    }
-                                }
-                        }),
+                        new UAnd(getInitProxyUsages()),
                 }),
                 new UFile(Context.CERTREPOSITORY),
                 new UFile(VOMSContext.VOMSDIR),
                 new UOptional(VOMSContext.VOMSES)
         });
+    }
+    
+    protected Usage[] getInitProxyUsages() {
+        return new Usage[]{
+                new UOr(new Usage[]{
+                        new UFile(USAGE_INIT_PKCS12, VOMSContext.USERCERTKEY),
+                        new UAnd(USAGE_INIT_PEM, new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)})
+                }),
+                new UFilePath(Context.USERPROXY), 
+                new UHidden(Context.USERPASS),
+                new UOptional(Context.SERVER), 
+                new U(Context.USERVO), 
+                new UOptional(VOMSContext.USERFQAN),
+                new UDuration(Context.LIFETIME) {
+                    @Override
+                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                        return (value != null ? super.throwExceptionIfInvalid(value) : null);
+                    }
+                },
+                new UOptional(VOMSContext.DELEGATION) {
+                    @Override
+                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                        if (super.throwExceptionIfInvalid(value) != null) {
+                            String v = (String) value;
+                            if (!DelegationTypeMap.isValid(v)) {
+                                throw new BadParameterException(DelegationTypeMap.getExpected());
+                            }
+                        }
+                        return value;
+                    }
+                },
+                new UOptional(VOMSContext.PROXYTYPE) {
+                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                        if (super.throwExceptionIfInvalid(value) != null) {
+                            String v = (String) value;
+                            if (!ProxyTypeMap.isValid(v)) {
+                                throw new BadParameterException(ProxyTypeMap.getExpected());
+                            }
+                        }
+                        return value;
+                    }
+                }
+        };
     }
 
     public Default[] getDefaults(Map map) throws IncorrectStateException {
@@ -151,6 +161,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                 new Default(VOMSContext.PROXYTYPE, ProxyTypeMap.TYPE_RFC3820)
         };
     }
+
     protected static String getUnixUID() throws IncorrectStateException {
         try {
             Process p = Runtime.getRuntime().exec("id -u");
