@@ -47,6 +47,11 @@ of the <a href="http://operations-portal.in2p3.fr/vo">EGI Operations Portal</a> 
                 <pre>voms://{Host}:{Vomses port}{DN}</pre>
             </answer>
         </faq>
+        <faq id="MyProxy">
+            <question>How do I use the VOMSMyProxy context ?</question>
+            <answer>It is basically the same usage of the <a href="../jsaga-adaptor-globus/faq.html">MyProxy</a> context, except
+            that you use a VOMS proxy as described above</answer>
+        </faq>
         <faq id="ca">
             <question>How to name the Certificate Authority (on client side) ?</question>
             <answer>Use the "openssl" command line interface from Linux/Cygwin distribution:
