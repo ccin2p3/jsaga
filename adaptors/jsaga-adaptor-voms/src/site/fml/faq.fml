@@ -14,13 +14,23 @@
     </part>
     <part id="security">
         <title>Security</title>
-        <faq id="proxy">
-            <question>What do I need to build a VOMS Proxy?</question>
-            <answer>The VOMS Proxy can be built from either:
+        <faq id="proxyExists">
+            <question>How do I configure this adaptor to use an existing proxy</question>
+            <answer>JSAGA can load your proxy from either (in order of priority):
                 <ul>
-                    <li>The PEM certificate (attribute "UserCert") and its private key (attribute "UserKey") with its password (attribute "UserPass")</li>
-                    <li>The PKCS12 certificate (attribute "UserCertKey") with its password (attribute "UserPass")</li>
+                    <li>An object in memory (attribute "UserProxyObject")</li>
+                    <li>A string (attribute "UserProxyString")</li>
+                    <li>A file (attribute "UserProxy")</li>
+                </ul>
+            </answer>
+        </faq>
+        <faq id="proxyInit">
+            <question>What do I need to build a VOMS Proxy?</question>
+            <answer>The VOMS Proxy can be built from either (in order of priority):
+                <ul>
                     <li>A valid Globus Proxy (attribute "InitialProxy")</li>
+                    <li>The PKCS12 certificate (attribute "UserCertKey") with its password (attribute "UserPass")</li>
+                    <li>The PEM certificate (attribute "UserCert") and its private key (attribute "UserKey") with its password (attribute "UserPass")</li>
                 </ul>
             </answer>
         </faq>
