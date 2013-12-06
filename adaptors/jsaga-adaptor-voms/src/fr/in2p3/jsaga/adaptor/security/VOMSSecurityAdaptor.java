@@ -79,7 +79,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                         new UFile(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY),
                         new UAnd(new Usage[]{
                                 new UOr(new Usage[]{
-                                        new UFilePath(USAGE_INIT_PKCS12, VOMSContext.USERCERTKEY),
+                                        new UFile(USAGE_INIT_PKCS12, VOMSContext.USERCERTKEY),
                                         new UAnd(USAGE_INIT_PEM, new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)})
                                 }),
                                 new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS),
