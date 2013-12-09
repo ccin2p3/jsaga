@@ -16,7 +16,7 @@
         <module>jsaga-adaptor-linux</module>
         <module>jsaga-adaptor-lfc</module>
         <module>jsaga-adaptor-srm</module>
-        <module>jsaga-adaptor-wsgram</module>
+        <!-- <module>jsaga-adaptor-wsgram</module> -->
         <module>jsaga-adaptor-cream</module>
         <module>jsaga-adaptor-wms</module>
         <module>jsaga-adaptor-bes-genesis2</module>
