@@ -31,8 +31,6 @@
             <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
             </snapshots>
         </repository>
     </repositories>
