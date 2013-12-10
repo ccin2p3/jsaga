@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
-import eu.emi.security.canl.axis2.CANLAXIS2SocketFactory;
+//import eu.emi.security.canl.axis2.CANLAXIS2SocketFactory;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
@@ -39,8 +39,6 @@ import java.util.Properties;
 public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements QueryListJob, ListableJobAdaptor, JobInfoAdaptor {
 	
     public JobStatus[] getStatusList(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
-    	// TODO: removing this line gives : "no truststore defined". Check CANLAXIS2 threadsafe
-        CANLAXIS2SocketFactory.setCurrentProperties(m_sslConfig);
 
         JobInfo[] resultArray;
 		resultArray = getJobInfoResult(nativeJobIdArray);
@@ -84,7 +82,7 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
             }
             return jobIds;
         } else {
-            throw new NoSuccessException("Failed to list jobs");
+            return new String[]{};
         }
     }
 

@@ -1,26 +1,9 @@
 package integration;
 
-import eu.emi.security.canl.axis2.CANLAXIS2SocketFactory;
-import fr.in2p3.jsaga.adaptor.cream.job.CreamStub;
-import fr.in2p3.jsaga.adaptor.cream.job.DelegationStub;
-
-import org.apache.commons.httpclient.protocol.Protocol;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobFilter;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobPurgeRequest;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.Result;
-//import org.glite.ce.creamapi.ws.cream2.CREAMLocator;
-//import org.glite.ce.creamapi.ws.cream2.CREAMPort;
-//import org.glite.ce.creamapi.ws.cream2.types.JobFilter;
-//import org.glite.ce.creamapi.ws.cream2.types.Result;
-import org.ogf.saga.AbstractTest;
-import org.ogf.saga.error.BadParameterException;
-import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
-
-import java.io.File;
-import java.net.MalformedURLException;
-import java.util.Properties;
 
 //import javax.xml.rpc.ServiceException;
 
@@ -36,45 +19,13 @@ import java.util.Properties;
 /**
  *
  */
-public class CreamExecutionPurgeJobs extends AbstractTest {
-    private URL m_url;
-    private String m_delegationId;
+public class CreamExecutionPurgeJobs extends CreamAbstractTest {
 
     public CreamExecutionPurgeJobs() throws Exception {
-        this("cream");
-    }
-    protected CreamExecutionPurgeJobs(String jobprotocol) throws Exception {
         super();
-        m_url = URLFactory.createURL(getRequiredProperty(jobprotocol, CONFIG_JOBSERVICE_URL));
-        String query = m_url.getQuery();
-        if (query!=null && query.startsWith("delegationId=")) {
-            m_delegationId = query.substring(query.indexOf('=')+1);
-        } else {
-            m_delegationId = null;
-        }
     }
 
     public void test_purge() throws Exception {
-        Protocol.registerProtocol("https", new Protocol("https", new CANLAXIS2SocketFactory(), m_url.getPort()));
-        
-        Properties m_sslConfig = new Properties();
-        m_sslConfig.put("truststore", new File(
-        									new File(
-        										new File(
-        											new File(System.getProperty("user.home"), ".jsaga"),
-        										"contexts"),
-        									"voms"),
-        								"certificates")
-        								.getAbsolutePath());
-        m_sslConfig.put("proxy", new File(
-        							new File(
-    										new File(System.getProperty("user.home"), ".jsaga"),
-        							"tmp"),
-        						 "voms_cred.txt")
-        						 .getAbsolutePath());
-        							
-        CANLAXIS2SocketFactory.setCurrentProperties(m_sslConfig);
-
         // set filter
         JobFilter filter = new JobFilter();
         if (m_delegationId != null) {

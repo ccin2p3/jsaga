@@ -21,7 +21,7 @@
         </developer>
     </developers>
     <build>
-		<plugins>
+        <plugins>
              <plugin>
                 <groupId>org.apache.axis2</groupId>
                 <artifactId>axis2-wsdl2code-maven-plugin</artifactId>
@@ -53,10 +53,10 @@
                     </execution>
                 </executions>
             </plugin>           
-	    <plugin>
-    	       <groupId>org.codehaus.mojo</groupId>
-    	       <artifactId>build-helper-maven-plugin</artifactId>
-    	       <executions>
+        <plugin>
+               <groupId>org.codehaus.mojo</groupId>
+               <artifactId>build-helper-maven-plugin</artifactId>
+               <executions>
                    <execution>
                        <phase>generate-sources</phase>
                            <goals><goal>add-source</goal></goals>
@@ -70,7 +70,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
             </plugin>
-		</plugins>
+        </plugins>
     </build>
     <dependencies>
         <dependency><!-- for security context (WARNING: order of dependencies matters) -->
@@ -91,46 +91,41 @@
             <version>0.9.17-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
-        	<dependency>
-   			<groupId>eu.eu-emi.security</groupId>
-  			<artifactId>canl-java-axis2</artifactId>
-  			<version>0.1.3</version>
-		</dependency>
-        	<dependency>
-   			<groupId>eu.eu-emi.security</groupId>
-  			<artifactId>canl</artifactId>
-  			<version>1.3.0</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.axis2</groupId>
-			<artifactId>axis2</artifactId>
-			<version>1.6.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.axis2</groupId>
-			<artifactId>axis2-transport-local</artifactId>
-			<version>1.6.2</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.axis2</groupId>
-			<artifactId>axis2-transport-http</artifactId>
-			<version>1.6.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.condor</groupId>
-			<artifactId>classad</artifactId>
-			<version>2.4</version>
-			<scope>compile</scope>
-		</dependency>
+        <dependency>
+               <groupId>eu.eu-emi.security</groupId>
+              <artifactId>canl</artifactId>
+              <version>1.3.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-transport-local</artifactId>
+            <version>1.6.2</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-transport-http</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.condor</groupId>
+            <artifactId>classad</artifactId>
+            <version>2.4</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
-	<repositories>
+    <repositories>
         <!-- argus-pep-common and argus-parent repo -->
         <repository>
             <id>switch</id>
             <name>SWITCH releases</name>
             <url>http://www.switch.ch/grid/authz/docs/maven2/release</url>
         </repository>
-	</repositories>
+    </repositories>
 </project>

@@ -1,10 +1,10 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
-import eu.emi.security.canl.axis2.CANLAXIS2SocketFactory;
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.cream.CreamSocketFactory;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 
@@ -12,6 +12,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.databinding.types.URI;
 import org.apache.axis2.databinding.types.URI.MalformedURIException;
 import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.log4j.Logger;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobFilter;
@@ -99,15 +100,15 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
         return null;    // no default
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
-        Protocol.registerProtocol("https", new Protocol("https", new CANLAXIS2SocketFactory(), port));
-        
-        m_sslConfig = new Properties();
-        m_sslConfig.put("truststore", m_certRepository.getPath());
-        m_sslConfig.put("crlcheckingmode", "ifvalid");
-        m_sslConfig.put("proxy", m_proxyFilename);
-        CANLAXIS2SocketFactory.setCurrentProperties(m_sslConfig);
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) 
+            throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, 
+            BadParameterException, TimeoutException, NoSuccessException {
 
+        Protocol.registerProtocol("https", 
+                new Protocol("https", 
+                             (ProtocolSocketFactory)new CreamSocketFactory(m_proxyFilename, m_certRepository), 
+                             port));
+        
         // set DELEGATION_ID
         if (attributes.containsKey(DELEGATION_ID)) {
             m_delegationId = (String) attributes.get(DELEGATION_ID);
