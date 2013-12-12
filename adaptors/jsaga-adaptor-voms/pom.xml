@@ -45,8 +45,13 @@
         </dependency>
         <dependency>
             <groupId>org.italiangrid</groupId>
-            <artifactId>voms-api-java</artifactId>
-            <version>3.0.2</version>
+            <artifactId>voms-clients</artifactId>
+            <version>3.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-globus</artifactId>
+            <version>0.9.17-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <repositories>

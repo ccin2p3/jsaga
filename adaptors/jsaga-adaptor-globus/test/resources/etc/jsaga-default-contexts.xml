@@ -5,6 +5,10 @@
             <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/globus/certificates/"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>
         </context>
+        <context type="GlobusRFC3820">
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/globus/certificates/"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>
+        </context>
         <context type="MyProxy">
             <!-- <attribute name="CertRepository" value="${user.home}/.globus/certificates/"/> -->
             <attribute name="Server" value="myproxy.cern.ch:7512"/>

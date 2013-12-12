@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.engine.session.SessionConfiguration;
 import fr.in2p3.jsaga.impl.context.ConfiguredContext;
 import fr.in2p3.jsaga.impl.context.ConfigurableContextFactory;
+import fr.in2p3.jsaga.impl.context.ContextImpl;
 
 import org.apache.commons.cli.*;
 import org.ogf.saga.context.Context;
@@ -55,6 +56,7 @@ public class ContextInit extends AbstractCommand {
                     Context context = ConfigurableContextFactory.createContext(configContexts[i]);
                     // set password
                     setUserPass(context);
+                    ((ContextImpl) context).destroy();
                     // add context to session (and init context)
                     session.addContext(context);
                 }

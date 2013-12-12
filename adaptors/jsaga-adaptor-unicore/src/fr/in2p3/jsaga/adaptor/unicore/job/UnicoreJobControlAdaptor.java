@@ -213,7 +213,7 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
      * Extract the staging URL from the JSDL as follows:
      * 
      * <jsaga:DataStaging>
-     *   <jsaga:FileName>xxx</jsaga:FileName>
+     *   <jsaga:FileName>zzz</jsaga:FileName>
      *   <jsaga:Source>
      *     <jsaga:URI>/tmp/yyy</jsaga:URI>
      *   </jsaga:Source>
@@ -221,7 +221,7 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
      * 
      * or
      * <jsaga:DataStaging>
-     *   <jsaga:FileName>xxx</jsaga:FileName>
+     *   <jsaga:FileName>zzz</jsaga:FileName>
      *   <jsaga:Target>
      *     <jsaga:URI>/tmp/yyy</jsaga:URI>
      *   </jsaga:Target>

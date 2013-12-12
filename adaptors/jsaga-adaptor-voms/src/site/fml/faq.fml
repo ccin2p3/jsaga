@@ -7,19 +7,50 @@
             <answer>The command "jsaga-help" provides some useful information about the usage
                 and the current configuration of the plug-ins.
                 <pre>jsaga-help -help</pre>
-                If this command does not provides the answer to your question, then
+                If this command does not provide the answer to your question, then
                 please contact us so that we can fill out this FAQ.
             </answer>
         </faq>
     </part>
     <part id="security">
         <title>Security</title>
+        <faq id="proxyExists">
+            <question>How do I configure this adaptor to use an existing proxy</question>
+            <answer>JSAGA can load your proxy from either (in order of priority):
+                <ul>
+                    <li>An object in memory (attribute "UserProxyObject")</li>
+                    <li>A string (attribute "UserProxyString")</li>
+                    <li>A file (attribute "UserProxy")</li>
+                </ul>
+            </answer>
+        </faq>
+        <faq id="proxyInit">
+            <question>What do I need to build a VOMS Proxy?</question>
+            <answer>The VOMS Proxy can be built from either (in order of priority):
+                <ul>
+                    <li>A valid Globus Proxy (attribute "InitialProxy")</li>
+                    <li>The PKCS12 certificate (attribute "UserCertKey") with its password (attribute "UserPass")</li>
+                    <li>The PEM certificate (attribute "UserCert") and its private key (attribute "UserKey") with its password (attribute "UserPass")</li>
+                </ul>
+            </answer>
+        </faq>
+        <faq id="gLite">
+            <question>What is the "Server" attribute?</question>
+            <answer>It is the URI of the VOMS Server for your VO (attribute "UserVO"). If you have the gLite UI environment on your box, you can omit this
+            attribute. The URI will be found in the gLite "vomses" directory that you can set in the "Vomses" attribute.
+            If the "Vomses" attribute is not set, the URI will be found in "$HOME/.glite/vomses" or "$HOME/.voms/vomses" or "/etc/vomses".</answer>
+        </faq>
         <faq id="url">
-            <question>Where can I find the URL to set for attribute "Server" ?</question>
+            <question>Where can I find the URL to set for attribute "Server" if I have not the gLite UI environment?</question>
             <answer>The Server URL is built with the information found under section "VOMS information"
 of the <a href="http://operations-portal.in2p3.fr/vo">EGI Operations Portal</a> for your VO :
                 <pre>voms://{Host}:{Vomses port}{DN}</pre>
             </answer>
+        </faq>
+        <faq id="MyProxy">
+            <question>How do I use the VOMSMyProxy context ?</question>
+            <answer>It is basically the same usage of the <a href="../jsaga-adaptor-globus/faq.html">MyProxy</a> context, except
+            that you use a VOMS proxy as described above</answer>
         </faq>
         <faq id="ca">
             <question>How to name the Certificate Authority (on client side) ?</question>

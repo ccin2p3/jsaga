@@ -41,7 +41,7 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
         this._genuineLifeTime = (String) attributes.get(Context.LIFETIME);
         this._localLifeTime = (String) attributes.get(VOMSContext.DELEGATIONLIFETIME);
         if (_localLifeTime == null) {
-            _localLifeTime = VOMSProxyFactory.DEFAULTLIFE_TIME;
+            _localLifeTime = VOMSSecurityAdaptor.DEFAULT_LIFETIME;
         }
     }
 

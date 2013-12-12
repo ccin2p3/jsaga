@@ -28,7 +28,7 @@ public class UProxyValue extends U {
     @Override
     protected Object throwExceptionIfInvalid(Object value) throws Exception {
         String proxyValue = (String) super.throwExceptionIfInvalid(value);
-        if (!proxyValue.startsWith("-----") && proxyValue.endsWith("-----")) {
+        if (!(proxyValue.startsWith("-----") && proxyValue.endsWith("-----"))) {
             throw new BadParameterException("Not a proxy content value: "+ proxyValue);
         }
         return value;

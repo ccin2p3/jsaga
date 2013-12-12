@@ -39,12 +39,14 @@ import org.globus.gsi.util.ProxyCertificateUtil;
  */
 public class VOMSSecurityCredential extends GSSCredentialSecurityCredential implements SecurityCredential {
 
-    protected File m_userProxyFilename;
+    protected File m_userProxyFilename = null;
     protected File m_vomsDir;
 
     public VOMSSecurityCredential(GSSCredential proxy, Map attributes) {
         super(proxy, new File((String) attributes.get(Context.CERTREPOSITORY)));
-        m_userProxyFilename = new File((String) attributes.get(Context.USERPROXY));
+        if (attributes.containsKey(Context.USERPROXY)) {
+            m_userProxyFilename = new File((String) attributes.get(Context.USERPROXY));
+        }
         m_vomsDir = new File((String) attributes.get(VOMSContext.VOMSDIR));
     }
 
@@ -58,7 +60,9 @@ public class VOMSSecurityCredential extends GSSCredentialSecurityCredential impl
             throw new NoSuccessException("Not a globus proxy");
         }
         if (Context.USERPROXY.equals(key)) {
-			return this.m_userProxyFilename.getAbsolutePath();
+            return (m_userProxyFilename != null?
+                    this.m_userProxyFilename.getAbsolutePath()
+                    :"In memory");
         }
         ArrayList<String> vomsdirs = new ArrayList<String>(1);
         vomsdirs.add(m_vomsDir.getAbsolutePath());

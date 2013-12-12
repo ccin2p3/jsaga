@@ -17,36 +17,23 @@ import java.util.*;
 /**
  *
  */
-public class UOr implements Usage {
-    private Usage[] m_or;
+public class UOr extends ULogicalOperation {
 
-    public UOr(Usage[] usage) {
-        m_or = usage;
+    public UOr(Collection<Usage> c) {
+        super(c);
+    }
+    
+
+    @Deprecated
+    public UOr(Usage[] array) {
+        super(array);
     }
 
-    public Set<String> getKeys() {
-        Set<String> keys = new HashSet<String>(m_or.length);
-        for (Usage u : m_or) {
-            keys.addAll(u.getKeys());
-        }
-        return keys;
-    }
-
-    public String correctValue(String attributeName, String attributeValue) throws DoesNotExistException {
-        for (int i=0; m_or!=null && i<m_or.length; i++) {
-            try {
-                return m_or[i].correctValue(attributeName, attributeValue);
-            } catch(DoesNotExistException e) {
-                // next iteration
-            }
-        }
-        throw new DoesNotExistException("Attribute not found: "+attributeName);
-    }
 
     public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException, BadParameterException {
-        for (int i=0; m_or!=null && i<m_or.length; i++) {
+        for (Iterator<Usage> i = this.iterator(); i.hasNext();) {
             try {
-                int id = m_or[i].getFirstMatchingUsage(attributes);
+                int id = i.next().getFirstMatchingUsage(attributes);
                 if (id > -1) {
                     return id;
                 }
@@ -59,8 +46,8 @@ public class UOr implements Usage {
 
     public Usage getMissingValues(Map attributes) {
         List missing = new ArrayList();
-        for (int i=0; m_or!=null && i<m_or.length; i++) {
-            Usage m = m_or[i].getMissingValues(attributes);
+        for (Iterator<Usage> i = this.iterator(); i.hasNext();) {
+            Usage m = i.next().getMissingValues(attributes);
             if (m != null) {
                 missing.add(m);
             } else {
@@ -71,18 +58,24 @@ public class UOr implements Usage {
         if (missing.size() == 1) {
             return (Usage) missing.get(0);
         } else {
-            return new UOr((Usage[]) missing.toArray(new Usage[missing.size()]));
+            return new UOr(missing);
         }
     }
 
-    public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append('(');
-        for (int i=0; m_or!=null && i<m_or.length; i++) {
-            if(i>0) buf.append(" | ");
-            buf.append(m_or[i].toString());
-        }
-        buf.append(')');
-        return buf.toString();
+    @Override
+    public String getSeparator() {
+        return "|";
     }
+    
+    public static class Builder {
+        private Vector<Usage> m_coll = new Vector<Usage>();
+        public Builder or(Usage newOr) {
+            this.m_coll.add(newOr);
+            return this;
+        }
+        public UOr build() {
+            return new UOr(m_coll);
+        }
+    }
+
 }
