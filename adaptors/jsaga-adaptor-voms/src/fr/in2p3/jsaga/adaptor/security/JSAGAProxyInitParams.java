@@ -47,7 +47,6 @@ public class JSAGAProxyInitParams extends ProxyInitParams {
             setVomsesLocations(Arrays.asList((String) attributes.get(VOMSContext.VOMSES)));
         }
         
-        // TODO: test this
         if (attributes.containsKey(VOMSContext.USERFQAN)) {
             List<String> fqans = new ArrayList<String>();
             fqans.add((String) attributes.get(VOMSContext.USERFQAN));
