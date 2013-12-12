@@ -49,6 +49,56 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
     }
 
     public Usage getUsage() {
+        return new UAnd.Builder()
+            .and(new UOr.Builder()
+                    .or(new UAnd.Builder()
+                        .id(USAGE_GET_DELEGATED_MEMORY)
+                        .and(new UNoPrompt(GlobusContext.USERPROXYOBJECT))
+                        .and(new UDuration(VOMSContext.DELEGATIONLIFETIME))
+                        .build()
+                    )
+                    .or(new UAnd.Builder()
+                        .id(USAGE_GET_DELEGATED_LOAD)
+                        .and(new UFile(Context.USERPROXY))
+                        .and(new UDuration(VOMSContext.DELEGATIONLIFETIME))
+                        .build()
+                    )
+                    .or(new UNoPrompt(GlobusSecurityAdaptor.USAGE_MEMORY, GlobusContext.USERPROXYOBJECT))
+                    .or(new UProxyValue(GlobusSecurityAdaptor.USAGE_LOAD,  VOMSContext.USERPROXYSTRING))
+                    .or(new UFile(GlobusSecurityAdaptor.USAGE_LOAD, Context.USERPROXY))
+                    .or(new UAnd.Builder()
+                            .and(new UFile(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY))
+                            .and(getInitProxyUsages())
+                            .and(new UOptional(VOMSContext.DELEGATIONLIFETIME) {
+                                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                                        return (value != null ? super.throwExceptionIfInvalid(value) : null);
+                                    }
+                                }
+                            )
+                            .build()
+                       )
+                    .or(new UAnd.Builder()
+                            .and(fr.in2p3.jsaga.adaptor.security.usage.Util.buildCertsUsage())
+                            .and(new UHidden(Context.USERPASS))
+                            .and(getInitProxyUsages())
+                            .and(new UOptional(VOMSContext.DELEGATIONLIFETIME) {
+                                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                                        return (value != null ? super.throwExceptionIfInvalid(value) : null);
+                                    }
+                                }
+                            )
+                            .build()
+                       )
+                    .build()
+                )
+            .and(new UFile(Context.CERTREPOSITORY))
+            .and(new U(VOMSContext.MYPROXYSERVER))
+            .and(new UOptional(VOMSContext.MYPROXYUSERID))
+            .and(new UOptional(VOMSContext.MYPROXYPASS))
+            .build();
+    }
+    @Deprecated
+    public Usage getUsageOld() {
         return new UAnd(new Usage[]{
             new UOr(new Usage[]{
                 // get delegated proxy from server
@@ -85,21 +135,6 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
             new UOptional(VOMSContext.MYPROXYUSERID),
             new UOptional(VOMSContext.MYPROXYPASS),});
     }
-
-//    protected Usage[] getInitProxyUsages() {
-//        Usage[] voms = super.getInitProxyUsages();
-//        Usage[] u = new Usage[voms.length+1];
-//        int i=0;
-//        for (i=0; i<voms.length; i++) {
-//            u[i] = voms[i];
-//        }
-//        u[i] = new UOptional(VOMSContext.DELEGATIONLIFETIME) {
-//            protected Object throwExceptionIfInvalid(Object value) throws Exception {
-//                return (value != null ? super.throwExceptionIfInvalid(value) : null);
-//            }
-//        };
-//        return u;
-//    }
 
     public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, TimeoutException, NoSuccessException {
         try {
