@@ -45,6 +45,7 @@ public class SessionImpl extends AbstractSagaObjectImpl implements Session {
     public void addContext(Context context) throws NoSuccessException, TimeoutException {
         if (context instanceof ContextImpl) {
             ContextImpl ctxImpl = (ContextImpl) context;
+            // Check if Type is set
             try {
                 if ("Unknown".equals((String)context.getAttribute(Context.TYPE))) {
                     throw new NoSuccessException("The context is missing the attribute Type");
@@ -63,7 +64,6 @@ public class SessionImpl extends AbstractSagaObjectImpl implements Session {
                 throw new NoSuccessException("The context is missing the attribute Type");
             }
             if (! m_contexts.contains(ctxImpl)) {
-                // Check if Type is set
                 // check if new context will conflict with old contexts
                 boolean check = EngineProperties.getBoolean(EngineProperties.JSAGA_DEFAULT_CONTEXTS_CHECK_CONFLICTS);
                 if (check) {
