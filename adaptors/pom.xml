@@ -24,7 +24,7 @@
         <module>jsaga-adaptor-bes-unicore6</module>
         <module>jsaga-adaptor-bes</module>
         <module>jsaga-adaptor-unicore</module>
-        <module>jsaga-adaptor-batchssh</module>
+        <!-- <module>jsaga-adaptor-batchssh</module> -->
         <module>jsaga-adaptor-irods</module>
         <module>jsaga-adaptor-secretservice</module>
         <module>jsaga-adaptor-ourgrid</module>
@@ -32,7 +32,7 @@
         <module>jsaga-adaptor-rocci</module>
         <!-- adaptors which are used as dependencies of other adaptors must be declared at the end -->
         <module>jsaga-adaptor-ssh</module>
-        <module>jsaga-adaptor-ssh2</module>
+        <!-- <module>jsaga-adaptor-ssh2</module> -->
         <module>jsaga-adaptor-ssh3</module>
         <module>jsaga-adaptor-classic</module>
         <module>jsaga-adaptor-voms</module>
