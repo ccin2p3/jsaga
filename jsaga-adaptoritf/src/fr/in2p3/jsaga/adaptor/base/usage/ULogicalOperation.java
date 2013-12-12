@@ -35,18 +35,6 @@ public abstract class ULogicalOperation extends Vector<Usage> implements Usage {
         }
     }
 
-    // TODO: remove this when m_and_deprecated is removed
-//    @Override
-//    public boolean add(Usage newUsage) {
-//        boolean res = super.add(newUsage);
-//        if (res) {
-//            // If newUsage was added, build a new array
-//            m_and_deprecated = new Usage[this.size()];
-//            this.toArray(m_and_deprecated);
-//        }
-//        return res;
-//    }
-
     public Set<String> getKeys() {
         Set<String> keys = new HashSet<String>(this.size());
         for (Iterator<Usage> i = this.iterator(); i.hasNext(); ) {
