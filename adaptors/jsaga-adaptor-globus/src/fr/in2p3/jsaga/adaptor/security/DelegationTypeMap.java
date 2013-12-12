@@ -1,14 +1,10 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import eu.emi.security.authn.x509.proxy.ProxyType;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -49,7 +45,7 @@ public class DelegationTypeMap {
     
     public static String getExpected() {
         Set<String> valids = DelegationTypeMap.getValidTypes();
-        String msg = "\"" + VOMSContext.DELEGATION + "\": Expected: ";
+        String msg = "\"" + GlobusContext.DELEGATION + "\": Expected: ";
         for (Iterator<String> i = valids.iterator(); i.hasNext();) {
             msg += i.next() + " | ";
         }

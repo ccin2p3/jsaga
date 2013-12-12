@@ -102,7 +102,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                     }
                 }
             )
-            .and(new UOptional(VOMSContext.DELEGATION) {
+            .and(new UOptional(GlobusContext.DELEGATION) {
                     @Override
                     protected Object throwExceptionIfInvalid(Object value) throws Exception {
                         if (super.throwExceptionIfInvalid(value) != null) {
@@ -163,7 +163,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                         new File(System.getProperty("user.home")+"/.glite/vomses/"),
                         new File("/etc/vomses/")}),
                 new Default(Context.LIFETIME, DEFAULT_LIFETIME),
-                new Default(VOMSContext.DELEGATION, DelegationTypeMap.NONE),
+                new Default(GlobusContext.DELEGATION, DelegationTypeMap.NONE),
                 new Default(VOMSContext.PROXYTYPE, ProxyTypeMap.TYPE_RFC3820)
         };
     }

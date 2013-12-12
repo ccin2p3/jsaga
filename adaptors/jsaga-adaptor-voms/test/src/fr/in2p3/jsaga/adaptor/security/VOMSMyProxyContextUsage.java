@@ -29,13 +29,13 @@ public class VOMSMyProxyContextUsage extends VOMSContextUsage {
     
     @Test
     public void getDelegatedFromMemory() throws Exception {
-        m_context.setAttribute(VOMSContext.DELEGATIONLIFETIME, "PT12H");
+        m_context.setAttribute(GlobusContext.DELEGATIONLIFETIME, "PT12H");
         Assert.assertEquals(VOMSMyProxySecurityAdaptor.USAGE_GET_DELEGATED_MEMORY, getMatchingUsage());
     }
     
     @Test
     public void getDelegatedFromFile() throws Exception {
-        m_context.setAttribute(VOMSContext.DELEGATIONLIFETIME, "PT12H");
+        m_context.setAttribute(GlobusContext.DELEGATIONLIFETIME, "PT12H");
         m_context.removeAttribute(GlobusContext.USERPROXYOBJECT);
         Assert.assertEquals(VOMSMyProxySecurityAdaptor.USAGE_GET_DELEGATED_LOAD, getMatchingUsage());
     }
@@ -43,7 +43,7 @@ public class VOMSMyProxyContextUsage extends VOMSContextUsage {
     @Test(expected=BadParameterException.class)
     public void invalidDelegationLifetime() throws Exception {
 //        prepareContextForProxyInit();
-        m_context.setAttribute(VOMSContext.DELEGATIONLIFETIME, "invalid");
+        m_context.setAttribute(GlobusContext.DELEGATIONLIFETIME, "invalid");
         getMatchingUsage();
     }
     

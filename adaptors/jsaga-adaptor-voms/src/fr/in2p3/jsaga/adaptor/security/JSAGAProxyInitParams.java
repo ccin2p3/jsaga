@@ -60,7 +60,7 @@ public class JSAGAProxyInitParams extends ProxyInitParams {
         } catch (ParseException e) {
         }
 
-        setLimited(DelegationTypeMap.toLimitedValue((String)attributes.get(VOMSContext.DELEGATION)));
+        setLimited(DelegationTypeMap.toLimitedValue((String)attributes.get(GlobusContext.DELEGATION)));
         
     }
     

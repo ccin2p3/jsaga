@@ -39,7 +39,7 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
     public VOMSMyProxySecurityCredential(GSSCredential proxy, Map attributes) {
         super(proxy, attributes);
         this._genuineLifeTime = (String) attributes.get(Context.LIFETIME);
-        this._localLifeTime = (String) attributes.get(VOMSContext.DELEGATIONLIFETIME);
+        this._localLifeTime = (String) attributes.get(GlobusContext.DELEGATIONLIFETIME);
         if (_localLifeTime == null) {
             _localLifeTime = VOMSSecurityAdaptor.DEFAULT_LIFETIME;
         }
@@ -50,7 +50,7 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
      */
     public String getAttribute(String key) throws NotImplementedException, NoSuccessException {
         // get attribute
-        if (Context.LIFETIME.equals(key) || VOMSContext.DELEGATIONLIFETIME.equals(key)) {
+        if (Context.LIFETIME.equals(key) || GlobusContext.DELEGATIONLIFETIME.equals(key)) {
             // same as globus
             X509Credential globusProxy;
             if (m_proxy instanceof GlobusGSSCredentialImpl) {

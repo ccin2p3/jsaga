@@ -54,13 +54,13 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
                     .or(new UAnd.Builder()
                         .id(USAGE_GET_DELEGATED_MEMORY)
                         .and(new UNoPrompt(GlobusContext.USERPROXYOBJECT))
-                        .and(new UDuration(VOMSContext.DELEGATIONLIFETIME))
+                        .and(new UDuration(GlobusContext.DELEGATIONLIFETIME))
                         .build()
                     )
                     .or(new UAnd.Builder()
                         .id(USAGE_GET_DELEGATED_LOAD)
                         .and(new UFile(Context.USERPROXY))
-                        .and(new UDuration(VOMSContext.DELEGATIONLIFETIME))
+                        .and(new UDuration(GlobusContext.DELEGATIONLIFETIME))
                         .build()
                     )
                     .or(new UNoPrompt(GlobusSecurityAdaptor.USAGE_MEMORY, GlobusContext.USERPROXYOBJECT))
@@ -69,7 +69,7 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
                     .or(new UAnd.Builder()
                             .and(new UFile(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY))
                             .and(getInitProxyUsages())
-                            .and(new UOptional(VOMSContext.DELEGATIONLIFETIME) {
+                            .and(new UOptional(GlobusContext.DELEGATIONLIFETIME) {
                                     protected Object throwExceptionIfInvalid(Object value) throws Exception {
                                         return (value != null ? super.throwExceptionIfInvalid(value) : null);
                                     }
@@ -81,7 +81,7 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
                             .and(fr.in2p3.jsaga.adaptor.security.usage.Util.buildCertsUsage())
                             .and(new UHidden(Context.USERPASS))
                             .and(getInitProxyUsages())
-                            .and(new UOptional(VOMSContext.DELEGATIONLIFETIME) {
+                            .and(new UOptional(GlobusContext.DELEGATIONLIFETIME) {
                                     protected Object throwExceptionIfInvalid(Object value) throws Exception {
                                         return (value != null ? super.throwExceptionIfInvalid(value) : null);
                                     }
@@ -94,48 +94,9 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
             .and(new UFile(Context.CERTREPOSITORY))
             .and(new U(VOMSContext.MYPROXYSERVER))
             .and(new UOptional(VOMSContext.MYPROXYUSERID))
-            .and(new UOptional(VOMSContext.MYPROXYPASS))
+            .and(new UOptional(GlobusContext.MYPROXYPASS))
             .build();
     }
-    @Deprecated
-    public Usage getUsageOld() {
-        return new UAnd(new Usage[]{
-            new UOr(new Usage[]{
-                // get delegated proxy from server
-                new UAnd(USAGE_GET_DELEGATED_MEMORY, new Usage[]{
-                    new UNoPrompt(GlobusContext.USERPROXYOBJECT),
-                    new UDuration(VOMSContext.DELEGATIONLIFETIME)
-                }),
-                new UAnd(USAGE_GET_DELEGATED_LOAD, new Usage[]{
-                    new UFile(Context.USERPROXY),
-                    new UDuration(VOMSContext.DELEGATIONLIFETIME)
-                }),
-                
-                // local proxy
-                new UNoPrompt(GlobusSecurityAdaptor.USAGE_MEMORY, GlobusContext.USERPROXYOBJECT),
-                new UProxyValue(GlobusSecurityAdaptor.USAGE_LOAD,  VOMSContext.USERPROXYSTRING),
-                new UFile(GlobusSecurityAdaptor.USAGE_LOAD, Context.USERPROXY),
-                new UFile(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY),
-
-                // create and store proxy
-                new UAnd(
-                    new Usage[] {
-                        new UOptional(VOMSContext.DELEGATIONLIFETIME) {
-                            protected Object throwExceptionIfInvalid(Object value) throws Exception {
-                                return (value != null ? super.throwExceptionIfInvalid(value) : null);
-                            }
-                        },
-                        this.getInitProxyUsages()
-                    }
-                )
-            }),
-            new UFile(Context.CERTREPOSITORY),
-            new UFile(VOMSContext.VOMSDIR),
-            new U(VOMSContext.MYPROXYSERVER),
-            new UOptional(VOMSContext.MYPROXYUSERID),
-            new UOptional(VOMSContext.MYPROXYPASS),});
-    }
-
     public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             switch (usage) {
@@ -198,7 +159,7 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
             attributeForVOMS.put(e.getKey(), e.getValue());
         }
 
-        String lifeTime = attributes.get(VOMSContext.DELEGATIONLIFETIME);
+        String lifeTime = attributes.get(GlobusContext.DELEGATIONLIFETIME);
         if(lifeTime != null) attributeForVOMS.put(Context.LIFETIME, lifeTime);
 
         return attributeForVOMS;
@@ -218,8 +179,8 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
         String myProxyUserId = getUserName(cred, attributes);
         proxyParameters.setUserName(myProxyUserId);
 
-        if (attributes.get(VOMSContext.MYPROXYPASS) != null) {
-            proxyParameters.setPassphrase((String) attributes.get(VOMSContext.MYPROXYPASS));
+        if (attributes.get(GlobusContext.MYPROXYPASS) != null) {
+            proxyParameters.setPassphrase((String) attributes.get(GlobusContext.MYPROXYPASS));
         }
 
         // destroy remote proxy
@@ -248,12 +209,12 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
         String myProxyUserId = getUserName(newCred, attributes);
         proxyParameters.setUserName(myProxyUserId);
 
-        if (attributes.get(VOMSContext.MYPROXYPASS) != null) {
-            proxyParameters.setPassphrase((String) attributes.get(VOMSContext.MYPROXYPASS));
+        if (attributes.get(GlobusContext.MYPROXYPASS) != null) {
+            proxyParameters.setPassphrase((String) attributes.get(GlobusContext.MYPROXYPASS));
         }
 
-        int storedLifetime = attributes.containsKey(VOMSContext.DELEGATIONLIFETIME)
-                ? UDuration.toInt(attributes.get(VOMSContext.DELEGATIONLIFETIME))
+        int storedLifetime = attributes.containsKey(GlobusContext.DELEGATIONLIFETIME)
+                ? UDuration.toInt(attributes.get(GlobusContext.DELEGATIONLIFETIME))
                 : DEFAULT_STORED_PROXY_LIFETIME;  // default lifetime for stored proxies
         proxyParameters.setLifetime(storedLifetime);
 
@@ -268,12 +229,12 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
         String myProxyUserId = getUserName(oldCred, attributes);
         proxyParameters.setUserName(myProxyUserId);
 
-        if (attributes.get(VOMSContext.MYPROXYPASS) != null) {
-            proxyParameters.setPassphrase((String) attributes.get(VOMSContext.MYPROXYPASS));
+        if (attributes.get(GlobusContext.MYPROXYPASS) != null) {
+            proxyParameters.setPassphrase((String) attributes.get(GlobusContext.MYPROXYPASS));
         }
 
-        int delegatedLifetime = attributes.containsKey(VOMSContext.DELEGATIONLIFETIME)
-                ? UDuration.toInt(attributes.get(VOMSContext.DELEGATIONLIFETIME))
+        int delegatedLifetime = attributes.containsKey(GlobusContext.DELEGATIONLIFETIME)
+                ? UDuration.toInt(attributes.get(GlobusContext.DELEGATIONLIFETIME))
                 : DEFAULT_DELEGATED_PROXY_LIFETIME;  // effective lifetime for delegated proxy
         proxyParameters.setLifetime(delegatedLifetime);
 

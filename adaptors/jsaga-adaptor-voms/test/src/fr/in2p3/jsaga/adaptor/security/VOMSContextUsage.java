@@ -112,7 +112,7 @@ public class VOMSContextUsage {
     @Test(expected=BadParameterException.class)
     public void invalidDelegation() throws Exception {
         prepareContextForProxyInit();
-        m_context.setAttribute(VOMSContext.DELEGATION, "invalid");
+        m_context.setAttribute(GlobusContext.DELEGATION, "invalid");
         getMatchingUsage();
     }
     
