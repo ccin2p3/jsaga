@@ -29,10 +29,11 @@ public class UOr extends ULogicalOperation {
         super(array);
     }
 
+
     public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException, BadParameterException {
-        for (int i=0; m_and_deprecated!=null && i<m_and_deprecated.length; i++) {
+        for (Iterator<Usage> i = this.iterator(); i.hasNext();) {
             try {
-                int id = m_and_deprecated[i].getFirstMatchingUsage(attributes);
+                int id = i.next().getFirstMatchingUsage(attributes);
                 if (id > -1) {
                     return id;
                 }
@@ -45,8 +46,8 @@ public class UOr extends ULogicalOperation {
 
     public Usage getMissingValues(Map attributes) {
         List missing = new ArrayList();
-        for (int i=0; m_and_deprecated!=null && i<m_and_deprecated.length; i++) {
-            Usage m = m_and_deprecated[i].getMissingValues(attributes);
+        for (Iterator<Usage> i = this.iterator(); i.hasNext();) {
+            Usage m = i.next().getMissingValues(attributes);
             if (m != null) {
                 missing.add(m);
             } else {
@@ -57,7 +58,7 @@ public class UOr extends ULogicalOperation {
         if (missing.size() == 1) {
             return (Usage) missing.get(0);
         } else {
-            return new UOr((Usage[]) missing.toArray(new Usage[missing.size()]));
+            return new UOr(missing);
         }
     }
 

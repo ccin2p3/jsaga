@@ -18,8 +18,6 @@ import java.util.*;
  *
  */
 public abstract class ULogicalOperation extends Vector<Usage> implements Usage {
-    @Deprecated
-    protected Usage[] m_and_deprecated;
     
     public ULogicalOperation() {
         super();
@@ -27,42 +25,40 @@ public abstract class ULogicalOperation extends Vector<Usage> implements Usage {
     
     public ULogicalOperation(Collection c) {
         super(c);
-        m_and_deprecated = (Usage[])(c.toArray(new Usage[c.size()]));
     }
     
     @Deprecated
     public ULogicalOperation(Usage[] usage) {
         super(usage.length);
-        m_and_deprecated = usage;
         for (Usage u: usage) {
             this.add(u);
         }
     }
 
     // TODO: remove this when m_and_deprecated is removed
-    @Override
-    public boolean add(Usage newUsage) {
-        boolean res = super.add(newUsage);
-        if (res) {
-            // If newUsage was added, build a new array
-            m_and_deprecated = new Usage[this.size()];
-            this.toArray(m_and_deprecated);
-        }
-        return res;
-    }
-    
+//    @Override
+//    public boolean add(Usage newUsage) {
+//        boolean res = super.add(newUsage);
+//        if (res) {
+//            // If newUsage was added, build a new array
+//            m_and_deprecated = new Usage[this.size()];
+//            this.toArray(m_and_deprecated);
+//        }
+//        return res;
+//    }
+
     public Set<String> getKeys() {
-        Set<String> keys = new HashSet<String>(m_and_deprecated.length);
-        for (Usage u : m_and_deprecated) {
-            keys.addAll(u.getKeys());
+        Set<String> keys = new HashSet<String>(this.size());
+        for (Iterator<Usage> i = this.iterator(); i.hasNext(); ) {
+            keys.addAll(i.next().getKeys());
         }
         return keys;
     }
 
     public String correctValue(String attributeName, String attributeValue) throws DoesNotExistException {
-        for (int i=0; m_and_deprecated!=null && i<m_and_deprecated.length; i++) {
+        for (Iterator<Usage> i = this.iterator(); i.hasNext();) {
             try {
-                return m_and_deprecated[i].correctValue(attributeName, attributeValue);
+                return i.next().correctValue(attributeName, attributeValue);
             } catch(DoesNotExistException e) {
                 // next iteration
             }
@@ -75,13 +71,14 @@ public abstract class ULogicalOperation extends Vector<Usage> implements Usage {
     public abstract Usage getMissingValues(Map attributes);
 
     public abstract String getSeparator();
-    
+
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append('(');
-        for (int i=0; m_and_deprecated!=null && i<m_and_deprecated.length; i++) {
-            if(i>0) buf.append(" "+ getSeparator() + " ");
-            buf.append(m_and_deprecated[i].toString());
+        for (Iterator<Usage> i = this.iterator(); i.hasNext();) {
+            buf.append(i.next().toString());
+            if (i.hasNext())
+                buf.append(" "+ getSeparator() + " ");
         }
         buf.append(')');
         return buf.toString();

@@ -52,10 +52,6 @@ import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
  *
  */
 public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
-//    protected static final int USAGE_INIT_PKCS12 = 1;
-//    protected static final int USAGE_INIT_PEM = 2;
-//    protected static final int USAGE_MEMORY = 3;
-//    protected static final int USAGE_LOAD = 4;
     protected static final int USAGE_INIT_PROXY = 5;
     public static final String DEFAULT_LIFETIME = "PT12H";
 
@@ -67,33 +63,6 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
         return VOMSSecurityCredential.class;
     }
 
-//    @Deprecated
-//    public Usage getUsageOld() {
-//        return new UAnd(new Usage[]{
-//                new UOr(new Usage[]{
-//                        new UNoPrompt(GlobusSecurityAdaptor.USAGE_MEMORY, GlobusContext.USERPROXYOBJECT),
-//                        new UProxyValue(GlobusSecurityAdaptor.USAGE_LOAD,  VOMSContext.USERPROXYSTRING),
-//                        new UFile(GlobusSecurityAdaptor.USAGE_LOAD, Context.USERPROXY),
-//                        new UAnd(
-//                            new Usage[]{
-//                                new UFile(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY),
-//                                getInitProxyUsages()
-//                            }),
-//                        new UAnd(
-//                            new Usage[]{
-//                                new UOr(new Usage[]{
-//                                        new UFile(GlobusSecurityAdaptor.USAGE_INIT_PKCS12, GlobusContext.USERCERTKEY),
-//                                        new UAnd(GlobusSecurityAdaptor.USAGE_INIT_PEM, new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)})
-//                                }),
-//                                new UHidden(Context.USERPASS),
-//                                getInitProxyUsages()
-//                            }
-//                        )
-//                }),
-//                new UFile(Context.CERTREPOSITORY)
-//        });
-//    }
-    
     public Usage getUsage() {
         return new UAnd.Builder()
             .and(new UOr.Builder()
