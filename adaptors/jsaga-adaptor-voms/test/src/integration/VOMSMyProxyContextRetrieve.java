@@ -2,6 +2,8 @@ package integration;
 
 import org.ogf.saga.context.ContextInitTest;
 import org.ogf.saga.context.Context;
+
+import fr.in2p3.jsaga.adaptor.security.GlobusContext;
 import fr.in2p3.jsaga.adaptor.security.VOMSContext;
 
 /* ***************************************************
@@ -23,6 +25,6 @@ public class VOMSMyProxyContextRetrieve extends ContextInitTest {
 
     protected void updateContextAttributes(Context context) throws Exception {
     	// "DelegationLifeTime" activates USAGE_GET_DELEGATED_* usage
-        context.setAttribute(VOMSContext.DELEGATIONLIFETIME, "PT4H");
+        context.setAttribute(GlobusContext.DELEGATIONLIFETIME, "PT4H");
     }
 }
