@@ -17,42 +17,33 @@ import java.util.*;
 /**
  *
  */
-public class UAnd implements Usage {
+public class UAnd extends ULogicalOperation {
     private int m_id;
-    private Usage[] m_and;
 
+    public UAnd(Collection<Usage> c) {
+        this(-1, c);
+    }
+    
+    public UAnd(int id, Collection<Usage> c) {
+        super(c);
+        m_id = id;
+    }
+    
+    @Deprecated
     public UAnd(Usage[] usage) {
         this(-1, usage);
     }
-
+    
+    @Deprecated
     public UAnd(int id, Usage[] usage) {
+        super(usage);
         m_id = id;
-        m_and = usage;
-    }
-
-    public Set<String> getKeys() {
-        Set<String> keys = new HashSet<String>(m_and.length);
-        for (Usage u : m_and) {
-            keys.addAll(u.getKeys());
-        }
-        return keys;
-    }
-
-    public String correctValue(String attributeName, String attributeValue) throws DoesNotExistException {
-        for (int i=0; m_and!=null && i<m_and.length; i++) {
-            try {
-                return m_and[i].correctValue(attributeName, attributeValue);
-            } catch(DoesNotExistException e) {
-                // next iteration
-            }
-        }
-        throw new DoesNotExistException("Attribute not found: "+attributeName);
     }
 
     public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException, BadParameterException {
         int firstMatchingUsage = -1;
-        for (int i=0; m_and!=null && i<m_and.length; i++) {
-            int id = m_and[i].getFirstMatchingUsage(attributes);
+        for (int i=0; m_and_deprecated!=null && i<m_and_deprecated.length; i++) {
+            int id = m_and_deprecated[i].getFirstMatchingUsage(attributes);
             if (firstMatchingUsage==-1 && id>-1) {
                 firstMatchingUsage = id;
             }
@@ -66,8 +57,8 @@ public class UAnd implements Usage {
 
     public Usage getMissingValues(Map attributes) {
         List missing = new ArrayList();
-        for (int i=0; m_and!=null && i<m_and.length; i++) {
-            Usage m = m_and[i].getMissingValues(attributes);
+        for (int i=0; m_and_deprecated!=null && i<m_and_deprecated.length; i++) {
+            Usage m = m_and_deprecated[i].getMissingValues(attributes);
             if (m != null) {
                 missing.add(m);
             }
@@ -81,14 +72,25 @@ public class UAnd implements Usage {
         }
     }
 
-    public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append('(');
-        for (int i=0; m_and!=null && i<m_and.length; i++) {
-            if(i>0) buf.append(" ");
-            buf.append(m_and[i].toString());
-        }
-        buf.append(')');
-        return buf.toString();
+    @Override
+    public String getSeparator() {
+        return "";
     }
+    
+    public static class Builder {
+        private Vector<Usage> m_coll = new Vector<Usage>();
+        private int m_id = -1;
+        public Builder id(int i) {
+            m_id = i;
+            return this;
+        }
+        public Builder and(Usage newAnd) {
+            this.m_coll.add(newAnd);
+            return this;
+        }
+        public UAnd build() {
+            return new UAnd(m_id, m_coll);
+        }
+    }
+    
 }
