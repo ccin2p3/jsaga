@@ -13,12 +13,9 @@ package fr.in2p3.jsaga.adaptor.security;
  *
  */
 public class VOMSContext {
-//    public static final String USERCERTKEY = "UserCertKey";
     public static final String VOMSDIR = "VomsDir";
     public static final String VOMSES = "Vomses";
-//    public static final String USERPROXYOBJECT = "UserProxyObject";
     public static final String USERFQAN = "UserFQAN";
-//    public static final String DELEGATION = "Delegation";
     public static final String PROXYTYPE = "ProxyType";
     public static final String INITIALPROXY = "InitialProxy";
     public static final String USERPROXYSTRING = "UserProxyString";
@@ -26,6 +23,4 @@ public class VOMSContext {
     // MyProxy attributes
     public static final String MYPROXYSERVER = "MyProxyServer";
     public static final String MYPROXYUSERID = "MyProxyUserID";
-//    public static final String MYPROXYPASS = "MyProxyPass";
-//    public static final String DELEGATIONLIFETIME = "DelegationLifeTime";
 }
