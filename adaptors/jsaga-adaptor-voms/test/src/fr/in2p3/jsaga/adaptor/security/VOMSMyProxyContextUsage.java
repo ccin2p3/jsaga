@@ -36,7 +36,7 @@ public class VOMSMyProxyContextUsage extends VOMSContextUsage {
     @Test
     public void getDelegatedFromFile() throws Exception {
         m_context.setAttribute(VOMSContext.DELEGATIONLIFETIME, "PT12H");
-        m_context.removeAttribute(VOMSContext.USERPROXYOBJECT);
+        m_context.removeAttribute(GlobusContext.USERPROXYOBJECT);
         Assert.assertEquals(VOMSMyProxySecurityAdaptor.USAGE_GET_DELEGATED_LOAD, getMatchingUsage());
     }
     

@@ -34,10 +34,10 @@ import org.globus.gsi.X509Credential;
  *
  */
 public abstract class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor {
-    private static final int USAGE_INIT_PKCS12 = 1;
-    private static final int USAGE_INIT_PEM = 2;
-    private static final int USAGE_MEMORY = 3;
-    private static final int USAGE_LOAD = 4;
+    public static final int USAGE_INIT_PKCS12 = 1;
+    public static final int USAGE_INIT_PEM = 2;
+    public static final int USAGE_MEMORY = 3;
+    public static final int USAGE_LOAD = 4;
 
     public abstract String getType();
     protected abstract int getGlobusType();

@@ -60,48 +60,53 @@ public class VOMSContextUsage {
     
     @Test
     public void userProxyObject() throws Exception {
-        Assert.assertEquals(VOMSSecurityAdaptor.USAGE_MEMORY, getMatchingUsage());
+        Assert.assertEquals(GlobusSecurityAdaptor.USAGE_MEMORY, getMatchingUsage());
     }
     
     @Test
     public void userProxyString() throws Exception {
-        m_context.removeAttribute(VOMSContext.USERPROXYOBJECT);
+        m_context.removeAttribute(GlobusContext.USERPROXYOBJECT);
         m_context.setAttribute(VOMSContext.USERPROXYSTRING, "-----This is a proxy value-----");
-        Assert.assertEquals(VOMSSecurityAdaptor.USAGE_LOAD, getMatchingUsage());
+        Assert.assertEquals(GlobusSecurityAdaptor.USAGE_LOAD, getMatchingUsage());
     }
     
     @Test
     public void userProxyExists() throws Exception {
-        m_context.removeAttribute(VOMSContext.USERPROXYOBJECT);
-        Assert.assertEquals(VOMSSecurityAdaptor.USAGE_LOAD, getMatchingUsage());
+        m_context.removeAttribute(GlobusContext.USERPROXYOBJECT);
+        Assert.assertEquals(GlobusSecurityAdaptor.USAGE_LOAD, getMatchingUsage());
     }
     
     @Test
     public void userProxyDoesNotExist() throws Exception {
-        m_context.removeAttribute(VOMSContext.USERPROXYOBJECT);
+        m_context.removeAttribute(GlobusContext.USERPROXYOBJECT);
         m_context.setAttribute(Context.USERPROXY, "/tmp/doesNotExist");
         Assert.assertEquals(VOMSSecurityAdaptor.USAGE_INIT_PROXY, getMatchingUsage());
     }
     
     @Test
     public void initialProxy() throws Exception {
-        m_context.removeAttribute(VOMSContext.USERPROXYOBJECT);
-        m_context.removeAttribute(Context.USERPROXY);
+        prepareContextForProxyInit();
+//        m_context.removeAttribute(VOMSContext.USERPROXYOBJECT);
+//        m_context.removeAttribute(Context.USERPROXY);
         Assert.assertEquals(VOMSSecurityAdaptor.USAGE_INIT_PROXY, getMatchingUsage());
     }
     
     @Test
     public void userCertPKCS12() throws Exception {
         prepareContextForProxyInit();
-        Assert.assertEquals(VOMSSecurityAdaptor.USAGE_INIT_PKCS12, getMatchingUsage());
+        // InitialProxy must not be set
+        m_context.removeAttribute(VOMSContext.INITIALPROXY);
+        Assert.assertEquals(GlobusSecurityAdaptor.USAGE_INIT_PKCS12, getMatchingUsage());
     }
     
     @Test
     public void userCertPEM() throws Exception {
         prepareContextForProxyInit();
+        // InitialProxy must not be set
+        m_context.removeAttribute(VOMSContext.INITIALPROXY);
         // USerCertKey must not be set
-        m_context.removeAttribute(VOMSContext.USERCERTKEY);
-        Assert.assertEquals(VOMSSecurityAdaptor.USAGE_INIT_PEM, getMatchingUsage());
+        m_context.removeAttribute(GlobusContext.USERCERTKEY);
+        Assert.assertEquals(GlobusSecurityAdaptor.USAGE_INIT_PEM, getMatchingUsage());
     }
     
     @Test(expected=BadParameterException.class)
@@ -120,7 +125,7 @@ public class VOMSContextUsage {
     
     @Test(expected=BadParameterException.class)
     public void invalidProxyString() throws Exception {
-        m_context.removeAttribute(VOMSContext.USERPROXYOBJECT);
+        m_context.removeAttribute(GlobusContext.USERPROXYOBJECT);
         m_context.setAttribute(VOMSContext.USERPROXYSTRING, "invalid");
         getMatchingUsage();
     }
@@ -128,11 +133,6 @@ public class VOMSContextUsage {
     @Test(expected=DoesNotExistException.class)
     public void missingVO() throws Exception {
         missing(Context.USERVO);
-    }
-    
-    @Test(expected=DoesNotExistException.class)
-    public void missingPassword() throws Exception {
-        missing(Context.USERPASS);
     }
     
     @Test(expected=DoesNotExistException.class)
@@ -151,12 +151,12 @@ public class VOMSContextUsage {
     
     protected void initAttributes() throws Exception {
         String exists = m_tmpFile.getAbsolutePath();
-        m_context.setAttribute(VOMSContext.USERPROXYOBJECT, "");
+        m_context.setAttribute(GlobusContext.USERPROXYOBJECT, "");
         m_context.setAttribute(Context.USERPROXY, exists);
         m_context.setAttribute(VOMSContext.INITIALPROXY, exists);
         m_context.setAttribute(Context.USERCERT, exists);
         m_context.setAttribute(Context.USERKEY, exists);
-        m_context.setAttribute(VOMSContext.USERCERTKEY, exists);
+        m_context.setAttribute(GlobusContext.USERCERTKEY, exists);
         m_context.setAttribute(Context.USERPASS, "changeIt");
         m_context.setAttribute(Context.USERVO, "myVo");
         m_context.setAttribute(Context.CERTREPOSITORY, exists);
@@ -165,8 +165,7 @@ public class VOMSContextUsage {
     
     protected void prepareContextForProxyInit() throws Exception {
         // Prepare for PKCS12 and check all attributes for building proxy
-        m_context.removeAttribute(VOMSContext.USERPROXYOBJECT);
-        m_context.removeAttribute(VOMSContext.INITIALPROXY);
+        m_context.removeAttribute(GlobusContext.USERPROXYOBJECT);
         // UserProxy must not exist
         m_context.setAttribute(Context.USERPROXY, "/tmp/doesNotExist");
     }

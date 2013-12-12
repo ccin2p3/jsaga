@@ -52,10 +52,10 @@ import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
  *
  */
 public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
-    protected static final int USAGE_INIT_PKCS12 = 1;
-    protected static final int USAGE_INIT_PEM = 2;
-    protected static final int USAGE_MEMORY = 3;
-    protected static final int USAGE_LOAD = 4;
+//    protected static final int USAGE_INIT_PKCS12 = 1;
+//    protected static final int USAGE_INIT_PEM = 2;
+//    protected static final int USAGE_MEMORY = 3;
+//    protected static final int USAGE_LOAD = 4;
     protected static final int USAGE_INIT_PROXY = 5;
     public static final String DEFAULT_LIFETIME = "PT12H";
 
@@ -67,39 +67,73 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
         return VOMSSecurityCredential.class;
     }
 
+//    @Deprecated
+//    public Usage getUsageOld() {
+//        return new UAnd(new Usage[]{
+//                new UOr(new Usage[]{
+//                        new UNoPrompt(GlobusSecurityAdaptor.USAGE_MEMORY, GlobusContext.USERPROXYOBJECT),
+//                        new UProxyValue(GlobusSecurityAdaptor.USAGE_LOAD,  VOMSContext.USERPROXYSTRING),
+//                        new UFile(GlobusSecurityAdaptor.USAGE_LOAD, Context.USERPROXY),
+//                        new UAnd(
+//                            new Usage[]{
+//                                new UFile(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY),
+//                                getInitProxyUsages()
+//                            }),
+//                        new UAnd(
+//                            new Usage[]{
+//                                new UOr(new Usage[]{
+//                                        new UFile(GlobusSecurityAdaptor.USAGE_INIT_PKCS12, GlobusContext.USERCERTKEY),
+//                                        new UAnd(GlobusSecurityAdaptor.USAGE_INIT_PEM, new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)})
+//                                }),
+//                                new UHidden(Context.USERPASS),
+//                                getInitProxyUsages()
+//                            }
+//                        )
+//                }),
+//                new UFile(Context.CERTREPOSITORY)
+//        });
+//    }
+    
     public Usage getUsage() {
-        return new UAnd(new Usage[]{
-                new UOr(new Usage[]{
-                        new UNoPrompt(USAGE_MEMORY, VOMSContext.USERPROXYOBJECT),
-                        new UProxyValue(USAGE_LOAD,  VOMSContext.USERPROXYSTRING),
-                        new UFile(USAGE_LOAD, Context.USERPROXY),
-                        new UFile(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY),
-                        new UAnd(getInitProxyUsages()),
-                }),
-                new UFile(Context.CERTREPOSITORY),
-                new UFile(VOMSContext.VOMSDIR),
-                new UOptional(VOMSContext.VOMSES)
-        });
+        return new UAnd.Builder()
+            .and(new UOr.Builder()
+                    .or(new UNoPrompt(GlobusSecurityAdaptor.USAGE_MEMORY, GlobusContext.USERPROXYOBJECT))
+                    .or(new UProxyValue(GlobusSecurityAdaptor.USAGE_LOAD,  VOMSContext.USERPROXYSTRING))
+                    .or(new UFile(GlobusSecurityAdaptor.USAGE_LOAD, Context.USERPROXY))
+                    .or(new UAnd.Builder()
+                            .and(new UFile(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY))
+                            .and(getInitProxyUsages())
+                            .build()
+                       )
+                    .or(new UAnd.Builder()
+                            .and(fr.in2p3.jsaga.adaptor.security.usage.Util.buildCertsUsage())
+                            .and(new UHidden(Context.USERPASS))
+                            .and(getInitProxyUsages())
+                            .build()
+                       )
+                    .build()
+                )
+            .and(new UFile(Context.CERTREPOSITORY))
+            .build();
     }
     
-    protected Usage[] getInitProxyUsages() {
-        return new Usage[]{
-                new UOr(new Usage[]{
-                        new UFile(USAGE_INIT_PKCS12, VOMSContext.USERCERTKEY),
-                        new UAnd(USAGE_INIT_PEM, new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)})
-                }),
-                new UFilePath(Context.USERPROXY), 
-                new UHidden(Context.USERPASS),
-                new UOptional(Context.SERVER), 
-                new U(Context.USERVO), 
-                new UOptional(VOMSContext.USERFQAN),
-                new UDuration(Context.LIFETIME) {
+    protected UAnd getInitProxyUsages() {
+        return new UAnd.Builder()
+            .and(new UFilePath(Context.USERPROXY))
+            .and(new UOptional(Context.SERVER))
+            .and(new UFile(VOMSContext.VOMSDIR))
+            .and(new UFile(VOMSContext.VOMSDIR))
+            .and(new UOptional(VOMSContext.VOMSES))
+            .and(new U(Context.USERVO))
+            .and(new UOptional(VOMSContext.USERFQAN))
+            .and(new UDuration(Context.LIFETIME) {
                     @Override
                     protected Object throwExceptionIfInvalid(Object value) throws Exception {
                         return (value != null ? super.throwExceptionIfInvalid(value) : null);
                     }
-                },
-                new UOptional(VOMSContext.DELEGATION) {
+                }
+            )
+            .and(new UOptional(VOMSContext.DELEGATION) {
                     @Override
                     protected Object throwExceptionIfInvalid(Object value) throws Exception {
                         if (super.throwExceptionIfInvalid(value) != null) {
@@ -110,8 +144,10 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                         }
                         return value;
                     }
-                },
-                new UOptional(VOMSContext.PROXYTYPE) {
+                }
+            )
+            .and(new UOptional(VOMSContext.PROXYTYPE) {
+                    @Override
                     protected Object throwExceptionIfInvalid(Object value) throws Exception {
                         if (super.throwExceptionIfInvalid(value) != null) {
                             String v = (String) value;
@@ -122,7 +158,8 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                         return value;
                     }
                 }
-        };
+            )
+            .build();
     }
 
     public Default[] getDefaults(Map map) throws IncorrectStateException {
@@ -177,8 +214,8 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
     public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             switch(usage) {
-                case USAGE_INIT_PKCS12:
-                case USAGE_INIT_PEM:
+                case GlobusSecurityAdaptor.USAGE_INIT_PKCS12:
+                case GlobusSecurityAdaptor.USAGE_INIT_PEM:
                 case USAGE_INIT_PROXY:
                 {
                     // Initialize params with attributes
@@ -190,9 +227,9 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                         params.setNoRegen(true);
                     } else {
                         params.setNoRegen(false);
-                        if (usage == USAGE_INIT_PKCS12) {
-                            params.setCertFile((String)attributes.get(VOMSContext.USERCERTKEY));
-                        } else if (usage == USAGE_INIT_PEM) {
+                        if (usage == GlobusSecurityAdaptor.USAGE_INIT_PKCS12) {
+                            params.setCertFile((String)attributes.get(GlobusContext.USERCERTKEY));
+                        } else if (usage == GlobusSecurityAdaptor.USAGE_INIT_PEM) {
                             params.setCertFile((String)attributes.get(Context.USERCERT));
                             params.setKeyFile((String)attributes.get(Context.USERKEY));
                         }
@@ -205,13 +242,13 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
 
                     return this.createSecurityAdaptor(creation_listener.getProxy(), attributes);
                 }
-                case USAGE_MEMORY:
+                case GlobusSecurityAdaptor.USAGE_MEMORY:
                 {
-                    String base64 = (String) attributes.get(VOMSContext.USERPROXYOBJECT);
+                    String base64 = (String) attributes.get(GlobusContext.USERPROXYOBJECT);
                     GSSCredential cred = InMemoryProxySecurityCredential.toGSSCredential(base64);
                     return this.createSecurityAdaptor(cred, attributes);
                 }
-                case USAGE_LOAD:
+                case GlobusSecurityAdaptor.USAGE_LOAD:
                 {
                     CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
                     GSSCredential cred = null;

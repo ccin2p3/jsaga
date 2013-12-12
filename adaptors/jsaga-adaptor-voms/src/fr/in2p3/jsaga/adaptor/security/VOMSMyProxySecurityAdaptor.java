@@ -53,7 +53,7 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
             new UOr(new Usage[]{
                 // get delegated proxy from server
                 new UAnd(USAGE_GET_DELEGATED_MEMORY, new Usage[]{
-                    new UNoPrompt(VOMSContext.USERPROXYOBJECT),
+                    new UNoPrompt(GlobusContext.USERPROXYOBJECT),
                     new UDuration(VOMSContext.DELEGATIONLIFETIME)
                 }),
                 new UAnd(USAGE_GET_DELEGATED_LOAD, new Usage[]{
@@ -62,13 +62,22 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
                 }),
                 
                 // local proxy
-                new UNoPrompt(USAGE_MEMORY, VOMSContext.USERPROXYOBJECT),
-                new UProxyValue(USAGE_LOAD,  VOMSContext.USERPROXYSTRING),
-                new UFile(USAGE_LOAD, Context.USERPROXY),
+                new UNoPrompt(GlobusSecurityAdaptor.USAGE_MEMORY, GlobusContext.USERPROXYOBJECT),
+                new UProxyValue(GlobusSecurityAdaptor.USAGE_LOAD,  VOMSContext.USERPROXYSTRING),
+                new UFile(GlobusSecurityAdaptor.USAGE_LOAD, Context.USERPROXY),
                 new UFile(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY),
 
                 // create and store proxy
-                new UAnd(this.getInitProxyUsages()),
+                new UAnd(
+                    new Usage[] {
+                        new UOptional(VOMSContext.DELEGATIONLIFETIME) {
+                            protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                                return (value != null ? super.throwExceptionIfInvalid(value) : null);
+                            }
+                        },
+                        this.getInitProxyUsages()
+                    }
+                )
             }),
             new UFile(Context.CERTREPOSITORY),
             new UFile(VOMSContext.VOMSDIR),
@@ -77,26 +86,26 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
             new UOptional(VOMSContext.MYPROXYPASS),});
     }
 
-    protected Usage[] getInitProxyUsages() {
-        Usage[] voms = super.getInitProxyUsages();
-        Usage[] u = new Usage[voms.length+1];
-        int i=0;
-        for (i=0; i<voms.length; i++) {
-            u[i] = voms[i];
-        }
-        u[i] = new UOptional(VOMSContext.DELEGATIONLIFETIME) {
-            protected Object throwExceptionIfInvalid(Object value) throws Exception {
-                return (value != null ? super.throwExceptionIfInvalid(value) : null);
-            }
-        };
-        return u;
-    }
+//    protected Usage[] getInitProxyUsages() {
+//        Usage[] voms = super.getInitProxyUsages();
+//        Usage[] u = new Usage[voms.length+1];
+//        int i=0;
+//        for (i=0; i<voms.length; i++) {
+//            u[i] = voms[i];
+//        }
+//        u[i] = new UOptional(VOMSContext.DELEGATIONLIFETIME) {
+//            protected Object throwExceptionIfInvalid(Object value) throws Exception {
+//                return (value != null ? super.throwExceptionIfInvalid(value) : null);
+//            }
+//        };
+//        return u;
+//    }
 
     public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             switch (usage) {
-                case USAGE_INIT_PKCS12:
-                case USAGE_INIT_PEM: 
+                case GlobusSecurityAdaptor.USAGE_INIT_PKCS12:
+                case GlobusSecurityAdaptor.USAGE_INIT_PEM: 
                 case USAGE_INIT_PROXY: {
                     VOMSSecurityCredential adaptor = (VOMSSecurityCredential) super.createSecurityCredential(usage, attributeForVOMS(attributes), contextId);
 
@@ -111,14 +120,14 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
                     // returns
                     return this.createSecurityAdaptor(cred, attributes);
                 }
-                case USAGE_MEMORY:
-                case USAGE_LOAD: {
+                case GlobusSecurityAdaptor.USAGE_MEMORY:
+                case GlobusSecurityAdaptor.USAGE_LOAD: {
                     // creates a VOMSMyProxySecurityCredential
                     return super.createSecurityCredential(usage, attributes, contextId);
                 }
                 case USAGE_GET_DELEGATED_MEMORY: {
                     // get old proxy (required unless anonymous is authorized by server's default trusted_retrievers policy)
-                    GSSCredential oldCred = InMemoryProxySecurityCredential.toGSSCredential((String) attributes.get(VOMSContext.USERPROXYOBJECT));
+                    GSSCredential oldCred = InMemoryProxySecurityCredential.toGSSCredential((String) attributes.get(GlobusContext.USERPROXYOBJECT));
 
                     // get delegated proxy
                     GSSCredential cred = getDelegatedCredential(oldCred, attributes);
