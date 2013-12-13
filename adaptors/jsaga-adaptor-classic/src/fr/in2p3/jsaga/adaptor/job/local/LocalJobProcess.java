@@ -168,7 +168,7 @@ public class LocalJobProcess implements Serializable {
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
 		}
-		// Get PID reading xxx.pid file minus last character (carriage return)
+		// Get PID reading yyy.pid file minus last character (carriage return)
 		m_pid = new String(buf).trim();
 		return m_pid;
 	}
@@ -194,7 +194,7 @@ public class LocalJobProcess implements Serializable {
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
 		}
-		// Get return code reading xxx.endcode file minus last character (carriage return)
+		// Get return code reading yyy.endcode file minus last character (carriage return)
 		m_returnCode = Integer.valueOf(new String(buf).trim());
 		return m_returnCode;
 	}
