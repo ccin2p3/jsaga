@@ -47,6 +47,7 @@ import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
+import fr.in2p3.jsaga.helpers.URLEncoder;
 import fr.maatg.glite.dm.CNSConnector;
 import fr.maatg.glite.dm.connection.DMError;
 import fr.maatg.glite.dm.connection.ReceiveException;
@@ -269,6 +270,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				m_lfcConnector.endTransaction(connection);
 				done = true;
 			} catch (URISyntaxException e) {
+				e.printStackTrace();
 				//Cannot happen
 			}finally{
 				if(!done){
