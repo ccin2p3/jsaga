@@ -23,7 +23,7 @@
         <module>commonj</module>
         <module>concurrent</module>
         <module>dbus-java</module>
-        <!--<module>file-system</module>-->
+        <module>file-system</module>
         <!--<module>ganymed-ssh-2</module>-->
         <module>glite</module>
         <module>jargon</module>
@@ -48,8 +48,8 @@
                             <configuration>
                                 <tasks>
                                     <copy overwrite="true"
-                                          file="${basedir}/${artifactId}.jar"
-                                          tofile="${project.build.directory}/${artifactId}-${version}.jar"/>
+                                          file="${basedir}/${project.artifactId}.jar"
+                                          tofile="${project.build.directory}/${project.artifactId}-${project.version}.jar"/>
                                 </tasks>
                             </configuration>
                         </execution>

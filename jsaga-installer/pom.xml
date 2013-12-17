@@ -33,43 +33,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-dependency-xml</artifactId>
+                <version>1.0</version>
                 <executions>
                     <execution>
                         <id>serialize-dependencies</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>serialize</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>xml-maven-plugin</artifactId>
-                <configuration>
-                    <transformationSets>
-                        <transformationSet>
-                            <dir>../jsaga-adaptors-alt</dir>
-                            <includes>
-                                <include>pom.xml</include>
-                            </includes>
-                            <outputDir>${project.build.directory}/generated-site/xdoc</outputDir>
-                            <stylesheet>src/site/xsl/adaptors-alt.xsl</stylesheet>
-						    <fileMappers>
-						      <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
-						          <pattern>pom.xml</pattern>
-						          <replacement>adaptors-alt.xml</replacement>
-						      </fileMapper>
-						    </fileMappers>
-                        </transformationSet>
-                    </transformationSets>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>generate-adaptors-alt-web-page</id>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>transform</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -230,6 +200,31 @@
                             </transformationSets>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>generate-adaptors-alt-web-page</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                        <configuration>
+                            <transformationSets>
+                                <transformationSet>
+                                    <dir>../jsaga-adaptors-alt</dir>
+                                    <includes>
+                                        <include>pom.xml</include>
+                                    </includes>
+                                    <outputDir>${project.build.directory}/generated-site/xdoc</outputDir>
+                                    <stylesheet>src/site/xsl/adaptors-alt.xsl</stylesheet>
+                                    <fileMappers>
+                                      <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
+                                          <pattern>pom.xml</pattern>
+                                          <replacement>adaptors-alt.xml</replacement>
+                                      </fileMapper>
+                                    </fileMappers>
+                                </transformationSet>
+                            </transformationSets>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -378,6 +373,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-changes-plugin</artifactId>
+                <version>2.9</version>
                 <reportSets><reportSet><reports><report>changes-report</report></reports></reportSet></reportSets>
             </plugin>
         </plugins>
