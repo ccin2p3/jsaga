@@ -18,7 +18,7 @@
         <breadcrumbs>
             <item name="JSAGA" href="../../index.html"/>
             <item name="Adaptors" href="../../adaptors.html"/>
-            <item name="${project.name}"/>
+            <item name="${project.name}"  href=""/>
         </breadcrumbs>
         <menu name="JSAGA">
             <item name="Welcome" href="../../index.html"/>
