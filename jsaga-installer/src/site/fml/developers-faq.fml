@@ -6,8 +6,8 @@
             <question>What are the pre-requisites for building JSAGA entirely ?</question>
             <answer>
                 <ul>
-                    <li>Install <a href="http://java.sun.com/j2se/1.5/download.html">JDK 1.5</a> (or above)</li>
-                    <li>Install <a href="http://archive.apache.org/dist/maven/binaries/">Maven 2.2.1</a></li>
+                    <li>Install <a href="http://java.sun.com/j2se/1.5/download.html">JDK 1.6</a> (or above)</li>
+                    <li>Install <a href="http://archive.apache.org/dist/maven/binaries/">Maven 3.0.4</a></li>
                     <li>Optional: releasing JSAGA requires SSH to be installed</li>
                     <li>Optional: some adaptors requires gcc compiler to be installed
                         (these adaptors must either be built on both windows and linux platforms,
