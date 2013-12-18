@@ -171,7 +171,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>2.1.1</version>
+                <version>3.3</version>
                 <configuration>
                     <chmod>false</chmod>
                 </configuration>
@@ -192,6 +192,13 @@
             </testResource>
         </testResources>
         <directory>build</directory>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.5</version>
+            </extension>
+        </extensions>
     </build>
     <reporting>
         <!-- directories -->
