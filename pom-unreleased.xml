@@ -15,7 +15,7 @@
     <distributionManagement>
         <repository>
             <id>maven2-repository</id>
-            <url>scpexe://maven.in2p3.fr/sites/maven/www/htdocs</url>
+            <url>scpexe://maven@maven.in2p3.fr/sites/maven/www/htdocs</url>
         </repository>
     </distributionManagement>
     <build>
