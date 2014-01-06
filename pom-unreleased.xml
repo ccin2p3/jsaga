@@ -15,14 +15,14 @@
     <distributionManagement>
         <repository>
             <id>maven2-repository</id>
-            <url>sftp://maven.in2p3.fr/www/htdocs</url>
+            <url>scpexe://maven.in2p3.fr/sites/maven/www/htdocs</url>
         </repository>
     </distributionManagement>
     <build>
         <extensions>
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh</artifactId>
+                <artifactId>wagon-ssh-external</artifactId>
                 <version>2.5</version>
             </extension>
         </extensions>

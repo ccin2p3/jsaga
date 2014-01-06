@@ -119,7 +119,8 @@
             	4) The password of the remote user is (encypted) in settings.xml
             	5) The public key of the SFTP server must be added to the client's known_hosts file
              -->
-                <maven.repository>sftp://maven.in2p3.fr/www/htdocs</maven.repository>
+                <!-- <maven.repository>sftp://maven.in2p3.fr/www/htdocs</maven.repository> -->
+                <maven.repository>scpexe://maven.in2p3.fr/sites/maven/www/htdocs</maven.repository>
             <!-- 
             	1) The Maven site-deploy plugin DOES NOT use the SSH client configuration.
             	2) Giving the username in the URL DOES work, but for security reasons, it is rather given in settings.xml in the <server> part.
@@ -195,7 +196,7 @@
         <extensions>
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh</artifactId>
+                <artifactId>wagon-ssh-external</artifactId>
                 <version>2.5</version>
             </extension>
         </extensions>
