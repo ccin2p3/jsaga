@@ -126,7 +126,7 @@
             	2) Giving the username in the URL DOES work, but for security reasons, it is rather given in settings.xml in the <server> part.
             	3) The public key of the SFTP server must be added to the client's known_hosts file
              -->
-                <project.web.site>sftp://software.in2p3.fr/www/htdocs/jsaga-dev</project.web.site>
+                <project.web.site>sftp://software@software.in2p3.fr/www/htdocs/jsaga-dev</project.web.site>
             </properties>
             <build>
                 <plugins>
