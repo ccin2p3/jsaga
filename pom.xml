@@ -91,19 +91,21 @@
             </activation>
             <properties>
             <!-- 
-            	1) The Maven deploy plugin DOES NOT use the SSH client configuration.
-            	2) Giving the username in the URL DOES NOT work. The username must be given in settings.xml in the <server> part.
-            	3) The configuration with SSH public key does not work in settings.xml
-            	4) The password of the remote user is (encypted) in settings.xml
-            	5) The public key of the SFTP server must be added to the client's known_hosts file
+                1) The Maven deploy plugin uses wagon-ssh-external (ssh command)
+                2) wagon-ssh-external DOES use the SSH client configuration.
+                3) The username MUST be given in the URL AND in the settings.xml in the <server> part.
+                4) When building in Jenkins, the settings.xml is created via the Configuration Files plugin
+                5) When building outside Jenkins, the settings.xml DOES NOT need <password>. The local SSH configuration is used.
+                6) The public key of the SFTP server must be added to the client's known_hosts file
              -->
-                <maven.repository>sftp://maven.in2p3.fr/www/htdocs</maven.repository>
+                <maven.repository>scpexe://maven@maven.in2p3.fr/sites/maven/www/htdocs</maven.repository>
             <!-- 
-            	1) The Maven site-deploy plugin DOES NOT use the SSH client configuration.
-            	2) Giving the username in the URL DOES work, but for security reasons, it is rather given in settings.xml in the <server> part.
-            	3) The public key of the SFTP server must be added to the client's known_hosts file
+                1) The Maven site-deploy plugin use the wagon-ssh
+                2) wagon-ssh (JSch API) DOES NOT use the SSH client configuration.
+                3) Giving the username in the URL DOES work, but for security reasons, it is rather given in settings.xml in the <server> part.
+                4) The public key of the SFTP server must be added to the client's known_hosts file
              -->
-                <project.web.site>sftp://software.in2p3.fr/www/htdocs/jsaga</project.web.site>
+                <project.web.site>sftp://software.in2p3.fr/sites/software/www/htdocs/jsaga</project.web.site>
             </properties>
         </profile>
         <profile>
@@ -113,20 +115,21 @@
             </activation>
             <properties>
             <!-- 
-            	1) The Maven deploy plugin DOES NOT use the SSH client configuration.
-            	2) Giving the username in the URL DOES NOT work. The username must be given in settings.xml in the <server> part.
-            	3) The configuration with SSH public key does not work in settings.xml
-            	4) The password of the remote user is (encypted) in settings.xml
-            	5) The public key of the SFTP server must be added to the client's known_hosts file
+            	1) The Maven deploy plugin uses wagon-ssh-external (ssh command)
+            	2) wagon-ssh-external DOES use the SSH client configuration.
+            	3) The username MUST be given in the URL AND in the settings.xml in the <server> part.
+            	4) When building in Jenkins, the settings.xml is created via the Configuration Files plugin
+            	5) When building outside Jenkins, the settings.xml DOES NOT need <password>. The local SSH configuration is used.
+            	6) The public key of the SFTP server must be added to the client's known_hosts file
              -->
-                <!-- <maven.repository>sftp://maven.in2p3.fr/www/htdocs</maven.repository> -->
                 <maven.repository>scpexe://maven@maven.in2p3.fr/sites/maven/www/htdocs</maven.repository>
             <!-- 
-            	1) The Maven site-deploy plugin DOES NOT use the SSH client configuration.
-            	2) Giving the username in the URL DOES work, but for security reasons, it is rather given in settings.xml in the <server> part.
-            	3) The public key of the SFTP server must be added to the client's known_hosts file
+            	1) The Maven site-deploy plugin use the wagon-ssh
+            	2) wagon-ssh (JSch API) DOES NOT use the SSH client configuration.
+            	3) Giving the username in the URL DOES work, but for security reasons, it is rather given in settings.xml in the <server> part.
+            	4) The public key of the SFTP server must be added to the client's known_hosts file
              -->
-                <project.web.site>sftp://software@software.in2p3.fr/www/htdocs/jsaga-dev</project.web.site>
+                <project.web.site>sftp://software.in2p3.fr/sites/software/www/htdocs/jsaga-dev</project.web.site>
             </properties>
             <build>
                 <plugins>
