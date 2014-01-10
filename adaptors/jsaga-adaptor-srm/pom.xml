@@ -82,7 +82,7 @@
         <dependency>
             <groupId>org.jglobus</groupId>
             <artifactId>gss</artifactId>
-            <version>2.0-Beta6-SNAPSHOT</version>
+            <version>2.0.7-custom2</version>
         </dependency>
         <dependency>
             <groupId>axis</groupId>
@@ -109,6 +109,10 @@
         </dependency>
     </dependencies>
      <repositories>
+        <repository>
+            <id>maatg-releases</id>
+            <url>http://nexus.maatg.fr/content/repositories/maatg-fr-releases</url>
+        </repository>
         <repository>
             <id>maatg-snapshots</id>
             <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>

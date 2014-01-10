@@ -21,6 +21,10 @@
     </developers>
     <repositories>
         <repository>
+            <id>maatg-releases</id>
+            <url>http://nexus.maatg.fr/content/repositories/maatg-fr-releases</url>
+        </repository>
+        <repository>
             <id>maatg-fr-snapshots</id>
             <name>maatG France Snapshots</name>
             <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
@@ -45,7 +49,7 @@
         <dependency>
             <groupId>fr.maatg</groupId>
             <artifactId>glite.dm</artifactId>
-            <version>0.5.4-SNAPSHOT</version>
+            <version>0.5.4</version>
         </dependency>
         <dependency>
             <groupId>org.italiangrid</groupId>

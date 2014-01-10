@@ -41,7 +41,7 @@
         <dependency>
             <groupId>org.jglobus</groupId>
             <artifactId>myproxy</artifactId>
-            <version>2.0-Beta6-SNAPSHOT</version>
+            <version>2.0.7-custom2</version>
         </dependency>
         <dependency>
             <groupId>org.italiangrid</groupId>
@@ -59,6 +59,10 @@
             <!-- Temporary for voms-clients TODO: remove this when in maven central -->
             <id>IN2P3</id>
             <url>http://maven.in2p3.fr</url>
+        </repository>
+        <repository>
+            <id>maatg-releases</id>
+            <url>http://nexus.maatg.fr/content/repositories/maatg-fr-releases</url>
         </repository>
         <repository>
             <id>maatg-snapshots</id>
