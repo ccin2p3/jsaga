@@ -94,6 +94,15 @@ public class TimeoutableAbstractNSDirectoryImplTest extends AbstractTest {
         }
     }
 
+    public void test_copy() throws Exception {
+        try {
+            m_directory.copy(URLFactory.createURL(m_url), Flags.RECURSIVE.getValue());
+            fail("Expected exception: "+TimeoutException.class);
+        } catch (TimeoutException e) {
+            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
+        }
+    } 
+    
     public void test_openDir() throws Exception {
         try {
             m_directory.openDir(URLFactory.createURL(m_url));
