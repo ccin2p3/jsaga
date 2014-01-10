@@ -116,13 +116,6 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractSyncNSEntryImpl i
                     source._copyAndMonitor(target, flags, this);
                 }
             };
-        } else if (this instanceof AbstractSyncDirectoryImpl) {
-            final AbstractSyncDirectoryImpl source = (AbstractSyncDirectoryImpl) this;
-            return new AbstractCopyTask<NSEntry,Void>(mode, m_session, target, flags) {
-                public void doCopy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
-                    source._copyAndMonitor(target, flags, this);
-                }
-            };
         } else {
             return new AbstractThreadedTask<NSEntry,Void>(mode) {
                 public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
