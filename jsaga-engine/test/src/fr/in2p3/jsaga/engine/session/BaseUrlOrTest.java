@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.engine.session;
 
 import fr.in2p3.jsaga.impl.context.ContextImpl;
-import junit.framework.TestCase;
+import org.ogf.saga.AbstractTest;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
 
@@ -17,7 +17,11 @@ import org.ogf.saga.context.ContextFactory;
 /**
  *
  */
-public class BaseUrlOrTest extends TestCase {
+public class BaseUrlOrTest extends AbstractTest {
+    public BaseUrlOrTest() throws Exception {
+        super();
+    }
+
     public void test_or_items() throws Exception {
         String url = "{gsiftp,gridftp->gsiftp}://{cc,*host*}*.{in2p3.fr,*de}/*/{dteam,lhc*}";
         String[] expected = new String[]{
@@ -51,6 +55,7 @@ public class BaseUrlOrTest extends TestCase {
     }
 
     private static String[] split(String url) throws Exception {
+        //WARNING: the use of a SAGA factory requires this class to extend AbstractTest
         Context context = ContextFactory.createContext("VOMS");
         context.setVectorAttribute(ContextImpl.BASE_URL_INCLUDES, new String[]{url});
         return context.getVectorAttribute(ContextImpl.BASE_URL_INCLUDES);
