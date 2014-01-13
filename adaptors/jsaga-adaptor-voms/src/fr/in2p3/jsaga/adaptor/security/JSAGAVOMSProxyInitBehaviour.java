@@ -1,10 +1,14 @@
 package fr.in2p3.jsaga.adaptor.security;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +57,7 @@ import org.italiangrid.voms.store.VOMSTrustStoreStatusListener;
 import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.italiangrid.voms.util.CredentialsUtils;
+import org.italiangrid.voms.util.FilePermissionHelper;
 import org.italiangrid.voms.util.VOMSFQANNamingScheme;
 
 import eu.emi.security.authn.x509.CrlCheckingMode;
@@ -360,6 +365,9 @@ public class JSAGAVOMSProxyInitBehaviour implements ProxyInitStrategy {
         
         List<String> proxyCreationWarnings = new ArrayList<String>();
         
+        // LS does not work on windows
+        // FIXME: remove when voms-api works on windows
+        /*
         String proxyFilePath = VOMSProxyPathBuilder.buildProxyPath();
         
         String envProxyPath = System.getenv(VOMSEnvironmentVariables.X509_USER_PROXY);
@@ -369,6 +377,9 @@ public class JSAGAVOMSProxyInitBehaviour implements ProxyInitStrategy {
         
         if (params.getGeneratedProxyFile() != null)
             proxyFilePath = params.getGeneratedProxyFile();
+        */
+        String proxyFilePath =params.getGeneratedProxyFile();
+        // END LS fix me
         
         ProxyCertificateOptions proxyOptions = new ProxyCertificateOptions(credential.getCertificateChain());
         
@@ -400,7 +411,27 @@ public class JSAGAVOMSProxyInitBehaviour implements ProxyInitStrategy {
             
             ProxyCertificate proxy = ProxyGenerator.generate(proxyOptions, credential.getKey());
             
-            CredentialsUtils.saveProxyCredentials(proxyFilePath, proxy.getCredential());
+            // Lionel Schwarz 13/01: saveProxyPermissions not available on Windows
+            // FIXME remove this bloc when voms-api works on windows
+//            CredentialsUtils.saveProxyCredentials(proxyFilePath, proxy.getCredential());
+            File f = new File(proxyFilePath);
+            RandomAccessFile raf = new RandomAccessFile(f, "rws");
+            FileChannel channel = raf.getChannel();
+            if (!System.getProperty("os.name").startsWith("Windows")) {
+                FilePermissionHelper.setProxyPermissions(proxyFilePath);
+            }
+            
+            channel.truncate(0);
+            
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            CredentialsUtils.saveProxyCredentials(baos, proxy.getCredential(), CredentialsUtils.DEFAULT_ENCONDING);
+            
+            baos.close();
+            channel.write(ByteBuffer.wrap(baos.toByteArray()));
+            
+            channel.close();        
+            raf.close();
+            // End LS fix me
             proxyCreationListener.proxyCreated(proxyFilePath, proxy, proxyCreationWarnings);
         
         } catch (Throwable t) {
@@ -518,13 +549,16 @@ public class JSAGAVOMSProxyInitBehaviour implements ProxyInitStrategy {
         
         // Patch from lionel.schwarz@in2p3.fr: need certFile
         if (params.isNoRegen() && params.getCertFile()!=null)
-            return new LoadProxyCredential(loadCredentialsEventListener, params.getCertFile());
+            // FIXME: use LoadProxyCredential when voms-api-java works on Windos
+            return new JSAGALoadProxyCredential(loadCredentialsEventListener, params.getCertFile());
         
         if (params.getCertFile()!=null && params.getKeyFile() == null)
-            return new LoadUserCredential(loadCredentialsEventListener, params.getCertFile());
+            // FIXME: use LoadUserCredential when voms-api-java works on Windos
+            return new JSAGALoadUserCredential(loadCredentialsEventListener, params.getCertFile());
         
         if (params.getCertFile()!=null && params.getKeyFile()!=null)
-            return new LoadUserCredential(loadCredentialsEventListener, params.getCertFile(), params.getKeyFile());
+            // FIXME: use LoadUserCredential when voms-api-java works on Windos
+            return new JSAGALoadUserCredential(loadCredentialsEventListener, params.getCertFile(), params.getKeyFile());
         
         return new DefaultLoadCredentialsStrategy(System.getProperty(DefaultLoadCredentialsStrategy.HOME_PROPERTY),
                     DefaultLoadCredentialsStrategy.TMPDIR_PROPERTY,
