@@ -17,7 +17,7 @@ public class VOMSContext {
     public static final String VOMSES = "Vomses";
     public static final String USERFQAN = "UserFQAN";
     public static final String PROXYTYPE = "ProxyType";
-    public static final String INITIALPROXY = "InitialProxy";
+    public static final String INITIALPROXY = "InitialUserProxy";
     public static final String USERPROXYSTRING = "UserProxyString";
 
     // MyProxy attributes

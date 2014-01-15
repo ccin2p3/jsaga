@@ -91,7 +91,6 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
             .and(new UFilePath(Context.USERPROXY))
             .and(new UOptional(Context.SERVER))
             .and(new UFile(VOMSContext.VOMSDIR))
-            .and(new UFile(VOMSContext.VOMSDIR))
             .and(new UOptional(VOMSContext.VOMSES))
             .and(new U(Context.USERVO))
             .and(new UOptional(VOMSContext.USERFQAN))

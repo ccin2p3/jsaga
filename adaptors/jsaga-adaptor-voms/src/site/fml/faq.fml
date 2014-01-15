@@ -28,7 +28,7 @@
             <question>What do I need to build a VOMS Proxy?</question>
             <answer>The VOMS Proxy can be built from either (in order of priority):
                 <ul>
-                    <li>A valid Globus Proxy (attribute "InitialProxy")</li>
+                    <li>A valid Globus Proxy (attribute "InitialUserProxy")</li>
                     <li>The PKCS12 certificate (attribute "UserCertKey") with its password (attribute "UserPass")</li>
                     <li>The PEM certificate (attribute "UserCert") and its private key (attribute "UserKey") with its password (attribute "UserPass")</li>
                 </ul>

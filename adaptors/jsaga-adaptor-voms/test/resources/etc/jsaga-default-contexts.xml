@@ -4,19 +4,20 @@
         <context type="VOMS">
             <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
-            <!--  PEM
+            <attribute name="LifeTime" value="PT17H"/>
+            <!--  PEM -->
             <attribute name="Vomses" value="${user.home}/.jsaga/contexts/voms/vomses/"/>
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
             <attribute name="Server" value="voms://voms2.hellasgrid.gr:15004/C=GR/O=HellasGrid/OU=hellasgrid.gr/CN=voms2.hellasgrid.gr"/>
             <attribute name="UserVO" value="dteam"/>
             <attribute name="UserCert" value="${user.home}/.jsaga/contexts/globus/usercert.pem"/>
-            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/globus/userkey.pem"/> -->
-            <!--  InitialProxy
+            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/globus/userkey.pem"/>
+            <!--  InitialUserProxy
             <attribute name="Vomses" value="${user.home}/.jsaga/contexts/voms/vomses/"/>
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
             <attribute name="Server" value="voms://voms2.hellasgrid.gr:15004/C=GR/O=HellasGrid/OU=hellasgrid.gr/CN=voms2.hellasgrid.gr"/>
             <attribute name="UserVO" value="dteam"/>
-            <attribute name="InitialProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>-->
+            <attribute name="InitialUserProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>-->
             <!--  PKCS12
             <attribute name="Vomses" value="${user.home}/.jsaga/contexts/voms/vomses/"/>
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>

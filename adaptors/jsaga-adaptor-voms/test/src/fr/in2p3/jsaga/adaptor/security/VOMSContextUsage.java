@@ -94,7 +94,7 @@ public class VOMSContextUsage {
     @Test
     public void userCertPKCS12() throws Exception {
         prepareContextForProxyInit();
-        // InitialProxy must not be set
+        // InitialUserProxy must not be set
         m_context.removeAttribute(VOMSContext.INITIALPROXY);
         Assert.assertEquals(GlobusSecurityAdaptor.USAGE_INIT_PKCS12, getMatchingUsage());
     }
@@ -102,7 +102,7 @@ public class VOMSContextUsage {
     @Test
     public void userCertPEM() throws Exception {
         prepareContextForProxyInit();
-        // InitialProxy must not be set
+        // InitialUserProxy must not be set
         m_context.removeAttribute(VOMSContext.INITIALPROXY);
         // USerCertKey must not be set
         m_context.removeAttribute(GlobusContext.USERCERTKEY);
