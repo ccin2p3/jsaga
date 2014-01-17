@@ -92,7 +92,7 @@ public class VOMSProxyListener implements InitListenerAdapter {
     }
 
     public void notifyCredentialLookup(String... locations) {
-        logger.error("Looking for credential in : " + Arrays.toString(locations));
+        logger.debug("Looking for credential in : " + Arrays.toString(locations));
     }
 
     public void notifyLoadCredentialFailure(Throwable error, String... locations) {
