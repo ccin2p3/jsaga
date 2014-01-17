@@ -175,20 +175,30 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractSyncNSEntryImpl i
     }
 
     public Task<NSEntry, Void> move(TaskMode mode, final URL target, final int flags) throws NotImplementedException {
-        return new AbstractThreadedTask<NSEntry,Void>(mode) {
-            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-                AbstractAsyncNSEntryImpl.super.moveSync(target, flags);
-                return null;
-            }
-        };
+        if (this instanceof AbstractSyncFileImpl) {
+            final AbstractSyncFileImpl source = (AbstractSyncFileImpl) this;
+            return new AbstractCopyTask<NSEntry,Void>(mode, m_session, target, flags) {
+                public void doCopy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+                    source._copyAndMonitor(target, flags, this);
+                    // For remove, ignore all flags except DEREFERENCE
+                    if (Flags.DEREFERENCE.isSet(flags)) {
+                        source.removeSync(Flags.DEREFERENCE.getValue());
+                    } else {
+                        source.removeSync();
+                    }
+                }
+            };
+        } else {
+            return new AbstractThreadedTask<NSEntry,Void>(mode) {
+                public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                    AbstractAsyncNSEntryImpl.this.moveSync(target, flags);
+                    return null;
+                }
+            };
+        }
     }
     public Task<NSEntry, Void> move(TaskMode mode, final URL target) throws NotImplementedException {
-        return new AbstractThreadedTask<NSEntry,Void>(mode) {
-            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-                AbstractAsyncNSEntryImpl.super.moveSync(target);
-                return null;
-            }
-        };
+        return this.move(mode, target, Flags.NONE.getValue());
     }
 
     public Task<NSEntry, Void> remove(TaskMode mode, final int flags) throws NotImplementedException {

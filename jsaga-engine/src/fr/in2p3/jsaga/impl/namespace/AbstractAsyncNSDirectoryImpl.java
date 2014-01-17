@@ -5,6 +5,7 @@ import fr.in2p3.jsaga.impl.file.AbstractSyncDirectoryImpl;
 import fr.in2p3.jsaga.impl.file.copy.AbstractCopyTask;
 import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
 import org.ogf.saga.error.*;
+import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSDirectory;
 import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.session.Session;
@@ -445,12 +446,27 @@ public abstract class AbstractAsyncNSDirectoryImpl extends AbstractSyncNSDirecto
     
     /** override super.move() */
     public Task<NSEntry, Void> move(TaskMode mode, final URL target, final int flags) throws NotImplementedException {
-        return new AbstractThreadedTask<NSEntry,Void>(mode) {
-            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-                AbstractAsyncNSDirectoryImpl.super.moveSync(target, flags);
-                return null;
-            }
-        };
+        if (this instanceof AbstractSyncDirectoryImpl) {
+            final AbstractSyncDirectoryImpl source = (AbstractSyncDirectoryImpl) this;
+            return new AbstractCopyTask<NSEntry,Void>(mode, m_session, target, flags) {
+                public void doCopy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+                    source._copyAndMonitor(target, flags, this);
+                    // For remove, ignore all flags except DEREFERENCE
+                    if (Flags.DEREFERENCE.isSet(flags)) {
+                        source.removeSync(Flags.DEREFERENCE.getValue());
+                    } else {
+                        source.removeSync();
+                    }
+                }
+            };
+        } else {
+            return new AbstractThreadedTask<NSEntry,Void>(mode) {
+                public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                    AbstractAsyncNSDirectoryImpl.super.moveSync(target, flags);
+                    return null;
+                }
+            };
+        }
     }
 
     /** override super.remove() */
