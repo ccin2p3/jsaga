@@ -3,7 +3,7 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
-        <release version="0.9.17">
+        <release version="1.0.0">
             <action dev="lschwarz" type="update">Upgrade to JGlobus2</action>
             <action dev="lschwarz" type="update">NAREGI adaptor has been removed</action>
             <action dev="lschwarz" type="update">WSGRAM adaptor has been removed</action>
@@ -21,8 +21,10 @@
             <action dev="lschwarz" type="update">Globus, VOMS and MyProxy: JSAGA first uses the local proxy if it exists instead of generating it at context 
             creation. See the FAQ of appropriate adaptors.</action>
             <action dev="lschwarz" type="update">VOMS: to load an existing proxy as a string, use the "UserProxyString" instead of "UserProxy"</action>
-            <action dev="lschwarz" type="add">VOMS: it is now possible to build a VOMS proxy from a Globus proxy (attribute "InitialProxy")</action>
+            <action dev="lschwarz" type="add">VOMS: it is now possible to build a VOMS proxy from a Globus proxy (attribute "InitialUserProxy")</action>
             <action dev="lschwarz" type="fix">VOMS: the extension lifetime is now the same as the proxy lifetime "attribute "LifeTime"</action>
+            <action dev="lschwarz" type="update">Added a 5-minute tolerance on VOMS proxy start date</action>
+            <action dev="lschwarz" type="add">Implemented copy file metric on directory COPY and MOVE</action>
             <action dev="lschwarz" type="update">jsaga-* commands have been moved to "examples/" directory. Usage of these commands is not officially supported anymore and thus discouraged</action>
             <action dev="lschwarz" type="update">JSAGA is now built with Maven3</action>
         </release>
