@@ -334,8 +334,12 @@ public class JSAGAVOMSProxyInitBehaviour implements ProxyInitStrategy {
         
         Calendar cal = Calendar.getInstance();
         
+        // LSZ set starttime 5 min before current time
+        cal.add(Calendar.MINUTE, -5);
         Date proxyStartTime = cal.getTime();
         
+        // LSZ reset cal to compute end date
+        cal = Calendar.getInstance();
         cal.add(Calendar.SECOND, options.getLifetime());
         
         Date proxyEndTime = cal.getTime();
