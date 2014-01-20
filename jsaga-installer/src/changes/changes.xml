@@ -4,10 +4,6 @@
     </properties>
     <body>
         <release version="1.0.0">
-            <action dev="lschwarz" type="update">Upgrade to JGlobus2</action>
-            <action dev="lschwarz" type="update">NAREGI adaptor has been removed</action>
-            <action dev="lschwarz" type="update">WSGRAM adaptor has been removed</action>
-            <action dev="lschwarz" type="update">SSH2 and batchSSH have been removed</action>
             <action dev="lschwarz" type="add">new SSH and SFTP adaptors based on the Ganymed library. 
             URL prefixes have not changed ("ssh" for job and "sftp" for data). 
             If you have a dependency on the ssh adaptor, use the artifactId "jsaga-adaptor-ssh3".
@@ -16,17 +12,24 @@
             It is still possible to use the old SSH adaptor ("jsaga-adaptor-ssh") with a context of type "DEPRECATED-SSH", and URL prefixes like
             "deprecated-ssh" and "deprecated-sftp". "jsaga-adaptor-ssh" is deprecated and will be removed in a future release.</action>
             <action dev="lschwarz" type="add">New adaptor for Dirac</action>
-            <action dev="lschwarz" type="add">New adaptor for rOCCI</action>
+            <action dev="Diego Scardaci, Giuseppe La Rocca" type="add">New adaptor for rOCCI</action>
+            <action dev="lschwarz" type="add" issue="5306">VOMS: it is now possible to build a VOMS proxy from a Globus proxy (attribute "InitialUserProxy")</action>
+            <action dev="lschwarz" type="add">Implemented copy file metric on directory COPY/MOVE and thrid party COPY
+                <fixes issue="5398"/>
+                <fixes issue="5603"/>
+            </action>
+            <action dev="lschwarz" type="remove">NAREGI adaptor has been removed</action>
+            <action dev="lschwarz" type="remove">WSGRAM adaptor has been removed</action>
+            <action dev="lschwarz" type="remove">SSH2 and batchSSH have been removed</action>
+            <action dev="lschwarz, jrevillard" type="update">Upgrade Grid adaptors to JGlobus2 (Globus, Cream, VOMS, LFC, SRM, WMS)</action>
             <action dev="lschwarz" type="update">VOMS: New default value for "ProxyType": "RFC3820" instead of "old".</action>
             <action dev="lschwarz" type="update">Globus, VOMS and MyProxy: JSAGA first uses the local proxy if it exists instead of generating it at context 
             creation. See the FAQ of appropriate adaptors.</action>
             <action dev="lschwarz" type="update">VOMS: to load an existing proxy as a string, use the "UserProxyString" instead of "UserProxy"</action>
-            <action dev="lschwarz" type="add">VOMS: it is now possible to build a VOMS proxy from a Globus proxy (attribute "InitialUserProxy")</action>
-            <action dev="lschwarz" type="fix">VOMS: the extension lifetime is now the same as the proxy lifetime "attribute "LifeTime"</action>
-            <action dev="lschwarz" type="update">VOMS: Added a 5-minute tolerance on proxy start date</action>
-            <action dev="lschwarz" type="add">Implemented copy file metric on directory COPY and MOVE</action>
+            <action dev="lschwarz" type="update" issue="5850">VOMS: Added a 5-minute tolerance on proxy start date</action>
             <action dev="lschwarz" type="update">jsaga-* commands have been moved to "examples/" directory. Usage of these commands is not officially supported anymore and thus discouraged</action>
             <action dev="lschwarz" type="update">JSAGA is now built with Maven3</action>
+            <action dev="lschwarz" type="fix">VOMS: the extension lifetime is now the same as the proxy lifetime "attribute "LifeTime"</action>
         </release>
         <release version="0.9.15" date="2012-12-11" description="Last release based on jglobus 1.8">
             <action dev="rreuillon" type="add">New SSH adaptor based upon Ganymed-ssh2 library</action>

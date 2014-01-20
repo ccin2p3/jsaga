@@ -16,6 +16,11 @@
         <developerConnection>scm:git:ssh://git.in2p3.fr/jsaga</developerConnection>
         <url>https://git.in2p3.fr/public/jsaga</url>
     </scm>
+    <!-- Override for changes report : bug in the support of Redmine in maven-report-plugin with URL like "/issues/show/" -->
+    <issueManagement>
+        <system>redmineForMaven</system>
+        <url>http://forge.in2p3.fr/</url>
+    </issueManagement>
     <distributionManagement>
         <repository>
             <id>maven2-repository</id>
@@ -375,6 +380,12 @@
                 <artifactId>maven-changes-plugin</artifactId>
                 <version>2.9</version>
                 <reportSets><reportSet><reports><report>changes-report</report></reports></reportSet></reportSets>
+                <!-- workaround a bug in the support of Redmine in maven-report-plugin with URL like "/issues/show/" -->
+                <configuration>
+                    <issueLinkTemplatePerSystem>
+                        <redmineForMaven>%URL%/issues/%ISSUE%</redmineForMaven>
+                    </issueLinkTemplatePerSystem>
+                </configuration>
             </plugin>
         </plugins>
     </reporting>
