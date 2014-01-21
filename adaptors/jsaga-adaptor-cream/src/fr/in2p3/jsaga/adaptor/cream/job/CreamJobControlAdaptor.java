@@ -220,7 +220,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 	        client.close();
 		} catch (Exception e) {
 			e.printStackTrace();
-    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Could not check if CREAM CE has the OSB bug");
+    		Logger.getLogger(CreamJobAdaptorAbstract.class).warn("Could not check if CREAM CE has the OSB bug");
 		}
 		return st;
     }
