@@ -7,7 +7,7 @@
             <answer>
                 <p>JSAGA is an implementation of the SAGA specification, so it is supposed to be used as any
                     other implementation of this specification.</p>
-                <p>Please refer to the <a href="https://forge.gridforum.org/sf/projects/saga-core-wg">Open Grid Forum
+                <p>Please refer to the <a href="http://www.ogf.org/documents/GFD.90.pdf">Open Grid Forum
                     documentation</a> to learn more about SAGA specification and how to use it.</p>
                 <p>You can also see sample code <a href="jsaga-engine/xref/fr/in2p3/jsaga/command/package-summary.html">here</a>.</p>
             </answer>
@@ -41,15 +41,7 @@ public class List {
                 <p>Compile your grid application:</p>
                 <pre>javac -d . -classpath $JSAGA_HOME/lib/saga-api-1.1.1.jar List.java</pre>
                 <p>Run your grid application:</p>
-                <ul>
-                    <li>Example with Java 1.6 on Unix/Linux operating system:
-                        <pre>java -cp .:$JSAGA_HOME/lib/'*' -DJSAGA_HOME=$JSAGA_HOME List file:///</pre>
-                    </li>
-                    <li>Example with Java 1.5 on Unix/Linux operating system:
-                        <pre>for i in $JSAGA_HOME/lib/*.jar ; do CLASSPATH="${CLASSPATH}:${i}" ; done
-java -cp .:$CLASSPATH -DJSAGA_HOME=$JSAGA_HOME List file:///</pre>
-                    </li>
-                </ul>
+                <pre>java -cp .:$JSAGA_HOME/lib/'*' -DJSAGA_HOME=$JSAGA_HOME List file:///</pre>
             </answer>
         </faq>
         <faq id="compile-with-maven">

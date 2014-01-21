@@ -19,39 +19,38 @@
             <item name="JSAGA" href="index.html"/>
         </breadcrumbs>
         <menu name="JSAGA">
-            <item name="Welcome" href="http://software.in2p3.fr/jsaga/index.html"/>
+            <item name="Welcome" href="index.html"/>
             <item name="Download" href="download.html"/>
+            <item name="Release notes" href="changes-report.html"/>
+            <item name="Submit a bug" href="https://forge.in2p3.fr/projects/jsaga/issues"/>
             <item name="Presentations" href="presentations.html"/>
             <item name="They are using JSAGA" href="projects.html"/>
             <item name="Dependencies" href="dependencies-licenses.html"/>
             <item name="Contributors" href="contributors.html"/>
-            <item name="Development Release" href="http://software.in2p3.fr/jsaga-dev/index.html"/>
         </menu>
         <menu name="User Documentation">
             <item name="Quick Start Guide" href="quickstart.html"/>
             <item name="Adaptors" href="adaptors.html"/>
-            <item name="Alternative adaptors" href="adaptors-alt.html"/>
+            <item name="FAQ" href="users-faq.html"/>
             <item name="SAGA Specification" href="http://www.ogf.org/documents/GFD.90.pdf"/>
             <item name="SAGA Java Binding API" href="saga-apidocs/index.html"/>
             <item name="Code Examples" href="jsaga-engine/xref/fr/in2p3/jsaga/command/package-summary.html"/>
             <item name="Deviations from SAGA" href="SAGA-delta.html"/>
             <item name="Wiki" href="https://forge.in2p3.fr/projects/jsaga/wiki"/>
-            <item name="FAQ" href="users-faq.html"/>
             <item name="Forum" href="https://forge.in2p3.fr/projects/jsaga/boards/11"/>
+            <item name="Alternative adaptors" href="adaptors-alt.html"/>
         </menu>
         <menu name="Contributor Documentation">
             <item name="Developing Adaptors" href="contributors-guide.html"/>
             <item name="Testing Adaptors" href="testers-guide.html"/>
             <item name="Adaptors Test Suite" href="saga-api-test/xref/overview-summary.html"/>
-            <item name="JSDL Specification" href="http://www.ogf.org/documents/GFD.56.pdf"/>
             <item name="FAQ" href="contributors-faq.html"/>
             <item name="Forum" href="https://forge.in2p3.fr/projects/jsaga/boards/12"/>
+            <item name="JSDL Specification" href="http://www.ogf.org/documents/GFD.56.pdf"/>
         </menu>
         <menu name="Developer Documentation">
-            <item name="Dependencies Tree" href="dependencies-tree.html"/>
-            <item name="TODO list" href="jsaga-engine/taglist.html"/>
             <item name="FAQ" href="developers-faq.html"/>
-            <item name="Engine Doc." href="jsaga-engine/index.html"/>
+            <item name="Dependencies Tree" href="dependencies-tree.html"/>
         </menu>
         <menu name="Project Documentation" ref="reports"/>
     </body>

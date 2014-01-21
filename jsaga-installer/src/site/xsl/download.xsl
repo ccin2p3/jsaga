@@ -11,7 +11,7 @@
                     <table>
                         <tr>
                             <th>JDK</th>
-                            <td>Download and install <a href="http://www.oracle.com/technetwork/java/javase/downloads/index-jdk5-jsp-142662.html">JDK 1.5</a> or later versions.</td>
+                            <td>Download and install <a href="http://www.oracle.com/technetwork/indexes/downloads/index.html">JDK 1.6</a> or later versions.</td>
                         </tr>
                         <tr>
                             <th>Operating System</th>

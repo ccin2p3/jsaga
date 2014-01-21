@@ -4,13 +4,16 @@ Quick Start Guide
 
     * {{{./download.html}Download and install}} JSAGA.
 
-    * Use the {{{./commands.html}command line interfaces}} provided with JSAGA (see examples below),
-      or use the {{{./saga-apidocs/index.html}SAGA API}}
-      (see {{{./jsaga-engine/xref/fr/in2p3/jsaga/command/package-summary.html}code examples}}).
+    * As a start, you can try the {{{./commands.html}command line interfaces}} provided with JSAGA (see examples below). Please note
+    that these commands are intended to check your configuration and are provided as examples only. We do not recommend to use them
+    in production.
 
     * If you install and use several adaptors, default configurations may overlap and you will
       have to configure adaptors (see configuration examples of {{{./adaptors.html}plug-ins}}).
 
+    * Use the {{{./saga-apidocs/index.html}SAGA API}} in your Java code
+      (see {{{./jsaga-engine/xref/fr/in2p3/jsaga/command/package-summary.html}code examples}}).
+    
 * Security context
 
     * List supported security context types (with attributes to be set):
