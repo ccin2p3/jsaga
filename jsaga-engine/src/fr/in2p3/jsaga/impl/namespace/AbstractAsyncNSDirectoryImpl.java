@@ -452,11 +452,11 @@ public abstract class AbstractAsyncNSDirectoryImpl extends AbstractSyncNSDirecto
                 public void doCopy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
                     source._copyAndMonitor(target, flags, this);
                     // For remove, ignore all flags except DEREFERENCE
+                    int removeFlags = Flags.RECURSIVE.getValue();
                     if (Flags.DEREFERENCE.isSet(flags)) {
-                        source.removeSync(Flags.DEREFERENCE.getValue());
-                    } else {
-                        source.removeSync();
+                        removeFlags += Flags.DEREFERENCE.getValue();
                     }
+                    source.removeSync(removeFlags);
                 }
             };
         } else {
