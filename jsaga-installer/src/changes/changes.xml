@@ -15,6 +15,7 @@
             <action dev="Diego Scardaci, Giuseppe La Rocca" type="add">New adaptor for rOCCI</action>
             <action dev="lschwarz" type="add" issue="5306">VOMS: it is now possible to build a VOMS proxy from a Globus proxy (attribute "InitialUserProxy")</action>
             <action dev="lschwarz" type="add">Implemented copy file metric on directory COPY/MOVE and thrid party COPY
+                <fixes issue="5397"/>
                 <fixes issue="5398"/>
                 <fixes issue="5603"/>
             </action>
@@ -23,7 +24,7 @@
             <action dev="lschwarz" type="remove">SSH2 and batchSSH have been removed</action>
             <action dev="lschwarz, jrevillard" type="update">Upgrade Grid adaptors to JGlobus2 (Globus, Cream, VOMS, LFC, SRM, WMS)</action>
             <action dev="lschwarz" type="update">VOMS: New default value for "ProxyType": "RFC3820" instead of "old".</action>
-            <action dev="lschwarz" type="update">Globus, VOMS and MyProxy: JSAGA first uses the local proxy if it exists instead of generating it at context 
+            <action dev="lschwarz" type="update" issue="5618">Globus, VOMS and MyProxy: JSAGA first uses the local proxy if it exists instead of generating it at context 
             creation. See the FAQ of appropriate adaptors.</action>
             <action dev="lschwarz" type="update">VOMS: to load an existing proxy as a string, use the "UserProxyString" instead of "UserProxy"</action>
             <action dev="lschwarz" type="update" issue="5850">VOMS: Added a 5-minute tolerance on proxy start date</action>
