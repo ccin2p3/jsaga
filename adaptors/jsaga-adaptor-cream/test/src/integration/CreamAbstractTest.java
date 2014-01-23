@@ -63,6 +63,7 @@ public abstract class CreamAbstractTest extends AbstractTest {
                 m_url.getPort()
             )
         );
+        System.out.println("Registered protocol");
         super.setUp();
     }
         

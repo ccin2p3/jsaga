@@ -93,19 +93,8 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 
         // renew/create delegated proxy
         m_client.renewDelegation(m_delegationId, m_vo);
-//        DelegationStub delegationStub = new DelegationStub(host, port, m_vo);
-//        m_delegProxy = delegationStub.renewDelegation(m_delegationId, m_credential);
-//        // put new delegated proxy for multiple jobs
-//        if (m_delegProxy != null) {
-//            delegationStub.putProxy(m_delegationId, m_delegProxy);
-//        }
 
     }
-
-//    public void disconnect() throws NoSuccessException {
-//        m_delegProxy = null;
-//        super.disconnect();
-//    }
 
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
         JobDescriptionTranslator translator = new JobDescriptionTranslatorXSLT("xsl/job/cream-jdl.xsl");

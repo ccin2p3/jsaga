@@ -51,14 +51,6 @@ public class CreamClient {
 
     private Logger m_logger;
 
-//    public CreamClient(String host, int port, ProtocolSocketFactory sf) throws MalformedURLException, AxisFault {
-//        m_creamUrl = new URL("https", host, port, "/ce-cream/services/CREAM2");
-//        m_creamStub = new CREAMStub(m_creamUrl.toString());
-//        m_socketFactory = sf;
-//        m_port = port;
-//        m_host = host;
-//    }
-
     public CreamClient(String host, int port, GSSCredential cred, File certs) throws MalformedURLException, AxisFault, AuthenticationFailedException {
         m_creamUrl = new URL("https", host, port, "/ce-cream/services/CREAM2");
         m_creamStub = new CREAMStub(m_creamUrl.toString());
@@ -95,11 +87,6 @@ public class CreamClient {
     }
 
     public JobInfoResult[] jobInfo(String nativeJobId) throws NoSuccessException, RemoteException, Authorization_Fault, Generic_Fault, InvalidArgument_Fault {
-//        JobFilter filter = this.getJobFilter(nativeJobId);
-//        // get job info
-//        JobInfoResult resultArray[];
-//        JobInfoRequest request = new JobInfoRequest();
-//        request.setJobInfoRequest(filter);
         return this.jobInfo(new String[]{nativeJobId});
     }
 
@@ -115,6 +102,7 @@ public class CreamClient {
             }
         }
         JobFilter filter = new JobFilter();
+        // TODO: check this
 //        filter.setDelegationId(m_delegationId);
         filter.setJobId(jobIdList);
         JobInfoRequest request = new JobInfoRequest();

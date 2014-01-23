@@ -2,6 +2,7 @@ package integration;
 
 import junit.framework.Test;
 
+import org.apache.commons.httpclient.protocol.Protocol;
 import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
@@ -43,6 +44,7 @@ public class CreamExecutionTestSuite extends JSAGATestSuite {
         /**
          * Runs simple job and expects done status
          */
+        /* test SSL
         public void test_run() throws Exception {
             
             // prepare
@@ -52,6 +54,7 @@ public class CreamExecutionTestSuite extends JSAGATestSuite {
             // submit
             Job job = createJob(desc);
             
+//            Protocol.getProtocol("https");
             try {
                 URL url = URLFactory.createURL("gsiftp://cccreamceli09.in2p3.fr:2811/tmp/lszzz");
                 NSFactory.createNSEntry(m_session, createURL(url, "unexisting.txt"), Flags.NONE.getValue());
@@ -59,6 +62,7 @@ public class CreamExecutionTestSuite extends JSAGATestSuite {
             } catch (DoesNotExistException dnee) {
             }
         }
+        */
     }
 
     // test cases

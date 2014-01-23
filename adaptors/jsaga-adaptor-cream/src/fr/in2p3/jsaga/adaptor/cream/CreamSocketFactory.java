@@ -18,6 +18,7 @@ import org.apache.commons.httpclient.params.HttpConnectionParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory;
+import org.apache.log4j.Logger;
 import org.globus.gsi.CredentialException;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSCredential;
@@ -28,12 +29,14 @@ import eu.emi.security.authn.x509.helpers.proxy.ProxyCertificateImpl;
 import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
+import fr.in2p3.jsaga.adaptor.cream.job.CreamClient;
 
 public class CreamSocketFactory implements SecureProtocolSocketFactory {
 
     private X509Credential m_credential;
     private OpensslCertChainValidator m_validator;
-    
+    private Logger m_logger;
+
     public CreamSocketFactory(GSSCredential cred, File certificatesPath) throws AuthenticationFailedException {
         try {
             org.globus.gsi.X509Credential c = ((GlobusGSSCredentialImpl)cred).getX509Credential();
@@ -46,6 +49,7 @@ public class CreamSocketFactory implements SecureProtocolSocketFactory {
             throw new AuthenticationFailedException("Error with proxy: " + e1.getMessage(),e1);
         }
         m_validator = new OpensslCertChainValidator(certificatesPath.getPath());
+        m_logger = Logger.getLogger(CreamSocketFactory.class);
     }
 
     public CreamSocketFactory(String credFile, File certificatesPath) throws AuthenticationFailedException {
@@ -74,6 +78,7 @@ public class CreamSocketFactory implements SecureProtocolSocketFactory {
     public Socket createSocket(String host, int port, InetAddress localHost,
             int localPort, HttpConnectionParams params) throws IOException,
             UnknownHostException, ConnectTimeoutException {
+        m_logger.debug("creating socket");
         SSLSocketFactory newFactory = SocketFactoryCreator.getSocketFactory(m_credential, m_validator);
         SSLSocket socket = (SSLSocket) newFactory.createSocket();
         SocketAddress remoteaddr = new InetSocketAddress(host, port);

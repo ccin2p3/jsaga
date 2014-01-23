@@ -53,10 +53,8 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
 
     protected String m_delegationId;
 
-    protected CreamClient m_client;
+    protected CreamClient m_client = null;
     protected String m_creamVersion = "";
-    
-    private int m_port;
     
     public String getType() {
         return "cream";
@@ -96,7 +94,6 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
             throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, 
             BadParameterException, TimeoutException, NoSuccessException {
 
-//        m_port = port;
         // set DELEGATION_ID
         if (attributes.containsKey(DELEGATION_ID)) {
             m_delegationId = (String) attributes.get(DELEGATION_ID);
@@ -119,7 +116,6 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
 		}
 
     	try {
-//        	ServiceInfoRequest request = new ServiceInfoRequest();
         	ServiceInfo service_info = m_client.getServiceInfo();
 			String cream_desc = host + " (interface version=" + 
 								service_info.getInterfaceVersion() + ",service version=" + 
