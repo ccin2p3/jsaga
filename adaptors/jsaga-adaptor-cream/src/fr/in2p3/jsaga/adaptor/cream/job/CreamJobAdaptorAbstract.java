@@ -50,16 +50,13 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     protected GSSCredential m_credential;
     protected String m_vo;
     protected File m_certRepository;
-    protected String m_proxyFilename;
 
     protected String m_delegationId;
-    protected CREAMStub m_creamStub;
-    // TODO: check if URL can be retrieved from Stub
-    protected URL m_creamUrl;
 
+    protected CreamClient m_client;
     protected String m_creamVersion = "";
     
-    protected Properties m_sslConfig;
+    private int m_port;
     
     public String getType() {
         return "cream";
@@ -81,11 +78,6 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
         } catch (Exception e) {
             /* ignore */
         }
-        try {
-            m_proxyFilename = credential.getAttribute(Context.USERPROXY);
-        } catch (Exception e) {
-            /* ignore */
-        }
     }
 
     public int getDefaultPort() {
@@ -104,11 +96,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
             throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, 
             BadParameterException, TimeoutException, NoSuccessException {
 
-        Protocol.registerProtocol("https", 
-                new Protocol("https", 
-                             (ProtocolSocketFactory)new CreamSocketFactory(m_proxyFilename, m_certRepository), 
-                             port));
-        
+//        m_port = port;
         // set DELEGATION_ID
         if (attributes.containsKey(DELEGATION_ID)) {
             m_delegationId = (String) attributes.get(DELEGATION_ID);
@@ -123,8 +111,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
             }
         }
     	try {
-    		m_creamUrl = new URL("https", host, port, "/ce-cream/services/CREAM2");
-    		m_creamStub = new CREAMStub(m_creamUrl.toString());
+    	    m_client = new CreamClient(host, port, m_credential, m_certRepository);
 		} catch (MalformedURLException e) {
             throw new BadParameterException(e.getMessage(), e);
 		} catch (AxisFault e) {
@@ -132,8 +119,8 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
 		}
 
     	try {
-        	ServiceInfoRequest request = new ServiceInfoRequest();
-        	ServiceInfo service_info = m_creamStub.getServiceInfo(request).getServiceInfoResponse();
+//        	ServiceInfoRequest request = new ServiceInfoRequest();
+        	ServiceInfo service_info = m_client.getServiceInfo();
 			String cream_desc = host + " (interface version=" + 
 								service_info.getInterfaceVersion() + ",service version=" + 
 								service_info.getServiceVersion() + ")";
@@ -143,27 +130,11 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Could not get service version");
 		}
         
-
     }
 
     public void disconnect() throws NoSuccessException {
-        m_creamStub = null;
-        m_creamUrl = null;
+        m_client.disconnect();
     }
     
-	protected JobFilter getJobFilter(String nativeJobId) throws NoSuccessException {
-        JobId jobId = new JobId();
-        jobId.setId(nativeJobId);
-        try {
-			jobId.setCreamURL(new URI(m_creamUrl.toString()));
-		} catch (MalformedURIException e) {
-			throw new NoSuccessException(e);
-		}
-        JobFilter filter = new JobFilter();
-        filter.setDelegationId(m_delegationId);
-        filter.setJobId(new JobId[]{jobId});
-        return filter;
-    }
-
 
 }

@@ -2,6 +2,7 @@ package integration;
 
 import junit.framework.Test;
 
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.job.JobDescriptionTest;
@@ -12,7 +13,11 @@ import org.ogf.saga.job.JobRunMinimalTest;
 import org.ogf.saga.job.JobRunOptionalTest;
 import org.ogf.saga.job.JobRunRequiredTest;
 import org.ogf.saga.job.JobRunSandboxTest;
+import org.ogf.saga.namespace.Flags;
+import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.task.State;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -35,6 +40,25 @@ public class CreamExecutionTestSuite extends JSAGATestSuite {
     /** test cases */
     public static class CreamJobRunMinimalTest extends JobRunMinimalTest {
         public CreamJobRunMinimalTest() throws Exception {super("cream");}
+        /**
+         * Runs simple job and expects done status
+         */
+        public void test_run() throws Exception {
+            
+            // prepare
+            // prepare
+            JobDescription desc = createSimpleJob();
+            
+            // submit
+            Job job = createJob(desc);
+            
+            try {
+                URL url = URLFactory.createURL("gsiftp://cccreamceli09.in2p3.fr:2811/tmp/lszzz");
+                NSFactory.createNSEntry(m_session, createURL(url, "unexisting.txt"), Flags.NONE.getValue());
+                fail("Expected DoesNotExistException");
+            } catch (DoesNotExistException dnee) {
+            }
+        }
     }
 
     // test cases

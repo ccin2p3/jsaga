@@ -68,7 +68,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     private String m_batchSystem;
     private String m_queueName;
 
-    private String m_delegProxy;
+//    private String m_delegProxy;
     private Boolean m_hasOutputSandboxBug = null;
     
 //    private DelegationServiceStub m_delegationServiceStub;
@@ -92,19 +92,20 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
 
         // renew/create delegated proxy
-        DelegationStub delegationStub = new DelegationStub(host, port, m_vo);
-        m_delegProxy = delegationStub.renewDelegation(m_delegationId, m_credential);
-        // put new delegated proxy for multiple jobs
-        if (m_delegProxy != null) {
-            delegationStub.putProxy(m_delegationId, m_delegProxy);
-        }
+        m_client.renewDelegation(m_delegationId, m_vo);
+//        DelegationStub delegationStub = new DelegationStub(host, port, m_vo);
+//        m_delegProxy = delegationStub.renewDelegation(m_delegationId, m_credential);
+//        // put new delegated proxy for multiple jobs
+//        if (m_delegProxy != null) {
+//            delegationStub.putProxy(m_delegationId, m_delegProxy);
+//        }
 
     }
 
-    public void disconnect() throws NoSuccessException {
-        m_delegProxy = null;
-        super.disconnect();
-    }
+//    public void disconnect() throws NoSuccessException {
+//        m_delegProxy = null;
+//        super.disconnect();
+//    }
 
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
         JobDescriptionTranslator translator = new JobDescriptionTranslatorXSLT("xsl/job/cream-jdl.xsl");
@@ -115,21 +116,9 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	
-        // create job description
-        JobDescription jd = new JobDescription();
-        jd.setJDL(jobDesc);
-        jd.setAutoStart(false);
-        jd.setDelegationId(m_delegationId);
-//        if (m_delegProxy != null) {
-//            jd.setDelegationProxy(m_delegProxy);
-//        }
-        
-        // submit job
-    	JobRegisterRequest request = new JobRegisterRequest();
-    	request.setJobDescriptionList(new JobDescription[]{jd});
         JobRegisterResponse response;
 		try {
-			response = m_creamStub.jobRegister(request, null);
+			response = m_client.jobRegister(jobDesc, m_delegationId);
 		} catch (Authorization_Fault e) {
 			throw new PermissionDeniedException(e);
 		} catch (Generic_Fault e) {
@@ -226,15 +215,9 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
     
     private JobInfo getJobInfo(String nativeJobId) throws TimeoutException, NoSuccessException {
-        JobFilter filter = this.getJobFilter(nativeJobId);
-
-        // get job info
-        JobInfoResult resultArray[];
-
-        JobInfoRequest request = new JobInfoRequest();
-        request.setJobInfoRequest(filter);
+        JobInfoResult[] resultArray;
         try {
-			resultArray = m_creamStub.jobInfo(request).getResult();
+			resultArray = m_client.jobInfo(nativeJobId);
 		} catch (Authorization_Fault e) {
 			throw new NoSuccessException(e);
 		} catch (Generic_Fault e) {
@@ -258,15 +241,10 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
 
     public void start(String nativeJobId) throws TimeoutException, NoSuccessException {
-        JobFilter filter = this.getJobFilter(nativeJobId);
-
-        JobStartRequest request = new JobStartRequest();
-        request.setJobStartRequest(filter);
-        
         // cancel job
         Result[] resultArray;
         try {
-			resultArray = m_creamStub.jobStart(request).getJobStartResponse().getResult();
+			resultArray = m_client.jobStart(nativeJobId);
 		} catch (Authorization_Fault e) {
 			throw new NoSuccessException(e);
 		} catch (Generic_Fault e) {
@@ -280,15 +258,10 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
 
     public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        JobFilter filter = this.getJobFilter(nativeJobId);
-
-        JobCancelRequest request = new JobCancelRequest();
-        request.setJobCancelRequest(filter);
-        
         // cancel job
         Result[] resultArray;
         try {
-            resultArray = m_creamStub.jobCancel(request).getJobCancelResponse().getResult();
+            resultArray = m_client.jobCancel(nativeJobId);
 		} catch (Authorization_Fault e) {
 			throw new PermissionDeniedException(e);
 		} catch (Generic_Fault e) {
@@ -302,15 +275,10 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
 
     public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        JobFilter filter = this.getJobFilter(nativeJobId);
-
-        JobPurgeRequest request = new JobPurgeRequest();
-        request.setJobPurgeRequest(filter);
-        
         // cancel job
         Result[] resultArray;
         try {
-            resultArray = m_creamStub.jobPurge(request).getJobPurgeResponse().getResult();
+            resultArray = m_client.jobClean(nativeJobId);
 		} catch (Authorization_Fault e) {
 			throw new PermissionDeniedException(e);
 		} catch (Generic_Fault e) {
@@ -323,16 +291,10 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
 
 	public boolean hold(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        JobFilter filter = this.getJobFilter(nativeJobId);
-
-        JobSuspendRequest request = new JobSuspendRequest();
-        request.setJobSuspendRequest(filter);
-        
         // cancel job
         Result[] resultArray;
         try {
-        	JobSuspendResponse jsr = m_creamStub.jobSuspend(request);
-            resultArray = jsr.getJobSuspendResponse().getResult();
+            resultArray = m_client.jobSuspend(nativeJobId);
 		} catch (Authorization_Fault e) {
 			throw new PermissionDeniedException(e);
 		} catch (Generic_Fault e) {
@@ -348,16 +310,10 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 	}
 
 	public boolean release(String nativeJobId) throws PermissionDeniedException, TimeoutException,	NoSuccessException {
-        JobFilter filter = this.getJobFilter(nativeJobId);
-
-        JobResumeRequest request = new JobResumeRequest();
-        request.setJobResumeRequest(filter);
-        
         // cancel job
         Result[] resultArray;
         try {
-        	CommandResult jrr = m_creamStub.jobResume(request).getJobResumeResponse();
-            resultArray = jrr.getResult();
+            resultArray = m_client.jobResume(nativeJobId);
 		} catch (Authorization_Fault e) {
 			throw new PermissionDeniedException(e);
 		} catch (Generic_Fault e) {

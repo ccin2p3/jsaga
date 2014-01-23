@@ -8,6 +8,7 @@ import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 import java.io.File;
+import java.util.Date;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -28,6 +29,7 @@ public abstract class CreamAbstractTest extends AbstractTest {
     public CreamAbstractTest() throws Exception {
         this("cream");
     }
+
     protected CreamAbstractTest(String jobprotocol) throws Exception {
         super();
         m_url = URLFactory.createURL(getRequiredProperty(jobprotocol, CONFIG_JOBSERVICE_URL));
@@ -38,6 +40,10 @@ public abstract class CreamAbstractTest extends AbstractTest {
             String dn = "/O=GRID-FR/C=FR/O=CNRS/OU=CC-LYON/CN=Sylvain Reynaud";
             m_delegationId = "delegation-"+Math.abs(dn.hashCode());
         }
+    }
+
+    /** Implicitly invoked before executing each test method */
+    protected void setUp() throws Exception {
         // Set the SSL context
         Protocol.registerProtocol("https", 
             new Protocol("https", (ProtocolSocketFactory)new CreamSocketFactory(
@@ -57,6 +63,13 @@ public abstract class CreamAbstractTest extends AbstractTest {
                 m_url.getPort()
             )
         );
+        super.setUp();
+    }
+        
+    /** Implicitly invoked after executing each test method */
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        Protocol.unregisterProtocol("https");
     }
 
 }

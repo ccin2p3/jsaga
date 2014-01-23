@@ -67,7 +67,7 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
     public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
         JobId[] resultArray;
         try {
-            resultArray = m_creamStub.jobList().getResult();
+            resultArray = m_client.jobList();
         } catch (RemoteException e) {
             throw new TimeoutException(e);
         } catch (Authorization_Fault e) {
@@ -151,34 +151,10 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
 		throw new NoSuccessException("Status not available");
 	}
 	
-//	private Command getLastCommand(String nativeJobId) throws NotImplementedException, NoSuccessException {
-//		try {
-//			Command[] cmds = this.getJobInfoResult(new String[]{nativeJobId})[0].getLastCommand();
-//			return cmds[cmds.length-1];
-//		} catch (TimeoutException e) {
-//			throw new NoSuccessException(e);
-//		}
-//	}
-	
     private JobInfo[] getJobInfoResult(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
-        JobId[] jobIdList = new JobId[nativeJobIdArray.length];
-        for (int i = 0; i < nativeJobIdArray.length; i++) {
-            jobIdList[i] = new JobId();
-            jobIdList[i].setId(nativeJobIdArray[i]);
-            try {
-				jobIdList[i].setCreamURL(new URI(m_creamUrl.toString()));
-			} catch (MalformedURIException e) {
-				throw new NoSuccessException(e);
-			}
-        }
-        JobFilter filter = new JobFilter();
-        filter.setDelegationId(m_delegationId);
-        filter.setJobId(jobIdList);
-        JobInfoRequest request = new JobInfoRequest();
-        request.setJobInfoRequest(filter);
         JobInfoResult[] resultArray;
         try {
-            resultArray = m_creamStub.jobInfo(request).getResult();
+            resultArray = m_client.jobInfo(nativeJobIdArray);
         } catch (RemoteException e) {
             throw new TimeoutException(e);
         } catch (Authorization_Fault e) {
