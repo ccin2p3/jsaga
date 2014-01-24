@@ -15,7 +15,7 @@
                         </tr>
                     </table>
                 </subsection>
-                <subsection name="Current Release">
+                <subsection name="Latest Release">
                 <xsl:choose>
                     <xsl:when test="contains($project.version, 'SNAPSHOT')">
                         <p>If you want to use JSAGA in a stable environment, you might prefer the latest release. 
