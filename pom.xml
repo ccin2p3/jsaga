@@ -81,35 +81,11 @@
             </activation>
             <properties>
                 <maven.repository>file:///tmp/grid.in2p3.fr/maven2</maven.repository>
-                <project.web.site>file:///tmp/grid.in2p3.fr/site</project.web.site>
+                <project.web.site>file:///tmp/grid.in2p3.fr/jsaga/${project.version}</project.web.site>
             </properties>
         </profile>
         <profile>
-            <id>release</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-            <!-- 
-                1) The Maven deploy plugin uses wagon-ssh-external (ssh command)
-                2) wagon-ssh-external DOES use the SSH client configuration.
-                3) The username MUST be given in the URL AND in the settings.xml in the <server> part.
-                4) When building in Jenkins, the settings.xml is created via the Configuration Files plugin
-                5) When building outside Jenkins, the settings.xml DOES NOT need <password>. The local SSH configuration is used.
-                6) The public key of the SFTP server must be added to the client's known_hosts file
-             -->
-                <maven.repository>scpexe://maven@maven.in2p3.fr/sites/maven/www/htdocs</maven.repository>
-            <!-- 
-                1) The Maven site-deploy plugin use the wagon-ssh
-                2) wagon-ssh (JSch API) DOES NOT use the SSH client configuration.
-                3) Giving the username in the URL DOES work, but for security reasons, it is rather given in settings.xml in the <server> part.
-                4) The public key of the SFTP server must be added to the client's known_hosts file
-             -->
-                <project.web.site>sftp://software.in2p3.fr/sites/software/www/htdocs/jsaga</project.web.site>
-            </properties>
-        </profile>
-        <profile>
-            <id>snapshot</id>
+            <id>remote</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -129,30 +105,8 @@
             	3) Giving the username in the URL DOES work, but for security reasons, it is rather given in settings.xml in the <server> part.
             	4) The public key of the SFTP server must be added to the client's known_hosts file
              -->
-                <project.web.site>sftp://software.in2p3.fr/sites/software/www/htdocs/jsaga-dev</project.web.site>
+                <project.web.site>sftp://software.in2p3.fr/sites/software/www/htdocs/jsaga/${project.version}</project.web.site>
             </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>replace-logo</id>
-                                <phase>post-site</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <tasks>
-                                        <move overwrite="true" failonerror="false" file="${project.build.directory}/site/images/logo-jsaga-dev.png" tofile="${project.build.directory}/site/images/logo-jsaga.png" />
-                                    </tasks>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
     <properties>
