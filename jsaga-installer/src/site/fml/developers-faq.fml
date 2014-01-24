@@ -37,21 +37,19 @@ mvn scm:bootstrap -DscmVersionType=tag -DscmVersion=$TAG -Dgoals=deploy,site-dep
             <question>How to release JSAGA ?</question>
             <answer>
                 <ul>
-                    <li>Update the release notes
-                        <br/>
-                    </li>
+                    <li>Update the release notes (jsaga-installer/src/changes/changes.xml)<br/></li>
+                    <li>Update the "Previous releases" section in the download page (jsaga-installer/src/site/sxl/download.xsl)<br/></li>
                     <li>Update from GIT and select the branch "master"
                         <pre>git pull
 git checkout master</pre>
                     </li>
                     <li>From a ccdevli host, run:
-                        <pre>export MAVEN_OPTS=-Xmx256m
-mvn -f pom-unreleased.xml deploy
+                        <pre>mvn -f pom-unreleased.xml deploy
 
 mvn release:prepare
-mvn install ; mvn release:prepare   # workaround
-mvn release:perform -P release</pre>
+mvn release:perform</pre>
                     </li>
+                    <li>Change the symbolic link latest-release on the web server</li>
                 </ul>
             </answer>
         </faq>
@@ -64,19 +62,18 @@ mvn release:perform -P release</pre>
 git checkout &lt;yourBranch&gt;</pre>
                     </li>
                     <li>From a ccdevli host, run:
-                        <pre>export MAVEN_OPTS=-Xmx256m
-mvn -f pom-unreleased.xml deploy
+                        <pre>mvn -f pom-unreleased.xml deploy
 
 mvn deploy site-deploy</pre>
                     </li>
+                    <li>Change the symbolic link dev on the web server</li>
                 </ul>
             </answer>
         </faq>
         <faq id="test-web-site">
             <question>How to test web site generation without deploying it ?</question>
             <answer>From a ccdevli host, run:
-                <pre>export MAVEN_OPTS=-Xmx256m
-mvn site-deploy -P local</pre>
+                <pre>mvn site-deploy -P local</pre>
             </answer>
         </faq>
         <faq id="maven-repository">
