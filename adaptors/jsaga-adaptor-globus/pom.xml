@@ -6,8 +6,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jsaga-adaptor-globus</artifactId>
-    <name>Adaptors for Globus Toolkit v2</name>
-    <description>This module provides support for Globus Toolkit v2 components, for;
+    <name>Adaptors for Globus Toolkit</name>
+    <description>This module provides support for Globus Toolkit components, for;
 security mechanisms (Globus, GlobusLegacy, GlobusRFC820, MyProxy),
 data management protocols (gsiftp v1, v2 and .NET implementation),
 execution management technologies (Gatekeeper).</description>
