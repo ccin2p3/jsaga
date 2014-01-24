@@ -11,29 +11,29 @@
     </contexts>
     <session>
         <context type="SSH"/>
-	    <context type="SSH" id="sreynaud">
+        <context type="SSH" id="sreynaud">
             <attribute name="UserID" value="sreynaud"/>
             <attribute name="UserPrivateKey" value="${user.home}/.jsaga/contexts/ssh/sreynaud"/>
             <data type="sftp">
-           		<attribute name="FilenameEncoding" value="ISO-8859-1"/>
+                <attribute name="FilenameEncoding" value="ISO-8859-1"/>
             </data>
             <job type="ssh"/>
             <include host="ccsyre*.in2p3.fr"/>
             <exclude host="localhost"/>
-	    </context>
-	    <context type="UserPass" id="AFS">
+        </context>
+        <context type="UserPass" id="AFS">
             <attribute name="UserID" value="${user.name}"/>
             <attribute name="UserPass" value="${AFS_PASSWORD}"/>
             <data type="sftp"/>
             <job type="ssh"/>
             <include host="ccage022.in2p3.fr"/>
             <exclude host="localhost"/>
-	    </context>
-	    <context type="UserPassStore" id="netrc">
+        </context>
+        <context type="UserPassStore" id="netrc">
             <data type="sftp"/>
             <job type="ssh"/>
             <include host="ccali05.in2p3.fr"/>
             <exclude host="localhost"/>
-	    </context>
+        </context>
     </session>
 </jsaga-default>

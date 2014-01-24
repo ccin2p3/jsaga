@@ -6,22 +6,19 @@
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
             <attribute name="UserVO" value="dteam"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
-
             <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
-
             <attribute name="LifeTime" value="PT3H"/>
-
             <data type="gsiftp"/>
             <job type="cream"/>
         </context>
-<context type="MyProxy">
+        <context type="MyProxy">
             <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
             <attribute name="Server" value="cclcgsrvli02.in2p3.fr:7512"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/myproxy_cred.txt"/>
-<!-- <attribute name="Server" value="myproxy.cern.ch"/> -->
-<attribute name="LifeTime" value="PT48H"/>
-<attribute name="UserPass" value="${GRID_PASSPHRASE}"/>
-</context>
+            <!-- <attribute name="Server" value="myproxy.cern.ch"/> -->
+            <attribute name="LifeTime" value="PT48H"/>
+            <attribute name="UserPass" value="${GRID_PASSPHRASE}"/>
+        </context>
         <context type="VOMSMyProxy">
             <attribute name="Server" value="voms://voms.hellasgrid.gr:15004/C=GR/O=HellasGrid/OU=hellasgrid.gr/CN=voms.hellasgrid.gr"/>
             <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
@@ -29,7 +26,7 @@
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_myproxy_cred.txt"/>
             <attribute name="UserVO" value="dteam"/>
             <attribute name="MyProxyServer" value="cclcgsrvli02.in2p3.fr:7512"/>
-<attribute name="LifeTime" value="PT48H"/>
+            <attribute name="LifeTime" value="PT48H"/>
             <!-- Optional attributes (equivalent to "-d -n" if not specified) -->
             <!--<attribute name="MyProxyUserID" value="jsaga"/>-->
             <!-- <attribute name="MyProxyPass" value="tototo"/>-->

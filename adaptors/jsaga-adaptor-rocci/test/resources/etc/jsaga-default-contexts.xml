@@ -7,7 +7,6 @@
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
             <attribute name="UserID" value="root"/>
             <attribute name="UserPrivateKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI"/>
-            <!--attribute name="UserKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI"/-->
             <attribute name="UserPublicKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI.pub"/>
             <data type="rocci"/>
             <job type="rocci">
@@ -16,25 +15,8 @@
                 <attribute name="mixin_resource_tpl" value="small"/>
             </job>
          </context>
-         <context type="VOMS">
-            <attribute name="UserProxy" value="${user.home}/.jsaga/contexts/rOCCI/proxy"/>
-            <!-- <attribute name="UserCert" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI.pub"/> -->
-            <!-- <attribute name="UserKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI"/> -->
-            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
-            <job type="rocci"/>
-        </context>
-        <context type="SSH">
-            <attribute name="UserID" value="root"/>
-            <attribute name="UserPrivateKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI"/>
-            <attribute name="UserPublicKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI.pub"/>
-            <data type="sftp">
-                <attribute name="KnownHosts" value=""/>
-            </data>
-        </context>
     </contexts>
     <session>
-        <!-- <context type="VOMS"/> -->
-        <!-- <context type="SSH"/>  -->
         <context type="rocci"/>
     </session>
 </jsaga-default>

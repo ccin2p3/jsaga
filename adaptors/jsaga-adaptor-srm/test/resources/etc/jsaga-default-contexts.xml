@@ -7,13 +7,10 @@
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
             <attribute name="UserVO" value="dteam"/>
-            <attribute name="ProxyType" value="old"/>
         </context>
     </contexts>
     <session>
         <context type="VOMS">
-            <!-- not required because there is a single context -->
-            <!--<data type="srm"/>-->
         </context>
     </session>
 </jsaga-default>
