@@ -18,7 +18,7 @@
                 <subsection name="Current Release">
                 <xsl:choose>
                     <xsl:when test="contains($project.version, 'SNAPSHOT')">
-                        <p>If you want JSAGA in a stable environment, you might prefer the latest release. 
+                        <p>If you want to use JSAGA in a stable environment, you might prefer the latest release. 
                         Please visit <a href="../latest-release/download.html">this page</a></p>
                     </xsl:when>
                     <xsl:otherwise>
