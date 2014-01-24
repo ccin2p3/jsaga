@@ -9,9 +9,9 @@
 
             <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
 
-            <!-- fixme: signer certificate expires earlier than the delegated proxy if VOMS lifetime is lower than  12H -->
-            <attribute name="LifeTime" value="PT13H"/>
+            <attribute name="LifeTime" value="PT3H"/>
 
+            <data type="gsiftp"/>
             <job type="cream"/>
         </context>
 <context type="MyProxy">
