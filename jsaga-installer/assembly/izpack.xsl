@@ -14,7 +14,7 @@
                 <authors>
                     <author name="Sylvain Reynaud" email="sreynaud@in2p3.fr"/>
                     <author name="Lionel Schwarz" email="lionel.schwarz@in2p3.fr"/>
-                    <author name="See contributors list" email="http://software.in2p3.fr/jsaga-dev/contributors.html"/>
+                    <author name="See contributors list" email="http://software.in2p3.fr/jsaga/latest-release/contributors.html"/>
                 </authors>
                 <javaversion>1.5</javaversion>
             </info>

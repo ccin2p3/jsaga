@@ -104,7 +104,7 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
                 m_dir = NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.NONE.getValue());
                 m_file = m_dir.open(m_fileUrl, Flags.NONE.getValue());
             } catch(DoesNotExistException e2) {
-                throw new DoesNotExistException("Please create the expected files and directories for test suite (http://software.in2p3.fr/jsaga-dev/faq.html#create-test-entries)", e2);
+                throw new DoesNotExistException("Please create the expected files and directories for test suite (http://software.in2p3.fr/jsaga/latest-release/faq.html#create-test-entries)", e2);
             }
         } catch(Exception e) {
 //            try{this.tearDown();}catch(Exception e2){/**/}
