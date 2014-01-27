@@ -4,7 +4,7 @@
   <parent>
     <artifactId>adaptors</artifactId>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
-    <version>0.9.17-SNAPSHOT</version>
+    <version>1.0.0</version>
   </parent>
   <artifactId>jsaga-adaptor-arc</artifactId>
   <name>Adaptor for BES submission on ARC systems (A-REX)</name>
@@ -59,13 +59,13 @@
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-classic</artifactId>
-			<version>0.9.17-SNAPSHOT</version>
+			<version>1.0.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-bes</artifactId>
-			<version>0.9.17-SNAPSHOT</version>
+			<version>1.0.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
