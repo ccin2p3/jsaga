@@ -41,28 +41,6 @@ public class CreamExecutionTestSuite extends JSAGATestSuite {
     /** test cases */
     public static class CreamJobRunMinimalTest extends JobRunMinimalTest {
         public CreamJobRunMinimalTest() throws Exception {super("cream");}
-        /**
-         * Runs simple job and expects done status
-         */
-        /* test SSL
-        public void test_run() throws Exception {
-            
-            // prepare
-            // prepare
-            JobDescription desc = createSimpleJob();
-            
-            // submit
-            Job job = createJob(desc);
-            
-//            Protocol.getProtocol("https");
-            try {
-                URL url = URLFactory.createURL("gsiftp://cccreamceli09.in2p3.fr:2811/tmp/lszzz");
-                NSFactory.createNSEntry(m_session, createURL(url, "unexisting.txt"), Flags.NONE.getValue());
-                fail("Expected DoesNotExistException");
-            } catch (DoesNotExistException dnee) {
-            }
-        }
-        */
     }
 
     // test cases
