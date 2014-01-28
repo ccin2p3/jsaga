@@ -47,7 +47,23 @@ git checkout master</pre>
                         <pre>mvn -f pom-unreleased.xml deploy
 
 mvn release:prepare
-mvn release:perform</pre>
+mvn release:perform
+</pre>At this point, if you get an error like:
+<pre>
+[INFO] [ERROR] Failed to execute goal org.apache.maven.plugins:maven-site-plugin:3.3:site (default-site) on project saga-api-test: 
+failed to get report for org.apache.maven.plugins:maven-javadoc-plugin: Failed to execute goal on project jsaga-adaptor-srm: 
+Could not resolve dependencies for project fr.in2p3.jsaga.adaptor:jsaga-adaptor-srm:jar:1.0.0: The following artifacts could not 
+be resolved: fr.in2p3.jsaga.adaptor:jsaga-adaptor-voms:jar:1.0.0, fr.in2p3.jsaga.adaptor:jsaga-adaptor-globus:jar:1.0.0, 
+fr.in2p3.jsaga:jsaga-adaptoritf:jar:1.0.0, fr.in2p3.jsaga:jsaga-engine:jar:1.0.0: 
+Could not find artifact fr.in2p3.jsaga.adaptor:jsaga-adaptor-voms:jar:1.0.0 
+</pre>
+You have to manually install release artifacts in your local repository:
+<pre>
+cd build/checkout
+mvn install
+cd -
+mvn release:perform
+</pre>
                     </li>
                     <li>Change the symbolic link latest-release on the web server</li>
                 </ul>
