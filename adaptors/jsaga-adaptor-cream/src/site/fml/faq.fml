@@ -42,21 +42,4 @@ Where:
             </answer>
         </faq>
     </part>
-    <part id="known_issues">
-        <title>Known issues</title>
-        <faq id="SSL Error">
-            <question>There is a SSL issue with Oracle JDK > JDK1.7.0_05 when submitting job with Input/Output files</question>
-            <answer>When staging the data (via GFTP), JSAGA might fail with this exception
-                <pre>
-NoSuccess: AuthorizationFailed: org.globus.ftp.exception.UnexpectedReplyCodeException:  Custom message: Unexpected reply: 530-globus_xio: Authentication Error
-530-globus_gsi_gssapi: Error with GSI proxy
-530-globus_gsi_proxy: Error with X509 structure: Couldn't convert X509 proxy cert from DER encoded to internal form
-530-OpenSSL Error: asn1_lib.c:150: in library: asn1 encoding routines, function ASN1_get_object: header too long
-530 End.
-                </pre>
-                The workaround is to downgrade JDK1.7.0 to an update not later than u5 (jdk7u5), 
-                or use an alternative JRE (OpenJDK or a Java6 JRE)
-            </answer>
-        </faq>
-    </part>
 </faqs>
