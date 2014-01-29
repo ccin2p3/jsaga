@@ -8,6 +8,7 @@
                 <ul>
                     <li>Install <a href="http://www.oracle.com/technetwork/java/index.html">JDK 1.6</a> (or above)</li>
                     <li>Install <a href="http://maven.apache.org/download.html">Maven 3.0.4 (or above)</a></li>
+                    <li>Install <a href="http://git-scm.com/">Git</a></li>
                 </ul>
             </answer>
         </faq>

@@ -1,6 +1,6 @@
 Welcome to JSAGA
 
- JSAGA is a Java implementation of the
+ JSAGA is a free and open-source Java implementation of the
  Simple API for Grid Applications ({{{http://www.ogf.org/documents/GFD.90.pdf}SAGA}})
  specification from the Open Grid Forum ({{{http://www.ogf.org/}OGF}}).
 
