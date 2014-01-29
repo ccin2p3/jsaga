@@ -5,6 +5,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.ogf.saga.error.AlreadyExistsException;
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.permissions.PermTest;
@@ -72,6 +74,17 @@ public class SRMIntegrationTestSuite {
         public void test_read_and_write() throws Exception {}
         @Test @Ignore("Not supported: SRM ends SRM_DUPLICATION_ERROR on SrmPrepareToPut")
         public void test_write_append() throws Exception {}
+        @Test @Ignore("Some characters are not supported by SrmPrepareToPut")
+        public void test_write_encoded_filename() throws Exception {}
+        @Test(expected=AlreadyExistsException.class)
+        public void test_outputStream_overwrite() throws Exception {
+            super.test_outputStream_overwrite();
+        }
+        @Test(expected=BadParameterException.class)
+        public void test_outputStream_append() throws Exception {
+            super.test_outputStream_append();
+        }
+
     }
     public static class SRMDataMovementTest extends DataMovementTest {
         public SRMDataMovementTest() throws Exception {super(TYPE, TYPE);}
