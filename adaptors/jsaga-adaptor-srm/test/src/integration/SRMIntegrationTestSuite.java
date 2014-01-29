@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.permissions.PermTest;
+import org.ogf.saga.url.URL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -53,7 +54,8 @@ public class SRMIntegrationTestSuite {
     }
     public static class SRMFileReadTest extends ReadTest {
         public SRMFileReadTest() throws Exception {super(TYPE);}
-        /*
+        
+        @Test @Ignore("comment this line to test big files")
         public void test_size_2GB() throws Exception {
         	// this test only works with srm.base.url=srm://ccsrm02.in2p3.fr:8443/pnfs/in2p3.fr/data/dteam/JSAGA/
         	long size = 2150643248L;
@@ -63,16 +65,13 @@ public class SRMIntegrationTestSuite {
                     size,
                     ((File)file2BG).getSize());
         }
-        */
     }
     public static class SRMFileWriteTest extends WriteTest {
         public SRMFileWriteTest() throws Exception {super(TYPE);}
-        @Test
-        @Ignore
+        @Test @Ignore("Not supported: Timeout, SRM_request blocked in status SRM_REQUEST_INPROGRESS")
         public void test_read_and_write() throws Exception {}
-        @Test
-        @Ignore
-        public void test_write_append() throws Exception {/*super.ignore("Not supported: SRM ends SRM_DUPLICATION_ERROR on SrmPrepareToPut");*/}
+        @Test @Ignore("Not supported: SRM ends SRM_DUPLICATION_ERROR on SrmPrepareToPut")
+        public void test_write_append() throws Exception {}
     }
     public static class SRMDataMovementTest extends DataMovementTest {
         public SRMDataMovementTest() throws Exception {super(TYPE, TYPE);}

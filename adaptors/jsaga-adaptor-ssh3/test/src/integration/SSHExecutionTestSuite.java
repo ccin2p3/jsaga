@@ -26,7 +26,6 @@ import org.ogf.saga.job.run.SandboxTest;
 @RunWith(Suite.class)
 @SuiteClasses({
 	SSHExecutionTestSuite.SSHJobDescriptionTest.class, 
-	SSHExecutionTestSuite.SSHJobRunMinimalTest.class,
 	SSHExecutionTestSuite.SSHJobRunRequiredTest.class,
 	SSHExecutionTestSuite.SSHJobRunOptionalTest.class,
 	SSHExecutionTestSuite.SSHJobRunSandboxTest.class,
@@ -36,11 +35,6 @@ import org.ogf.saga.job.run.SandboxTest;
 public class SSHExecutionTestSuite {
 	
 	private final static String TYPE = "ssh";
-
-    /** create test suite */
-//    public static Test suite() throws Exception {return new SSHExecutionTestSuite();}
-    /** index of test cases */
-//    public static class index extends IndexTest {public index(){super(SSHExecutionTestSuite.class);}}
 
     // test cases
     public static class SSHJobDescriptionTest extends DescriptionTest {
@@ -84,38 +78,29 @@ public class SSHExecutionTestSuite {
     // test cases
     public static class SSHJobRunOptionalTest extends OptionalTest {
         public SSHJobRunOptionalTest() throws Exception {super(TYPE);}
-        @Test
-        @Ignore("Not working: Exception in thread \"Timer-0\"")
+        @Test @Ignore("Not working: Exception in thread \"Timer-0\"")
         public void test_simultaneousLongJob() { }
 
-        @Test
-        @Ignore("Not working: Exception in thread \"Timer-0\"")
+        @Test @Ignore("Not working: Exception in thread \"Timer-0\"")
         public void test_simultaneousShortJob() { }
         
-        @Test
-        @Ignore
+        @Test @Ignore
         public void test_resume_done() {}
         
-        @Test
-        @Ignore
+        @Test @Ignore
         public void test_suspend_done() {}
         
-        @Test
-        @Ignore
+        @Test @Ignore
         public void test_suspend_running() {}
     }
     
  	// test cases
     public static class SSHJobRunDescriptionTest extends RequirementsTest {
         public SSHJobRunDescriptionTest() throws Exception {super(TYPE);}
-        @Override
-        @Test
-        @Ignore
+        @Test @Override @Ignore
         public void test_run_queueRequirement() {}
 
-        @Override
-        @Test
-        @Ignore
+        @Test @Override @Ignore
         public void test_run_cpuTimeRequirement() {}
     }
     
