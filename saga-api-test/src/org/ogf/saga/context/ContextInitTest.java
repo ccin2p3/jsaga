@@ -1,6 +1,7 @@
 package org.ogf.saga.context;
 
-import org.ogf.saga.AbstractTest;
+import org.junit.Test;
+import org.ogf.saga.BaseTest;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 
@@ -19,7 +20,7 @@ import java.awt.*;
 /**
  *
  */
-public abstract class ContextInitTest extends AbstractTest {
+public abstract class ContextInitTest extends BaseTest {
     private String m_contextId;
     private boolean m_hasUserPass;
 
@@ -40,7 +41,8 @@ public abstract class ContextInitTest extends AbstractTest {
         // do nothing
     }
 
-    public void test_init() throws Exception {
+    @Test
+    public void init() throws Exception {
     	// create empty session
     	Session session = SessionFactory.createSession(false);
         // create context

@@ -1,6 +1,7 @@
 package org.ogf.saga.context;
 
-import org.ogf.saga.AbstractTest;
+import org.junit.Test;
+import org.ogf.saga.BaseTest;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 
@@ -16,7 +17,7 @@ import org.ogf.saga.session.SessionFactory;
 /**
  *
  */
-public abstract class ContextInfoTest extends AbstractTest {
+public abstract class ContextInfoTest extends BaseTest {
     private String m_type = null;
     
     protected ContextInfoTest() throws Exception {
@@ -28,7 +29,8 @@ public abstract class ContextInfoTest extends AbstractTest {
         this.m_type = contextType;
     }
     
-    public void test_info() throws Exception {
+    @Test
+    public void info() throws Exception {
         Session session = SessionFactory.createSession();
         Context[] contexts = session.listContexts();
         for (int i=0; i<contexts.length; i++) {
