@@ -50,10 +50,16 @@
 
                 <i>Copy-paste this code to your test class.</i>
                 <pre>package integration;
-import junit.framework.Test;
+import org.junit.*;
 import org.ogf.saga.context.*;
 
-public class <i>_MyGrid_</i>TestSuite extends JSAGATestSuite {
+@RunWith(Suite.class)
+@SuiteClasses({
+    <i>_MyGrid_</i>TestSuite.<i>_MyGrid_</i>ContextInit.class, 
+    <i>_MyGrid_</i>TestSuite.<i>_MyGrid_</i>ContextInfo.class, 
+    <i>_MyGrid_</i>TestSuite.<i>_MyGrid_</i>ContextDestroy.class})
+
+public class <i>_MyGrid_</i>TestSuite {
     /** create test suite */
     public static Test suite() throws Exception {return new <i>_MyGrid_</i>TestSuite();}
     /** index of test cases */
