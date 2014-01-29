@@ -3,7 +3,7 @@ package org.ogf.saga.permissions;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.namespace.base.DataBaseTest;
+import org.ogf.saga.namespace.abstracts.AbstractData;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -18,7 +18,7 @@ import org.ogf.saga.namespace.base.DataBaseTest;
 /**
  *
  */
-public abstract class PermTest extends DataBaseTest {
+public abstract class PermTest extends AbstractData {
     private static Logger s_logger = Logger.getLogger(PermTest.class);
 
     public PermTest(String protocol) throws Exception {

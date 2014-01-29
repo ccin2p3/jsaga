@@ -1,8 +1,8 @@
-package org.ogf.saga.namespace.base;
+package org.ogf.saga.namespace.abstracts;
 
 import org.junit.After;
 import org.junit.Before;
-import org.ogf.saga.BaseTest;
+import org.ogf.saga.AbstractTest_JUNIT4;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.DoesNotExistException;
@@ -31,7 +31,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public abstract class DataBaseTest extends BaseTest {
+public abstract class AbstractData extends AbstractTest_JUNIT4 {
     // test data
     protected static final String DEFAULT_DIRNAME = "dir/";
     protected static final String DEFAULT_SUBDIRNAME = "subdir/";
@@ -59,7 +59,7 @@ public abstract class DataBaseTest extends BaseTest {
     protected Directory m_physicalDir;
     protected boolean m_toBeRemoved;
 
-    public DataBaseTest(String protocol) throws Exception {
+    public AbstractData(String protocol) throws Exception {
         super();
 
         // configure

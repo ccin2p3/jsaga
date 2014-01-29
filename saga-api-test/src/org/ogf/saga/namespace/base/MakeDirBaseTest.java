@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
+import org.ogf.saga.namespace.abstracts.AbstractDirectory;
 import org.ogf.saga.url.URL;
 
 /* ***************************************************
@@ -20,7 +21,7 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public abstract class MakeDirBaseTest extends DirBaseTest {
+public abstract class MakeDirBaseTest extends AbstractDirectory {
 
 	// subdir configuration
 	protected static final String DEFAULT_SUBDIRNAME_2 = "subdir2/";

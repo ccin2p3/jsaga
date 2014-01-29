@@ -7,6 +7,7 @@ import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.file.File;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
+import org.ogf.saga.namespace.abstracts.AbstractDirectory;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
@@ -25,7 +26,7 @@ import java.util.List;
 /**
  *
  */
-public abstract class DataMovementBaseTest extends DirBaseTest {
+public abstract class AbstractDataMovement extends AbstractDirectory {
     protected static final int FLAGS_BYPASSEXIST = 4096;
 
     // test data
@@ -41,7 +42,7 @@ public abstract class DataMovementBaseTest extends DirBaseTest {
     // setup
     protected NSDirectory m_dir2;
 
-    public DataMovementBaseTest(String protocol, String targetProtocol) throws Exception {
+    public AbstractDataMovement(String protocol, String targetProtocol) throws Exception {
         super(protocol);
         URL baseUrl2;
         if (protocol.equals(targetProtocol)) {

@@ -16,6 +16,7 @@ import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.file.MakeDirTest;
 import org.ogf.saga.file.ReadTest;
 import org.ogf.saga.file.WriteTest;
+import org.ogf.saga.namespace.DataCleanUp;
 import org.ogf.saga.namespace.DataMovementTest;
 import org.ogf.saga.namespace.EntryTest;
 import org.ogf.saga.permissions.Permission;
@@ -95,5 +96,8 @@ public class SFTPDataTestSuite {
     }
     public static class SFTPEmulatorDataMovementTest extends DataMovementTest {
         public SFTPEmulatorDataMovementTest() throws Exception {super(TYPE, "test");}
+    }
+    public static class SFTPDataCleanUp extends DataCleanUp {
+        public SFTPDataCleanUp() throws Exception {super(TYPE, TYPE);}
     }
 }

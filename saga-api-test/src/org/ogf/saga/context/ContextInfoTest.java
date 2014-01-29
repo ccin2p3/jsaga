@@ -1,7 +1,7 @@
 package org.ogf.saga.context;
 
 import org.junit.Test;
-import org.ogf.saga.BaseTest;
+import org.ogf.saga.AbstractTest_JUNIT4;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 
@@ -17,7 +17,7 @@ import org.ogf.saga.session.SessionFactory;
 /**
  *
  */
-public abstract class ContextInfoTest extends BaseTest {
+public abstract class ContextInfoTest extends AbstractTest_JUNIT4 {
     private String m_type = null;
     
     protected ContextInfoTest() throws Exception {

@@ -2,7 +2,7 @@ package org.ogf.saga.namespace;
 
 import org.junit.Test;
 import org.ogf.saga.error.*;
-import org.ogf.saga.namespace.base.DataMovementBaseTest;
+import org.ogf.saga.namespace.base.AbstractDataMovement;
 import org.ogf.saga.url.URL;
 
 /* ***************************************************
@@ -17,7 +17,7 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public abstract class DataMovementTest extends DataMovementBaseTest {
+public abstract class DataMovementTest extends AbstractDataMovement {
     protected DataMovementTest(String protocol, String targetProtocol) throws Exception {
         super(protocol, targetProtocol);
     }

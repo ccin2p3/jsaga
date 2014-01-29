@@ -3,8 +3,8 @@ package org.ogf.saga.namespace;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.namespace.abstracts.AbstractData;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
-import org.ogf.saga.namespace.base.DataBaseTest;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
@@ -20,7 +20,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public abstract class EntryTest extends DataBaseTest {
+public abstract class EntryTest extends AbstractData {
     protected EntryTest(String protocol) throws Exception {
         super(protocol);
     }

@@ -29,7 +29,7 @@ import java.util.*;
 /**
  *
  */
-public abstract class BaseTest extends Assert {
+public abstract class AbstractTest_JUNIT4 extends Assert {
     /** jobservice.url (required): for testing job service */
     protected static final String CONFIG_JOBSERVICE_URL = "jobservice.url";
     /** base.url (required): for testing any protocol */
@@ -43,7 +43,7 @@ public abstract class BaseTest extends Assert {
     private long startTime;
     private Logger logger = Logger.getLogger(this.getClass());
 
-    public BaseTest() throws Exception {
+    public AbstractTest_JUNIT4() throws Exception {
         // set configuration files to use
         if (System.getProperty("jsaga.default.contexts") == null) {
             java.net.URL defaultContexts = this.getResource("etc/jsaga-default-contexts.xml");

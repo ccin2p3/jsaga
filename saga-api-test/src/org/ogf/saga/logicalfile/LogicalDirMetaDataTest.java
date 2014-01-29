@@ -4,7 +4,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.base.DirBaseTest;
+import org.ogf.saga.namespace.abstracts.AbstractDirectory;
+import org.ogf.saga.namespace.base.DirectoryBaseTest;
 import org.ogf.saga.url.URL;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
 /**
  *
  */
-public abstract class LogicalDirMetaDataTest extends DirBaseTest {
+public abstract class LogicalDirMetaDataTest extends DirectoryBaseTest {
     private static final String METADATA_KEY = "myKey";
     private static final String METADATA_VALUE = "myValue";
     private static final String[] METADATA_FILTER = new String[]{METADATA_KEY+"="+METADATA_VALUE};
