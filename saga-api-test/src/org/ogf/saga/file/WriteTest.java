@@ -121,7 +121,7 @@ public abstract class WriteTest extends WriteBaseTest {
     }
 
     @Test
-    public void test_outputStream() throws Exception {
+    public void test_outputStream_overwrite() throws Exception {
         if (m_file instanceof File) {
         	FileOutputStream fos = FileFactory.createFileOutputStream(m_session, m_fileUrl, false);
         	fos.write(DEFAULT_CONTENT2.getBytes());
