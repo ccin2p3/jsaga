@@ -26,6 +26,7 @@ import java.util.UUID;
 /**
  *
  */
+@Deprecated
 public abstract class JobRunSandboxTest extends AbstractJobTest {
     private static final String SCRIPT_IMPLICIT = "/usr/bin/tr 'ou' 'ui'";
     protected String m_scriptExplicit = "#!/bin/bash\n/bin/cat ${1##file:} | "+SCRIPT_IMPLICIT+" > ${2##file:}";

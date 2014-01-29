@@ -28,6 +28,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
+@Deprecated
 public abstract class JobRunInfoTest extends AbstractJobTest {
     private Logger logger = Logger.getLogger(this.getClass());
     private static final String FORMAT_DATETOSTRING = "EEE MMM dd HH:mm:ss z yyyy";

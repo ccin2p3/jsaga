@@ -21,6 +21,7 @@ import java.util.List;
 /**
  *
  */
+@Deprecated
 public abstract class JobListTest extends AbstractTest {
     protected Session m_session;
     protected URL m_url;

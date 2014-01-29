@@ -18,6 +18,7 @@ import org.ogf.saga.task.State;
 /**
  *
  */
+@Deprecated
 public abstract class JobRunMinimalTest extends AbstractJobTest {
     private Logger logger = Logger.getLogger(this.getClass());
     

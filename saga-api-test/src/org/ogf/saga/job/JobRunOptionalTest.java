@@ -17,6 +17,7 @@ import java.util.List;
 * Description: 
 * This test suite is made to be test advanced functions
 */
+@Deprecated
 public abstract class JobRunOptionalTest extends AbstractJobTest {
 	
 	protected JobRunOptionalTest(String jobprotocol) throws Exception {

@@ -16,6 +16,7 @@ import org.ogf.saga.task.State;
 * This test suite is made to be sure that the plug-in 
 * transmits well the requested attributes
 */
+@Deprecated
 public abstract class JobRunWithPrequisiteTest extends AbstractJobTest {
 
 	protected JobRunWithPrequisiteTest(String jobprotocol) throws Exception {

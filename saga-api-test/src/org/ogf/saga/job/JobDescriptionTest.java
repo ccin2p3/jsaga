@@ -14,6 +14,7 @@ import org.ogf.saga.job.abstracts.AbstractJobTest;
 /**
  *
  */
+@Deprecated
 public abstract class JobDescriptionTest extends AbstractJobTest {
     private JobService m_jobTranslator;
     private JobDescription m_jobDescription;
