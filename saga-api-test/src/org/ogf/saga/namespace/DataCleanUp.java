@@ -4,8 +4,8 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.namespace.abstracts.AbstractDataMovement;
 import org.ogf.saga.namespace.abstracts.AbstractNSCopyTest;
-import org.ogf.saga.namespace.base.AbstractDataMovement;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

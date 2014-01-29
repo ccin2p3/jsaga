@@ -22,6 +22,7 @@ import java.util.*;
 /**
  *
  */
+@Deprecated
 public abstract class AbstractTest extends TestCase {
     /** jobservice.url (required): for testing job service */
     protected static final String CONFIG_JOBSERVICE_URL = "jobservice.url";

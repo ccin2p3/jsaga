@@ -7,6 +7,7 @@ import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSDirectory;
 import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.namespace.abstracts.AbstractDirectory;
+import org.ogf.saga.namespace.base.DirectoryBaseTest;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
@@ -22,7 +23,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public abstract class DirTest extends DirectoryTest {
+public abstract class DirTest extends DirectoryBaseTest {
     protected DirTest(String protocol) throws Exception {
         super(protocol);
     }

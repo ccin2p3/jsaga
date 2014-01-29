@@ -2,7 +2,7 @@ package org.ogf.saga.namespace;
 
 import org.junit.Test;
 import org.ogf.saga.error.*;
-import org.ogf.saga.namespace.base.AbstractDataMovement;
+import org.ogf.saga.namespace.abstracts.AbstractDataMovement;
 import org.ogf.saga.url.URL;
 
 /* ***************************************************

@@ -95,14 +95,11 @@ public class <i>_MyGrid_</i>TestSuite {
                     with the IntegrationClean test suite.
                 </p>
                 <pre>package integration;
-import junit.framework.Test;
-import org.ogf.saga.namespace.IntegrationClean;
 
-public class <i>_MyProtocol_</i>Cleanup extends IntegrationClean {
-    public <i>_MyProtocol_</i>Cleanup() throws Exception {
+public class <i>_MyProtocol_</i>CleanUp extends DataCleanUp {
+    public <i>_MyProtocol_</i>CleanUp() throws Exception {
         super("<i>myprotocol</i>", "<i>myprotocol</i>");
     }
-    public void test_dummy() {}
 }
                 </pre>
 

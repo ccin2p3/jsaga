@@ -1,4 +1,4 @@
-package org.ogf.saga.namespace.base;
+package org.ogf.saga.namespace.abstracts;
 
 import org.junit.After;
 import org.junit.Before;
@@ -7,7 +7,6 @@ import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.file.File;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
-import org.ogf.saga.namespace.abstracts.AbstractDirectory;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
