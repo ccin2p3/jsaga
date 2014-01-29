@@ -19,6 +19,7 @@ import org.ogf.saga.namespace.abstracts.AbstractNSEntryWriteTest;
 /**
  *
  */
+@Deprecated
 public abstract class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
     protected LogicalFileWriteTest(String protocol) throws Exception {
         super(protocol);

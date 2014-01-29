@@ -18,6 +18,7 @@ import org.ogf.saga.namespace.abstracts.AbstractNSEntryReadTest;
 /**
  *
  */
+@Deprecated
 public abstract class FileReadTest extends AbstractNSEntryReadTest {
     protected FileReadTest(String protocol) throws Exception {
         super(protocol);

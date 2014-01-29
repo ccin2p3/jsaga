@@ -18,6 +18,7 @@ import java.util.List;
 /**
  *
  */
+@Deprecated
 public abstract class LogicalDirectoryMetaDataTest extends AbstractNSDirectoryTest {
     private static final String METADATA_KEY = "myKey";
     private static final String METADATA_VALUE = "myValue";

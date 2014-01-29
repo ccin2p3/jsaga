@@ -14,6 +14,7 @@ import org.ogf.saga.namespace.abstracts.AbstractNSDirectoryMakeTest;
 /**
  *
  */
+@Deprecated
 public abstract class DirectoryMakeTest extends AbstractNSDirectoryMakeTest {
     protected DirectoryMakeTest(String protocol) throws Exception {
         super(protocol);

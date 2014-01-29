@@ -16,6 +16,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
+@Deprecated
 public abstract class DirectoryTest extends AbstractNSDirectoryTest {
     protected DirectoryTest(String protocol) throws Exception {
         super(protocol);

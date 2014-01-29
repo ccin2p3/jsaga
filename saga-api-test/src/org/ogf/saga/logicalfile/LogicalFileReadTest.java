@@ -17,6 +17,7 @@ import java.util.List;
 /**
  *
  */
+@Deprecated
 public abstract class LogicalFileReadTest extends AbstractNSEntryReadTest {
     protected LogicalFileReadTest(String protocol) throws Exception {
         super(protocol);

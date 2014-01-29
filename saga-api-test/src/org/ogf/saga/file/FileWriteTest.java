@@ -26,6 +26,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
+@Deprecated
 public abstract class FileWriteTest extends AbstractNSEntryTest {
     // test data
     private static final String DEFAULT_CONTENT2 = "Another text !";

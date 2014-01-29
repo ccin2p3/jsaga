@@ -19,6 +19,7 @@ import java.util.List;
 /**
  *
  */
+@Deprecated
 public abstract class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
     protected LogicalDirectoryListTest(String protocol) throws Exception {
         super(protocol);

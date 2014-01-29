@@ -16,6 +16,7 @@ import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 /**
  *
  */
+@Deprecated
 public abstract class PermissionsTest extends AbstractNSEntryTest {
     private static Logger s_logger = Logger.getLogger(PermissionsTest.class);
 

@@ -18,6 +18,7 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
+@Deprecated
 public abstract class DirectoryListTest extends AbstractNSDirectoryListTest {
     protected DirectoryListTest(String protocol) throws Exception {
         super(protocol);
