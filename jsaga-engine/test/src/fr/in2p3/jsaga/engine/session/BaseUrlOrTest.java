@@ -1,7 +1,9 @@
 package fr.in2p3.jsaga.engine.session;
 
 import fr.in2p3.jsaga.impl.context.ContextImpl;
-import org.ogf.saga.AbstractTest;
+
+import org.junit.Test;
+import org.ogf.saga.AbstractTest_JUNIT4;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
 
@@ -17,11 +19,12 @@ import org.ogf.saga.context.ContextFactory;
 /**
  *
  */
-public class BaseUrlOrTest extends AbstractTest {
+public class BaseUrlOrTest extends AbstractTest_JUNIT4 {
     public BaseUrlOrTest() throws Exception {
         super();
     }
 
+    @Test
     public void test_or_items() throws Exception {
         String url = "{gsiftp,gridftp->gsiftp}://{cc,*host*}*.{in2p3.fr,*de}/*/{dteam,lhc*}";
         String[] expected = new String[]{
@@ -41,9 +44,10 @@ public class BaseUrlOrTest extends AbstractTest {
                 "gridftp->gsiftp://*host*.in2p3.fr/*/lhc*",
                 "gridftp->gsiftp://*host*.*de/*/dteam",
                 "gridftp->gsiftp://*host*.*de/*/lhc*"};
-        assertEquals(expected, split(url));
+        assertArrayEquals(expected, split(url));
     }
 
+    @Test
     public void test_or_groups() throws Exception {
         String url = "gsiftp://{cc*.in2p3.fr,*host*.*de}/{*/dteam,pnfs/lhc*}";
         String[] expected = new String[]{
@@ -51,7 +55,7 @@ public class BaseUrlOrTest extends AbstractTest {
                 "gsiftp://cc*.in2p3.fr/pnfs/lhc*",
                 "gsiftp://*host*.*de/*/dteam",
                 "gsiftp://*host*.*de/pnfs/lhc*"};
-        assertEquals(expected, split(url));
+        assertArrayEquals(expected, split(url));
     }
 
     private static String[] split(String url) throws Exception {
@@ -61,16 +65,4 @@ public class BaseUrlOrTest extends AbstractTest {
         return context.getVectorAttribute(ContextImpl.BASE_URL_INCLUDES);
     }
 
-    private static void dump(String[] array) {
-        for (String s : array) {
-            System.out.println("                \""+s+"\",");
-        }
-    }
-
-    private static void assertEquals(String[] expected, String[] array) {
-        assertEquals("Unexpected array length", expected.length, array.length);
-        for (int i=0; i<array.length; i++) {
-            assertEquals(expected[i], array[i]);
-        }
-    }
 }

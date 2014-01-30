@@ -1,5 +1,8 @@
 package fr.in2p3.jsaga.engine.session;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import fr.in2p3.jsaga.engine.session.item.*;
 import junit.framework.TestCase;
 
@@ -15,7 +18,7 @@ import junit.framework.TestCase;
 /**
  *
  */
-public class BaseUrlPatternTest extends TestCase {
+public class BaseUrlPatternTest {
     private static final BaseUrlItem SCHEME = new SchemeItem("gsiftp", "gridftp");
     private static final BaseUrlItem HOST = new HostItem("cc", null, "*");
     private static final BaseUrlItem DOMAIN = new DomainItem("in2p3.fr", "*");
@@ -29,14 +32,16 @@ public class BaseUrlPatternTest extends TestCase {
     private static final BaseUrlPattern URL4 = new BaseUrlPattern(SCHEME, HOST);
     private static final BaseUrlPattern URL5 = new BaseUrlPattern(SCHEME);
 
+    @Test
     public void test_toString() {
-        assertEquals("gridftp->gsiftp://cc*.*in2p3.fr/*/dteam", URL1.toString());
-        assertEquals("gridftp->gsiftp://cc*.*in2p3.fr[:2811]/*/dteam", URL2.toString());
-        assertEquals("gridftp->gsiftp://*:1234", URL3.toString());
-        assertEquals("gridftp->gsiftp://cc*", URL4.toString());
-        assertEquals("gridftp->gsiftp", URL5.toString());
+        Assert.assertEquals("gridftp->gsiftp://cc*.*in2p3.fr/*/dteam", URL1.toString());
+        Assert.assertEquals("gridftp->gsiftp://cc*.*in2p3.fr[:2811]/*/dteam", URL2.toString());
+        Assert.assertEquals("gridftp->gsiftp://*:1234", URL3.toString());
+        Assert.assertEquals("gridftp->gsiftp://cc*", URL4.toString());
+        Assert.assertEquals("gridftp->gsiftp", URL5.toString());
     }
 
+    @Test
     public void test_toRegExp() {
         System.out.println(URL1.toRegExp().toString());
         System.out.println(URL2.toRegExp().toString());
@@ -45,39 +50,42 @@ public class BaseUrlPatternTest extends TestCase {
         System.out.println(URL5.toRegExp().toString());
     }
 
+    @Test
     public void test_matches() {
-        assertTrue(URL1.matches("gridftp://cclcgvmli07.in2p3.fr:2811/pnfs/dteam"));
-        assertFalse(URL1.matches("gsiftp://cclcgvmli07.in2p3.fr:2811/pnfs/dteam"));
-        assertFalse(URL1.matches("gridftp://licclcgvmli07.in2p3.fr/pnfs/dteam"));
-        assertFalse(URL1.matches("gridftp://cclcgvmli07.in2p3.fr/dteam"));
+        Assert.assertTrue(URL1.matches("gridftp://cclcgvmli07.in2p3.fr:2811/pnfs/dteam"));
+        Assert.assertFalse(URL1.matches("gsiftp://cclcgvmli07.in2p3.fr:2811/pnfs/dteam"));
+        Assert.assertFalse(URL1.matches("gridftp://licclcgvmli07.in2p3.fr/pnfs/dteam"));
+        Assert.assertFalse(URL1.matches("gridftp://cclcgvmli07.in2p3.fr/dteam"));
 
-        assertTrue(URL2.matches("gridftp://cclcgvmli07.in2p3.fr:2811/pnfs/dteam"));
-        assertTrue(URL2.matches("gridftp://cclcgvmli07.in2p3.fr/pnfs/dteam"));
-        assertFalse(URL2.matches("gridftp://cclcgvmli07.in2p3.fr:1111/pnfs/dteam"));
+        Assert.assertTrue(URL2.matches("gridftp://cclcgvmli07.in2p3.fr:2811/pnfs/dteam"));
+        Assert.assertTrue(URL2.matches("gridftp://cclcgvmli07.in2p3.fr/pnfs/dteam"));
+        Assert.assertFalse(URL2.matches("gridftp://cclcgvmli07.in2p3.fr:1111/pnfs/dteam"));
 
-        assertTrue(URL3.matches("gridftp://cclcgvmli07.in2p3.fr:1234/pnfs/dteam"));
-        assertFalse(URL3.matches("gridftp://cclcgvmli07.in2p3.fr/pnfs/dteam"));
+        Assert.assertTrue(URL3.matches("gridftp://cclcgvmli07.in2p3.fr:1234/pnfs/dteam"));
+        Assert.assertFalse(URL3.matches("gridftp://cclcgvmli07.in2p3.fr/pnfs/dteam"));
 
-        assertTrue(URL4.matches("gridftp://cclcgvmli07.in2p3.fr/pnfs/dteam"));
-        assertFalse(URL4.matches("gridftp://lcgvmli07.in2p3.fr/pnfs/dteam"));
+        Assert.assertTrue(URL4.matches("gridftp://cclcgvmli07.in2p3.fr/pnfs/dteam"));
+        Assert.assertFalse(URL4.matches("gridftp://lcgvmli07.in2p3.fr/pnfs/dteam"));
 
-        assertTrue(URL5.matches("gridftp://cclcgvmli07.in2p3.fr/pnfs/dteam"));
-        assertFalse(URL5.matches("ridftp://cclcgvmli07.in2p3.fr/pnfs/dteam"));
+        Assert.assertTrue(URL5.matches("gridftp://cclcgvmli07.in2p3.fr/pnfs/dteam"));
+        Assert.assertFalse(URL5.matches("ridftp://cclcgvmli07.in2p3.fr/pnfs/dteam"));
     }
 
+    @Test
     public void test_conflictsWith() {
-        assertTrue(URL1.conflictsWith(URL2));
-        assertTrue(URL1.conflictsWith(URL3));
-        assertFalse(URL2.conflictsWith(URL3));
+        Assert.assertTrue(URL1.conflictsWith(URL2));
+        Assert.assertTrue(URL1.conflictsWith(URL3));
+        Assert.assertFalse(URL2.conflictsWith(URL3));
     }
 
+    @Test
     public void test_conflictsWith_more() {
         BaseUrlPattern url = new BaseUrlPattern(SCHEME, HOST, DOMAIN, new PortItem(), new DirItem(), new DirItem("dteam", "*", null));
-        assertTrue(url.conflictsWith(
+        Assert.assertTrue(url.conflictsWith(
                 new BaseUrlPattern(SCHEME, HOST, DOMAIN, new PortItem(), new DirItem(), new DirItem("myvo", null, "*"))));
-        assertTrue(url.conflictsWith(
+        Assert.assertTrue(url.conflictsWith(
                 new BaseUrlPattern(SCHEME, HOST, DOMAIN, new PortItem(), new DirItem(), new DirItem("eam", "*", null))));
-        assertFalse(url.conflictsWith(
+        Assert.assertFalse(url.conflictsWith(
                 new BaseUrlPattern(SCHEME, HOST, DOMAIN, new PortItem(), new DirItem(), new DirItem("tea", "*", null))));
     }
 }
