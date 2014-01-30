@@ -14,6 +14,7 @@ import junit.framework.TestSuite;
 /**
  *
  */
+@Deprecated
 public abstract class JSAGATestSuite extends TestSuite {
     public JSAGATestSuite() {
         super();

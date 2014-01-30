@@ -17,6 +17,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
+@Deprecated
 public abstract class NSEntryTest extends AbstractNSEntryTest {
     protected NSEntryTest(String protocol) throws Exception {
         super(protocol);
