@@ -1,6 +1,5 @@
 package integration;
 
-import org.apache.commons.httpclient.protocol.Protocol;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobFilter;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobPurgeRequest;
@@ -11,18 +10,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
-import org.ogf.saga.job.JobDescriptionTest;
-import org.ogf.saga.job.JobListTest;
-import org.ogf.saga.job.JobRunDescriptionTest;
-import org.ogf.saga.job.JobRunInfoTest;
-import org.ogf.saga.job.JobRunInteractiveTest;
-import org.ogf.saga.job.JobRunMinimalTest;
-import org.ogf.saga.job.JobRunOptionalTest;
-import org.ogf.saga.job.JobRunRequiredTest;
-import org.ogf.saga.job.JobRunSandboxTest;
 import org.ogf.saga.job.ListTest;
 import org.ogf.saga.job.description.DescriptionTest;
 import org.ogf.saga.job.run.InfoTest;
@@ -31,12 +20,7 @@ import org.ogf.saga.job.run.MinimalTest;
 import org.ogf.saga.job.run.OptionalTest;
 import org.ogf.saga.job.run.RequiredTest;
 import org.ogf.saga.job.run.SandboxTest;
-import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.task.State;
-import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
-
 import fr.in2p3.jsaga.adaptor.cream.job.DelegationStub;
 
 /* ***************************************************
