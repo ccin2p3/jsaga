@@ -12,7 +12,7 @@ package org.ogf.saga.file;
 /**
  *
  */
-public class EmulatorFileWriteTest extends FileWriteTest {
+public class EmulatorFileWriteTest extends WriteTest {
     public EmulatorFileWriteTest() throws Exception {
         super("test");
     }

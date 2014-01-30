@@ -12,7 +12,7 @@ package org.ogf.saga.file;
 /**
  *
  */
-public class EmulatorDirectoryTest extends DirectoryTest {
+public class EmulatorDirectoryTest extends DirTest {
     public EmulatorDirectoryTest() throws Exception {
         super("test");
     }
