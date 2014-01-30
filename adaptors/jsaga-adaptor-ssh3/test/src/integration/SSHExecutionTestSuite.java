@@ -39,8 +39,7 @@ public class SSHExecutionTestSuite {
     // test cases
     public static class SSHJobDescriptionTest extends DescriptionTest {
         public SSHJobDescriptionTest() throws Exception {super(TYPE);}
-        @Test
-    	@Ignore
+        @Test @Ignore("Not supported")
         public void test_spmdVariation() { }
 //        public void test_totalCPUCount() { super.ignore("not supported"); }
 //        public void test_numberOfProcesses() { super.ignore("not supported"); }

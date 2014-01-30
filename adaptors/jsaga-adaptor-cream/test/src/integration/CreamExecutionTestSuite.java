@@ -19,6 +19,7 @@ import org.ogf.saga.job.run.InteractiveTest;
 import org.ogf.saga.job.run.MinimalTest;
 import org.ogf.saga.job.run.OptionalTest;
 import org.ogf.saga.job.run.RequiredTest;
+import org.ogf.saga.job.run.RequirementsTest;
 import org.ogf.saga.job.run.SandboxTest;
 import org.ogf.saga.task.State;
 import fr.in2p3.jsaga.adaptor.cream.job.DelegationStub;
@@ -77,7 +78,7 @@ public class CreamExecutionTestSuite {
         public void test_queue() throws Exception {}
      }
 
-    public static class CreamJobRunDescriptionTest extends DescriptionTest {
+    public static class CreamJobRunDescriptionTest extends RequirementsTest {
         public CreamJobRunDescriptionTest() throws Exception {super(TYPE);}
         @Test @Ignore("Not supported")
         public void test_run_inWorkingDirectory() { }

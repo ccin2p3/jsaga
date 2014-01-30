@@ -12,6 +12,7 @@ import org.ogf.saga.job.run.InteractiveTest;
 import org.ogf.saga.job.run.MinimalTest;
 import org.ogf.saga.job.run.OptionalTest;
 import org.ogf.saga.job.run.RequiredTest;
+import org.ogf.saga.job.run.RequirementsTest;
 import org.ogf.saga.job.run.SandboxTest;
 
 /* ***************************************************
@@ -97,9 +98,9 @@ public class GlobusExecutionTestSuite {
     }
     
  	// test cases
-    public static class GlobusJobRunDescriptionTest extends DescriptionTest {
+    public static class GlobusJobRunDescriptionTest extends RequirementsTest {
         public GlobusJobRunDescriptionTest() throws Exception {super(TYPE);}
-        @Test @Ignore("Unexpected error: The job manager failed to open stdout")
+        @Test @Override @Ignore("Unexpected error: The job manager failed to open stdout")
         public void test_run_inWorkingDirectory() { } 
     }
 
@@ -107,6 +108,7 @@ public class GlobusExecutionTestSuite {
         public GlobusJobRunInteractiveTest() throws Exception {super(TYPE);}
     }
 
+    // TODO: upgrade this to JUnit4
     public static class GlobusJobRunWithPrequisiteTest extends JobRunWithPrequisiteTest {
         public GlobusJobRunWithPrequisiteTest() throws Exception {super(TYPE);}
     }
