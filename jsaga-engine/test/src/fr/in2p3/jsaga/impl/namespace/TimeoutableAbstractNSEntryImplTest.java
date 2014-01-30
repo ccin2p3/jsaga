@@ -1,7 +1,9 @@
 package fr.in2p3.jsaga.impl.namespace;
 
-import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
-import org.ogf.saga.AbstractTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.ogf.saga.AbstractTest_JUNIT4;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.permissions.Permission;
@@ -22,7 +24,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableAbstractNSEntryImplTest extends AbstractTest {
+public class TimeoutableAbstractNSEntryImplTest extends AbstractTest_JUNIT4 {
     private static final String m_url = "waitforever://host/directory/file";
     private NSEntry m_entry;
 
@@ -30,103 +32,65 @@ public class TimeoutableAbstractNSEntryImplTest extends AbstractTest {
         super();
     }
 
+    @Before
     public void setUp() throws Exception {
         Session emptySession = SessionFactory.createSession(false);
         URL url = URLFactory.createURL(m_url);
         m_entry = NSFactory.createNSEntry(emptySession, url, Flags.NONE.getValue());
     }
 
+    @After
     public void tearDown() throws Exception {
         m_entry.close();
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_isDir() throws Exception {
-        try {
-            m_entry.isDir();
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
+        m_entry.isDir();
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_isEntry() throws Exception {
-        try {
-            m_entry.isEntry();
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
+        m_entry.isEntry();
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_isLink() throws Exception {
-        try {
-            m_entry.isLink();
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
+        m_entry.isLink();
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_readLink() throws Exception {
-        try {
-            m_entry.readLink();
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
+        m_entry.readLink();
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_copy() throws Exception {
-        try {
-            m_entry.copy(URLFactory.createURL(m_url));
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
+        m_entry.copy(URLFactory.createURL(m_url));
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_link() throws Exception {
-        try {
-            m_entry.link(URLFactory.createURL(m_url));
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
+        m_entry.link(URLFactory.createURL(m_url));
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_move() throws Exception {
-        try {
-            m_entry.move(URLFactory.createURL(m_url));
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
+        m_entry.move(URLFactory.createURL(m_url));
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_remove() throws Exception {
-        try {
-            m_entry.remove();
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
+        m_entry.remove();
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_permissionsAllow() throws Exception {
-        try {
-            m_entry.permissionsAllow("*", Permission.READ.getValue(), Flags.NONE.getValue());
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
+        m_entry.permissionsAllow("*", Permission.READ.getValue(), Flags.NONE.getValue());
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_permissionsDeny() throws Exception {
-        try {
-            m_entry.permissionsDeny("*", Permission.READ.getValue(), Flags.NONE.getValue());
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
+        m_entry.permissionsDeny("*", Permission.READ.getValue(), Flags.NONE.getValue());
     }
 }

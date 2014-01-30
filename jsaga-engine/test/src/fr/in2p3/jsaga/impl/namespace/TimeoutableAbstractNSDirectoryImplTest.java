@@ -1,8 +1,9 @@
 package fr.in2p3.jsaga.impl.namespace;
 
-import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
-import org.apache.log4j.Logger;
-import org.ogf.saga.AbstractTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.ogf.saga.AbstractTest_JUNIT4;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.namespace.*;
@@ -23,25 +24,27 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableAbstractNSDirectoryImplTest extends AbstractTest {
+public class TimeoutableAbstractNSDirectoryImplTest extends AbstractTest_JUNIT4 {
     private static final String m_url = "waitforever://host/directory/";
-    private static Logger s_logger = Logger.getLogger(TimeoutableAbstractNSDirectoryImplTest.class);
     private NSDirectory m_directory;
 
     public TimeoutableAbstractNSDirectoryImplTest() throws Exception {
         super();
     }
 
+    @Before
     public void setUp() throws Exception {
         Session emptySession = SessionFactory.createSession(false);
         URL url = URLFactory.createURL(m_url);
         m_directory = NSFactory.createNSDirectory(emptySession, url, Flags.NONE.getValue());
     }
 
+    @After
     public void tearDown() throws Exception {
         m_directory.close();
     }
 
+    @Test
     public void test_changeDir() throws Exception {
         // can not hang...
         m_directory.changeDir(URLFactory.createURL("new_directory/"));
@@ -49,75 +52,43 @@ public class TimeoutableAbstractNSDirectoryImplTest extends AbstractTest {
         //m_directory.changeDir(URLFactory.createURL("waitforever://host/new_directory/"));
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_list() throws Exception {
-        try {
-            m_directory.list();
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
+        m_directory.list();
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_find() throws Exception {
-        try {
             m_directory.find("*");
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_getNumEntries() throws Exception {
-        try {
             m_directory.getNumEntries();
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_getEntry() throws Exception {
-        try {
             m_directory.getEntry(0);
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_makeDir() throws Exception {
-        try {
             m_directory.makeDir(URLFactory.createURL(m_url));
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
     }
 
+    @Test(expected=TimeoutException.class)
     public void test_copy() throws Exception {
-        try {
             m_directory.copy(URLFactory.createURL(m_url), Flags.RECURSIVE.getValue());
-            fail("Expected exception: "+TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
     } 
     
+    @Test(expected=NotImplementedException.class)
     public void test_openDir() throws Exception {
-        try {
             m_directory.openDir(URLFactory.createURL(m_url));
-            fail("Expected exception: "+NotImplementedException.class);
-        } catch (NotImplementedException e) {
-            s_logger.info(e.getMessage());
-        }
     }
 
+    @Test(expected=NotImplementedException.class)
     public void test_open() throws Exception {
-        try {
             m_directory.open(URLFactory.createURL(m_url));
-            fail("Expected exception: "+NotImplementedException.class);
-        } catch (NotImplementedException e) {
-            s_logger.info(e.getMessage());
-        }
     }
 }
