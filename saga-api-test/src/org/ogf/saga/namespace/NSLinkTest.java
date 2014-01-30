@@ -15,6 +15,7 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
+@Deprecated
 public abstract class NSLinkTest extends AbstractNSEntryTest {
     // test data
     private static final String DEFAULT_LINKNAME = "link.txt";

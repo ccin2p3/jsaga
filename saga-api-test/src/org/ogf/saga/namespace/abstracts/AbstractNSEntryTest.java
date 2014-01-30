@@ -26,6 +26,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
+@Deprecated
 public abstract class AbstractNSEntryTest extends AbstractTest {
     // test data
     protected static final String DEFAULT_DIRNAME = "dir/";
