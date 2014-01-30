@@ -14,6 +14,7 @@ import junit.framework.TestCase;
 /**
  *
  */
+@Deprecated
 public abstract class IndexTest extends TestCase {
     private Class m_class;
 

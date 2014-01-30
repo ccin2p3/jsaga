@@ -19,6 +19,7 @@ import java.net.URL;
 /**
  *
  */
+@Deprecated
 public abstract class RootIndexTest extends TestCase {
     public void test_index() throws Exception {
         final String pkgName = "integration";
