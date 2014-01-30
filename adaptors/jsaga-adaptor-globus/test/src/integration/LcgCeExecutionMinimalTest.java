@@ -1,12 +1,12 @@
 package integration;
 
-import org.junit.BeforeClass;
+import org.ogf.saga.job.run.MinimalTest;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   LcgCeExecutionTestSuite
+ * File:   LcgCeExecutionMinimalTest
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
  * Date:   17 juin 2009
  * ***************************************************
@@ -14,9 +14,8 @@ import org.junit.BeforeClass;
 /**
  *
  */
-public class LcgCeExecutionTestSuite extends GlobusExecutionTestSuite {
-    @BeforeClass
-    public static void setType() {
-        TYPE = "lcgce";
+public class LcgCeExecutionMinimalTest extends MinimalTest {
+    public LcgCeExecutionMinimalTest() throws Exception {
+        super("lcgce");
     }
 }

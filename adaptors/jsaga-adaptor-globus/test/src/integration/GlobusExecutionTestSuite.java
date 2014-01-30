@@ -1,6 +1,5 @@
 package integration;
 
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,12 +38,7 @@ import org.ogf.saga.job.run.SandboxTest;
     })
 public class GlobusExecutionTestSuite {
 
-    protected static String TYPE;
-
-    @BeforeClass
-    public static void setType() {
-        TYPE = "gatekeeper";
-    }
+    protected static String TYPE = "gatekeeper";
 
     // test cases
     public static class GlobusJobDescriptionTest extends DescriptionTest {
