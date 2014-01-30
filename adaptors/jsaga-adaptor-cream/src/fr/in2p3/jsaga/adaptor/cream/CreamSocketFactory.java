@@ -37,7 +37,7 @@ public class CreamSocketFactory implements SecureProtocolSocketFactory {
 
     private X509Credential m_credential;
     private OpensslCertChainValidator m_validator;
-    private Logger m_logger;
+    private Logger m_logger = Logger.getLogger(CreamSocketFactory.class);
 
     public CreamSocketFactory(GSSCredential cred, File certificatesPath) throws AuthenticationFailedException {
         try {
@@ -51,7 +51,6 @@ public class CreamSocketFactory implements SecureProtocolSocketFactory {
             throw new AuthenticationFailedException("Error with proxy: " + e1.getMessage(),e1);
         }
         m_validator = new OpensslCertChainValidator(certificatesPath.getPath());
-        m_logger = Logger.getLogger(CreamSocketFactory.class);
     }
 
     public CreamSocketFactory(String credFile, File certificatesPath) throws AuthenticationFailedException {
