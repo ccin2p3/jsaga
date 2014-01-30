@@ -5,6 +5,7 @@
     <body>
         <release version="1.0.1">
             <action dev="lschwarz" type="fix" issue="5893">Cream: data staging with jdk7 &gt; update5</action>
+            <action dev="lschwarz" type="fix">HTTPS: fix inputStream reading bug (first character read only)</action>
         </release>
         <release version="1.0.0" date="2014-01-24" description="Release based on JGlobus2">
             <action dev="lschwarz" type="add">new SSH and SFTP adaptors based on the Ganymed library. 
