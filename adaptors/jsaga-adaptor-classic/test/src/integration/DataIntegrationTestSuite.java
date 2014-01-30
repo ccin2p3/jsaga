@@ -1,5 +1,9 @@
 package integration;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -15,16 +19,13 @@ import junit.framework.TestSuite;
 /**
  *
  */
-public class DataIntegrationTestSuite extends TestSuite {
-    public DataIntegrationTestSuite() throws Exception {
-        super();
-        this.addTest(FileIntegrationTestSuite.suite());
-        this.addTest(ZipIntegrationTestSuite.suite());
-        this.addTest(HttpIntegrationTestSuite.suite());
-        this.addTest(HttpsIntegrationTestSuite.suite());
-    }
+@RunWith(Suite.class)
+@SuiteClasses({
+    FileIntegrationTestSuite.class,
+    ZipIntegrationTestSuite.class,
+    HttpIntegrationTestSuite.class,
+    HttpsIntegrationTestSuite.class
+})
 
-    public static Test suite() throws Exception {
-        return new DataIntegrationTestSuite();
-    }
+public class DataIntegrationTestSuite {
 }

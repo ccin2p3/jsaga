@@ -1,6 +1,9 @@
 package integration;
 
-import junit.framework.Test;
+import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 
@@ -16,47 +19,44 @@ import org.ogf.saga.namespace.*;
 /**
  *
  */
-public class FileIntegrationTestSuite extends JSAGATestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new FileIntegrationTestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(FileIntegrationTestSuite.class);}}
+@RunWith(Suite.class)
+@SuiteClasses({
+    FileIntegrationTestSuite.FileNSEntryTest.class,
+    FileIntegrationTestSuite.FileDirectoryTest.class,
+    FileIntegrationTestSuite.FileDirectoryMakeTest.class,
+    FileIntegrationTestSuite.FileFileReadTest.class,
+    FileIntegrationTestSuite.FileFileWriteTest.class,
+    FileIntegrationTestSuite.FileMovementTest.class,
+    FileIntegrationTestSuite.EmulatorMovementTest.class
+})
+public class FileIntegrationTestSuite {
 
+    protected static String TYPE;
+
+    @BeforeClass
+    public static void setType() {
+        TYPE = "file";
+    }
     /** test cases */
-    public static class FileNSEntryTest extends NSEntryTest {
+    public static class FileNSEntryTest extends EntryTest {
         public FileNSEntryTest() throws Exception {super("file");}
     }
-    public static class FileDirectoryListTest extends DirectoryListTest {
-        public FileDirectoryListTest() throws Exception {super("file");}
-    }
-    public static class FileDirectoryMakeTest extends DirectoryMakeTest {
-        public FileDirectoryMakeTest() throws Exception {super("file");}
-    }
-    public static class FileDirectoryTest extends DirectoryTest {
+    public static class FileDirectoryTest extends DirTest {
         public FileDirectoryTest() throws Exception {super("file");}
     }
-    public static class FileFileReadTest extends FileReadTest {
+    public static class FileDirectoryMakeTest extends MakeDirTest {
+        public FileDirectoryMakeTest() throws Exception {super("file");}
+    }
+    public static class FileFileReadTest extends ReadTest {
         public FileFileReadTest() throws Exception {super("file");}
     }
-    public static class FileFileWriteTest extends FileWriteTest {
+    public static class FileFileWriteTest extends WriteTest {
         public FileFileWriteTest() throws Exception {super("file");}
     }
-    public static class FileNSCopyTest extends NSCopyTest {
-        public FileNSCopyTest() throws Exception {super("file", "file");}
+    public static class FileMovementTest extends DataMovementTest {
+        public FileMovementTest() throws Exception {super("file", "file");}
     }
-    public static class FileNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public FileNSCopyRecursiveTest() throws Exception {super("file", "file");}
-    }
-    public static class FileNSMoveTest extends NSMoveTest {
-        public FileNSMoveTest() throws Exception {super("file", "file");}
-    }
-    public static class File_to_EmulatorNSCopyTest extends NSCopyTest {
-        public File_to_EmulatorNSCopyTest() throws Exception {super("file", "test");}
-    }
-    public static class File_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public File_to_EmulatorNSCopyRecursiveTest() throws Exception {super("file", "test");}
-    }
-    public static class File_to_EmulatorNSMoveTest extends NSMoveTest {
-        public File_to_EmulatorNSMoveTest() throws Exception {super("file", "test");}
+    public static class EmulatorMovementTest extends DataMovementTest {
+        public EmulatorMovementTest() throws Exception {super("file", "test");}
     }
 }

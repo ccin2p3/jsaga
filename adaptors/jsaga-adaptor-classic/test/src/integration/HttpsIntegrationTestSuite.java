@@ -1,14 +1,22 @@
 package integration;
 
-import junit.framework.Test;
-import org.ogf.saga.file.*;
-import org.ogf.saga.namespace.*;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.file.DirTest;
+import org.ogf.saga.file.ReadTest;
+import org.ogf.saga.namespace.DataReadOnlyMovementTest;
+import org.ogf.saga.namespace.EntryTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
-* ***             http://cc.in2p3.fr/             ***
+* ***             Https://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   HttpsIntegrationTestSuite
+* File:   HttpssIntegrationTestSuite
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
 * Date:   26 mars 2008
 * ***************************************************
@@ -16,29 +24,36 @@ import org.ogf.saga.namespace.*;
 /**
  *
  */
-public class HttpsIntegrationTestSuite extends JSAGATestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new HttpsIntegrationTestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(HttpsIntegrationTestSuite.class);}}
+@RunWith(Suite.class)
+@SuiteClasses({
+    HttpsIntegrationTestSuite.HttpsNSEntryTest.class,
+    HttpsIntegrationTestSuite.HttpsDirectoryTest.class,
+    HttpsIntegrationTestSuite.HttpsFileReadTest.class,
+    HttpsIntegrationTestSuite.Https_to_EmulatorNSCopyTest.class
+})
+public class HttpsIntegrationTestSuite {
+
+    protected static String TYPE = "https";
 
     /** test cases */
-    public static class HttpsNSEntryTest extends NSEntryTest {
-        public HttpsNSEntryTest() throws Exception {super("https");}
+    public static class HttpsNSEntryTest extends EntryTest {
+        public HttpsNSEntryTest() throws Exception {super(TYPE);}
     }
-    public static class HttpsDirectoryListTest extends DirectoryListTest {
-        public HttpsDirectoryListTest() throws Exception {super("https");}
+    public static class HttpsDirectoryTest extends DirTest {
+        public HttpsDirectoryTest() throws Exception {super(TYPE);}
+        
+        @Test(expected=NotImplementedException.class)
+        public void test_getSizeRecursive() throws Exception {
+            super.test_getSizeRecursive();
+        }
+        @Test @Ignore("Read-only adaptor: cannot delete file to test empty directory")
+        public void test_list_empty() throws Exception {}
+
     }
-    public static class HttpsDirectoryTest extends DirectoryTest {
-        public HttpsDirectoryTest() throws Exception {super("https");}
+    public static class HttpsFileReadTest extends ReadTest {
+        public HttpsFileReadTest() throws Exception {super(TYPE);}
     }
-    public static class HttpsFileReadTest extends FileReadTest {
-        public HttpsFileReadTest() throws Exception {super("https");}
-    }
-    public static class Https_to_EmulatorNSCopyTest extends NSCopyTest {
-        public Https_to_EmulatorNSCopyTest() throws Exception {super("https", "test");}
-    }
-    public static class Https_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public Https_to_EmulatorNSCopyRecursiveTest() throws Exception {super("https", "test");}
+    public static class Https_to_EmulatorNSCopyTest extends DataReadOnlyMovementTest {
+        public Https_to_EmulatorNSCopyTest() throws Exception {super(TYPE, "test");}
     }
 }
