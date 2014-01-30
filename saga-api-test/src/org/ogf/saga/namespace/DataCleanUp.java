@@ -20,8 +20,8 @@ import org.ogf.saga.namespace.abstracts.AbstractNSCopyTest;
  *
  */
 public abstract class DataCleanUp extends AbstractDataMovement {
-    protected DataCleanUp(String protocol, String targetProtocol) throws Exception {
-        super(protocol, targetProtocol);
+    protected DataCleanUp(String protocol) throws Exception {
+        super(protocol, protocol);
     }
 
     @Override

@@ -40,7 +40,7 @@ public class SRMIntegrationTestSuite {
 
     /** test cases */
     public static class SRMCleanUp extends DataCleanUp {
-        public SRMCleanUp() throws Exception {super(TYPE, TYPE);}
+        public SRMCleanUp() throws Exception {super(TYPE);}
     }
     public static class SRMNSSetUpTest extends SetUpTest {
         public SRMNSSetUpTest() throws Exception {super(TYPE);}

@@ -98,6 +98,6 @@ public class SFTPDataTestSuite {
         public SFTPEmulatorDataMovementTest() throws Exception {super(TYPE, "test");}
     }
     public static class SFTPDataCleanUp extends DataCleanUp {
-        public SFTPDataCleanUp() throws Exception {super(TYPE, TYPE);}
+        public SFTPDataCleanUp() throws Exception {super(TYPE);}
     }
 }
