@@ -12,7 +12,7 @@ package org.ogf.saga.logicalfile;
 /**
  *
  */
-public class CatalogLogicalDirectoryMakeTest extends LogicalDirectoryMakeTest {
+public class CatalogLogicalDirectoryMakeTest extends LogicalMakeDirTest {
     public CatalogLogicalDirectoryMakeTest() throws Exception {
         super("catalog");
     }
