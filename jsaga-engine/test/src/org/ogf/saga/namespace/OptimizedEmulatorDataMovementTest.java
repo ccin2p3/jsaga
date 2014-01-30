@@ -4,16 +4,16 @@ package org.ogf.saga.namespace;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   EmulatorNSCopyRecursiveTest
+* File:   OptimizedEmulatorNSMoveTest
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   2 juil. 2007
+* Date:   25 mars 2008
 * ***************************************************
 * Description:                                      */
 /**
  *
  */
-public class EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
-    public EmulatorNSCopyRecursiveTest() throws Exception {
-        super("test", "test");
+public class OptimizedEmulatorDataMovementTest extends DataMovementTest {
+    public OptimizedEmulatorDataMovementTest() throws Exception {
+        super("otest", "otest");
     }
 }

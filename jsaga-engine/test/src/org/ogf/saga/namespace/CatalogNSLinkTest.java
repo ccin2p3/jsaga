@@ -12,7 +12,7 @@ package org.ogf.saga.namespace;
 /**
  *
  */
-public class CatalogNSLinkTest extends NSLinkTest {
+public class CatalogNSLinkTest extends LinkTest {
     public CatalogNSLinkTest() throws Exception {
         super("catalog");
     }
