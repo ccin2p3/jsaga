@@ -1,7 +1,5 @@
 package integration;
 
-import java.util.Random;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -26,7 +24,6 @@ import org.ogf.saga.url.URL;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-//    GlobusDataTestSuite.GsiftpNSSetUpTest.class,
     GlobusDataTestSuite.GsiftpNSEntryTest.class,
     GlobusDataTestSuite.GsiftpDirTest.class,
     GlobusDataTestSuite.GsiftpDirectoryMakeTest.class,
@@ -36,10 +33,9 @@ import org.ogf.saga.url.URL;
     GlobusDataTestSuite.GsiftpEmulatorDataMovementTest.class
 })
 public class GlobusDataTestSuite {
-    /** test cases */
-//    public static class GsiftpNSSetUpTest extends NSSetUpTest {
-//        public GsiftpNSSetUpTest() throws Exception {super("gsiftp");}
-//    }
+    public static class GsiftpDataCleanUp extends DataCleanUp {
+        public GsiftpDataCleanUp() throws Exception {super("gsiftp");}
+    }
     public static class GsiftpNSEntryTest extends EntryTest {
         public GsiftpNSEntryTest() throws Exception {super("gsiftp");}
     }

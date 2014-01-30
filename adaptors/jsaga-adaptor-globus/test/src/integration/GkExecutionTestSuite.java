@@ -1,7 +1,9 @@
 package integration;
 
-import junit.framework.Test;
-import org.ogf.saga.job.JobRunMinimalTest;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+import org.ogf.saga.job.run.MinimalTest;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -15,14 +17,14 @@ import org.ogf.saga.job.JobRunMinimalTest;
 /**
  *
  */
-public class GkExecutionTestSuite extends JSAGATestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new GkExecutionTestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(GkExecutionTestSuite.class);}}
+@RunWith(Suite.class)
+@SuiteClasses({
+    GkExecutionTestSuite.GkJobRunMinimalTest.class
+})
 
+public class GkExecutionTestSuite {
     // test cases
-    public static class GkJobRunMinimalTest extends JobRunMinimalTest {
+    public static class GkJobRunMinimalTest extends MinimalTest {
         public GkJobRunMinimalTest() throws Exception {super("gk");}
      }
 }

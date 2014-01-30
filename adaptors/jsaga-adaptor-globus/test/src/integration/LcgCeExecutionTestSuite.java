@@ -1,7 +1,6 @@
 package integration;
 
-import junit.framework.Test;
-import org.ogf.saga.job.JobRunMinimalTest;
+import org.junit.BeforeClass;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -15,14 +14,9 @@ import org.ogf.saga.job.JobRunMinimalTest;
 /**
  *
  */
-public class LcgCeExecutionTestSuite extends JSAGATestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new LcgCeExecutionTestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(LcgCeExecutionTestSuite.class);}}
-
-    // test cases
-    public static class LcgCeJobRunMinimalTest extends JobRunMinimalTest {
-        public LcgCeJobRunMinimalTest() throws Exception {super("lcgce");}
-     }
+public class LcgCeExecutionTestSuite extends GlobusExecutionTestSuite {
+    @BeforeClass
+    public static void setType() {
+        TYPE = "lcgce";
+    }
 }
