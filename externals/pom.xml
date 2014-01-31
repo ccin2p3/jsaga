@@ -23,7 +23,6 @@
         <module>glite</module>
         <module>jargon</module>
         <module>jeldoclet</module>
-        <module>libmatthew-java</module>
         <module>secret-service-api-java</module>
     </modules>
     <build>
