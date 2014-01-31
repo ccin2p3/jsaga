@@ -19,7 +19,7 @@
             </properties>
         </developer>
     </developers>
-    <!-- uncomment when the new API jargon-core will become stable: https://code.renci.org/gf/project/jargon/
+    <!-- TODO: uncomment when the new API jargon-core will become stable: https://code.renci.org/gf/project/jargon/
 	<repositories>
 		<repository>
 			<id>renci.releases</id>
@@ -35,6 +35,12 @@
             <version>1.0.1-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- 3.1.4 is the last version without gog-jglobus and PureTLS...
+        <dependency>
+            <groupId>org.irods.jargon</groupId>
+            <artifactId>jargon-core</artifactId>
+            <version>3.1.4</version>
+        </dependency> -->
 		<dependency>
 			<groupId>edu.sdsc.grid</groupId>
 			<artifactId>jargon</artifactId>
