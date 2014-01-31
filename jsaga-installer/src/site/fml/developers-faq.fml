@@ -66,6 +66,12 @@ mvn release:perform
 </pre>
                     </li>
                     <li>Change the symbolic link latest-release on the web server</li>
+                    <li>Upgrade snapshot version in:
+                        <ul>
+                            <li>saga-api/pom.xml:parent</li>
+                            <li>maven/maven-archetype-jsaga/resources/archetype-resources/pom.xml:parent</li>
+                        </ul>
+                    </li>
                 </ul>
             </answer>
         </faq>
