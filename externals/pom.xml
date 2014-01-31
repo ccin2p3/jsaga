@@ -18,7 +18,6 @@
         <module>axis</module>
         <module>classad</module>
         <module>cog-axis</module>
-        <module>concurrent</module>
         <module>dbus-java</module>
         <module>file-system</module>
         <module>glite</module>
