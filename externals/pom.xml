@@ -15,7 +15,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <!--<module>addressing-1.0</module>-->
         <module>axis</module>
         <module>classad</module>
         <module>cog-axis</module>
