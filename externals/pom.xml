@@ -19,12 +19,10 @@
         <module>axis</module>
         <module>classad</module>
         <module>cog-axis</module>
-        <module>cog-url</module>
         <module>commonj</module>
         <module>concurrent</module>
         <module>dbus-java</module>
         <module>file-system</module>
-        <!--<module>ganymed-ssh-2</module>-->
         <module>glite</module>
         <module>jargon</module>
         <module>jeldoclet</module>
