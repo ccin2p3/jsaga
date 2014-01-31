@@ -1,8 +1,0 @@
-<securityConfig xmlns="http://www.globus.org">
-    <auth-method>
-        <GSITransport/>
-        <GSISecureConversation/>
-        <GSISecureMessage/>
-    </auth-method>
-    <authz value="self"/>
-</securityConfig>
