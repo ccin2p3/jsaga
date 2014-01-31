@@ -49,6 +49,18 @@
         </dependency>
         <dependency>
             <groupId>org.jglobus</groupId>
+            <artifactId>axisg</artifactId>
+            <version>2.0.7-custom2</version>
+            <exclusions>
+                <!-- leads to version 1.2 which conflicts with 1.6 needed by adaptoritf -->
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jglobus</groupId>
             <artifactId>gridftp</artifactId>
             <version>2.0.7-custom2</version>
         </dependency>
@@ -62,6 +74,12 @@
             <groupId>org.glite</groupId>
             <artifactId>glite-wms-wmproxy-api-java</artifactId>
             <version>3.3.2-1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.globus</groupId>
+                    <artifactId>cog-axis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.glite</groupId>

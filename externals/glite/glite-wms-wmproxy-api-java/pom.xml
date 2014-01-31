@@ -79,6 +79,7 @@
             <artifactId>glite-security-util-java</artifactId>
             <version>1.4.0</version>
         </dependency>
+        <!-- TODO: replace by axisg-2.0.7-custom2 -->
         <dependency>
             <groupId>org.globus</groupId>
             <artifactId>cog-axis</artifactId>
