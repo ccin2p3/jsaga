@@ -12,7 +12,7 @@ import org.ogf.saga.job.abstracts.AbstractJobTest;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class JobDescriptionTest extends AbstractJobTest {

@@ -14,7 +14,7 @@ import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class PermissionsTest extends AbstractNSEntryTest {

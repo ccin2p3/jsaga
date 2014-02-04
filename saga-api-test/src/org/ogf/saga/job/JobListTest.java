@@ -19,7 +19,7 @@ import java.util.List;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class JobListTest extends AbstractTest {

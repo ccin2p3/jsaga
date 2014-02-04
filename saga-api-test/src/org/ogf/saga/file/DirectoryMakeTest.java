@@ -12,7 +12,7 @@ import org.ogf.saga.namespace.abstracts.AbstractNSDirectoryMakeTest;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class DirectoryMakeTest extends AbstractNSDirectoryMakeTest {

@@ -14,7 +14,7 @@ import org.ogf.saga.namespace.abstracts.AbstractNSCopyTest;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class IntegrationClean extends AbstractNSCopyTest {

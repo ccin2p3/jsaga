@@ -26,7 +26,7 @@ import org.ogf.saga.url.URLFactory;
 * This test suite is made to be sure that the plug-in 
 * properly implements the  JobInfoAdaptor interface  */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class JobRunInfoTest extends AbstractJobTest {

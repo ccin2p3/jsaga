@@ -13,7 +13,7 @@ import org.ogf.saga.url.URL;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class NSLinkTest extends AbstractNSEntryTest {

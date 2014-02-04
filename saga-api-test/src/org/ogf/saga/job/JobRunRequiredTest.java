@@ -17,7 +17,7 @@ import org.ogf.saga.task.State;
 * This test suite is made to be sure that the plug-in 
 * has the minimum functions                         */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class JobRunRequiredTest extends AbstractJobTest {

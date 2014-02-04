@@ -24,7 +24,7 @@ import org.ogf.saga.url.URLFactory;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class FileWriteTest extends AbstractNSEntryTest {

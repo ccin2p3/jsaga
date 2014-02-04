@@ -14,7 +14,7 @@ import org.ogf.saga.url.URL;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class NSCopyTest extends AbstractNSCopyTest {

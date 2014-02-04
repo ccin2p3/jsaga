@@ -14,7 +14,7 @@ import org.ogf.saga.url.URLFactory;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class DirectoryTest extends AbstractNSDirectoryTest {

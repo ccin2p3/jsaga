@@ -15,7 +15,7 @@ import org.ogf.saga.url.URLFactory;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class NSEntryTest extends AbstractNSEntryTest {

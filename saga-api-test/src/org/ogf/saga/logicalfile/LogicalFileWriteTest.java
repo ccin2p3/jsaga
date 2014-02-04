@@ -17,7 +17,7 @@ import org.ogf.saga.namespace.abstracts.AbstractNSEntryWriteTest;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class LogicalFileWriteTest extends AbstractNSEntryWriteTest {

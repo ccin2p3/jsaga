@@ -17,7 +17,7 @@ import java.util.List;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {

@@ -24,7 +24,7 @@ import java.util.UUID;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class JobRunSandboxTest extends AbstractJobTest {

@@ -16,7 +16,7 @@ import org.ogf.saga.namespace.abstracts.AbstractNSEntryReadTest;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 @Deprecated
 public abstract class FileReadTest extends AbstractNSEntryReadTest {

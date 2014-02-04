@@ -19,6 +19,10 @@ import java.io.*;
 * This test suite is made to be test  
 * interactive jobs
 */
+/**
+ *  @deprecated
+ *
+ */
 @Deprecated
 public abstract class JobRunInteractiveTest extends AbstractJobTest {
 	
