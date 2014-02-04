@@ -16,6 +16,7 @@ import org.ogf.saga.namespace.abstracts.AbstractNSCopyTest;
 /**
  *
  */
+@Deprecated
 public abstract class IntegrationClean extends AbstractNSCopyTest {
     protected IntegrationClean(String protocol, String targetProtocol) throws Exception {
         super(protocol, targetProtocol);

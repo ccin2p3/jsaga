@@ -15,6 +15,7 @@ import org.ogf.saga.namespace.NSDirectory;
 /**
  *
  */
+@Deprecated
 public abstract class AbstractNSDirectoryTest extends AbstractNSEntryTest {
     // setup
     protected NSDirectory m_subDir;

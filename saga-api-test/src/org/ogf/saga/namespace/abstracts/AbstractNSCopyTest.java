@@ -23,6 +23,7 @@ import java.util.List;
 /**
  *
  */
+@Deprecated
 public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
     protected static final int FLAGS_BYPASSEXIST = 4096;
 
