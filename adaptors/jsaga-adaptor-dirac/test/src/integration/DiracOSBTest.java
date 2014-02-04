@@ -1,6 +1,7 @@
 package integration;
 
-import org.ogf.saga.AbstractTest;
+import org.junit.Test;
+import org.ogf.saga.AbstractTest_JUNIT4;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.file.File;
@@ -12,10 +13,11 @@ import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
-public class DiracOSBTest extends AbstractTest {
+public class DiracOSBTest extends AbstractTest_JUNIT4 {
 
     protected Session m_session;
     protected NSEntry m_file;
+    
 	public DiracOSBTest() throws Exception {
 		super();
         // configure
@@ -27,6 +29,7 @@ public class DiracOSBTest extends AbstractTest {
         }
 	}
 
+    @Test
 	public void test_OSB_OK() throws Exception {
         Buffer buffer = BufferFactory.createBuffer(1024);
         File reader = (File) NSFactory.createNSEntry(m_session, m_file.getURL(), Flags.READ.getValue());
@@ -35,6 +38,7 @@ public class DiracOSBTest extends AbstractTest {
         reader.close();
 	}
 
+    @Test
 	public void test_OSB_empty() throws Exception {
         Buffer buffer = BufferFactory.createBuffer(1024);
         // modify filename: add "dummy" at the end
