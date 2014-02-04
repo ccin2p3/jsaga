@@ -60,10 +60,6 @@ import org.ogf.saga.context.*;
     <i>_MyGrid_</i>TestSuite.<i>_MyGrid_</i>ContextDestroy.class})
 
 public class <i>_MyGrid_</i>TestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new <i>_MyGrid_</i>TestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(<i>_MyGrid_</i>TestSuite.class);}}
 
     /** test cases */
     public static class <i>_MyGrid_</i>ContextInit extends <a
@@ -84,15 +80,15 @@ public class <i>_MyGrid_</i>TestSuite {
 
 
             <section name="Testing a data adaptor">
-                <p>If the tested adaptor only support read operations, you must set up the test environment manually
+                <p>If the tested adaptor only supports read operations, you must set up the test environment manually
                     (see <a href="contributors-faq.html#create-test-entries">Contributors How To</a> web page).
                 </p>
-                <p>If the tested adaptor support write operations, you should first test if the test environment set up
-                    properly, by using the NSSetUpTest test suite:
+                <p>If the tested adaptor supports write operations, you should first test if the test environment set up
+                    properly, by using the SetUpTest class:
                 </p>
-                <pre>mvn integration-test -Dtest={integration.<i>_MyProtocol_</i>TestSuite\$<i>_MyProtocol_</i>NSSetUpTest}</pre>
+                <pre>mvn integration-test -Dtest={integration.<i>_MyProtocol_</i>TestSuite\$<i>_MyProtocol_</i>SetUpTest}</pre>
                 <p>If the test environment set up fails with exception AlreadyExistsException, first clean it up
-                    with the IntegrationClean test suite.
+                    with the DataCleanUp class.
                 </p>
                 <pre>package integration;
 
@@ -106,24 +102,24 @@ public class <i>_MyProtocol_</i>CleanUp extends DataCleanUp {
                 <subsection name="Testing a physical file adator">
                     <i>Copy-paste this code to your test class.</i>
                     <pre>package integration;
-import junit.framework.Test;
-import org.ogf.saga.file.*;
-import org.ogf.saga.namespace.*;
 
-public class <i>_MyProtocol_</i>TestSuite extends JSAGATestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new <i>_MyProtocol_</i>TestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(<i>_MyProtocol_</i>TestSuite.class);}}
+@RunWith(Suite.class)
+@SuiteClasses({
+    <i>_MyProtocol_</i>TestSuite.<i>_WhatEverSubClassYouWantInYourTestSuite_</i>.class,
+    ...
+}) 
+public class <i>_MyProtocol_</i>TestSuite {
 
-    /** test cases */<xsl:text/>
+    <xsl:text/>
                         <xsl:for-each select="jelclass[@package='org.ogf.saga.file' or @package='org.ogf.saga.namespace' or @package='org.ogf.saga.permissions']
-                                                      [contains(@type,'Test')]">
+                                                      [contains(@type,'Test')]
+                                                      [not(comment/attribute/@name='@deprecated')]">
                             <xsl:call-template name="CODE_jelclass"/>
                         </xsl:for-each>
                         <xsl:for-each select="jelclass[@package='org.ogf.saga.file' or @package='org.ogf.saga.namespace']
                                                       [contains(@type,'Test')]
-                                                      [contains(@type,'Copy') or contains(@type,'Move')]">
+                                                      [contains(@type,'DataMovement')]
+                                                      [not(comment/attribute/@name='@deprecated')]">
                             <xsl:call-template name="CODE_jelclass">
                                 <xsl:with-param name="targetAdaptor">_to_Emulator</xsl:with-param>
                                 <xsl:with-param name="targetProtocol">test</xsl:with-param>
@@ -136,24 +132,24 @@ public class <i>_MyProtocol_</i>TestSuite extends JSAGATestSuite {
                 <subsection name="Testing a logical file adator">
                     <i>Copy-paste this code to your test class.</i>
                     <pre>package integration;
-import junit.framework.Test;
-import org.ogf.saga.logicalfile.*;
-import org.ogf.saga.namespace.*;
 
-public class <i>_MyProtocol_</i>TestSuite extends JSAGATestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new <i>_MyProtocol_</i>TestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(<i>_MyProtocol_</i>TestSuite.class);}}
+@RunWith(Suite.class)
+@SuiteClasses({
+    <i>_MyProtocol_</i>TestSuite.<i>_WhatEverSubClassYouWantInYourTestSuite_</i>.class,
+    ...
+}) 
+public class <i>_MyProtocol_</i>TestSuite {
 
-    /** test cases */<xsl:text/>
+    <xsl:text/>
                         <xsl:for-each select="jelclass[@package='org.ogf.saga.logicalfile' or @package='org.ogf.saga.namespace' or @package='org.ogf.saga.permissions']
-                                                      [contains(@type,'Test')]">
+                                                      [contains(@type,'Test')]
+                                                      [not(comment/attribute/@name='@deprecated')]">
                             <xsl:call-template name="CODE_jelclass"/>
                         </xsl:for-each>
                         <xsl:for-each select="jelclass[@package='org.ogf.saga.logicalfile' or @package='org.ogf.saga.namespace']
                                                       [contains(@type,'Test')]
-                                                      [contains(@type,'Copy') or contains(@type,'Move')]">
+                                                      [contains(@type,'Move')]
+                                                      [not(comment/attribute/@name='@deprecated')]">
                             <xsl:call-template name="CODE_jelclass">
                                 <xsl:with-param name="targetAdaptor">_to_Emulator</xsl:with-param>
                                 <xsl:with-param name="targetProtocol">test</xsl:with-param>
@@ -168,17 +164,16 @@ public class <i>_MyProtocol_</i>TestSuite extends JSAGATestSuite {
             <section name="Testing a job adaptor">
                 <i>Copy-paste this code to your test class.</i>
                 <pre>package integration;
-import junit.framework.Test;
-import org.ogf.saga.job.*;
 
-public class <i>_MyProtocol_</i>TestSuite extends JSAGATestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new <i>_MyProtocol_</i>TestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(<i>_MyProtocol_</i>TestSuite.class);}}
+@RunWith(Suite.class)
+@SuiteClasses({
+    <i>_MyProtocol_</i>TestSuite.<i>_WhatEverSubClassYouWantInYourTestSuite_</i>.class,
+    ...
+}) 
+public class <i>_MyProtocol_</i>TestSuite {
 
-    /** test cases */<xsl:text/>
-                    <xsl:for-each select="jelclass[@package='org.ogf.saga.job'][contains(@type,'Test')]">
+    <xsl:text/>
+                    <xsl:for-each select="jelclass[@package='org.ogf.saga.job.run'][contains(@type,'Test')][not(comment/attribute/@name='@deprecated')]">
                         <xsl:call-template name="CODE_jelclass"/>
                     </xsl:for-each>
 }
@@ -194,18 +189,19 @@ public class <i>_MyProtocol_</i>TestSuite extends JSAGATestSuite {
     public static class <i>_MyProtocol_</i><xsl:value-of select="$targetAdaptor"/><xsl:value-of select="@type"/> extends <a
         href="saga-api-test/xref/org/ogf/saga/{$package}/{@type}.html"><xsl:value-of select="@type"/></a> {
         public <i>_MyProtocol_</i><xsl:value-of select="$targetAdaptor"/><xsl:value-of select="@type"/>() throws Exception {super("<i>myprotocol</i>"<xsl:text/>
-        <xsl:if test="contains(@type,'Copy') or contains(@type,'Move')">, "<i><xsl:value-of select="$targetProtocol"/></i>"</xsl:if>);}<xsl:text/>
+        <xsl:if test="contains(@type,'DataMovement')">, "<i><xsl:value-of select="$targetProtocol"/></i>"</xsl:if>);}<xsl:text/>
         <xsl:for-each select="methods/method[@visibility='public' and starts-with(@name,'test_')]"><xsl:call-template name="CODE_method"/></xsl:for-each>
     }
     </xsl:template>
     <xsl:template name="CODE_method">
         <xsl:value-of select="$CR"/>
+        <xsl:text>@Override @Test @Ignore("TODO: explain why this test is ignored...")
+        </xsl:text>
         <xsl:value-of select="@visibility"/><xsl:text> </xsl:text>
         <xsl:call-template name="CLASSNAME"><xsl:with-param name="FQClass" select="@fulltype"/></xsl:call-template><xsl:text> </xsl:text>
         <xsl:value-of select="@name"/>(<xsl:text/>
         <xsl:for-each select="params/param"><xsl:call-template name="CODE_param"/></xsl:for-each>)<xsl:text/>
-        <xsl:for-each select="exceptions"><xsl:call-template name="CODE_exceptions"/></xsl:for-each> {<xsl:text/>
-        <xsl:text> super.ignore("TODO: explain why this test is ignored..."); }</xsl:text>
+        <xsl:for-each select="exceptions"><xsl:call-template name="CODE_exceptions"/></xsl:for-each> {}<xsl:text/>
     </xsl:template>
     <xsl:template name="CODE_param">
         <xsl:if test="position()>1">, </xsl:if>
