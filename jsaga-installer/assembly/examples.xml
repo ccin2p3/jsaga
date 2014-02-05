@@ -28,12 +28,6 @@
             </excludes>
         </dependencySet>
     </dependencySets>
-    <fileSets>
-        <fileSet>
-            <outputDirectory>/doc</outputDirectory>
-            <directory>test/resources</directory>
-        </fileSet>
-    </fileSets>
     <files>
         <!-- <file>
             <outputDirectory>/bin/panels</outputDirectory>

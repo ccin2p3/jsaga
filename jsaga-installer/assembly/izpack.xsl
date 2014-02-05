@@ -80,8 +80,12 @@
             <file src="License-Apachev2.0.txt" targetdir="$INSTALL_PATH" condition="show_Apache"/>
             <file src="Readme.txt" targetdir="$INSTALL_PATH"/>
             <parsable targetfile="$INSTALL_PATH/Readme.txt" type="plain"/>
-            <file src="etc/" targetdir="$INSTALL_PATH"/>
-            <file src="doc/" targetdir="$INSTALL_PATH"/>
+            <!-- FIXME: seems to be a bug in izpack-maven-plugin: recursive copy of DIR does not work
+            <file src="etc/" targetdir="$INSTALL_PATH"/>-->
+            <file src="etc/jsaga-config.properties" targetdir="$INSTALL_PATH/etc"/>
+            <file src="etc/jsaga-default-contexts.xml" targetdir="$INSTALL_PATH/etc"/>
+            <file src="etc/jsaga-timeout.properties" targetdir="$INSTALL_PATH/etc"/>
+            <file src="etc/log4j.properties" targetdir="$INSTALL_PATH/etc"/>
             <xsl:for-each select="descendant-or-self::artifact[not(@scope='test')]">
                 <file src="{@file}" targetdir="$INSTALL_PATH/lib"/>
             </xsl:for-each>
