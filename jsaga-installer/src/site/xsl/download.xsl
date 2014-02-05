@@ -28,7 +28,7 @@
                         </xsl:variable>
                         <p>JSAGA is distributed in several formats for your convenience.</p>
                         <ul>
-                            <li>Graphical Installer:
+                            <li>Graphical Installer (we might have <a href="https://forge.in2p3.fr/issues/6013">display issues</a> if you run this with OpenJDK):
                                 <a href="{$prefix}.jar">jsaga-installer-<xsl:value-of select="$project.version"/>.jar</a>
                             </li>
                             <li>ZIP binaries package:
