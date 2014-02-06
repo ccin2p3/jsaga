@@ -47,8 +47,7 @@ public class GlobusStyle extends BCStyle {
         DefaultSymbols.put(ST, "ST");
         DefaultSymbols.put(SN, "SERIALNUMBER");
         DefaultSymbols.put(EmailAddress, "E");
-        // The following line is commented this line to fix the EMAIL issue in DN
-        //DefaultSymbols.put(EmailAddress, "EMAIL");
+        DefaultSymbols.put(EmailAddress, "EMAIL");
         DefaultSymbols.put(DC, "DC");
         DefaultSymbols.put(UID, "UID");
         DefaultSymbols.put(STREET, "STREET");
@@ -87,6 +86,8 @@ public class GlobusStyle extends BCStyle {
         DefaultLookUp.put("emailaddress", E);
         DefaultLookUp.put("dc", DC);
         DefaultLookUp.put("e", E);
+        // the following line is fixed in ssl-proxies-2.0.7-Custom3
+        DefaultLookUp.put("email", E);
         DefaultLookUp.put("uid", UID);
         DefaultLookUp.put("surname", SURNAME);
         DefaultLookUp.put("givenname", GIVENNAME);
