@@ -30,7 +30,5 @@
         </context>-->
         <context type="Globus">
         </context>
-        <context type="MyProxy">
-        </context>
     </session>
 </jsaga-default>
