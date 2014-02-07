@@ -124,8 +124,20 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         
         // return jobid
         if (resultArray.length == 1) {
-//        	resultArray[0].getDelegationProxyFault()
-            JobId jobid = resultArray[0].getJobId();
+            JobRegisterResult res = resultArray[0];
+            if (res.isGenericFaultSpecified()) {
+                throw new NoSuccessException(res.getGenericFault().getFaultCause());
+            }
+            if (res.isDelegationIdMismatchFaultSpecified()) {
+                throw new PermissionDeniedException(res.getDelegationIdMismatchFault().getFaultCause());
+            }
+            if (res.isDelegationProxyFaultSpecified()) {
+                throw new PermissionDeniedException(res.getDelegationProxyFault().getFaultCause());
+            }
+            if (res.isLeaseIdMismatchFaultSpecified()) {
+                throw new NoSuccessException(res.getLeaseIdMismatchFault().getFaultCause());
+            }
+            JobId jobid = res.getJobId();
             if (jobid == null) {
                 throw new NoSuccessException("Null job identifier");
             }
