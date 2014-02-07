@@ -72,6 +72,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     private Boolean m_hasOutputSandboxBug = null;
     
 //    private DelegationServiceStub m_delegationServiceStub;
+    private Logger m_logger = Logger.getLogger(CreamJobControlAdaptor.class);
     
     public JobMonitorAdaptor getDefaultJobMonitor() {
         // use CREAM portType as default monitoring service (instead of CEMon portType)
@@ -105,6 +106,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	
+        m_logger.debug("Submitting job described as:\n" + jobDesc);
         JobRegisterResponse response;
 		try {
 			response = m_client.jobRegister(jobDesc, m_delegationId);
@@ -121,7 +123,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 		}
         // rethrow exception if any fault in result
         JobRegisterResult[] resultArray = response.getResult();
-        
+        m_logger.debug("Job submitted");
         // return jobid
         if (resultArray.length == 1) {
             JobRegisterResult res = resultArray[0];
