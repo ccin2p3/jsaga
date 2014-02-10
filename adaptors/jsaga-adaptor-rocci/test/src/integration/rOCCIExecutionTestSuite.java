@@ -1,7 +1,18 @@
 package integration;
 
-import junit.framework.Test;
-import org.ogf.saga.job.*;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+import org.ogf.saga.job.description.DescriptionTest;
+import org.ogf.saga.job.run.InfoTest;
+import org.ogf.saga.job.run.InteractiveTest;
+import org.ogf.saga.job.run.MinimalTest;
+import org.ogf.saga.job.run.OptionalTest;
+import org.ogf.saga.job.run.RequiredTest;
+import org.ogf.saga.job.run.SandboxTest;
+
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -12,76 +23,86 @@ import org.ogf.saga.job.*;
 * Date:   30 sept 2013
 ****************************************************/
 
-public class rOCCIExecutionTestSuite extends JSAGATestSuite {
-	
-	private final static String TYPE = "rocci";
-
-    /** create test suite */
-    public static Test suite() throws Exception {return new rOCCIExecutionTestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(rOCCIExecutionTestSuite.class);}}
+@RunWith(Suite.class)
+@SuiteClasses({
+    rOCCIExecutionTestSuite.rOCCIJobDescriptionTest.class,
+    rOCCIExecutionTestSuite.rOCCIJobRunRequiredTest.class,
+    rOCCIExecutionTestSuite.rOCCIJobRunOptionalTest.class,
+    rOCCIExecutionTestSuite.rOCCIJobRunSandboxTest.class,
+    rOCCIExecutionTestSuite.rOCCIJobRunInteractiveTest.class,
+    rOCCIExecutionTestSuite.rOCCIJobRunInfoTest.class
+})
+public class rOCCIExecutionTestSuite {
+    
+    private final static String TYPE = "rocci";
 
     // test cases
-    public static class rOCCIJobDescriptionTest extends JobDescriptionTest {
+    public static class rOCCIJobDescriptionTest extends DescriptionTest {
         public rOCCIJobDescriptionTest() throws Exception {super(TYPE);}
-        public void test_spmdVariation() { super.ignore("not supported"); }
-        public void test_totalCPUCount() { super.ignore("not supported"); }
-        public void test_numberOfProcesses() { super.ignore("not supported"); }
-        public void test_processesPerHost() { super.ignore("not supported"); }
-        public void test_threadsPerProcess() { super.ignore("not supported"); }
-//        public void test_input() { super.ignore("not supported"); }
-//        public void test_fileTransfer() { super.ignore("not supported"); }
-        public void test_cleanup() { super.ignore("not supported"); }
-        public void test_totalCPUTime() { super.ignore("not supported"); }
-        public void test_totalPhysicalMemory() { super.ignore("not supported"); }
-        public void test_cpuArchitecture() { super.ignore("not supported"); }
-        public void test_operatingSystemType() { super.ignore("not supported"); }
-        public void test_candidateHosts() { super.ignore("not supported"); }
-        public void test_queue() { super.ignore("not supported"); }
-        public void test_wallTimeLimit() { super.ignore("not supported"); }
+        public void test_spmdVariation() {  }
+        public void test_totalCPUCount() {  }
+        public void test_numberOfProcesses() {  }
+        public void test_processesPerHost() {  }
+        public void test_threadsPerProcess() {  }
+//        public void test_input() {  }
+//        public void test_fileTransfer() {  }
+        public void test_cleanup() {  }
+        public void test_totalCPUTime() {  }
+        public void test_totalPhysicalMemory() {  }
+        public void test_cpuArchitecture() {  }
+        public void test_operatingSystemType() {  }
+        public void test_candidateHosts() {  }
+        public void test_queue() {  }
+        public void test_wallTimeLimit() {  }
      }
     
     // test cases
-    public static class rOCCIJobRunMinimalTest extends JobRunMinimalTest {
+    public static class rOCCIJobRunMinimalTest extends MinimalTest {
         public rOCCIJobRunMinimalTest() throws Exception {super(TYPE);}
     }
     
     // test cases
-    public static class rOCCIJobRunRequiredTest extends JobRunRequiredTest {
+    public static class rOCCIJobRunRequiredTest extends RequiredTest {
         public rOCCIJobRunRequiredTest() throws Exception {super(TYPE);}
     }
 
     // test cases
-    public static class rOCCIJobRunSandboxTest extends JobRunSandboxTest {
+    public static class rOCCIJobRunSandboxTest extends SandboxTest {
         public rOCCIJobRunSandboxTest() throws Exception {super(TYPE);}
-        public void test_output_workingDirectory() { super.ignore("not supported"); }
+        @Override @Test @Ignore("Not supported")
+        public void test_output_workingDirectory() {  }
     }
     
     // test cases
-    public static class rOCCIJobRunOptionalTest extends JobRunOptionalTest {
+    public static class rOCCIJobRunOptionalTest extends OptionalTest {
         public rOCCIJobRunOptionalTest() throws Exception {super(TYPE);}
-        public void test_resume_done() { super.ignore("not supported"); }
-        public void test_resume_running() { super.ignore("not supported"); }
-        public void test_suspend_done() { super.ignore("not supported"); }
-        public void test_suspend_running() { super.ignore("not supported"); }
+        @Override @Test @Ignore("Not supported")
+        public void test_resume_done() {  }
+        @Override @Test @Ignore("Not supported")
+        public void test_resume_running() {  }
+        @Override @Test @Ignore("Not supported")
+        public void test_suspend_done() {  }
+        @Override @Test @Ignore("Not supported")
+        public void test_suspend_running() {  }
     }
     
- 	// test cases
-//    public static class rOCCIJobRunDescriptionTest extends JobRunDescriptionTest {
+     // test cases
+//    public static class rOCCIJobRunDescriptionTest extends RequirementsTest {
 //        public rOCCIJobRunDescriptionTest() throws Exception {super(TYPE);}
-//        public void test_run_queueRequirement() { super.ignore("not supported"); }
-//        public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
-//        public void test_run_memoryRequirement() { super.ignore("not supported"); }
+//        public void test_run_queueRequirement() {  }
+//        public void test_run_cpuTimeRequirement() {  }
+//        public void test_run_memoryRequirement() {  }
 //    }
     
     // test cases
-    public static class rOCCIJobRunInteractiveTest extends JobRunInteractiveTest {
+    public static class rOCCIJobRunInteractiveTest extends InteractiveTest {
         public rOCCIJobRunInteractiveTest() throws Exception {super(TYPE);}
-        public void test_simultaneousStdin()  { super.ignore("Not supported");}
+        @Override @Test @Ignore("Not supported")
+        public void test_simultaneousStdin()  { }
     }
 
     // test cases
-    public static class rOCCIJobRunInfoTest extends JobRunInfoTest {
+    public static class rOCCIJobRunInfoTest extends InfoTest {
         public rOCCIJobRunInfoTest() throws Exception {super(TYPE);}
     }
 }
