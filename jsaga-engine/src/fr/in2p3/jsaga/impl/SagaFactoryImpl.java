@@ -117,6 +117,8 @@ public class SagaFactoryImpl implements SagaFactory {
         String truststore_pass = EngineProperties.getProperty(EngineProperties.JAVAX_NET_SSL_TRUSTSTOREPASSWORD);
         if (truststore_pass != null) System.setProperty(EngineProperties.JAVAX_NET_SSL_TRUSTSTOREPASSWORD, truststore_pass);
         
+        /* jsse.enableCBCProtection should be false Bug 5893 */
+        System.setProperty("jsse.enableCBCProtection", "false");
         
         AdaptorDescriptors descriptors = AdaptorDescriptors.getInstance();
         m_securityAdaptorFactory = new SecurityAdaptorFactory(descriptors);

@@ -82,18 +82,19 @@ public class CreamSocketFactory implements SecureProtocolSocketFactory {
         m_logger.debug("creating socket");
         SSLSocketFactory newFactory = SocketFactoryCreator.getSocketFactory(m_credential, m_validator);
         SSLSocket socket = (SSLSocket) newFactory.createSocket();
-        ArrayList<String> supportedProtocols = new ArrayList<String>(Arrays.asList(socket.getSupportedProtocols()));
-        ArrayList<String> enabledProtocols = new ArrayList<String>(Arrays.asList(socket.getEnabledProtocols()));
-        // Enables TLSv1.1 if not already enabled AND supported
-        if (!enabledProtocols.contains("TLSv1.1")) {
-            if (supportedProtocols.contains("TLSv1.1")) {
-                m_logger.debug("adding support of protocol TLSv1.1");
-                enabledProtocols.add("TLSv1.1");
-                socket.setEnabledProtocols(enabledProtocols.toArray(new String[enabledProtocols.size()]));
-            } else {
-                m_logger.warn("protocol TLSv1.1 is not supported");
-            }
-        }
+        // This code is commented because bug #5893 was fixed in SagaFactoryImpl with "jsse.enableCBCprotection" SP
+//        ArrayList<String> supportedProtocols = new ArrayList<String>(Arrays.asList(socket.getSupportedProtocols()));
+//        ArrayList<String> enabledProtocols = new ArrayList<String>(Arrays.asList(socket.getEnabledProtocols()));
+//        // Enables TLSv1.1 if not already enabled AND supported
+//        if (!enabledProtocols.contains("TLSv1.1")) {
+//            if (supportedProtocols.contains("TLSv1.1")) {
+//                m_logger.debug("adding support of protocol TLSv1.1");
+//                enabledProtocols.add("TLSv1.1");
+//                socket.setEnabledProtocols(enabledProtocols.toArray(new String[enabledProtocols.size()]));
+//            } else {
+//                m_logger.warn("protocol TLSv1.1 is not supported");
+//            }
+//        }
         SocketAddress remoteaddr = new InetSocketAddress(host, port);
         if (params != null) {
             socket.setSoTimeout(params.getConnectionTimeout());
