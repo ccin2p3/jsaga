@@ -103,6 +103,11 @@ chmod 664 $HASH.signing_policy]]></pre>
             </ul>
             </answer>
         </faq>
+        <faq id="InvalidKeyException">
+            <question>What does mean the "InvalidKeyException: Illegal key size" error?</question>
+            <answer>It probably means that you have not installed the Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files.
+            Search for "jce download" on oracle.com</answer>
+        </faq>
     </part>
     <part id="job">
         <title>Globus Gatekeeper</title>
