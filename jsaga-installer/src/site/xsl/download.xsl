@@ -13,6 +13,11 @@
                             <th>JDK</th>
                             <td>Download and install <a href="http://www.oracle.com/technetwork/indexes/downloads/index.html">JDK 1.6</a> or later versions.</td>
                         </tr>
+                        <tr>
+                            <th>JCE Unlimited Strength Jurisdiction Policy Files</th>
+                            <td>If you use certificates and/ot private keys you will probably need to install these files in "JRE/lib/security". 
+                            See <a href="adaptors/jsaga-adaptor-globus/faq.html#InvalidKeyException">the FAQ</a></td>
+                        </tr>
                     </table>
                 </subsection>
                 <subsection name="Latest Release">
