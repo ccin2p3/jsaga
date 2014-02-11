@@ -26,7 +26,7 @@ import java.util.*;
 /**
  *
  */
-public class IrodsDataAdaptorLogical extends IrodsDataAdaptor implements LogicalReaderMetaDataExtended, LogicalWriterMetaData, LogicalReader {
+public class IrodsDataAdaptorLogical extends IrodsDataAdaptorAbstract implements LogicalReaderMetaDataExtended, LogicalWriterMetaData, LogicalReader {
     public String[] listLocations(String logicalEntry, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         throw new NoSuccessException("not yet implemented");
     }

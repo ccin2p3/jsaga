@@ -20,8 +20,17 @@ import java.io.*;
 /**
  *
  */
-public class IrodsDataAdaptorPhysical extends IrodsDataAdaptor implements FileReaderStreamFactory, FileWriterStreamFactory {
-	public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+public class IrodsDataAdaptorPhysical extends IrodsDataAdaptorAbstract implements FileReaderStreamFactory, FileWriterStreamFactory {
+
+    public String getType() {
+        return "irods";
+    }
+
+    protected boolean isClassic(){
+        return false;
+    }        
+
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
 		String[] split = absolutePath.split(SEPARATOR);
 		String fileName = split[split.length-1];
 
