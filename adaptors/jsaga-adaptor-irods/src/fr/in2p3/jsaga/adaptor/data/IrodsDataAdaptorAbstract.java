@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-//import edu.sdsc.grid.io.*;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -18,9 +17,9 @@ import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import org.ietf.jgss.GSSCredential;
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.io.IRODSFile;
-import org.irods.jargon.core.pub.io.IRODSFileFactoryImpl;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 
@@ -74,38 +73,71 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
     }
     
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
-        // URL attributes
-        parseValue(attributes, userInfo);
-        //if (defaultStorageResource == null) {
-        //    throw new BadParameterException("The default storage resource cannot be null");
-        //}
+        // Parsing for defaultResource
+        Set set = attributes.entrySet();
+        Iterator iterator = set.iterator();
 
+        while (iterator.hasNext()) {
+            Map.Entry me = (Map.Entry) iterator.next();
+            String key = ((String)me.getKey()).toLowerCase();
+            String value =(String)me.getValue();
+            
+            if (key.equals(DEFAULTRESOURCE)) {
+                defaultStorageResource = value;
+            } else if (key.equals(DOMAIN)) {
+                mdasDomainName  = value;
+            } else if (key.equals(ZONE)) {
+                mcatZone  = value;
+            } else if (key.equals(METADATAVALUE)) {
+                metadataValue = value;
+            }
+        }
         try {
             IRODSAccount account = null;
             
             if (credential instanceof GSSCredentialSecurityCredential) {
                 cert = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
-                account = new IRODSAccount(host, port, userName, passWord, basePath, mcatZone, defaultStorageResource);
-                account.setGSSCredential(cert);
+                /* 3.1.4 */
+                m_account = IRODSAccount.instance(host, port, cert);
+                /* 3.2.1.4 and 3.3.1.1
+                m_account = org.irods.jargon.core.connection.GSIIRODSAccount.instance(host, port, cert, defaultStorageResource);
+                m_account.setZone(mcatZone);*/
+                
+                m_account.setDefaultStorageResource(defaultStorageResource);
+                m_account.setHomeDirectory(basePath);
             } else {
-//                if (host == null) {
-//                    account = new IRODSAccount();
-//                } else {
-                    account = new IRODSAccount(host, port, userName, passWord, basePath, mcatZone, defaultStorageResource);
-//                }
+                if (userInfo!=null) {
+                    int pos =userInfo.indexOf(":");
+                    if (pos<0) {
+                        userName = userInfo;
+                    } else {
+                        userName = userInfo.substring(0, pos); 
+                        passWord = userInfo.substring(pos+1, userInfo.length());
+                    }
+                } else {
+                    userName = credential.getUserID();
+                    passWord = ((UserPassSecurityCredential) credential).getUserPass();
+                }
+                
+                m_account = IRODSAccount.instance(host, port, userName, passWord, basePath, mcatZone, defaultStorageResource);
             }
-            
-            fileSystem = IRODSFileFactory.newFileSystem(account);
-        } catch (IOException ioe) {
-            throw new AuthenticationFailedException(ioe);
+            m_fileSystem = IRODSFileSystem.instance();
+            // FIXME: with 3.1.4: the following line gives -806000 CAT_SQL_ERR
+            //with 3.2 stuck
+            m_fileFactory = m_fileSystem.getIRODSFileFactory(m_account);
+        } catch (JargonException je) {
+            rethrow(je);
+        } catch (Exception e) {
+            throw new NoSuccessException(e);
         }
     }
 
     public void disconnect() throws NoSuccessException {
         try {
             ((IRODSFileSystem)fileSystem).close();
-        } catch (IOException e) {
-            throw new NoSuccessException(e);
+        } catch (JargonException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
