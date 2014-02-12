@@ -25,7 +25,7 @@ import java.util.Date;
 * Date:   12 nov. 2007
 * ***************************************************
 * Description:                                      */
-
+@Deprecated
 public abstract class AbstractJobTest extends AbstractTest {
     protected static final String MODEL = "JSAGA";
 	
