@@ -176,12 +176,13 @@ public class CreamClient {
     
     public void renewDelegation(String delegId, String vo) throws BadParameterException, NoSuccessException, AuthenticationFailedException {
         this.registerProtocol();
+        // TODO: use directly the stub and remove class DelegationStub
         DelegationStub delegationStub = new DelegationStub(m_host, m_port, vo);
-        String m_delegProxy = delegationStub.renewDelegation(delegId, m_credential);
+        delegationStub.renewDelegation(delegId, m_credential);
         // put new delegated proxy for multiple jobs
-        if (m_delegProxy != null) {
-            delegationStub.putProxy(delegId, m_delegProxy);
-        }
+//        if (m_delegProxy != null) {
+//            delegationStub.putProxy(delegId, m_delegProxy);
+//        }
     }
 
     public void disconnect() {
