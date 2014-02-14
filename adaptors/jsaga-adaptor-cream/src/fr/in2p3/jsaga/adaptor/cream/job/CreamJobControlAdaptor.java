@@ -15,30 +15,19 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.apache.axis2.databinding.types.URI;
 import org.apache.log4j.Logger;
 import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.CommandResult;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoRequest;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobPurgeRequest;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobResumeRequest;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobResumeResponse;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobStartRequest;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobSuspendRequest;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobSuspendResponse;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.ResultChoice_type0;
 import org.glite.ce.creamapi.ws.cream2.Generic_Fault;
 import org.glite.ce.creamapi.ws.cream2.InvalidArgument_Fault;
 import org.glite.ce.creamapi.ws.cream2.JobSubmissionDisabled_Fault;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobCancelRequest;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobDescription;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobFilter;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobId;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfo;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoResult;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterRequest;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterResponse;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterResult;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.Result;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.Status;
 import org.glite.ce.creamapi.ws.cream2.OperationNotSupported_Fault;
+import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ogf.saga.error.*;
 
 import java.io.BufferedReader;
@@ -69,10 +58,8 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     private String m_batchSystem;
     private String m_queueName;
 
-//    private String m_delegProxy;
     private Boolean m_hasOutputSandboxBug = null;
     
-//    private DelegationServiceStub m_delegationServiceStub;
     private Logger m_logger = Logger.getLogger(CreamJobControlAdaptor.class);
     
     public JobMonitorAdaptor getDefaultJobMonitor() {
@@ -94,7 +81,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
 
         // renew/create delegated proxy
-        m_client.renewDelegation(m_delegationId, m_vo);
+        m_client.renewDelegation(m_delegationId, ((GlobusGSSCredentialImpl)m_credential).getX509Credential());
 
     }
 

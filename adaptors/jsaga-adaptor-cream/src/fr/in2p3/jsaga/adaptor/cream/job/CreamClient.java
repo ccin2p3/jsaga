@@ -53,7 +53,6 @@ import org.glite.ce.security.delegation.DelegationServiceStub.PutProxy;
 import org.glite.ce.security.delegation.DelegationServiceStub.RenewProxyReq;
 import org.globus.gsi.CredentialException;
 import org.globus.gsi.X509Credential;
-import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.BadParameterException;
@@ -70,7 +69,6 @@ public class CreamClient {
     private DelegationServiceStub m_delegationStub;
     protected URL m_creamUrl;
     private ProtocolSocketFactory m_socketFactory;
-    private GSSCredential m_credential;
     private String m_delegationId;
     private Logger m_logger;
 
@@ -79,7 +77,6 @@ public class CreamClient {
         m_creamStub = new CREAMStub(m_creamUrl.toString());
         m_delegationStub = new DelegationServiceStub(new URL("https", host, port, "/ce-cream/services/gridsite-delegation").toString());
         m_socketFactory = new CreamSocketFactory(cred, certs);
-        m_credential = cred;
         m_delegationId = delegId;
         m_logger = Logger.getLogger(CreamClient.class);
     }
@@ -196,14 +193,14 @@ public class CreamClient {
         return r;
     }
     
-    public void renewDelegation(String delegId, String vo) 
+    public void renewDelegation(String delegId, X509Credential globusProxy) 
             throws BadParameterException, NoSuccessException, AuthenticationFailedException {
 
         
-        if (!(m_credential instanceof GlobusGSSCredentialImpl)) {
-            throw new AuthenticationFailedException("Not a globus proxy: "+m_credential.getClass());
-        }
-        X509Credential globusProxy = ((GlobusGSSCredentialImpl)m_credential).getX509Credential();
+//        if (!(proxy instanceof GlobusGSSCredentialImpl)) {
+//            throw new AuthenticationFailedException("Not a globus proxy: "+proxy.getClass());
+//        }
+//        X509Credential globusProxy = ((GlobusGSSCredentialImpl)proxy).getX509Credential();
 
         String pkcs10 = null;
         try {

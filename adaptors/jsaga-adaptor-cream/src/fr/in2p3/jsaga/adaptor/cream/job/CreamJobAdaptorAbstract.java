@@ -49,6 +49,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     private static final String DELEGATION_ID = "delegationId";
 
     protected GSSCredential m_credential;
+    // TODO: m_vo may be useless
     protected String m_vo;
     protected File m_certRepository;
 
