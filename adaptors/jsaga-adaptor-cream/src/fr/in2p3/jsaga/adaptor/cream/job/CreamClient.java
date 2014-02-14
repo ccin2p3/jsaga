@@ -1,9 +1,20 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.SignatureException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Calendar;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.databinding.types.URI;
@@ -11,6 +22,8 @@ import org.apache.axis2.databinding.types.URI.MalformedURIException;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.log4j.Logger;
+import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.openssl.PEMReader;
 import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobCancelRequest;
@@ -32,21 +45,31 @@ import org.glite.ce.creamapi.ws.cream2.Generic_Fault;
 import org.glite.ce.creamapi.ws.cream2.InvalidArgument_Fault;
 import org.glite.ce.creamapi.ws.cream2.JobSubmissionDisabled_Fault;
 import org.glite.ce.creamapi.ws.cream2.OperationNotSupported_Fault;
+import org.glite.ce.security.delegation.DelegationException_Fault;
+import org.glite.ce.security.delegation.DelegationServiceStub;
+import org.glite.ce.security.delegation.DelegationServiceStub.GetProxyReq;
+import org.glite.ce.security.delegation.DelegationServiceStub.GetTerminationTime;
+import org.glite.ce.security.delegation.DelegationServiceStub.PutProxy;
+import org.glite.ce.security.delegation.DelegationServiceStub.RenewProxyReq;
+import org.globus.gsi.CredentialException;
+import org.globus.gsi.X509Credential;
+import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 
+import eu.emi.security.authn.x509.impl.CertificateUtils;
+import eu.emi.security.authn.x509.proxy.ProxyGenerator;
+import eu.emi.security.authn.x509.proxy.ProxyRequestOptions;
 import fr.in2p3.jsaga.adaptor.cream.CreamSocketFactory;
 
 public class CreamClient {
 
     protected CREAMStub m_creamStub;
-    // TODO: check if URL can be retrieved from Stub
+    private DelegationServiceStub m_delegationStub;
     protected URL m_creamUrl;
     private ProtocolSocketFactory m_socketFactory;
-    private int m_port;
-    private String m_host;
     private GSSCredential m_credential;
     private String m_delegationId;
     private Logger m_logger;
@@ -54,9 +77,8 @@ public class CreamClient {
     public CreamClient(String host, int port, GSSCredential cred, File certs, String delegId) throws MalformedURLException, AxisFault, AuthenticationFailedException {
         m_creamUrl = new URL("https", host, port, "/ce-cream/services/CREAM2");
         m_creamStub = new CREAMStub(m_creamUrl.toString());
+        m_delegationStub = new DelegationServiceStub(new URL("https", host, port, "/ce-cream/services/gridsite-delegation").toString());
         m_socketFactory = new CreamSocketFactory(cred, certs);
-        m_port = port;
-        m_host = host;
         m_credential = cred;
         m_delegationId = delegId;
         m_logger = Logger.getLogger(CreamClient.class);
@@ -174,26 +196,112 @@ public class CreamClient {
         return r;
     }
     
-    public void renewDelegation(String delegId, String vo) throws BadParameterException, NoSuccessException, AuthenticationFailedException {
-        this.registerProtocol();
-        // TODO: use directly the stub and remove class DelegationStub
-        DelegationStub delegationStub = new DelegationStub(m_host, m_port, vo);
-        delegationStub.renewDelegation(delegId, m_credential);
-        // put new delegated proxy for multiple jobs
-//        if (m_delegProxy != null) {
-//            delegationStub.putProxy(delegId, m_delegProxy);
-//        }
+    public void renewDelegation(String delegId, String vo) 
+            throws BadParameterException, NoSuccessException, AuthenticationFailedException {
+
+        
+        if (!(m_credential instanceof GlobusGSSCredentialImpl)) {
+            throw new AuthenticationFailedException("Not a globus proxy: "+m_credential.getClass());
+        }
+        X509Credential globusProxy = ((GlobusGSSCredentialImpl)m_credential).getX509Credential();
+
+        String pkcs10 = null;
+        try {
+            GetTerminationTime gtt = new GetTerminationTime();
+            gtt.setDelegationID(m_delegationId);
+            this.registerProtocol();
+            Calendar cal = m_delegationStub.getTerminationTime(gtt).getGetTerminationTimeReturn();
+            if (cal.before(Calendar.getInstance())) {
+                // renew delegation
+                m_logger.info("Renewing delegated proxy");
+                RenewProxyReq rpq = new RenewProxyReq();
+                rpq.setDelegationID(m_delegationId);
+                this.registerProtocol();
+                pkcs10 = m_delegationStub.renewProxyReq(rpq).getRenewProxyReqReturn();
+            }
+        } catch (Exception e) {
+            // New CreamCE sends a RemoteException when delegationId not found
+            if (e.getMessage()!=null && 
+                    (e.getMessage().contains("not found") || e.getMessage().startsWith("Failed to find delegation ID"))
+               )
+            {
+                // create a new delegation
+                try {
+                    GetProxyReq gpr = new GetProxyReq();
+                    gpr.setDelegationID(m_delegationId);
+                    m_logger.info("getProxyReq");
+                    this.registerProtocol();
+                    pkcs10 = m_delegationStub.getProxyReq(gpr).getGetProxyReqReturn();
+                } catch (RemoteException e1) {
+                    throw new AuthenticationFailedException(e);
+                } catch (DelegationException_Fault e1) {
+                    throw new AuthenticationFailedException(e);
+                }
+            } else {
+                // rethrow exception
+                throw new AuthenticationFailedException(e.getMessage(), e);
+            }
+        }
+        if (pkcs10 != null) {
+            // set delegation lifetime
+            int hours = (int) (globusProxy.getTimeLeft() / 3600) - 1;
+            if (hours < 0) {
+                throw new AuthenticationFailedException("Proxy is expired or about to expire: "+globusProxy.getIdentity());
+            }
+
+            try {
+                PrivateKey pKey = globusProxy.getPrivateKey();
+                X509Certificate[] parentChain = globusProxy.getCertificateChain();
+                
+                PEMReader pemReader = new PEMReader(new StringReader(pkcs10));
+                PKCS10CertificationRequest proxytReq = (PKCS10CertificationRequest) pemReader.readObject();
+                ProxyRequestOptions csrOpt = new ProxyRequestOptions(parentChain, proxytReq);
+                csrOpt.setLifetime(hours*3600);
+                
+                X509Certificate[] certChain = ProxyGenerator.generate(csrOpt, pKey);
+                
+                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                for (X509Certificate tmpcert : certChain) {
+                    CertificateUtils.saveCertificate(outStream, tmpcert, CertificateUtils.Encoding.PEM);
+                }
+                String delegProxy = outStream.toString();
+
+                PutProxy pp = new PutProxy();
+                pp.setDelegationID(m_delegationId);
+                pp.setProxy(delegProxy);
+                m_logger.info("sending proxy");
+                this.registerProtocol();
+                m_delegationStub.putProxy(pp);
+            } catch (InvalidKeyException e) {
+                throw new AuthenticationFailedException(e);
+            } catch (CertificateException e) {
+                throw new AuthenticationFailedException(e);
+            } catch (SignatureException e) {
+                throw new AuthenticationFailedException(e);
+            } catch (NoSuchAlgorithmException e) {
+                throw new AuthenticationFailedException(e);
+            } catch (NoSuchProviderException e) {
+                throw new AuthenticationFailedException(e);
+            } catch (IOException e) {
+                throw new AuthenticationFailedException(e);
+            } catch (DelegationException_Fault e) {
+                throw new AuthenticationFailedException(e);
+            } catch (CredentialException e) {
+                throw new AuthenticationFailedException(e);
+            }
+        }
     }
 
     public void disconnect() {
         m_creamStub = null;
+        this.m_delegationStub = null;
         m_creamUrl = null;
     }
 
     private void registerProtocol() {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        Protocol.registerProtocol("https", new Protocol("https", m_socketFactory, m_port));
-        m_logger.debug(stackTraceElements[2].getMethodName() + "() has registered protocol https on port " + m_port);
+        Protocol.registerProtocol(this.m_creamUrl.getProtocol(), new Protocol(this.m_creamUrl.getProtocol(), m_socketFactory, this.m_creamUrl.getPort()));
+        m_logger.debug(stackTraceElements[2].getMethodName() + "() has registered protocol " + this.m_creamUrl.getProtocol() + " on port " + this.m_creamUrl.getPort());
     }
     
     protected JobFilter getJobFilter(String nativeJobId) throws NoSuccessException {

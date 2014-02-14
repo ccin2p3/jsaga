@@ -63,6 +63,8 @@ import eu.emi.security.authn.x509.proxy.ProxyRequestOptions;
 /**
  *
  */
+// TODO drop this class when test_destroy has been refactored
+@Deprecated
 public class DelegationStub {
     public static final String ANY_VO = null;
 
