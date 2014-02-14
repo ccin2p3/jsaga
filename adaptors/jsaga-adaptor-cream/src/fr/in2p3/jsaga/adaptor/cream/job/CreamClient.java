@@ -48,16 +48,17 @@ public class CreamClient {
     private int m_port;
     private String m_host;
     private GSSCredential m_credential;
-
+    private String m_delegationId;
     private Logger m_logger;
 
-    public CreamClient(String host, int port, GSSCredential cred, File certs) throws MalformedURLException, AxisFault, AuthenticationFailedException {
+    public CreamClient(String host, int port, GSSCredential cred, File certs, String delegId) throws MalformedURLException, AxisFault, AuthenticationFailedException {
         m_creamUrl = new URL("https", host, port, "/ce-cream/services/CREAM2");
         m_creamStub = new CREAMStub(m_creamUrl.toString());
         m_socketFactory = new CreamSocketFactory(cred, certs);
         m_port = port;
         m_host = host;
         m_credential = cred;
+        m_delegationId = delegId;
         m_logger = Logger.getLogger(CreamClient.class);
     }
 
@@ -67,22 +68,20 @@ public class CreamClient {
     public ServiceInfo getServiceInfo() throws RemoteException, Authorization_Fault, Generic_Fault {
         this.registerProtocol();
         ServiceInfo r = m_creamStub.getServiceInfo(new ServiceInfoRequest()).getServiceInfoResponse();
-        this.unregisterProtocol();
         return r;
     }
 
-    public JobRegisterResponse jobRegister(String jobDesc, String delegId) throws RemoteException, Authorization_Fault, Generic_Fault, InvalidArgument_Fault, JobSubmissionDisabled_Fault {
+    public JobRegisterResponse jobRegister(String jobDesc) throws RemoteException, Authorization_Fault, Generic_Fault, InvalidArgument_Fault, JobSubmissionDisabled_Fault {
         // create job description
         JobDescription jd = new JobDescription();
         jd.setJDL(jobDesc);
         jd.setAutoStart(false);
-        jd.setDelegationId(delegId);
+        jd.setDelegationId(m_delegationId);
         // submit job
         JobRegisterRequest request = new JobRegisterRequest();
         request.setJobDescriptionList(new JobDescription[]{jd});
         this.registerProtocol();
         JobRegisterResponse r = m_creamStub.jobRegister(request, null);
-        this.unregisterProtocol();
         return r;
     }
 
@@ -102,15 +101,13 @@ public class CreamClient {
             }
         }
         JobFilter filter = new JobFilter();
-        // TODO: check this
-//        filter.setDelegationId(m_delegationId);
+        filter.setDelegationId(m_delegationId);
         filter.setJobId(jobIdList);
         JobInfoRequest request = new JobInfoRequest();
         request.setJobInfoRequest(filter);
         
         this.registerProtocol();
         JobInfoResult[] r = m_creamStub.jobInfo(request).getResult();
-        this.unregisterProtocol();
         return r;
         
     }
@@ -123,7 +120,6 @@ public class CreamClient {
 
         this.registerProtocol();
         Result[] r = m_creamStub.jobStart(request).getJobStartResponse().getResult();
-        this.unregisterProtocol();
         return r;
     }
     
@@ -135,7 +131,6 @@ public class CreamClient {
         
         this.registerProtocol();
         Result[] r = m_creamStub.jobCancel(request).getJobCancelResponse().getResult();
-        this.unregisterProtocol();
         return r;
     }
     
@@ -147,7 +142,6 @@ public class CreamClient {
         
         this.registerProtocol();
         Result[] r = m_creamStub.jobPurge(request).getJobPurgeResponse().getResult();
-        this.unregisterProtocol();
         return r;
     }
     
@@ -159,7 +153,6 @@ public class CreamClient {
         
         this.registerProtocol();
         Result[] r = m_creamStub.jobSuspend(request).getJobSuspendResponse().getResult();
-        this.unregisterProtocol();
         return r;
     }
     
@@ -171,7 +164,6 @@ public class CreamClient {
         
         this.registerProtocol();
         Result[] r = m_creamStub.jobResume(request).getJobResumeResponse().getResult();
-        this.unregisterProtocol();
         return r;
         
     }
@@ -179,7 +171,6 @@ public class CreamClient {
     public JobId[] jobList() throws RemoteException, Authorization_Fault, Generic_Fault {
         this.registerProtocol();
         JobId[] r = m_creamStub.jobList().getResult();
-        this.unregisterProtocol();
         return r;
     }
     
@@ -191,7 +182,6 @@ public class CreamClient {
         if (m_delegProxy != null) {
             delegationStub.putProxy(delegId, m_delegProxy);
         }
-        this.unregisterProtocol();
     }
 
     public void disconnect() {
@@ -205,12 +195,6 @@ public class CreamClient {
         m_logger.debug(stackTraceElements[2].getMethodName() + "() has registered protocol https on port " + m_port);
     }
     
-    private void unregisterProtocol() {
-        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        Protocol.unregisterProtocol("https");
-        m_logger.debug(stackTraceElements[2].getMethodName() + "() has unregistered protocol https");
-    }
-
     protected JobFilter getJobFilter(String nativeJobId) throws NoSuccessException {
         JobId jobId = new JobId();
         jobId.setId(nativeJobId);
@@ -220,8 +204,7 @@ public class CreamClient {
             throw new NoSuccessException(e);
         }
         JobFilter filter = new JobFilter();
-        // TODO check this
-//        filter.setDelegationId(m_delegationId);
+        filter.setDelegationId(m_delegationId);
         filter.setJobId(new JobId[]{jobId});
         return filter;
     }

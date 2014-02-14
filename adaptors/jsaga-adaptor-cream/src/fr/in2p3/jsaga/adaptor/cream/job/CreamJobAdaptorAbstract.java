@@ -108,7 +108,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
             }
         }
     	try {
-    	    m_client = new CreamClient(host, port, m_credential, m_certRepository);
+    	    m_client = new CreamClient(host, port, m_credential, m_certRepository, m_delegationId);
 		} catch (MalformedURLException e) {
             throw new BadParameterException(e.getMessage(), e);
 		} catch (AxisFault e) {

@@ -109,7 +109,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         m_logger.debug("Submitting job described as:\n" + jobDesc);
         JobRegisterResponse response;
 		try {
-			response = m_client.jobRegister(jobDesc, m_delegationId);
+			response = m_client.jobRegister(jobDesc);
 		} catch (Authorization_Fault e) {
 			throw new PermissionDeniedException(e);
 		} catch (Generic_Fault e) {
