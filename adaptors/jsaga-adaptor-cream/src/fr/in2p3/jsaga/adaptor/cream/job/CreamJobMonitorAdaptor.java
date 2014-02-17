@@ -113,7 +113,8 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
 
     public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException {
         try {
-            return getStatus(nativeJobId, new String[]{CreamJobStatus.DONE_OK, CreamJobStatus.DONE_FAILED, CreamJobStatus.CANCELLED})
+            return getStatus(nativeJobId, new String[]{CreamJobStatus.DONE_OK, CreamJobStatus.DONE_FAILED, 
+                                                        CreamJobStatus.CANCELLED, CreamJobStatus.ABORTED})
                     .getTimestamp()
                     .getTime();
         } catch (TimeoutException e) {
