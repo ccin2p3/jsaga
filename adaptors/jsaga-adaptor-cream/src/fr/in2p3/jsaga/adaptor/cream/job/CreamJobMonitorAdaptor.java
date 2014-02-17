@@ -5,15 +5,9 @@ import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
-import org.apache.axis2.databinding.types.URI;
-import org.apache.axis2.databinding.types.URI.MalformedURIException;
-import org.apache.commons.httpclient.protocol.Protocol;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.Command;
 import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobFilter;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobId;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfo;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoRequest;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobInfoResult;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.Status;
 import org.glite.ce.creamapi.ws.cream2.Generic_Fault;
@@ -22,7 +16,6 @@ import org.ogf.saga.error.*;
 
 import java.rmi.RemoteException;
 import java.util.Date;
-import java.util.Properties;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -37,11 +30,11 @@ import java.util.Properties;
  *
  */
 public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements QueryListJob, ListableJobAdaptor, JobInfoAdaptor {
-	
+    
     public JobStatus[] getStatusList(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
 
         JobInfo[] resultArray;
-		resultArray = getJobInfoResult(nativeJobIdArray);
+        resultArray = getJobInfoResult(nativeJobIdArray);
         // convert
         JobStatus[] jsArray = new JobStatus[resultArray.length];
         for (int i=0; resultArray!=null && i<resultArray.length; i++) {
@@ -59,7 +52,7 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
             } else {
                 jsArray[i] = new CreamJobStatus(lastStatus);
             }
-        	
+            
         }
         return jsArray;
     }
@@ -71,10 +64,10 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
         } catch (RemoteException e) {
             throw new TimeoutException(e);
         } catch (Authorization_Fault e) {
-			throw new PermissionDeniedException(e);
-		} catch (Generic_Fault e) {
-			throw new NoSuccessException(e);
-		}
+            throw new PermissionDeniedException(e);
+        } catch (Generic_Fault e) {
+            throw new NoSuccessException(e);
+        }
         if (resultArray != null) {
             String[] jobIds = new String[resultArray.length];
             for (int i=0; i<resultArray.length; i++) {
@@ -86,71 +79,71 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
         }
     }
 
-	public Integer getExitCode(String nativeJobId)	throws NotImplementedException, NoSuccessException {
+    public Integer getExitCode(String nativeJobId)    throws NotImplementedException, NoSuccessException {
         try {
-        	Status[] stat = this.getJobInfoResult(new String[]{nativeJobId})[0].getStatus();
-			return new Integer(stat[stat.length-1].getExitCode());
-		} catch (TimeoutException e) {
-			throw new NoSuccessException(e);
-		} catch (NumberFormatException nfe) {
-			// Not a number
-			return null;
-		}
-	}
+            Status[] stat = this.getJobInfoResult(new String[]{nativeJobId})[0].getStatus();
+            return new Integer(stat[stat.length-1].getExitCode());
+        } catch (TimeoutException e) {
+            throw new NoSuccessException(e);
+        } catch (NumberFormatException nfe) {
+            // Not a number
+            return null;
+        }
+    }
 
-	public Date getCreated(String nativeJobId) throws NotImplementedException,	NoSuccessException {
+    public Date getCreated(String nativeJobId) throws NotImplementedException,    NoSuccessException {
         try {
-    		return getStatus(nativeJobId, new String[]{CreamJobStatus.REGISTERED})
-    				.getTimestamp()
-    				.getTime();
-		} catch (TimeoutException e) {
-			throw new NoSuccessException(e);
-		}
-	}
+            return getStatus(nativeJobId, new String[]{CreamJobStatus.REGISTERED})
+                    .getTimestamp()
+                    .getTime();
+        } catch (TimeoutException e) {
+            throw new NoSuccessException(e);
+        }
+    }
 
-	public Date getStarted(String nativeJobId) throws NotImplementedException,	NoSuccessException {
+    public Date getStarted(String nativeJobId) throws NotImplementedException,    NoSuccessException {
         try {
-    		return getStatus(nativeJobId, new String[]{CreamJobStatus.REALLY_RUNNING})
-    				.getTimestamp()
-    				.getTime();
-		} catch (TimeoutException e) {
-			throw new NoSuccessException(e);
-		}
-	}
+            return getStatus(nativeJobId, new String[]{CreamJobStatus.REALLY_RUNNING, CreamJobStatus.PENDING})
+                    .getTimestamp()
+                    .getTime();
+        } catch (TimeoutException e) {
+            throw new NoSuccessException(e);
+        }
+    }
 
-	public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException {
+    public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException {
         try {
-    		return getStatus(nativeJobId, new String[]{CreamJobStatus.DONE_OK, CreamJobStatus.DONE_FAILED, CreamJobStatus.CANCELLED})
-    				.getTimestamp()
-    				.getTime();
-		} catch (TimeoutException e) {
-			throw new NoSuccessException(e);
-		}
-	}
+            return getStatus(nativeJobId, new String[]{CreamJobStatus.DONE_OK, CreamJobStatus.DONE_FAILED, CreamJobStatus.CANCELLED})
+                    .getTimestamp()
+                    .getTime();
+        } catch (TimeoutException e) {
+            throw new NoSuccessException(e);
+        }
+    }
 
-	public String[] getExecutionHosts(String nativeJobId) throws NotImplementedException, NoSuccessException {
+    public String[] getExecutionHosts(String nativeJobId) throws NotImplementedException, NoSuccessException {
         try {
-			return new String[]{this.getJobInfoResult(new String[]{nativeJobId})[0].getWorkerNode()};
-		} catch (TimeoutException e) {
-			throw new NoSuccessException(e);
-		}
-	}
+            return new String[]{this.getJobInfoResult(new String[]{nativeJobId})[0].getWorkerNode()};
+        } catch (TimeoutException e) {
+            throw new NoSuccessException(e);
+        }
+    }
 
-	/*-----------------*/
-	/* Private methods */
-	/*-----------------*/	
-	private CreamJobStatus getStatus(String nativeJobId, String[] requestedStatuses) throws NoSuccessException, TimeoutException {
-    	Status[] stats = this.getJobInfoResult(new String[]{nativeJobId})[0].getStatus();
-		for (Status stat: stats) {
-			for (String requestedStatus: requestedStatuses) {
-				if (stat.getName().equals(requestedStatus)) {
-					return new CreamJobStatus(stat);
-				}
-			}
-		}
-		throw new NoSuccessException("Status not available");
-	}
-	
+    /*-----------------*/
+    /* Private methods */
+    /*-----------------*/    
+    private CreamJobStatus getStatus(String nativeJobId, String[] requestedStatuses) throws NoSuccessException, TimeoutException {
+        Status[] stats = this.getJobInfoResult(new String[]{nativeJobId})[0].getStatus();
+        for (Status stat: stats) {
+            for (String requestedStatus: requestedStatuses) {
+                if (stat.getName().equals(requestedStatus)) {
+                    return new CreamJobStatus(stat);
+                }
+            }
+        }
+        throw new NoSuccessException("Status not available");
+    }
+    
     private JobInfo[] getJobInfoResult(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
         JobInfoResult[] resultArray;
         try {
@@ -158,12 +151,12 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
         } catch (RemoteException e) {
             throw new TimeoutException(e);
         } catch (Authorization_Fault e) {
-        	throw new NoSuccessException(new PermissionDeniedException(e));
-		} catch (Generic_Fault e) {
-        	throw new NoSuccessException(e);
-		} catch (InvalidArgument_Fault e) {
-        	throw new NoSuccessException(e);
-		}
+            throw new NoSuccessException(new PermissionDeniedException(e));
+        } catch (Generic_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (InvalidArgument_Fault e) {
+            throw new NoSuccessException(e);
+        }
         JobInfo[] infos = new JobInfo[resultArray.length];
         for (int i=0; resultArray!=null && i<resultArray.length; i++) {
             // extract  job info
