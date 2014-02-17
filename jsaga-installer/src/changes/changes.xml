@@ -6,6 +6,8 @@
         <release version="1.0.1">
             <action dev="lschwarz" type="fix" issue="5893">Cream: data staging with jdk7 &gt; update5</action>
             <action dev="lschwarz" type="fix" issue="6020">Cream: data staging issue on CEs with Email in the DN</action>
+            <action dev="lschwarz" type="fix">Cream: fix potential issue when submitting job concurrently (threads)</action>
+            <action dev="lschwarz" type="fix" issue="6012">Graphical Installer: missing files in /etc</action>
         </release>
         <release version="1.0.0" date="2014-01-24" description="Release based on JGlobus2">
             <action dev="lschwarz" type="add">new SSH and SFTP adaptors based on the Ganymed library. 
