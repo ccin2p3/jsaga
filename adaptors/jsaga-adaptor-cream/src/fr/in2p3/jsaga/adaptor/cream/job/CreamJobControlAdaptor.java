@@ -37,6 +37,7 @@ import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterRequest;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterResponse;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobRegisterResult;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.Result;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.Status;
 import org.glite.ce.creamapi.ws.cream2.OperationNotSupported_Fault;
 import org.ogf.saga.error.*;
 
@@ -160,9 +161,17 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         return parsedJdl.getInputStagingTransfer(jobInfo.getCREAMInputSandboxURI()+"/");
     }
     
-    public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
+    public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	StagingTransfer[] st;
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
+        // First check if the status is ABORTED because of Unauthorized Request BLAH Error, this would be useless to stage files
+        for (Status stat: jobInfo.getStatus()) {
+            if (stat.getName().equals(CreamJobStatus.ABORTED)) {
+                if (stat.getFailureReason().contains("Unauthorized Request")) {
+                    throw new PermissionDeniedException(stat.getFailureReason());
+                }
+            }
+        }
         String jdl = jobInfo.getJDL();
         StagingJDL parsedJdl = new StagingJDL(jdl);
         
