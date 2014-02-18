@@ -14,6 +14,7 @@ import org.apache.axis2.databinding.types.URI.MalformedURIException;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.log4j.Logger;
+import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobFilter;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobId;
@@ -101,31 +102,32 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
             try {
                 String dn = m_credential.getName().toString();
                 m_delegationId = "delegation-";
-               	m_delegationId += (m_vo != null)?m_vo+"-":"";
+                   m_delegationId += (m_vo != null)?m_vo+"-":"";
                 m_delegationId += Math.abs(dn.hashCode());
             } catch (GSSException e) {
                 throw new NoSuccessException(e);
             }
         }
-    	try {
-    	    m_client = new CreamClient(host, port, m_credential, m_certRepository, m_delegationId);
-		} catch (MalformedURLException e) {
+        try {
+            m_client = new CreamClient(host, port, m_credential, m_certRepository, m_delegationId);
+        } catch (MalformedURLException e) {
             throw new BadParameterException(e.getMessage(), e);
-		} catch (AxisFault e) {
+        } catch (AxisFault e) {
             throw new BadParameterException(e.getMessage(), e);
-		}
+        }
 
-    	try {
-        	ServiceInfo service_info = m_client.getServiceInfo();
-			String cream_desc = host + " (interface version=" + 
-								service_info.getInterfaceVersion() + ",service version=" + 
-								service_info.getServiceVersion() + ")";
-    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Connecting to "+cream_desc);
-    		m_creamVersion = service_info.getServiceVersion();
-		} catch (Exception e) {
-    		Logger.getLogger(CreamJobAdaptorAbstract.class).info("Could not get service version");
-		}
-        
+        try {
+            ServiceInfo service_info = m_client.getServiceInfo();
+            String cream_desc = host + " (interface version=" + 
+                                service_info.getInterfaceVersion() + ",service version=" + 
+                                service_info.getServiceVersion() + ")";
+            Logger.getLogger(CreamJobAdaptorAbstract.class).info("Connecting to "+cream_desc);
+            m_creamVersion = service_info.getServiceVersion();
+        } catch (Authorization_Fault af) {
+            throw new AuthorizationFailedException(af.getFaultMessage().getDescription());
+        } catch (Exception e) {
+            Logger.getLogger(CreamJobAdaptorAbstract.class).warn("Could not get service version");
+        }
     }
 
     public void disconnect() throws NoSuccessException {
