@@ -167,7 +167,11 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         // First check if the status is ABORTED because of Unauthorized Request BLAH Error, this would be useless to stage files
         for (Status stat: jobInfo.getStatus()) {
             if (stat.getName().equals(CreamJobStatus.ABORTED) || stat.getName().equals(CreamJobStatus.CANCELLED)) {
-                if (stat.getFailureReason() != null && stat.getFailureReason().contains("Unauthorized Request")) {
+                if (stat.getFailureReason() != null && 
+                        (stat.getFailureReason().contains("Unauthorized Request") ||
+                         stat.getFailureReason().contains("Invalid credential")
+                        )
+                   ) {
                     throw new PermissionDeniedException(stat.getFailureReason());
                 } else {
                     throw new NoSuccessException(stat.getDescription());
