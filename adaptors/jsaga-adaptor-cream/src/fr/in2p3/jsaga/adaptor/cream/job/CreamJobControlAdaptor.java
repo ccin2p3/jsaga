@@ -169,6 +169,8 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
             if (stat.getName().equals(CreamJobStatus.ABORTED)) {
                 if (stat.getFailureReason().contains("Unauthorized Request")) {
                     throw new PermissionDeniedException(stat.getFailureReason());
+                } else {
+                    throw new NoSuccessException(stat.getFailureReason());
                 }
             }
         }
