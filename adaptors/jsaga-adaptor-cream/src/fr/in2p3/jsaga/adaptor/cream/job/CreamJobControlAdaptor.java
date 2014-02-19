@@ -81,7 +81,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
 
         // renew/create delegated proxy
-        m_client.renewDelegation(m_delegationId, ((GlobusGSSCredentialImpl)m_credential).getX509Credential());
+        m_client.renewDelegation(((GlobusGSSCredentialImpl)m_credential).getX509Credential());
 
     }
 

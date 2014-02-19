@@ -14,6 +14,7 @@ import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.text.DateFormat;
 import java.util.Calendar;
 
 import org.apache.axis2.AxisFault;
@@ -54,6 +55,7 @@ import org.glite.ce.security.delegation.DelegationServiceStub.RenewProxyReq;
 import org.globus.gsi.CredentialException;
 import org.globus.gsi.X509Credential;
 import org.ietf.jgss.GSSCredential;
+import org.italiangrid.voms.util.CredentialsUtils;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
@@ -61,6 +63,7 @@ import org.ogf.saga.error.NoSuccessException;
 import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 import eu.emi.security.authn.x509.proxy.ProxyRequestOptions;
+import eu.emi.security.authn.x509.proxy.ProxyType;
 import fr.in2p3.jsaga.adaptor.cream.CreamSocketFactory;
 
 public class CreamClient {
@@ -193,14 +196,8 @@ public class CreamClient {
         return r;
     }
     
-    public void renewDelegation(String delegId, X509Credential globusProxy) 
+    public void renewDelegation(X509Credential globusProxy) 
             throws BadParameterException, NoSuccessException, AuthenticationFailedException {
-
-        
-//        if (!(proxy instanceof GlobusGSSCredentialImpl)) {
-//            throw new AuthenticationFailedException("Not a globus proxy: "+proxy.getClass());
-//        }
-//        X509Credential globusProxy = ((GlobusGSSCredentialImpl)proxy).getX509Credential();
 
         String pkcs10 = null;
         try {
@@ -208,14 +205,16 @@ public class CreamClient {
             gtt.setDelegationID(m_delegationId);
             this.registerProtocol();
             Calendar cal = m_delegationStub.getTerminationTime(gtt).getGetTerminationTimeReturn();
-            if (cal.before(Calendar.getInstance())) {
-                // renew delegation
-                m_logger.info("Renewing delegated proxy");
-                RenewProxyReq rpq = new RenewProxyReq();
-                rpq.setDelegationID(m_delegationId);
-                this.registerProtocol();
-                pkcs10 = m_delegationStub.renewProxyReq(rpq).getRenewProxyReqReturn();
+            m_logger.debug("DelegationID " + m_delegationId + " termination time is: " + DateFormat.getTimeInstance().format(cal.getTime()));
+            if (cal.after(Calendar.getInstance())) {
+                return;
             }
+            // renew delegation
+            m_logger.info("Requesting a proxy delegation renewal");
+            RenewProxyReq rpq = new RenewProxyReq();
+            rpq.setDelegationID(m_delegationId);
+            this.registerProtocol();
+            pkcs10 = m_delegationStub.renewProxyReq(rpq).getRenewProxyReqReturn();
         } catch (Exception e) {
             // New CreamCE sends a RemoteException when delegationId not found
             if (e.getMessage()!=null && 
@@ -226,7 +225,7 @@ public class CreamClient {
                 try {
                     GetProxyReq gpr = new GetProxyReq();
                     gpr.setDelegationID(m_delegationId);
-                    m_logger.info("getProxyReq");
+                    m_logger.info("Requesting a proxy delegation creation");
                     this.registerProtocol();
                     pkcs10 = m_delegationStub.getProxyReq(gpr).getGetProxyReqReturn();
                 } catch (RemoteException e1) {
@@ -239,53 +238,53 @@ public class CreamClient {
                 throw new AuthenticationFailedException(e.getMessage(), e);
             }
         }
-        if (pkcs10 != null) {
-            // set delegation lifetime
-            int hours = (int) (globusProxy.getTimeLeft() / 3600) - 1;
-            if (hours < 0) {
-                throw new AuthenticationFailedException("Proxy is expired or about to expire: "+globusProxy.getIdentity());
-            }
+        // set delegation lifetime
+        int hours = (int) (globusProxy.getTimeLeft() / 3600) - 1;
+        if (hours < 0) {
+            throw new AuthenticationFailedException("Proxy is expired or about to expire: "+globusProxy.getIdentity());
+        }
 
-            try {
-                PrivateKey pKey = globusProxy.getPrivateKey();
-                X509Certificate[] parentChain = globusProxy.getCertificateChain();
-                
-                PEMReader pemReader = new PEMReader(new StringReader(pkcs10));
-                PKCS10CertificationRequest proxytReq = (PKCS10CertificationRequest) pemReader.readObject();
-                ProxyRequestOptions csrOpt = new ProxyRequestOptions(parentChain, proxytReq);
-                csrOpt.setLifetime(hours*3600);
-                
-                X509Certificate[] certChain = ProxyGenerator.generate(csrOpt, pKey);
-                
-                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-                for (X509Certificate tmpcert : certChain) {
-                    CertificateUtils.saveCertificate(outStream, tmpcert, CertificateUtils.Encoding.PEM);
-                }
-                String delegProxy = outStream.toString();
-
-                PutProxy pp = new PutProxy();
-                pp.setDelegationID(m_delegationId);
-                pp.setProxy(delegProxy);
-                m_logger.info("sending proxy");
-                this.registerProtocol();
-                m_delegationStub.putProxy(pp);
-            } catch (InvalidKeyException e) {
-                throw new AuthenticationFailedException(e);
-            } catch (CertificateException e) {
-                throw new AuthenticationFailedException(e);
-            } catch (SignatureException e) {
-                throw new AuthenticationFailedException(e);
-            } catch (NoSuchAlgorithmException e) {
-                throw new AuthenticationFailedException(e);
-            } catch (NoSuchProviderException e) {
-                throw new AuthenticationFailedException(e);
-            } catch (IOException e) {
-                throw new AuthenticationFailedException(e);
-            } catch (DelegationException_Fault e) {
-                throw new AuthenticationFailedException(e);
-            } catch (CredentialException e) {
-                throw new AuthenticationFailedException(e);
+        try {
+            PrivateKey pKey = globusProxy.getPrivateKey();
+            X509Certificate[] parentChain = globusProxy.getCertificateChain();
+            
+            PEMReader pemReader = new PEMReader(new StringReader(pkcs10));
+            PKCS10CertificationRequest proxytReq = (PKCS10CertificationRequest) pemReader.readObject();
+            pemReader.close();
+            ProxyRequestOptions csrOpt = new ProxyRequestOptions(parentChain, proxytReq);
+            csrOpt.setLifetime(hours*3600);
+            
+            X509Certificate[] certChain = ProxyGenerator.generate(csrOpt, pKey);
+            
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            for (X509Certificate tmpcert : certChain) {
+                CertificateUtils.saveCertificate(outStream, tmpcert, CertificateUtils.Encoding.PEM);
             }
+            
+            String delegProxy = outStream.toString();
+
+            PutProxy pp = new PutProxy();
+            pp.setDelegationID(m_delegationId);
+            pp.setProxy(delegProxy);
+            m_logger.debug("Sending the proxy to delegationID= " + m_delegationId);
+            this.registerProtocol();
+            m_delegationStub.putProxy(pp);
+        } catch (InvalidKeyException e) {
+            throw new AuthenticationFailedException(e);
+        } catch (CertificateException e) {
+            throw new AuthenticationFailedException(e);
+        } catch (SignatureException e) {
+            throw new AuthenticationFailedException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new AuthenticationFailedException(e);
+        } catch (NoSuchProviderException e) {
+            throw new AuthenticationFailedException(e);
+        } catch (IOException e) {
+            throw new AuthenticationFailedException(e);
+        } catch (DelegationException_Fault e) {
+            throw new AuthenticationFailedException(e);
+        } catch (CredentialException e) {
+            throw new AuthenticationFailedException(e);
         }
     }
 
