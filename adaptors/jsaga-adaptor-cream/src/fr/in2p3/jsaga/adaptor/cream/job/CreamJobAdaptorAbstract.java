@@ -126,7 +126,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
         } catch (Authorization_Fault af) {
             throw new AuthorizationFailedException(af.getFaultMessage().getDescription());
         } catch (Exception e) {
-            Logger.getLogger(CreamJobAdaptorAbstract.class).warn("Could not get service version");
+            Logger.getLogger(CreamJobAdaptorAbstract.class).warn("Could not get service version: " + e.getMessage());
         }
     }
 
