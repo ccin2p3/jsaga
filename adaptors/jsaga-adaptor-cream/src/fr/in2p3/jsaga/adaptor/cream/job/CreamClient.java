@@ -55,7 +55,6 @@ import org.glite.ce.security.delegation.DelegationServiceStub.RenewProxyReq;
 import org.globus.gsi.CredentialException;
 import org.globus.gsi.X509Credential;
 import org.ietf.jgss.GSSCredential;
-import org.italiangrid.voms.util.CredentialsUtils;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
@@ -63,7 +62,6 @@ import org.ogf.saga.error.NoSuccessException;
 import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 import eu.emi.security.authn.x509.proxy.ProxyRequestOptions;
-import eu.emi.security.authn.x509.proxy.ProxyType;
 import fr.in2p3.jsaga.adaptor.cream.CreamSocketFactory;
 
 public class CreamClient {
