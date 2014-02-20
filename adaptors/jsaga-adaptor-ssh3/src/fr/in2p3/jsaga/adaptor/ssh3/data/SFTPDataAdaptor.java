@@ -276,6 +276,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			for (;;) {
 			    // TODO check if we should write read(buffer, 0, READ_BUFFER_LEN) ...
 //			    m_logger.debug("[putToStream] reading " + buffer.length);
+			    // FIXME: increasing this buffer size leads to data corruption...
 				int rsz = stream.read(buffer, 0, 512);
 				if (rsz < 0)
 					break;
