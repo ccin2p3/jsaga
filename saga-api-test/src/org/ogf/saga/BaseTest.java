@@ -41,7 +41,7 @@ public abstract class BaseTest extends Assert {
 
     private Properties m_properties;
     private long startTime;
-    private Logger logger = Logger.getLogger(this.getClass());
+    protected Logger logger = Logger.getLogger(this.getClass());
 
     public BaseTest() throws Exception {
         // set configuration files to use
