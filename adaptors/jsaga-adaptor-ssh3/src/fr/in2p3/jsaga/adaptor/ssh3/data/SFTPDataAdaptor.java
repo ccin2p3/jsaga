@@ -20,6 +20,8 @@ import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
 import fr.in2p3.jsaga.adaptor.ssh3.SSHAdaptorAbstract;
 import fr.in2p3.jsaga.helpers.EntryPath;
+
+import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
 
 import java.io.File;
@@ -43,6 +45,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 	protected static final String FILENAME_ENCODING = "FilenameEncoding";
 	protected String m_charset = null;
 	public final static String TYPE = "sftp";
+	private Logger m_logger = Logger.getLogger(SFTPDataAdaptor.class);
 	
 	public String getType() {
 		return TYPE;
@@ -98,17 +101,25 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 //			throw new NoSuccessException(ioe);
 //		}
 	    SFTPv3Client sftp = null;
-	    SFTPInputStream is = null;
+//	    SFTPInputStream is = null;
 		try {
 			sftp = new SFTPv3Client(m_conn);
 			SFTPv3FileHandle f = sftp.openFileRO(absolutePath);
 			byte[] buffer = new byte[SSHAdaptorAbstract.READ_BUFFER_LEN];
 			int len = 0;
-			is = new SFTPInputStream(f);
-			while ((len=is.read(buffer, 0, READ_BUFFER_LEN)) > 0) {
-				stream.write(buffer, 0, len);
-			}
-			is.close();
+		    long readOffset = 0;
+//			is = new SFTPInputStream(f);
+			int index=1;
+//			while ((len=is.read(buffer, 0, READ_BUFFER_LEN)) > 0) {
+//			    m_logger.debug("[get " + index++ + "] read " + len + " now writing");
+//				stream.write(buffer, 0, len);
+//			}
+            while ((len=sftp.read(f, readOffset, buffer, 0, READ_BUFFER_LEN)) > 0) {
+                m_logger.debug("[get " + index++ + "] read " + len + " now writing");
+                readOffset += len;
+                stream.write(buffer, 0, len);
+            }
+//			is.close();
 			stream.flush();
 			sftp.closeFile(f);
 			sftp.close();
@@ -124,11 +135,11 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		} catch (IOException ioe) {
 			throw new NoSuccessException(ioe);
 		} finally {
-		    if (is != null)
-                try {
-                    is.close();
-                } catch (IOException e) {
-                }
+//		    if (is != null)
+//                try {
+//                    is.close();
+//                } catch (IOException e) {
+//                }
             if (sftp!=null) sftp.close();
 		}
 		
@@ -261,11 +272,16 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			throw new NoSuccessException(e);
 		}
 		try {
+		    int index=1;
 			for (;;) {
-				int rsz = stream.read(buffer, 0, buffer.length);
+			    // TODO check if we should write read(buffer, 0, READ_BUFFER_LEN) ...
+//			    m_logger.debug("[putToStream] reading " + buffer.length);
+				int rsz = stream.read(buffer, 0, 512);
 				if (rsz < 0)
 					break;
+                m_logger.debug("[put " + index++ + "] read " + rsz +" now writing at offset " + offset);
 				sftp.write(f, offset, buffer, 0, rsz);
+				
 				// shift offset
 				offset += rsz;
 			}
