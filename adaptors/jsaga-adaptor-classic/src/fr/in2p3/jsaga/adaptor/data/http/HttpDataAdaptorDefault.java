@@ -5,6 +5,9 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.helpers.URLEncoder;
 
+import org.apache.commons.codec.EncoderException;
+import org.apache.commons.codec.binary.Base64;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 
 import java.io.*;
@@ -75,7 +78,12 @@ public class HttpDataAdaptorDefault extends HttpDataAdaptorAbstract implements F
         } catch(IOException e) {
             throw new NoSuccessException(e);
         }
-
+        if (this.m_userID != null) {
+            cnx.setRequestProperty("Authorization", "Basic " + 
+                        new Base64().encodeAsString(
+                                new String(m_userID + ":" + this.m_userPass).getBytes()));
+        }
+        
         // check status
         String status = cnx.getHeaderField(null);
         if (status == null) {
@@ -87,6 +95,9 @@ public class HttpDataAdaptorDefault extends HttpDataAdaptorAbstract implements F
             cnx.disconnect();
             throw new DoesNotExistException(status);
         } else if (status.endsWith("403 Forbidden")) {
+            cnx.disconnect();
+            throw new PermissionDeniedException(status);
+        } else if (status.endsWith("401 Authorization Required")) {
             cnx.disconnect();
             throw new PermissionDeniedException(status);
         } else {

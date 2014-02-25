@@ -35,8 +35,13 @@ execution management technologies (fork).</description>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.8</version>
+            <version>1.2.16</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.6</version>
         </dependency>
     </dependencies>
 </project>
