@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.ssh3.data;
 
 import ch.ethz.ssh2.SFTPException;
-import ch.ethz.ssh2.SFTPInputStream;
+import ch.ethz.ssh2.SFTPOutputStream;
 import ch.ethz.ssh2.SFTPv3Client;
 import ch.ethz.ssh2.SFTPv3DirectoryEntry;
 import ch.ethz.ssh2.SFTPv3FileAttributes;
@@ -274,18 +274,15 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		try {
 		    int index=1;
 			for (;;) {
-			    // TODO check if we should write read(buffer, 0, READ_BUFFER_LEN) ...
-//			    m_logger.debug("[putToStream] reading " + buffer.length);
-			    // FIXME: increasing this buffer size leads to data corruption...
-				int rsz = stream.read(buffer, 0, 512);
+				int rsz = stream.read(buffer, 0, READ_BUFFER_LEN);
 				if (rsz < 0)
 					break;
                 m_logger.debug("[put " + index++ + "] read " + rsz +" now writing at offset " + offset);
 				sftp.write(f, offset, buffer, 0, rsz);
-				
 				// shift offset
 				offset += rsz;
 			}
+			sftp.closeFile(f);
 		} catch (IOException ex) {
 			throw new NoSuccessException(ex);
 		}
