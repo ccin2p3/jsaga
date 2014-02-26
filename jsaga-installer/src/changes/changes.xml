@@ -3,6 +3,10 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
+        <release version="1.0.2">
+            <action dev="lschwarz" type="fix" issue="6270">Cream: really fix: remaining axis2-tmp* after job finished 
+            (fix was not included in 1.0.1)</action>
+        </release>
         <release version="1.0.1" date="2014-02-26" description="Fixes for SFTP, HTTP and CREAM adaptors">
             <action dev="lschwarz" type="fix" issue="6229">SFTP: data corruption when writing to SFTP</action>
             <action dev="lschwarz" type="fix" issue="5893">Cream: data staging with jdk7 &gt; update5</action>
