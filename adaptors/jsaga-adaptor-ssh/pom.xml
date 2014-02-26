@@ -2,7 +2,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jsaga-adaptor-ssh</artifactId>
@@ -26,7 +26,7 @@ execution management technology (SSH). CAUTION: THIS ADAPTOR IS DEPRECATED</desc
         <dependency><!-- for data staging (scope runtime) and for class LocalJobProcess (scope compile) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-classic</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.1</version>
            <scope>compile</scope>
         </dependency>
 		<dependency>
