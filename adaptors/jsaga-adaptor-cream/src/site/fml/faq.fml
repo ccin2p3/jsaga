@@ -23,9 +23,14 @@ Where:
     <PORT> is 8443 by default,
     <SCHEDULER> is the scheduler available on targeted site: pbs, lsf, sge, bqs...
     <QUEUE> is the name of the job queue (e.g. short, long, a_vo_name... this queue will override any queue specified via SAGA)
-    <DELEGATION> is the identifier of your delegated proxy (optional).
+    <DELEGATION> is the identifier of your delegated proxy (optional). If not provided, JSAGA will create the identifier as "delegation-<yourVO>-<md5(yourDN)>"
 ]]></pre>
             </answer>
+        </faq>
+        <faq id="RFC-proxy">
+            <question>My job fails with error <pre>Cannot upload file://... into gsiftp://.../cream_sandbox/...</pre></question>
+            <answer>If your delegated proxy is of type "rfc3820" (the default if you have created a VOMS proxy with JSAGA), 
+            it might be possible that the remote site does not support RFC proxies. Try with a proxy of type "old".</answer>
         </faq>
         <faq id="identity_reading_failed">
             <question>It fails with this error message:
