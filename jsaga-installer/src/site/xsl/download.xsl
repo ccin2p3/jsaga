@@ -84,6 +84,11 @@
                         </li>
                     </ul>
                 </subsection>
+                <subsection name="Other releases">
+                    <ul>
+                        <li><a href="http://maven.in2p3.fr/fr/in2p3/jsaga/jsaga-installer/1.0.0">1.0.0</a> CAUTION: this release has serious bug in SFTP and CREAM adaptors</li>
+                    </ul>
+                </subsection>
                 <subsection name="Previous Releases (CAUTION: none of these are supported yet)">
                     <p>Previous releases of JSAGA can be downloaded from the <a href="http://grid.in2p3.fr/maven2/fr/in2p3/jsaga/jsaga-installer/">archives</a>.</p>
                 </subsection>
