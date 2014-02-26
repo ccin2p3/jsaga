@@ -3,7 +3,7 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
-        <release version="1.0.1">
+        <release version="1.0.1" date="2014-02-26" description="Fixes for SFTP, HTTP and CREAM adaptors">
             <action dev="lschwarz" type="fix" issue="6229">SFTP: data corruption when writing to SFTP</action>
             <action dev="lschwarz" type="fix" issue="5893">Cream: data staging with jdk7 &gt; update5</action>
             <action dev="lschwarz" type="fix" issue="6020">Cream: data staging issue on CEs with Email in the DN</action>
