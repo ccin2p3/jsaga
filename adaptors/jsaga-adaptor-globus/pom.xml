@@ -48,10 +48,6 @@ execution management technologies (Gatekeeper).</description>
             <id>maatg-releases</id>
             <url>http://nexus.maatg.fr/content/repositories/maatg-fr-releases</url>
         </repository>
-        <repository>
-            <id>maatg-snapshots</id>
-            <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
-        </repository>
     </repositories>
     <dependencies>
         <dependency>

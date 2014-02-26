@@ -24,14 +24,6 @@
             <id>maatg-releases</id>
             <url>http://nexus.maatg.fr/content/repositories/maatg-fr-releases</url>
         </repository>
-        <repository>
-            <id>maatg-fr-snapshots</id>
-            <name>maatG France Snapshots</name>
-            <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
     </repositories>
     <dependencies>
         <dependency><!-- for security context (WARNING: order of dependencies matters) -->

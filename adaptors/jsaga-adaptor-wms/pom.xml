@@ -99,10 +99,6 @@
             <url>http://nexus.maatg.fr/content/repositories/maatg-fr-releases</url>
         </repository>
         <repository>
-            <id>maatg-snapshots</id>
-            <url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
-        </repository>
-        <repository>
             <id>emi-infn-repo</id>
             <url>http://ci-01.cnaf.infn.it:8081/nexus/content/repositories/releases</url>
         </repository>
