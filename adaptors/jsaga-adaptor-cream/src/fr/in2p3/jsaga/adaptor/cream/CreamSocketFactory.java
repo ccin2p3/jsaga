@@ -33,6 +33,16 @@ import eu.emi.security.authn.x509.impl.PEMCredential;
 import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
 import fr.in2p3.jsaga.adaptor.cream.job.CreamClient;
 
+/* ***************************************************
+* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+* ***             http://cc.in2p3.fr/             ***
+* ***************************************************
+* File:   CreamSocketFactory
+* Author: lionel.schwarz@in2p3.fr
+* Date:   25 feb 2014
+* ***************************************************
+* Description:                                      */
+
 public class CreamSocketFactory implements SecureProtocolSocketFactory {
 
     private X509Credential m_credential;

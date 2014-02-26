@@ -18,6 +18,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.databinding.types.URI;
 import org.apache.axis2.databinding.types.URI.MalformedURIException;
 import org.apache.commons.httpclient.protocol.Protocol;
@@ -62,7 +63,18 @@ import org.ogf.saga.error.NoSuccessException;
 import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 import eu.emi.security.authn.x509.proxy.ProxyRequestOptions;
+import fr.in2p3.jsaga.adaptor.cream.CreamConfigurationContext;
 import fr.in2p3.jsaga.adaptor.cream.CreamSocketFactory;
+
+/* ***************************************************
+* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+* ***             http://cc.in2p3.fr/             ***
+* ***************************************************
+* File:   CreamClient
+* Author: lionel.schwarz@in2p3.fr
+* Date:   25 feb 2014
+* ***************************************************
+* Description:                                      */
 
 public class CreamClient {
 
@@ -74,9 +86,10 @@ public class CreamClient {
     private Logger m_logger;
 
     public CreamClient(String host, int port, GSSCredential cred, File certs, String delegId) throws MalformedURLException, AxisFault, AuthenticationFailedException {
+        ConfigurationContext cc = CreamConfigurationContext.getInstance();
         m_creamUrl = new URL("https", host, port, "/ce-cream/services/CREAM2");
-        m_creamStub = new CREAMStub(m_creamUrl.toString());
-        m_delegationStub = new DelegationServiceStub(new URL("https", host, port, "/ce-cream/services/gridsite-delegation").toString());
+        m_creamStub = new CREAMStub(cc, m_creamUrl.toString());
+        m_delegationStub = new DelegationServiceStub(cc, new URL("https", host, port, "/ce-cream/services/gridsite-delegation").toString());
         m_socketFactory = new CreamSocketFactory(cred, certs);
         m_delegationId = delegId;
         m_logger = Logger.getLogger(CreamClient.class);
@@ -287,7 +300,17 @@ public class CreamClient {
     }
 
     public void disconnect() {
+//        try {
+//            m_creamStub._getServiceClient().cleanup();
+//        } catch (AxisFault e) {
+//            m_logger.warn("Could not clean Stub", e);
+//        }
         m_creamStub = null;
+//        try {
+//            m_delegationStub.cleanup();
+//        } catch (AxisFault e) {
+//            m_logger.warn("Could not clean Stub", e);
+//        }
         this.m_delegationStub = null;
         m_creamUrl = null;
     }
