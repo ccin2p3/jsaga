@@ -1,7 +1,5 @@
 package fr.in2p3.jsaga.impl.namespace;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.ogf.saga.error.BadParameterException;
@@ -20,6 +18,7 @@ import org.ogf.saga.namespace.Flags;
  *
  */
 public class FlagsHelperTest {
+    
     @Test
     public void test_checkAllowed() {
         int flags = Flags.TRUNCATE.or(Flags.READ.or(Flags.EXCL));

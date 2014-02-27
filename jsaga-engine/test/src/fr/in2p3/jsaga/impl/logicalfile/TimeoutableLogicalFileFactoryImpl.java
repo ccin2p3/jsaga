@@ -1,7 +1,9 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
-import org.ogf.saga.AbstractTest;
+
+import org.junit.Test;
+import org.ogf.saga.AbstractTest_JUNIT4;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.session.Session;
@@ -21,7 +23,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableLogicalFileFactoryImpl extends AbstractTest {
+public class TimeoutableLogicalFileFactoryImpl extends AbstractTest_JUNIT4 {
     private static final String m_urlDir = "waitforever-logical://host/directory/?hangatconnect";
     private static final String m_urlFile = "waitforever-logical://host/directory/file?hangatconnect";
 
@@ -29,6 +31,7 @@ public class TimeoutableLogicalFileFactoryImpl extends AbstractTest {
         super();
     }
 
+    @Test
     public void test_createLogicalFile() throws Exception {
         Session emptySession = SessionFactory.createSession(false);
         URL url = URLFactory.createURL(m_urlFile);
@@ -40,6 +43,7 @@ public class TimeoutableLogicalFileFactoryImpl extends AbstractTest {
         }
     }
 
+    @Test
     public void test_createLogicalDirectory() throws Exception {
         Session emptySession = SessionFactory.createSession(false);
         URL url = URLFactory.createURL(m_urlDir);

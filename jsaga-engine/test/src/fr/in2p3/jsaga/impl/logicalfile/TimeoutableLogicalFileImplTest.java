@@ -1,7 +1,11 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
-import org.ogf.saga.AbstractTest;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.ogf.saga.AbstractTest_JUNIT4;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
@@ -23,7 +27,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableLogicalFileImplTest extends AbstractTest {
+public class TimeoutableLogicalFileImplTest extends AbstractTest_JUNIT4 {
     private static final String m_url = "waitforever-logical://host/directory/file";
     private LogicalFile m_file;
 
@@ -31,16 +35,19 @@ public class TimeoutableLogicalFileImplTest extends AbstractTest {
         super();
     }
 
+    @Before
     public void setUp() throws Exception {
         Session emptySession = SessionFactory.createSession(false);
         URL url = URLFactory.createURL(m_url);
         m_file = LogicalFileFactory.createLogicalFile(emptySession, url, Flags.NONE.getValue());
     }
 
+    @After
     public void tearDown() throws Exception {
         m_file.close();
     }
 
+    @Test
     public void test_addLocation() throws Exception {
         try {
             m_file.addLocation(URLFactory.createURL(m_url));
@@ -50,6 +57,7 @@ public class TimeoutableLogicalFileImplTest extends AbstractTest {
         }
     }
 
+    @Test
     public void test_removeLocation() throws Exception {
         try {
             m_file.removeLocation(URLFactory.createURL(m_url));
@@ -59,6 +67,7 @@ public class TimeoutableLogicalFileImplTest extends AbstractTest {
         }
     }
 
+    @Test
     public void test_updateLocation() throws Exception {
         try {
             m_file.updateLocation(URLFactory.createURL(m_url), URLFactory.createURL(m_url+"new"));
@@ -68,6 +77,7 @@ public class TimeoutableLogicalFileImplTest extends AbstractTest {
         }
     }
 
+    @Test
     public void test_listLocations() throws Exception {
         try {
             m_file.listLocations();
@@ -77,6 +87,7 @@ public class TimeoutableLogicalFileImplTest extends AbstractTest {
         }
     }
 
+    @Test
     public void test_replicate() throws Exception {
         try {
             m_file.replicate(URLFactory.createURL(m_url));

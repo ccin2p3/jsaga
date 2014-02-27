@@ -1,9 +1,6 @@
 package fr.in2p3.jsaga.impl.namespace;
 
-import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
-
 import org.junit.Test;
-import org.ogf.saga.AbstractTest;
 import org.ogf.saga.AbstractTest_JUNIT4;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.namespace.Flags;
