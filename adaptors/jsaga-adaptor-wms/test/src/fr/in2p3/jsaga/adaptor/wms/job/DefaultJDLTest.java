@@ -1,9 +1,10 @@
 package fr.in2p3.jsaga.adaptor.wms.job;
 
-import junit.framework.TestCase;
 
 import java.io.InputStream;
 import java.util.Properties;
+
+import org.junit.Test;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,7 +18,8 @@ import java.util.Properties;
 /**
  *
  */
-public class DefaultJDLTest extends TestCase {
+public class DefaultJDLTest {
+    @Test
     public void test_parse() throws Exception {
         InputStream jdl = DefaultJDLTest.class.getClassLoader().getResourceAsStream("etc/glite_wms.conf");
         Properties prop = new Properties();
