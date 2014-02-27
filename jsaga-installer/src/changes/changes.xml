@@ -3,6 +3,10 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
+        <release version="1.1.0">
+            <action dev="lschwarz" type="remove">Old SSH adaptor (urls like "DEPRECATED-SSH") has been removed</action>
+            <action dev="lschwarz" type="update">Upgrade tests to JUnit4</action>
+        </release>
         <release version="1.0.2">
             <action dev="lschwarz" type="fix" issue="6270">Cream: really fix: remaining axis2-tmp* after job finished 
             (fix was not included in 1.0.1)</action>
