@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
-import org.ogf.saga.job.abstracts.AbstractJobTest;
 import org.ogf.saga.job.abstracts.Attribute;
 import org.ogf.saga.job.base.JobBaseTest;
 import org.ogf.saga.task.State;

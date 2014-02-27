@@ -9,7 +9,6 @@ import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.job.JobService;
 import org.ogf.saga.job.StartJob;
-import org.ogf.saga.job.abstracts.AbstractJobTest;
 import org.ogf.saga.job.base.JobBaseTest;
 import org.ogf.saga.task.*;
 
