@@ -5,7 +5,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.ogf.saga.job.JobRunWithPrequisiteTest;
+import org.ogf.saga.job.Job;
+import org.ogf.saga.job.JobDescription;
+import org.ogf.saga.job.abstracts.Attribute;
 import org.ogf.saga.job.description.DescriptionTest;
 import org.ogf.saga.job.run.InteractiveTest;
 import org.ogf.saga.job.run.MinimalTest;
@@ -13,6 +15,7 @@ import org.ogf.saga.job.run.OptionalTest;
 import org.ogf.saga.job.run.RequiredTest;
 import org.ogf.saga.job.run.RequirementsTest;
 import org.ogf.saga.job.run.SandboxTest;
+import org.ogf.saga.task.State;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -35,7 +38,6 @@ import org.ogf.saga.job.run.SandboxTest;
     GlobusExecutionTestSuite.GlobusJobRunDescriptionTest.class,
     GlobusExecutionTestSuite.GlobusJobRunSandboxTest.class,
     GlobusExecutionTestSuite.GlobusJobRunInteractiveTest.class,
-    GlobusExecutionTestSuite.GlobusJobRunWithPrequisiteTest.class
     })
 public class GlobusExecutionTestSuiteForWindows {
 
@@ -97,14 +99,32 @@ public class GlobusExecutionTestSuiteForWindows {
         public GlobusJobRunDescriptionTest() throws Exception {super(TYPE);}
         @Test @Override @Ignore("Unexpected error: The job manager failed to open stdout")
         public void test_run_inWorkingDirectory() { } 
-    }
+
+        @Test
+        public void test_run_MPI() throws Exception {
+            
+            // prepare a job start a mpi binary
+            Attribute[] attributes = new Attribute[3];
+            attributes[0] = new Attribute(JobDescription.SPMDVARIATION, "MPI");
+            attributes[1] = new Attribute(JobDescription.NUMBEROFPROCESSES, "2");
+            attributes[2] = new Attribute(JobDescription.PROCESSESPERHOST, "2");
+            JobDescription desc =  createJob("helloMpi", attributes, null);
+            
+            // submit
+            Job job = runJob(desc);
+            
+            // wait for the end
+            job.waitFor();  
+            
+            // check job status
+            assertEquals(
+                    State.DONE,
+                    job.getState());       
+        }
+}
 
     public static class GlobusJobRunInteractiveTest extends InteractiveTest {
         public GlobusJobRunInteractiveTest() throws Exception {super(TYPE);}
     }
 
-    // TODO: upgrade this to JUnit4
-    public static class GlobusJobRunWithPrequisiteTest extends JobRunWithPrequisiteTest {
-        public GlobusJobRunWithPrequisiteTest() throws Exception {super(TYPE);}
-    }
 }
