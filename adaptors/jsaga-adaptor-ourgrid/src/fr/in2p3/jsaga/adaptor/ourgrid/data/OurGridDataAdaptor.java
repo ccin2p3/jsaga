@@ -315,4 +315,8 @@ FileReaderGetter, FileWriterPutter{
 
 	}
 
+    public int getBufferSize() {
+        return 0;
+    }
+
 }

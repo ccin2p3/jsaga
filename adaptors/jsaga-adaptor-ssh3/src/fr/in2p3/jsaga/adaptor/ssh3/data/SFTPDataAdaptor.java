@@ -105,7 +105,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		try {
 			sftp = new SFTPv3Client(m_conn);
 			SFTPv3FileHandle f = sftp.openFileRO(absolutePath);
-			byte[] buffer = new byte[SSHAdaptorAbstract.READ_BUFFER_LEN];
+			byte[] buffer = new byte[SSHAdaptorAbstract.IO_BUFFER_LEN];
 			int len = 0;
 		    long readOffset = 0;
 //			is = new SFTPInputStream(f);
@@ -114,7 +114,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 //			    m_logger.debug("[get " + index++ + "] read " + len + " now writing");
 //				stream.write(buffer, 0, len);
 //			}
-            while ((len=sftp.read(f, readOffset, buffer, 0, READ_BUFFER_LEN)) > 0) {
+            while ((len=sftp.read(f, readOffset, buffer, 0, IO_BUFFER_LEN)) > 0) {
                 m_logger.debug("[get " + index++ + "] read " + len + " now writing");
                 readOffset += len;
                 stream.write(buffer, 0, len);
@@ -237,7 +237,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 	public void putFromStream(String absolutePath, boolean append, String additionalArgs, InputStream stream) 
 			throws PermissionDeniedException, BadParameterException, AlreadyExistsException, 
 			ParentDoesNotExist, TimeoutException, NoSuccessException {
-		byte[] buffer = new byte[SSHAdaptorAbstract.READ_BUFFER_LEN];
+		byte[] buffer = new byte[SSHAdaptorAbstract.IO_BUFFER_LEN];
 		long offset = 0;
 		SFTPv3Client sftp = null;
 		SFTPv3FileHandle f;
@@ -274,7 +274,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		try {
 		    int index=1;
 			for (;;) {
-				int rsz = stream.read(buffer, 0, READ_BUFFER_LEN);
+				int rsz = stream.read(buffer, 0, IO_BUFFER_LEN);
 				if (rsz < 0)
 					break;
                 m_logger.debug("[put " + index++ + "] read " + rsz +" now writing at offset " + offset);
@@ -423,4 +423,8 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			if (sftp != null) sftp.close();
 		}
 	}
+
+    public int getBufferSize() {
+        return IO_BUFFER_LEN;
+    }
 }

@@ -191,5 +191,9 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
 			throw new NoSuccessException(e);
 		}
 	}
+	
+    public int getBufferSize() {
+        return 0;
+    }
 
 }

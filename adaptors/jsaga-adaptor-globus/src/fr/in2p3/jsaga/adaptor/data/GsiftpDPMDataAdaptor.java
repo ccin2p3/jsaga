@@ -141,4 +141,8 @@ public class GsiftpDPMDataAdaptor implements DataCopy, DataRename, FileReaderGet
     public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         m_adaptor.removeDir(parentAbsolutePath, directoryName, additionalArgs);
     }
+
+    public int getBufferSize() {
+        return 0;
+    }
 }

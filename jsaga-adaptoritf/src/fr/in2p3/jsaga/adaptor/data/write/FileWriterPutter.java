@@ -30,4 +30,11 @@ public interface FileWriterPutter extends FileWriter {
      */
     public void putFromStream(String absolutePath, boolean append, String additionalArgs, InputStream stream)
         throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException;
+    
+    /**
+     * Defines the buffer size in bytes for the PipedInputStream pipe
+     * @see java.io.PipedInputStream
+     * @return the pipe size used for the PipedInputStream (return 0 if you do not know what all this means)
+     */
+    public int getBufferSize();
 }

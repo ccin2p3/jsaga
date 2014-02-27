@@ -53,7 +53,7 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 	
 	protected static final String COMPRESSION_LEVEL = "CompressionLevel";
 	protected static final String KNOWN_HOSTS = "KnownHosts";
-	protected final static int READ_BUFFER_LEN = 32768;
+	protected final static int IO_BUFFER_LEN = 32768; // max number of bytes to write to SFTP outputstream
 	protected static Map sessionMap = new HashMap();
 	protected SecurityCredential credential;
 	private int compression_level = 0;
