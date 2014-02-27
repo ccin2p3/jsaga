@@ -18,10 +18,10 @@ import org.ogf.saga.namespace.abstracts.AbstractData;
 /**
  *
  */
-public abstract class PermTest extends AbstractData {
-    private static Logger s_logger = Logger.getLogger(PermTest.class);
+public abstract class PermissionsTest extends AbstractData {
+    private static Logger s_logger = Logger.getLogger(PermissionsTest.class);
 
-    public PermTest(String protocol) throws Exception {
+    public PermissionsTest(String protocol) throws Exception {
         super(protocol);
     }
 

@@ -6,7 +6,7 @@ import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.LinkTest;
 import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.namespace.NSFactory;
-import org.ogf.saga.permissions.PermTest;
+import org.ogf.saga.permissions.PermissionsTest;
 import org.ogf.saga.url.URL;
 
 import fr.in2p3.jsaga.adaptor.data.LinuxDataAdaptor;
@@ -45,7 +45,7 @@ public class LinuxIntegrationTestSuite {
         }
     }
     
-    public static class LinuxPermissionsTest extends PermTest {
+    public static class LinuxPermissionsTest extends PermissionsTest {
         public LinuxPermissionsTest() throws Exception {super("linux");    }
 
         @Test

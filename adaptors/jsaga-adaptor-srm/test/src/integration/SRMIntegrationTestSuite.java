@@ -9,7 +9,7 @@ import org.ogf.saga.error.AlreadyExistsException;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
-import org.ogf.saga.permissions.PermTest;
+import org.ogf.saga.permissions.PermissionsTest;
 import org.ogf.saga.url.URL;
 
 /* ***************************************************
@@ -92,7 +92,7 @@ public class SRMIntegrationTestSuite {
     public static class SRMEmulatorDataMovementTest extends DataMovementTest {
         public SRMEmulatorDataMovementTest() throws Exception {super(TYPE, "test");}
     }
-    public static class SRMPermissionsTest extends PermTest {
+    public static class SRMPermissionsTest extends PermissionsTest {
         public SRMPermissionsTest() throws Exception {super(TYPE);}
     }
 }

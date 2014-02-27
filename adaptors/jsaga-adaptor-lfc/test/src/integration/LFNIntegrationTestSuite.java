@@ -14,7 +14,7 @@ import org.ogf.saga.namespace.DataMovementTest;
 import org.ogf.saga.namespace.EntryTest;
 import org.ogf.saga.namespace.LinkTest;
 import org.ogf.saga.namespace.SetUpTest;
-import org.ogf.saga.permissions.PermTest;
+import org.ogf.saga.permissions.PermissionsTest;
 
 
 /**
@@ -97,7 +97,7 @@ public class LFNIntegrationTestSuite {
         public LFN_to_EmulatorDataMovementTest() throws Exception {super("lfn", "test");}
     }
     
-    public static class LFNPermissionsTest extends PermTest {
+    public static class LFNPermissionsTest extends PermissionsTest {
         public LFNPermissionsTest() throws Exception {super("lfn");}
     }
 }
