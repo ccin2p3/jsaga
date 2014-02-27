@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.bes.job;
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.ogf.saga.AbstractTest_JUNIT4;
 import org.ogf.saga.error.NoSuccessException;
@@ -23,7 +24,7 @@ import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceTyp
 /**
  *
  */
-public class BesJobAdaptorTest extends AbstractTest_JUNIT4 {
+public class BesJobAdaptorTest {
 	
 	public BesJobAdaptorTest() throws Exception {
 		super();
@@ -58,7 +59,7 @@ public class BesJobAdaptorTest extends AbstractTest_JUNIT4 {
 
 	@Test
     public void test_getScheme() {
-        assertEquals(
+        Assert.assertEquals(
                 "bes",
                 new BesJobControlAdaptor().getType());
     }
@@ -71,16 +72,16 @@ public class BesJobAdaptorTest extends AbstractTest_JUNIT4 {
     	BesJob job = new BesJob();
     	job.setActivityId(epr, true);
 		File xmlJob = job.getXmlJob();
-		assertTrue(xmlJob.exists());
+		Assert.assertTrue(xmlJob.exists());
 		
 		// deserialization of the result
 		BesJob job_deserialized = new BesJob();
 		job_deserialized.setNativeId(job.getNativeId());
 		EndpointReferenceType epr_deserialized = job_deserialized.getActivityIdentifier();
-		assertEquals(epr, epr_deserialized);
+		Assert.assertEquals(epr, epr_deserialized);
 
 		// clean and check that file is removed
 		xmlJob.delete();
-		assertFalse(xmlJob.exists());
+		Assert.assertFalse(xmlJob.exists());
     }
 }
