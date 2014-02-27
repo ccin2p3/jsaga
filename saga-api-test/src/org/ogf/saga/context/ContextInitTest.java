@@ -1,7 +1,7 @@
 package org.ogf.saga.context;
 
 import org.junit.Test;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 
@@ -20,7 +20,7 @@ import java.awt.*;
 /**
  *
  */
-public abstract class ContextInitTest extends AbstractTest_JUNIT4 {
+public abstract class ContextInitTest extends JSAGABaseTest {
     private String m_contextId;
     private boolean m_hasUserPass;
 

@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.impl.file;
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
 
 import org.junit.Test;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.namespace.Flags;
@@ -24,7 +24,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableFileFactoryImplTest extends AbstractTest_JUNIT4 {
+public class TimeoutableFileFactoryImplTest extends JSAGABaseTest {
     private static final String m_urlDir = "waitforever://host/directory/?hangatconnect";
     private static final String m_urlFile = "waitforever://host/directory/file?hangatconnect";
 

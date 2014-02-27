@@ -4,7 +4,7 @@ import fr.in2p3.jsaga.impl.context.ContextImpl;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
 

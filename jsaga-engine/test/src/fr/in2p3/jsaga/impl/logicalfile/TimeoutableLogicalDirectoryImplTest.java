@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.logicalfile.LogicalDirectory;
@@ -28,7 +28,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableLogicalDirectoryImplTest extends AbstractTest_JUNIT4 {
+public class TimeoutableLogicalDirectoryImplTest extends JSAGABaseTest {
     private static final String m_url = "waitforever-logical://host/directory/";
     private static Logger s_logger = Logger.getLogger(TimeoutableLogicalDirectoryImplTest.class);
     private LogicalDirectory m_directory;

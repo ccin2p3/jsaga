@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.job.run.MinimalTest;
 import org.ogf.saga.job.run.OptionalTest;
@@ -42,7 +42,7 @@ import fr.in2p3.jsaga.impl.session.SessionImpl;
 })
 public class BesTestSuite {
 
-    public static class BesConnectionTest extends AbstractTest_JUNIT4 {
+    public static class BesConnectionTest extends JSAGABaseTest {
         public BesConnectionTest() throws Exception {super();}
    
         @Test

@@ -3,17 +3,13 @@ package integration;
 import fr.in2p3.jsaga.adaptor.cream.CreamSocketFactory;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.ogf.saga.AbstractTest;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 import java.io.File;
-import java.util.Date;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -27,7 +23,7 @@ import java.util.Date;
 /**
  *
  */
-public abstract class CreamAbstractTest extends AbstractTest_JUNIT4 {
+public abstract class CreamAbstractTest extends JSAGABaseTest {
     protected URL m_url;
     protected String m_delegationId;
 

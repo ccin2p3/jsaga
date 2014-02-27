@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.impl.job;
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
 
 import org.junit.Test;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
@@ -23,7 +23,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableJobFactoryImplTest extends AbstractTest_JUNIT4 {
+public class TimeoutableJobFactoryImplTest extends JSAGABaseTest {
     private static final String m_url = "waitforever://host";
 
     public TimeoutableJobFactoryImplTest() throws Exception {

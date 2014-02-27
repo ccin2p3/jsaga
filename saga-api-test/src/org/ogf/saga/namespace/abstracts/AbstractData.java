@@ -2,7 +2,7 @@ package org.ogf.saga.namespace.abstracts;
 
 import org.junit.After;
 import org.junit.Before;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.DoesNotExistException;
@@ -31,7 +31,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public abstract class AbstractData extends AbstractTest_JUNIT4 {
+public abstract class AbstractData extends JSAGABaseTest {
     // test data
     protected static final String DEFAULT_DIRNAME = "dir/";
     protected static final String DEFAULT_SUBDIRNAME = "subdir/";

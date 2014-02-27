@@ -1,7 +1,7 @@
 package org.ogf.saga.job;
 
 import org.junit.Test;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
@@ -22,7 +22,7 @@ import java.util.List;
 /**
  *
  */
-public abstract class ListTest extends AbstractTest_JUNIT4 {
+public abstract class ListTest extends JSAGABaseTest {
     protected Session m_session;
     protected URL m_url;
 

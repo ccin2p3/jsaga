@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.file.Directory;
@@ -28,7 +28,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableDirectoryImplTest extends AbstractTest_JUNIT4 {
+public class TimeoutableDirectoryImplTest extends JSAGABaseTest {
     private static final String m_urlRoot = "waitforever://host/directory/";
     private static final String m_urlDir = m_urlRoot+"?hangatconnect";
     private static final String m_urlFile = m_urlRoot+"file?hangatconnect";

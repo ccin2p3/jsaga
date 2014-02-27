@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.engine.session;
 
 import org.junit.Test;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 
 import java.net.URL;
 
@@ -17,7 +17,7 @@ import java.net.URL;
 /**
  *
  */
-public class SessionConfigurationMergeTest extends AbstractTest_JUNIT4 {
+public class SessionConfigurationMergeTest extends JSAGABaseTest {
     private static final String CONFIG = "/home/user-default-contexts.xml";
 
     public SessionConfigurationMergeTest() throws Exception {

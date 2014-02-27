@@ -1,7 +1,7 @@
 package org.ogf.saga.context;
 
 import org.junit.Test;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
 /**
  *
  */
-public abstract class ContextDestroyTest extends AbstractTest_JUNIT4 {
+public abstract class ContextDestroyTest extends JSAGABaseTest {
     private String m_contextId;
 
     protected ContextDestroyTest(String contextId) throws Exception {

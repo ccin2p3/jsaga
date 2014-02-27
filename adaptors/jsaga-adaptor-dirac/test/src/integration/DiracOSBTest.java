@@ -1,7 +1,7 @@
 package integration;
 
 import org.junit.Test;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.file.File;
@@ -13,7 +13,7 @@ import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
-public class DiracOSBTest extends AbstractTest_JUNIT4 {
+public class DiracOSBTest extends JSAGABaseTest {
 
     protected Session m_session;
     protected NSEntry m_file;

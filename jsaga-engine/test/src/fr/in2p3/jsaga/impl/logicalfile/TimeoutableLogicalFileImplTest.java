@@ -5,7 +5,7 @@ import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
@@ -27,7 +27,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableLogicalFileImplTest extends AbstractTest_JUNIT4 {
+public class TimeoutableLogicalFileImplTest extends JSAGABaseTest {
     private static final String m_url = "waitforever-logical://host/directory/file";
     private LogicalFile m_file;
 

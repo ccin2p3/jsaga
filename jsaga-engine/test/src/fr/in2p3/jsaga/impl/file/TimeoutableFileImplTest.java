@@ -5,7 +5,7 @@ import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.ogf.saga.AbstractTest_JUNIT4;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.file.File;
@@ -28,7 +28,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableFileImplTest extends AbstractTest_JUNIT4 {
+public class TimeoutableFileImplTest extends JSAGABaseTest {
     private static final String m_url = "waitforever://host/directory/file";
     private File m_readfile, m_writefile;
 
