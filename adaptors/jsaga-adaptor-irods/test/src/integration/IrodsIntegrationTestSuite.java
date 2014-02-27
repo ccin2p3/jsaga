@@ -1,8 +1,17 @@
 package integration;
 
-import junit.framework.Test;
-import org.ogf.saga.file.*;
-import org.ogf.saga.namespace.*;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+import org.ogf.saga.file.DirTest;
+import org.ogf.saga.file.MakeDirTest;
+import org.ogf.saga.file.ReadTest;
+import org.ogf.saga.file.WriteTest;
+import org.ogf.saga.namespace.DataCleanUp;
+import org.ogf.saga.namespace.DataMovementTest;
+import org.ogf.saga.namespace.EntryTest;
+import org.ogf.saga.namespace.SetUpTest;
+
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -16,39 +25,41 @@ import org.ogf.saga.namespace.*;
 /**
  *
  */
-public class IrodsIntegrationTestSuite extends JSAGATestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new IrodsIntegrationTestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(IrodsIntegrationTestSuite.class);}}
+@RunWith(Suite.class)
+@SuiteClasses({
+    IrodsIntegrationTestSuite.IrodsNSEntryTest.class,
+    IrodsIntegrationTestSuite.IrodsDirectoryMakeTest.class,
+    IrodsIntegrationTestSuite.IrodsDirectoryTest.class,
+    IrodsIntegrationTestSuite.IrodsFileReadTest.class,
+    IrodsIntegrationTestSuite.IrodsFileWriteTest.class,
+    IrodsIntegrationTestSuite.Irods_to_EmulatorDataMovementTest.class,
+    })
+public class IrodsIntegrationTestSuite {
 
+    public static class IrodsCleanUp extends DataCleanUp {
+        public IrodsCleanUp() throws Exception {super("irods");}
+    }
+    public static class IrodsSetUpTest extends SetUpTest {
+        public IrodsSetUpTest() throws Exception {super("irods");}
+    }
     // test IRODS as a protocol for physical entries
-    public static class IrodsNSEntryTest extends NSEntryTest {
+    public static class IrodsNSEntryTest extends EntryTest {
         public IrodsNSEntryTest() throws Exception {super("irods");}
     }
-	public static class IrodsDirectoryListTest extends DirectoryListTest {
-        public IrodsDirectoryListTest() throws Exception {super("irods");}
-    }
-    public static class IrodsDirectoryMakeTest extends DirectoryMakeTest {
+    public static class IrodsDirectoryMakeTest extends MakeDirTest {
         public IrodsDirectoryMakeTest() throws Exception {super("irods");}
     }
-    public static class IrodsDirectoryTest extends DirectoryTest {
+    public static class IrodsDirectoryTest extends DirTest {
         public IrodsDirectoryTest() throws Exception {super("irods");}
     }
-    public static class IrodsFileReadTest extends FileReadTest {
+    public static class IrodsFileReadTest extends ReadTest {
         public IrodsFileReadTest() throws Exception {super("irods");}
     }
-    public static class IrodsFileWriteTest extends FileWriteTest {
+    public static class IrodsFileWriteTest extends WriteTest {
         public IrodsFileWriteTest() throws Exception {super("irods");}
     }
-    public static class Irods_to_EmulatorNSCopyTest extends NSCopyTest {
-        public Irods_to_EmulatorNSCopyTest() throws Exception {super("irods", "test");}
-    }
-    public static class Irods_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public Irods_to_EmulatorNSCopyRecursiveTest() throws Exception {super("irods", "test");}
-    }
-    public static class Irods_to_EmulatorNSMoveTest extends NSMoveTest {
-        public Irods_to_EmulatorNSMoveTest() throws Exception {super("irods", "test");}
+    public static class Irods_to_EmulatorDataMovementTest extends DataMovementTest {
+        public Irods_to_EmulatorDataMovementTest() throws Exception {super("irods", "test");}
     }
 
 /*
