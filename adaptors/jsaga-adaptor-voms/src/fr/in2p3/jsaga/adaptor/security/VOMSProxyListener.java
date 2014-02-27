@@ -12,14 +12,12 @@ import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.italiangrid.voms.ac.VOMSValidationResult;
 import org.italiangrid.voms.clients.impl.InitListenerAdapter;
-import org.italiangrid.voms.clients.impl.ProxyCreationListener;
 import org.italiangrid.voms.request.VOMSACRequest;
 import org.italiangrid.voms.request.VOMSErrorMessage;
 import org.italiangrid.voms.request.VOMSResponse;
 import org.italiangrid.voms.request.VOMSServerInfo;
 import org.italiangrid.voms.request.VOMSWarningMessage;
 import org.italiangrid.voms.store.LSCInfo;
-
 import eu.emi.security.authn.x509.ValidationError;
 import eu.emi.security.authn.x509.proxy.ProxyCertificate;
 
@@ -37,6 +35,11 @@ public class VOMSProxyListener implements InitListenerAdapter {
 
     private GlobusGSSCredentialImpl m_proxy = null;
     private static final Logger logger = Logger.getLogger(VOMSProxyListener.class);
+    private String m_exceptionMessage = null;
+    
+    public String getError() {
+        return m_exceptionMessage;
+    }
     
     public void proxyCreated(String proxyPath, ProxyCertificate proxy, List<String> warnings) {
         try {
@@ -60,10 +63,15 @@ public class VOMSProxyListener implements InitListenerAdapter {
 
     public void notifyErrorsInVOMSReponse(VOMSACRequest request, VOMSServerInfo si, VOMSErrorMessage[] errors) {
         logger.error("Errors In VOMS Reponse : \n\t- req:" + Arrays.toString(request.getRequestedFQANs().toArray()) + "\n\t- si: " + si + "\n\t- errors: " + Arrays.toString(errors));
+        this.m_exceptionMessage = errors[0].toString();
     }
 
     public void notifyVOMSRequestFailure(VOMSACRequest request, VOMSServerInfo endpoint, Throwable error) {
-        logger.error("Errors In VOMS Reponse : \n\t- req:" + Arrays.toString(request.getRequestedFQANs().toArray()) + "\n\t- endpoint: " + endpoint + "\n\t- errors: " + error);
+        logger.error("VOMS Request failure : \n\t- req:" + Arrays.toString(request.getRequestedFQANs().toArray()) + "\n\t- endpoint: " + endpoint + "\n\t- errors: " + error);
+        // in case of server unreachable: keep exception for future usage
+        if (error instanceof org.italiangrid.voms.request.VOMSProtocolError) {
+            m_exceptionMessage = error.getMessage();
+        }
     }
 
     public void notifyVOMSRequestStart(VOMSACRequest request, VOMSServerInfo si) {
@@ -97,6 +105,9 @@ public class VOMSProxyListener implements InitListenerAdapter {
 
     public void notifyLoadCredentialFailure(Throwable error, String... locations) {
         logger.error("Could not load credential : \n\t -locations: " + Arrays.toString(locations) + "\n\t -error: " + error);
+        if (error instanceof java.io.IOException) {
+            this.m_exceptionMessage = error.getMessage();
+        }
     }
 
     public void notifyLoadCredentialSuccess(String... locations) {

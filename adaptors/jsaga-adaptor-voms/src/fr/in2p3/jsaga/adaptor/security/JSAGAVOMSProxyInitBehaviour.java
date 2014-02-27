@@ -175,8 +175,13 @@ public class JSAGAVOMSProxyInitBehaviour implements ProxyInitStrategy {
         init(params);
         
         X509Credential cred = lookupCredential(params);
-        if (cred == null)
-            throw new VOMSError("No credentials found!");
+        if (cred == null) {
+            if (((VOMSProxyListener)this.requestListener).getError() != null) {
+                throw new VOMSError(((VOMSProxyListener)this.requestListener).getError());
+            } else {
+                throw new VOMSError("No credentials found!");
+            }
+        }
 
         if (params.validateUserCredential())    
             validateUserCredential(params, cred);
@@ -537,7 +542,9 @@ public class JSAGAVOMSProxyInitBehaviour implements ProxyInitStrategy {
             VOMSACService acService = builder.build();
             
             AttributeCertificate ac = acService.getVOMSAttributeCertificate(cred, request);
-
+            if (((VOMSProxyListener)requestListener).getError() != null) {
+                throw new VOMSError(((VOMSProxyListener)requestListener).getError());
+            }
             if (ac != null)
                 acs.add(ac);
         }
