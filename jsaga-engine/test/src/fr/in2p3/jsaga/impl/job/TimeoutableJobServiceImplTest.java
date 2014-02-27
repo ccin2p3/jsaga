@@ -1,7 +1,11 @@
 package fr.in2p3.jsaga.impl.job;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
-import org.ogf.saga.AbstractTest;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.ogf.saga.AbstractTest_JUNIT4;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
@@ -21,7 +25,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableJobServiceImplTest extends AbstractTest {
+public class TimeoutableJobServiceImplTest extends AbstractTest_JUNIT4 {
     private static final String m_url = "waitforever://host";
     private JobService m_service;
 
@@ -29,16 +33,19 @@ public class TimeoutableJobServiceImplTest extends AbstractTest {
         super();
     }
 
+    @Before
     public void setUp() throws Exception {
         Session emptySession = SessionFactory.createSession(false);
         URL url = URLFactory.createURL(m_url);
         m_service = JobFactory.createJobService(emptySession, url);
     }
 
+    @After
     public void tearDown() {
         // do nothing
     }
 
+    @Test
     public void test_createJob() throws Exception {
         // can not hang...
         JobDescription description = JobFactory.createJobDescription();
@@ -46,6 +53,7 @@ public class TimeoutableJobServiceImplTest extends AbstractTest {
         m_service.createJob(description);
     }
 
+    @Test
     public void test_runJob() throws Exception {
         try {
             m_service.runJob("hangatconnect");
@@ -55,6 +63,7 @@ public class TimeoutableJobServiceImplTest extends AbstractTest {
         }
     }
 
+    @Test
     public void test_list() throws Exception {
         try {
             m_service.list();
@@ -64,6 +73,7 @@ public class TimeoutableJobServiceImplTest extends AbstractTest {
         }
     }
 
+    @Test
     public void test_getJob() throws Exception {
         // can not hang...
         m_service.getJob("myjobid");

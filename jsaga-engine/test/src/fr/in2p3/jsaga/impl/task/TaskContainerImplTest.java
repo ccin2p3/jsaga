@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.task;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 import org.ogf.saga.task.*;
 
 /* ***************************************************
@@ -15,7 +16,9 @@ import org.ogf.saga.task.*;
 /**
  *
  */
-public class TaskContainerImplTest extends TestCase {
+public class TaskContainerImplTest extends Assert {
+    
+    @Test
     public void test_sync() throws Exception {
         TaskContainer container = new TaskContainerImpl(null);
         Task<?,?> task1 = new AsyncTest().getHello(TaskMode.SYNC, "test1");
@@ -25,6 +28,7 @@ public class TaskContainerImplTest extends TestCase {
                 task1.getResult());
     }
 
+    @Test
     public void test_async() throws Exception {
         TaskContainer container = new TaskContainerImpl(null);
         container.add(new AsyncTest().getHello(TaskMode.TASK, "test1"));
@@ -35,6 +39,7 @@ public class TaskContainerImplTest extends TestCase {
                 task1.getResult());
     }
 
+    @Test
     public void test_notified_task() throws Exception {
         TaskContainer container = new TaskContainerImpl(null);
         container.add(new TaskForTesting(true));
@@ -45,6 +50,7 @@ public class TaskContainerImplTest extends TestCase {
                 task1.getResult());
     }
 
+    @Test
     public void test_unnotified_task() throws Exception {
         TaskContainer container = new TaskContainerImpl(null);
         container.add(new TaskForTesting(false));

@@ -33,7 +33,7 @@ public class AsyncTest extends AbstractSagaObjectImpl implements SagaObject, Asy
         };
     }
     // For JUnit4
-    @Test
-    public void test_void() throws Exception {
-    }
+//    @Test
+//    public void test_void() throws Exception {
+//    }
 }

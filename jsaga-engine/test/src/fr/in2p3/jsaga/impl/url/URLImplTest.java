@@ -1,15 +1,15 @@
 package fr.in2p3.jsaga.impl.url;
 
-import junit.framework.TestCase;
-
-import org.ogf.saga.AbstractTest;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 import fr.in2p3.jsaga.EngineProperties;
-import fr.in2p3.jsaga.adaptor.data.WaitForEverFileAttributes;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 
@@ -25,33 +25,29 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 /**
  *
  */
-public class URLImplTest extends AbstractTest {
+public class URLImplTest extends Assert {
 
-	protected String _uri;
-	protected String _user;
-	protected String _host;
-	protected String _port;
-	protected String _abs_path;
-	protected String _file;
-	protected String _rel_path;
-	protected String _path_not_encoded;
-	protected String _path_encoded;
-	protected String _query;
-	protected String _fragment;
-	protected String _non_normalized_path;
-	protected String _url_simple;
-	protected String _url_relative;
-	protected String _url_directory;
-	protected String _url_space;
-	protected String _url_non_normalized;
-	protected String _url_rel_non_normalized;
+	protected static String _uri;
+	protected static String _user;
+	protected static String _host;
+	protected static String _port;
+	protected static String _abs_path;
+	protected static String _file;
+	protected static String _rel_path;
+	protected static String _path_not_encoded;
+	protected static String _path_encoded;
+	protected static String _query;
+	protected static String _fragment;
+	protected static String _non_normalized_path;
+	protected static String _url_simple;
+	protected static String _url_relative;
+	protected static String _url_directory;
+	protected static String _url_space;
+	protected static String _url_non_normalized;
+	protected static String _url_rel_non_normalized;
 	
-	public URLImplTest() throws Exception {
-		super();
-	}
-
-	public void setUp() throws Exception {
-    	super.setUp();
+	@BeforeClass
+	public static void setUp() throws Exception {
     	init();
     	_url_simple = _uri+_user+_host+_port+_abs_path+_file+_query+_fragment; 	//"uri://userinfo@host.domain:1234/path?query=value#fragment"
     	_url_relative = _rel_path+_file+_query+_fragment; 						//"path?query=value#fragment"
@@ -62,7 +58,7 @@ public class URLImplTest extends AbstractTest {
     	_url_rel_non_normalized = _rel_path+_non_normalized_path+_file;
     }
     
-    protected void init() {
+    protected static void init() {
     	 _uri = "uri://";
     	 _user = "userinfo@";
     	 _host = "host.domain";
@@ -78,6 +74,7 @@ public class URLImplTest extends AbstractTest {
     	 _non_normalized_path = "/dummy/.././";
     }
 
+    @Test
     public void test_remove() throws Exception {
         URL url;
 
@@ -126,6 +123,7 @@ public class URLImplTest extends AbstractTest {
         assertEquals(_uri+_user+_host+_port+_abs_path+_file+_query, url.getString());
     }
 
+    @Test
     public void test_replace() throws Exception {
         URL url;
 
@@ -192,6 +190,7 @@ public class URLImplTest extends AbstractTest {
         
     }
 
+    @Test
     public void test_relative() throws Exception {
     	URL url;
     	url = URLFactory.createURL(_abs_path);
@@ -221,11 +220,13 @@ public class URLImplTest extends AbstractTest {
     	
     }
     
+    @Test
     public void test_getString() throws Exception {
         URL url = URLFactory.createURL(_url_space);
         assertEquals(_url_space, url.getString());
     }
 
+    @Test
     public void test_getEscaped() throws Exception {
         URL url = URLFactory.createURL(_url_space);
         assertEquals(_uri+_host+_port+_path_encoded, url.getEscaped());
@@ -235,6 +236,7 @@ public class URLImplTest extends AbstractTest {
         assertEquals(_uri+_user+_host+_port+_path_encoded+_query+_fragment, url.getEscaped());
     }
     
+    @Test
     public void test_translate() throws Exception {
     	URL url = URLFactory.createURL(_url_simple);
     	URL translated = url.translate("NEW");
@@ -246,6 +248,7 @@ public class URLImplTest extends AbstractTest {
         }
     }
     
+    @Test
     public void test_isabsolute() throws Exception {
     	URL url = URLFactory.createURL(_url_simple);
     	assertTrue(url.isAbsolute());
@@ -253,6 +256,7 @@ public class URLImplTest extends AbstractTest {
     	assertFalse(url.isAbsolute());
     }
     
+    @Test
     public void test_normalize() throws Exception {
     	URL url = URLFactory.createURL(_url_non_normalized);
     	URL normalized = url.normalize();
@@ -270,6 +274,7 @@ public class URLImplTest extends AbstractTest {
     	assertEquals(_abs_path+_file+"#fragment", normalized.getString());
     }
     
+    @Test
     public void test_resolve() throws Exception {
     	URL url, newURL;
     	URL resolved;
@@ -329,6 +334,7 @@ public class URLImplTest extends AbstractTest {
     	}
     }
     
+    @Test
     public void test_helpers() throws Exception {
     	URL baseUrl;
     	URL relativeUrl;
@@ -348,6 +354,7 @@ public class URLImplTest extends AbstractTest {
     	assertEquals(_uri+_user+_host+_port+_abs_path, url.getString());
     }
 
+    @Test
     public void test_redondantslashes()  throws Exception {
         URL url;
 
@@ -366,6 +373,7 @@ public class URLImplTest extends AbstractTest {
         assertEquals(_abs_path+_file, url.getPath());
     }
     
+    @Test
     public void test_cache() throws Exception {
     	AbstractURLImpl url;
     	url = new RelativeURLImpl(new URLAttributes(_url_relative));

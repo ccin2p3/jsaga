@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.impl.url;
 
+import org.junit.Ignore;
+import org.junit.Test;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
@@ -18,12 +20,8 @@ import org.ogf.saga.url.URLFactory;
  */
 public class URLImplFileTest extends URLImplTest {
     
-	public URLImplFileTest() throws Exception {
-		super();
-	}
-
-	protected void init() {
-    	super.init();
+	protected static void init() {
+    	URLImplTest.init();
 	   	 _uri = "file:";
 		 _user = "";
 		 _host = "";
@@ -35,10 +33,11 @@ public class URLImplFileTest extends URLImplTest {
     	 _fragment = "";
      }
 
+	@Test @Override @Ignore("to skip")
     public void test_redondantslashes()  throws Exception {
-        super.ignore("To skip");
     }
-    
+
+	@Test
     public void test_path() throws Exception {
         URL url;
         
@@ -51,6 +50,7 @@ public class URLImplFileTest extends URLImplTest {
     
     }
 
+	@Test
     public void test_isabsolute() throws Exception {
     	URL url = URLFactory.createURL(_url_simple);
     	assertTrue(url.isAbsolute());
