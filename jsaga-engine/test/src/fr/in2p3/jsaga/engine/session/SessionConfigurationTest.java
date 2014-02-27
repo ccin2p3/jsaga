@@ -4,6 +4,11 @@ import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.session.SessionImpl;
 import junit.framework.TestCase;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.matchers.JUnitMatchers;
+import org.junit.rules.ExpectedException;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
@@ -26,21 +31,23 @@ import java.util.Arrays;
 /**
  *
  */
-public class SessionConfigurationTest extends TestCase {
+public class SessionConfigurationTest {
     private static final String CONFIG_SUCCESS = "/config/jsaga-default-contexts-success.xml";
     private static final String CONFIG_FAILURE = "/config/jsaga-default-contexts-failure.xml";
     private static final String CONFIG_SCHEMES = "/config/jsaga-default-contexts-schemes.xml";
     
+    @Test
     public void test_dumpXML() throws Exception {
         URL configUrl = SessionConfigurationTest.class.getResource(CONFIG_SUCCESS);
         SessionConfiguration config = new SessionConfiguration(configUrl);
         String expected = getResourceAsString("/config/expected.xml");
         //TODO: remove this workaround when castor will be replaced with JAXB
         expected = expected.replaceAll("\\r\\n", "\n");
-        assertTrue(configUrl != null);
-        assertEquals(expected, config.toXML());
+        Assert.assertTrue(configUrl != null);
+        Assert.assertEquals(expected, config.toXML());
     }
 
+    @Test
     public void test_dumpSession() throws Exception {
         Session session = createConfiguredSession(CONFIG_SUCCESS);
         for (Context context : session.listContexts()) {
@@ -54,44 +61,35 @@ public class SessionConfigurationTest extends TestCase {
             }
         }
     }
+    
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
+    @Test
     public void test_failure() throws Exception {
-        try {
-            createConfiguredSession(CONFIG_FAILURE);
-            fail("Expected exception: "+NoSuccessException.class);
-        } catch (NoSuccessException e) {
-            if (e.getMessage()!=null && e.getMessage().contains("conflicts with")) {
-                // test successful
-            } else {
-                throw e;
-            }
-        }
+        thrown.expect(NoSuccessException.class);
+        thrown.expectMessage("conflicts with");
+        createConfiguredSession(CONFIG_FAILURE);
     }
 
+    @Test
     public void test_success() throws Exception {
-        try {
-            createConfiguredSession(CONFIG_SUCCESS);
-            // test successful
-        } catch (NoSuccessException e) {
-            if (e.getMessage()!=null && e.getMessage().contains("conflicts with")) {
-                fail("Unexpected exception: "+e.getMessage());
-            } else {
-                throw e;
-            }
-        }
+        createConfiguredSession(CONFIG_SUCCESS);
     }
 
+    @Test
     public void test_findContext() throws Exception {
         SessionImpl session = (SessionImpl) createConfiguredSession(CONFIG_SUCCESS);
-        assertEquals("DGrid", findPrefixByUrl(session, "gridftp://cclcgvmli07.in2p3.fr/pnfs/dteam/myfile.txt"));
-        assertEquals("DGrid", findPrefixByUrl(session, "gsiftp://myhost.mydomain.de/tmp"));
-        assertEquals("DGrid", findPrefixByUrl(session, "gsiftp://myhost.fzk.de:6666/tmp"));
-        assertEquals("EGEE-dteam", findPrefixByUrl(session, "gsiftp://myhost.fzk.de/tmp"));
-        assertEquals("EGEE-dteam", findPrefixByUrl(session, "EGEE-dteam-srm://ccsrm.in2p3.fr/pnfs/dteam"));
-        assertEquals("EGEE-myvo", findPrefixByUrl(session, "srm://ccsrm.in2p3.fr/pnfs/dteam"));
-        assertEquals(null, findPrefixByUrl(session, "gridftp://cclcgvmli07.in2p3.fr/tmp"));
+        Assert.assertEquals("DGrid", findPrefixByUrl(session, "gridftp://cclcgvmli07.in2p3.fr/pnfs/dteam/myfile.txt"));
+        Assert.assertEquals("DGrid", findPrefixByUrl(session, "gsiftp://myhost.mydomain.de/tmp"));
+        Assert.assertEquals("DGrid", findPrefixByUrl(session, "gsiftp://myhost.fzk.de:6666/tmp"));
+        Assert.assertEquals("EGEE-dteam", findPrefixByUrl(session, "gsiftp://myhost.fzk.de/tmp"));
+        Assert.assertEquals("EGEE-dteam", findPrefixByUrl(session, "EGEE-dteam-srm://ccsrm.in2p3.fr/pnfs/dteam"));
+        Assert.assertEquals("EGEE-myvo", findPrefixByUrl(session, "srm://ccsrm.in2p3.fr/pnfs/dteam"));
+        Assert.assertEquals(null, findPrefixByUrl(session, "gridftp://cclcgvmli07.in2p3.fr/tmp"));
     }
     
+    @Test
     public void test_checkAttributes() throws Exception {
     	String[] expectedKeys = new String[]{ContextImpl.BASE_URL_EXCLUDES,
     			ContextImpl.BASE_URL_INCLUDES,
@@ -104,29 +102,29 @@ public class SessionConfigurationTest extends TestCase {
         
         // Check we have 1 context only
         Context[] ctxs = session.listContexts();
-        assertEquals(1, ctxs.length);
+        Assert.assertEquals(1, ctxs.length);
         Context context = ctxs[0];
         // Check keys
         Arrays.sort(expectedKeys);
         String[] _listAttributes = context.listAttributes();
         Arrays.sort(_listAttributes);
-    	this.assertEquals(Arrays.toString(expectedKeys), Arrays.toString(_listAttributes));
+        Assert.assertArrayEquals(expectedKeys, _listAttributes);
     	// Check values
         for (String key : context.listAttributes()) {
             if (key.equals(ContextImpl.BASE_URL_EXCLUDES)) {
-                assertEquals(Arrays.toString(new String[]{}), Arrays.toString(context.getVectorAttribute(key)));
+                Assert.assertArrayEquals(new String[]{}, context.getVectorAttribute(key));
             } else if (key.equals(ContextImpl.BASE_URL_INCLUDES)) {
-                assertEquals(Arrays.toString(new String[]{"unicore://*","unicore://*"}), Arrays.toString(context.getVectorAttribute(key)));
+                Assert.assertArrayEquals(new String[]{"unicore://*","unicore://*"}, context.getVectorAttribute(key));
             } else if (key.equals(ContextImpl.TYPE)) {
-                assertEquals("VOMS",context.getAttribute(key));
+                Assert.assertEquals("VOMS",context.getAttribute(key));
             } else if (key.equals("Att")) {
-                assertEquals("Value",context.getAttribute(key));
+                Assert.assertEquals("Value",context.getAttribute(key));
             } else if (key.equals(ContextImpl.URL_PREFIX)) {
-            	assertEquals("Demo",context.getAttribute(key));
+                Assert.assertEquals("Demo",context.getAttribute(key));
             } else if (key.equals(ContextImpl.JOB_SERVICE_ATTRIBUTES)) {
-                assertEquals(Arrays.toString(new String[]{"unicore.MaxJobsQueued=100","unicore.ServiceName=JobManagement"}), Arrays.toString(context.getVectorAttribute(key)));
+                Assert.assertArrayEquals(new String[]{"unicore.MaxJobsQueued=100","unicore.ServiceName=JobManagement"}, context.getVectorAttribute(key));
             } else if (key.equals(ContextImpl.DATA_SERVICE_ATTRIBUTES)) {
-                assertEquals(Arrays.toString(new String[]{"unicore.ServiceName=StorageManagement"}), Arrays.toString(context.getVectorAttribute(key)));
+                Assert.assertArrayEquals(new String[]{"unicore.ServiceName=StorageManagement"}, context.getVectorAttribute(key));
             }
         }
     }

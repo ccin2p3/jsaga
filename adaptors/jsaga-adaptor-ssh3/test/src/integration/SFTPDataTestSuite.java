@@ -27,6 +27,7 @@ import org.ogf.saga.file.WriteTest;
 import org.ogf.saga.monitoring.Callback;
 import org.ogf.saga.monitoring.Metric;
 import org.ogf.saga.monitoring.Monitorable;
+import org.ogf.saga.namespace.DataCleanUp;
 import org.ogf.saga.namespace.DataMovementTest;
 import org.ogf.saga.namespace.EntryTest;
 import org.ogf.saga.namespace.Flags;
@@ -146,121 +147,7 @@ public class SFTPDataTestSuite {
     public static class SFTPEmulatorDataMovementTest extends DataMovementTest {
         public SFTPEmulatorDataMovementTest() throws Exception {super(TYPE, "test");}
     }
-    
-    public static class AkosCopy extends BaseTest {
-
-        public AkosCopy() throws Exception {
-            super();
-            // TODO Auto-generated constructor stub
-        }
-        
-        @Test
-        public void copy() throws Exception {
-            URL fromUrl = URLFactory.createURL("sftp://localhost/home/schwarz/.jsaga/var/tmp/ssh/SRC/AKOSTST/");
-            URL toUrl = URLFactory.createURL("sftp://localhost/home/schwarz/.jsaga/var/tmp/ssh/DST/");
-            boolean isFromDir = true;
-            boolean isMove = false;
-            
-            int flags = Flags.RECURSIVE.getValue(); boolean overwrite = false;
-            Session session = SessionFactory.createSession(true);
-            
-            NSEntry fromEntry;
-//            try {
-                fromEntry = isFromDir ?
-                        NSFactory.createNSDirectory(session, fromUrl, Flags.NONE.getValue()) : // if it is a dir use create NS dir
-                        NSFactory.createNSEntry(session, fromUrl, Flags.NONE.getValue()); // else entry
-//            }
-//            catch (AlreadyExistsException e) { monitor.failed(e.getMessage()); throw new OperationException("Directory already exists!", e); }
-//            catch (IncorrectURLException e) {  monitor.failed(e.getMessage()); throw new OperationException(e); } // should not happen
-//            catch (NotImplementedException e) { monitor.failed(e.getMessage()); throw new OperationException("Operation not supported!", e); }
-//            catch (AuthenticationFailedException e) { monitor.failed(e.getMessage()); throw new OperationException("Authentication failed!", e); }
-//            catch (AuthorizationFailedException e) { monitor.failed(e.getMessage()); throw new OperationException("Authorization failed!", e); }
-//            catch (PermissionDeniedException e) { monitor.failed(e.getMessage()); throw new OperationException("Permission denied!", e); }
-//            catch (BadParameterException e) { monitor.failed(e.getMessage()); throw new URIException("Malformed URI: " + fromUri, e); } // getFullPath truncates subdir name
-//            catch (DoesNotExistException e) { monitor.failed(e.getMessage()); throw new OperationException(e); }  // should not happen
-//            catch (TimeoutException e) { monitor.failed(e.getMessage()); throw new OperationException("Connection timeout!", e); }
-//            catch (NoSuccessException e) { monitor.failed(e.getMessage()); throw new OperationException(e); } // ?
-    
-            Task<NSEntry, Void> task = null;
-//            try {
-                task =
-                    isMove ?
-                            fromEntry.move(TaskMode.TASK, toUrl, flags):  // overwrite OVERWRITE causes exception (fixed by Lionel)
-                            fromEntry.copy(TaskMode.TASK, toUrl, flags);  // TaskMode.ASYNC: calls Task.run() implicitely
-//            } catch (NotImplementedException e) {
-//                monitor.failed("Copy or move operation is not implemented by the adaptor");
-//                try { fromEntry.close(); } catch (Exception x) {}
-//                throw new OperationException("Copy or move operation is not implemented by the adaptor", e);   
-//            }
-               
-            String taskId = task.getId(); // get local id
-            logger.info("New copy/move task with adaptor-managed id: " + taskId);
-        
-            // try to add task monitoring callback
-            try {
-                Metric metric = task.getMetric(AbstractCopyTask.FILE_COPY_PROGRESS); // "file.copy.progress"
-                metric.addCallback(new Callback(){
-                    public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplementedException, AuthorizationFailedException {
-                        try {
-                            String value = metric.getAttribute(Metric.VALUE);
-                            String unit = metric.getAttribute(Metric.UNIT);
-//                            System.out.println("Progress: "+value+" "+unit);
-                        }
-                        catch (NotImplementedException e) {throw e;}
-                        catch (AuthorizationFailedException e) {throw e;}
-                        catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        // callback must stay registered
-                        return true;
-                    }
-                });
-                logger.trace("FILE_COPY_PROGRESS callback registered");
-            }
-            catch (Exception e) { logger.warn("Cannot register progress monitor for copy/move task! ("  + e.getMessage() + ")");    }
-           
-            // try to add task state monitoring callback
-//            try {
-//                Metric metric = task.getMetric(Task.TASK_STATE); // "task.state"
-//                metric.addCallback(new CopyStateMonitor(task, taskId, taskRegistry, taskResourceRegistry, monitor));
-//                log.trace("TASK_STATE callback registered");
-//            }
-//            catch (NotImplementedException e) { log.warn("Cannot register state monitor for copy/move task! ("  + e.getMessage() + ")");    }
-//            catch (AuthenticationFailedException e) { log.warn("Cannot register state monitor for copy/move task! ("  + e.getMessage() + ")");    }
-//            catch (AuthorizationFailedException e) { log.warn("Cannot register state monitor for copy/move task! ("  + e.getMessage() + ")");    }
-//            catch (PermissionDeniedException e) { log.warn("Cannot register state monitor for copy/move task! ("  + e.getMessage() + ")");    }
-//            catch (DoesNotExistException e) { log.warn("Cannot register state monitor for copy/move task! ("  + e.getMessage() + ")");    }
-//            catch (TimeoutException e) { log.warn("Cannot register state monitor for copy/move task! ("  + e.getMessage() + ")");    }
-//            catch (NoSuccessException e) { log.warn("Cannot register state monitor for copy/move task! ("  + e.getMessage() + ")");    }
-//            catch (IncorrectStateException e) {    log.warn("Cannot register state monitor for copy/move task! ("  + e.getMessage() + ")"); } // task.run()
-            // try to get source file size
-//            try {
-//                if (!isFromDir)
-//                    monitor.setTotalDataSize(getFileSize(fromUrl, session));
-//            } catch (Exception e) {
-//                log.debug("Cannot get file size of source file to be copied...");
-//            } // silently ignore if source file size cannot be retrieved
-    
-//            taskRegistry.put(taskId, task); // register task for later query (getStatus)
-//            taskResourceRegistry.put(taskId, fromEntry); // register resources to be released when task completed
-//            try {
-                task.run();
-                logger.info("JSAGA task started (run)...");
-                task.waitFor();
-                switch(task.getState()) {
-                case DONE:
-                    System.out.println("File successfully copied !");
-                    break;
-                default:
-                    task.rethrow();
-                    break;
-            }
-//            } // start task
-//            catch (NoSuccessException e) {  try { fromEntry.close(); } catch (Exception x) {} monitor.failed("Cannot run task!"); throw new OperationException("Cannot run task!", e); } // task.run()
-//            catch (TimeoutException e) {  try { fromEntry.close(); } catch (Exception x) {}    monitor.failed("Cannot run task!"); throw new OperationException("Cannot run task!", e); } // task.run()
-//            catch (IncorrectStateException e) {     try { fromEntry.close(); } catch (Exception x) {}    monitor.failed("Cannot run task!"); throw new OperationException("Cannot run task!", e);    } // task.run()
-//            catch (NotImplementedException e) {  try { fromEntry.close(); } catch (Exception x) {}    monitor.failed("Cannot run task!"); throw new OperationException("Cannot run task!", e); }
-        }
-        
+    public static class SFTPDataCleanUp extends DataCleanUp {
+        public SFTPDataCleanUp() throws Exception {super(TYPE);}
     }
 }

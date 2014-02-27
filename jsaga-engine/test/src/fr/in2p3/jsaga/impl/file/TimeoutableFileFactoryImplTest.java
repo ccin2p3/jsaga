@@ -1,7 +1,9 @@
 package fr.in2p3.jsaga.impl.file;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
-import org.ogf.saga.AbstractTest;
+
+import org.junit.Test;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.namespace.Flags;
@@ -22,7 +24,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableFileFactoryImplTest extends AbstractTest {
+public class TimeoutableFileFactoryImplTest extends JSAGABaseTest {
     private static final String m_urlDir = "waitforever://host/directory/?hangatconnect";
     private static final String m_urlFile = "waitforever://host/directory/file?hangatconnect";
 
@@ -30,6 +32,7 @@ public class TimeoutableFileFactoryImplTest extends AbstractTest {
         super();
     }
 
+    @Test
     public void test_createFile() throws Exception {
         Session emptySession = SessionFactory.createSession(false);
         URL url = URLFactory.createURL(m_urlFile);
@@ -41,6 +44,7 @@ public class TimeoutableFileFactoryImplTest extends AbstractTest {
         }
     }
 
+    @Test
     public void test_createFileInputStream() throws Exception {
         Session emptySession = SessionFactory.createSession(false);
         URL url = URLFactory.createURL(m_urlFile);
@@ -52,6 +56,7 @@ public class TimeoutableFileFactoryImplTest extends AbstractTest {
         }
     }
 
+    @Test
     public void test_createFileOutputStream() throws Exception {
         Session emptySession = SessionFactory.createSession(false);
         URL url = URLFactory.createURL(m_urlFile);
@@ -63,6 +68,7 @@ public class TimeoutableFileFactoryImplTest extends AbstractTest {
         }
     }
 
+    @Test
     public void test_createDirectory() throws Exception {
         Session emptySession = SessionFactory.createSession(false);
         URL url = URLFactory.createURL(m_urlDir);

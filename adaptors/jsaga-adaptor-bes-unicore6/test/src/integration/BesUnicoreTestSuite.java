@@ -1,7 +1,17 @@
 package integration;
 
-import junit.framework.Test;
-import org.ogf.saga.job.*;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+import org.ogf.saga.job.description.DescriptionTest;
+import org.ogf.saga.job.run.MinimalTest;
+import org.ogf.saga.job.run.OptionalTest;
+import org.ogf.saga.job.run.RequiredTest;
+import org.ogf.saga.job.run.RequirementsTest;
+import org.ogf.saga.job.run.SandboxTest;
+
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -15,49 +25,60 @@ import org.ogf.saga.job.*;
 /**
  *
  */
-public class BesUnicoreTestSuite extends JSAGATestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new BesUnicoreTestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(BesUnicoreTestSuite.class);}}
+@RunWith(Suite.class)
+@SuiteClasses({
+    BesUnicoreTestSuite.BesUnicoreJobRunRequiredTest.class,
+    BesUnicoreTestSuite.BesUnicoreJobRunOptionalTest.class,
+    BesUnicoreTestSuite.BesUnicoreJobRunDescriptionTest.class,
+    BesUnicoreTestSuite.BesUnicoreJobRunSandboxTest.class
+})
+public class BesUnicoreTestSuite {
 
     // test cases
-    public static class BesUnicoreJobDescriptionTest extends JobDescriptionTest {
+    public static class BesUnicoreJobDescriptionTest extends DescriptionTest {
         public BesUnicoreJobDescriptionTest() throws Exception {super("bes-unicore");}
-        public void test_wallTimeLimit() { super.ignore("not supported"); }
+        public void test_wallTimeLimit() { }
      }
     
     // test cases
-    public static class BesUnicoreJobRunMinimalTest extends JobRunMinimalTest {
+    public static class BesUnicoreJobRunMinimalTest extends MinimalTest {
         public BesUnicoreJobRunMinimalTest() throws Exception {super("bes-unicore");}
     }
     
     // test cases
-    public static class BesUnicoreJobRunRequiredTest extends JobRunRequiredTest {
+    public static class BesUnicoreJobRunRequiredTest extends RequiredTest {
         public BesUnicoreJobRunRequiredTest() throws Exception {super("bes-unicore");}
-        public void test_run_error() { super.ignore("return code not supported"); }
+        @Override @Test @Ignore("Not supported")
+        public void test_run_error() { }
     }
     
     // test cases
-    public static class BesUnicoreJobRunOptionalTest extends JobRunOptionalTest {
+    public static class BesUnicoreJobRunOptionalTest extends OptionalTest {
         public BesUnicoreJobRunOptionalTest() throws Exception {super("bes-unicore");}
-        public void test_resume_done() { super.ignore("not supported"); }
-        public void test_resume_running() { super.ignore("not supported"); }
-        public void test_suspend_done() { super.ignore("not supported"); }
-        public void test_suspend_running() { super.ignore("not supported"); }
+        @Override @Test @Ignore("Not supported")
+        public void test_resume_done() { }
+        @Override @Test @Ignore("Not supported")
+        public void test_resume_running() { }
+        @Override @Test @Ignore("Not supported")
+        public void test_suspend_done() { }
+        @Override @Test @Ignore("Not supported")
+        public void test_suspend_running() { }
     }
     
  	// test cases
-    public static class BesUnicoreJobRunSandboxTest extends JobRunSandboxTest {
+    public static class BesUnicoreJobRunSandboxTest extends SandboxTest {
         public BesUnicoreJobRunSandboxTest() throws Exception {super("bes-unicore");}
     }
     
  	// test cases
-    public static class BesUnicoreJobRunDescriptionTest extends JobRunDescriptionTest {
+    public static class BesUnicoreJobRunDescriptionTest extends RequirementsTest {
         public BesUnicoreJobRunDescriptionTest() throws Exception {super("bes-unicore");}
-        public void test_run_inWorkingDirectory() { super.ignore("return code not supported"); }
-        public void test_run_queueRequirement() { super.ignore("not supported"); }
-        public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
+        @Override @Test @Ignore("Not supported")
+        public void test_run_inWorkingDirectory() { }
+        @Override @Test @Ignore("Not supported")
+        public void test_run_queueRequirement() { }
+        @Override @Test @Ignore("Not supported")
+        public void test_run_cpuTimeRequirement() { }
     }
 
     /* incompatible with Unicore Data plugin */

@@ -12,7 +12,7 @@ package org.ogf.saga.namespace;
 /**
  *
  */
-public class EmulatorNSEntryTest extends NSEntryTest {
+public class EmulatorNSEntryTest extends EntryTest {
     public EmulatorNSEntryTest() throws Exception {
         super("test");
     }

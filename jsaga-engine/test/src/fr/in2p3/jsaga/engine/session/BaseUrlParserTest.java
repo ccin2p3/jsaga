@@ -1,5 +1,8 @@
 package fr.in2p3.jsaga.engine.session;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import fr.in2p3.jsaga.generated.parser.*;
 import junit.framework.TestCase;
 
@@ -15,7 +18,8 @@ import junit.framework.TestCase;
 /**
  *
  */
-public class BaseUrlParserTest extends TestCase {
+public class BaseUrlParserTest {
+    @Test
     public void test_success() throws ParseException {
         final String[] SUCCESS = {
                 "gridftp->gsiftp://cc*.*in2p3.fr/*/dteam",
@@ -24,10 +28,11 @@ public class BaseUrlParserTest extends TestCase {
         };
         for (String url : SUCCESS) {
             String result = new BaseUrlPattern(BaseUrlParser.parse(url)).toString();
-            assertEquals(url, result);
+            Assert.assertEquals(url, result);
         }
     }
 
+    @Test
     public void test_failure() {
         final String[] FAILURE = {
                 "gridftp>gsiftp://cc*.*in2p3.fr/*/dteam",
@@ -37,7 +42,7 @@ public class BaseUrlParserTest extends TestCase {
         for (String url : FAILURE) {
             try {
                 BaseUrlParser.parse(url);
-                fail("Expected exception: "+ParseException.class);
+                Assert.fail("Expected exception: "+ParseException.class);
             } catch (TokenMgrError e) {
                 // success
             } catch (ParseException e) {

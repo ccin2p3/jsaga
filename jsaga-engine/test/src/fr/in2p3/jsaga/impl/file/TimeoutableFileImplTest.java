@@ -1,7 +1,11 @@
 package fr.in2p3.jsaga.impl.file;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
-import org.ogf.saga.AbstractTest;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.file.File;
@@ -24,7 +28,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableFileImplTest extends AbstractTest {
+public class TimeoutableFileImplTest extends JSAGABaseTest {
     private static final String m_url = "waitforever://host/directory/file";
     private File m_readfile, m_writefile;
 
@@ -32,6 +36,7 @@ public class TimeoutableFileImplTest extends AbstractTest {
         super();
     }
 
+    @Before
     public void setUp() throws Exception {
         Session emptySession = SessionFactory.createSession(false);
         URL url = URLFactory.createURL(m_url);
@@ -39,6 +44,7 @@ public class TimeoutableFileImplTest extends AbstractTest {
         m_writefile = FileFactory.createFile(emptySession, url, Flags.WRITE.getValue());
     }
 
+    @After
     public void tearDown() throws Exception {
         m_readfile.close();
     }
@@ -52,6 +58,7 @@ public class TimeoutableFileImplTest extends AbstractTest {
         }
     }
 
+    @Test
     public void test_read() throws Exception {
         try {
             m_readfile.read(BufferFactory.createBuffer(1024));
@@ -61,6 +68,7 @@ public class TimeoutableFileImplTest extends AbstractTest {
         }
     }
 
+    @Test
     public void test_write() throws Exception {
         try {
             m_writefile.write(BufferFactory.createBuffer(1024));

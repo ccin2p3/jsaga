@@ -12,7 +12,7 @@ package org.ogf.saga.file;
 /**
  *
  */
-public class SecureEmulatorFileReadTest extends FileReadTest {
+public class SecureEmulatorFileReadTest extends ReadTest {
     public SecureEmulatorFileReadTest() throws Exception {
         super("stest");
     }

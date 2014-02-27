@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.task;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 import org.ogf.saga.monitoring.*;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.context.Context;
@@ -19,7 +20,9 @@ import org.ogf.saga.error.AuthorizationFailedException;
 /**
  *
  */
-public class AbstractTaskImplTest extends TestCase implements Callback {
+public class AbstractTaskImplTest extends Assert implements Callback {
+
+    @Test
     public void test_notified_task() throws Exception {
         Task task = new TaskForTesting(true);
         task.addCallback(Task.TASK_STATE, this);
@@ -30,6 +33,7 @@ public class AbstractTaskImplTest extends TestCase implements Callback {
                 task.getResult());
     }
 
+    @Test
     public void test_unnotified_task() throws Exception {
         Task task = new TaskForTesting(false);
         task.addCallback(Task.TASK_STATE, this);

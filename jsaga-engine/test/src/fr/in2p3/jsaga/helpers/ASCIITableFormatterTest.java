@@ -1,9 +1,10 @@
 package fr.in2p3.jsaga.helpers;
 
-import junit.framework.TestCase;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,7 +18,8 @@ import java.io.PrintStream;
 /**
  *
  */
-public class ASCIITableFormatterTest extends TestCase {
+public class ASCIITableFormatterTest extends Assert {
+    @Test
     public void test_dump() throws Exception {
         ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
                 "first_column", "col2", "col3",});

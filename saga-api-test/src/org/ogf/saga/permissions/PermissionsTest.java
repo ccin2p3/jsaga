@@ -1,8 +1,9 @@
 package org.ogf.saga.permissions;
 
 import org.apache.log4j.Logger;
+import org.junit.Test;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
+import org.ogf.saga.namespace.abstracts.AbstractData;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -10,51 +11,61 @@ import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 * ***************************************************
 * File:   PermissionsTest
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   2 juil. 2007
+* Author: lionel.schwarz@in2p3.fr
+* Date:   5 NOV 2013
 * ***************************************************
 * Description:                                      */
 /**
  *
  */
-public abstract class PermissionsTest extends AbstractNSEntryTest {
+public abstract class PermissionsTest extends AbstractData {
     private static Logger s_logger = Logger.getLogger(PermissionsTest.class);
 
     public PermissionsTest(String protocol) throws Exception {
         super(protocol);
     }
 
+    @Test
     public void test_ownerEXECPermissions() throws Exception {
     	test_permissions(null, Permission.EXEC);
     }
     
+    @Test
     public void test_ownerREADPermissions() throws Exception {
     	test_permissions(null, Permission.READ);
     }
     
+    @Test
     public void test_ownerWRITEPermissions() throws Exception {
     	test_permissions(null, Permission.WRITE);
     }
     
+    @Test
     public void test_groupEXECPermissions() throws Exception {
     	test_permissions("group-" + m_file.getGroup(), Permission.EXEC);
     }
     
+    @Test
     public void test_groupREADPermissions() throws Exception {
     	test_permissions("group-" + m_file.getGroup(), Permission.READ);
     }
     
+    @Test
     public void test_groupWRITEPermissions() throws Exception {
     	test_permissions("group-" + m_file.getGroup(), Permission.WRITE);
     }
     
+    @Test
     public void test_otherEXECPermissions() throws Exception {
     	test_permissions("*", Permission.EXEC);
     }
     
+    @Test
     public void test_otherREADPermissions() throws Exception {
     	test_permissions("*", Permission.READ);
     }
     
+    @Test
     public void test_otherWRITEPermissions() throws Exception {
     	test_permissions("*", Permission.WRITE);
     }
@@ -74,6 +85,7 @@ public abstract class PermissionsTest extends AbstractNSEntryTest {
         }
     }
 
+    @Test
     public void test_getOwner() throws Exception {
         String owner = m_file.getOwner();
         if (owner==null || "*".equals(owner)) {
@@ -88,6 +100,7 @@ public abstract class PermissionsTest extends AbstractNSEntryTest {
         fail("Owner not found in security contexts: "+owner);
     }
 
+    @Test
     public void test_getGroup() throws Exception {
         String group = m_file.getGroup();
         if (group==null || "*".equals(group)) {

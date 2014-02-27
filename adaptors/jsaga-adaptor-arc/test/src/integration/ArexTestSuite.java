@@ -1,11 +1,18 @@
 package integration;
 
-import junit.framework.Test;
-
-import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.job.*;
-import org.ogf.saga.job.abstracts.Attribute;
-import org.ogf.saga.task.State;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+import org.ogf.saga.job.description.DescriptionTest;
+import org.ogf.saga.job.run.InfoTest;
+import org.ogf.saga.job.run.InteractiveTest;
+import org.ogf.saga.job.run.MinimalTest;
+import org.ogf.saga.job.run.OptionalTest;
+import org.ogf.saga.job.run.RequiredTest;
+import org.ogf.saga.job.run.RequirementsTest;
+import org.ogf.saga.job.run.SandboxTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -19,55 +26,65 @@ import org.ogf.saga.task.State;
 /**
  *
  */
-public class ArexTestSuite extends JSAGATestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new ArexTestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(ArexTestSuite.class);}}
+@RunWith(Suite.class)
+@SuiteClasses({
+    ArexTestSuite.ArexJobRunRequiredTest.class,
+    ArexTestSuite.ArexJobRunOptionalTest.class,
+    ArexTestSuite.ArexJobRunDescriptionTest.class,
+    ArexTestSuite.ArexJobRunSandboxTest.class,
+    ArexTestSuite.ArexJobRunInteractiveTest.class,
+    ArexTestSuite.ArexJobRunInfoTest.class
+})
+public class ArexTestSuite {
 
     // test cases
-    public static class ArexJobDescriptionTest extends JobDescriptionTest {
+    public static class ArexJobDescriptionTest extends DescriptionTest {
         public ArexJobDescriptionTest() throws Exception {super("arex");}
      }
     
     // test cases
-    public static class ArexJobRunMinimalTest extends JobRunMinimalTest {
+    public static class ArexJobRunMinimalTest extends MinimalTest {
         public ArexJobRunMinimalTest() throws Exception {super("arex");}
     }
     
     // test cases
-    public static class ArexJobRunRequiredTest extends JobRunRequiredTest {
+    public static class ArexJobRunRequiredTest extends RequiredTest {
         public ArexJobRunRequiredTest() throws Exception {super("arex");}
-        public void test_run_error() { super.ignore("return code not supported"); }
+        @Override @Test @Ignore("Not supported")
+        public void test_run_error() {}
     }
     
     // test cases
-    public static class ArexJobRunOptionalTest extends JobRunOptionalTest {
+    public static class ArexJobRunOptionalTest extends OptionalTest {
         public ArexJobRunOptionalTest() throws Exception {super("arex");}
-        public void test_resume_done() { super.ignore("not supported"); }
-        public void test_resume_running() { super.ignore("not supported"); }
-        public void test_suspend_done() { super.ignore("not supported"); }
-        public void test_suspend_running() { super.ignore("not supported"); }
+        @Override @Test @Ignore("Not supported")
+        public void test_resume_done() {}
+        @Override @Test @Ignore("Not supported")
+        public void test_resume_running() {}
+        @Override @Test @Ignore("Not supported")
+        public void test_suspend_done() { }
+        @Override @Test @Ignore("Not supported")
+        public void test_suspend_running() {}
     }
 
     // test cases
-    public static class ArexJobRunDescriptionTest extends JobRunDescriptionTest {
+    public static class ArexJobRunDescriptionTest extends RequirementsTest {
         public ArexJobRunDescriptionTest() throws Exception {super("arex");}
-        //public void test_run_inWorkingDirectory() { super.ignore("WorkingDirectory is not supported"); }
-        public void test_run_cpuTimeRequirement() throws Exception { super.ignore("TotalCPUTime is ignored");}
+        @Override @Test @Ignore("Not supported")
+        public void test_run_cpuTimeRequirement() throws Exception {}
     }
 
  	// test cases
-    public static class ArexJobRunSandboxTest extends JobRunSandboxTest {
+    public static class ArexJobRunSandboxTest extends SandboxTest {
         public ArexJobRunSandboxTest() throws Exception {super("arex");}
     }
     
     // test cases
-    public static class ArexJobRunInfoTest extends JobRunInfoTest {
+    public static class ArexJobRunInfoTest extends InfoTest {
     	public ArexJobRunInfoTest() throws Exception {super("arex");}
     }
     
-    public static class ArexJobRunInteractiveTest extends JobRunInteractiveTest {
+    public static class ArexJobRunInteractiveTest extends InteractiveTest {
     	public ArexJobRunInteractiveTest() throws Exception {super("arex");}
     }
 

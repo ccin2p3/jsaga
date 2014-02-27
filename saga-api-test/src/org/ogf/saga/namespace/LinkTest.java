@@ -4,8 +4,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
-import org.ogf.saga.namespace.base.DataBaseTest;
+import org.ogf.saga.namespace.abstracts.AbstractData;
 import org.ogf.saga.url.URL;
 
 /* ***************************************************
@@ -20,7 +19,7 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public abstract class LinkTest extends DataBaseTest {
+public abstract class LinkTest extends AbstractData {
     // test data
     private static final String DEFAULT_LINKNAME = "link.txt";
     private static final String DEFAULT_LINKNAME_2 = "link2.txt";

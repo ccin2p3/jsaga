@@ -3,12 +3,13 @@ package integration;
 import fr.in2p3.jsaga.adaptor.cream.CreamSocketFactory;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
-import org.ogf.saga.AbstractTest;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 import java.io.File;
-import java.util.Date;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -22,7 +23,7 @@ import java.util.Date;
 /**
  *
  */
-public abstract class CreamAbstractTest extends AbstractTest {
+public abstract class CreamAbstractTest extends JSAGABaseTest {
     protected URL m_url;
     protected String m_delegationId;
 
@@ -43,7 +44,8 @@ public abstract class CreamAbstractTest extends AbstractTest {
     }
 
     /** Implicitly invoked before executing each test method */
-    protected void setUp() throws Exception {
+    @BeforeClass
+    public static void registerProtocol() throws Exception {
         // Set the SSL context
         Protocol.registerProtocol("https", 
             new Protocol("https", (ProtocolSocketFactory)new CreamSocketFactory(
@@ -60,16 +62,14 @@ public abstract class CreamAbstractTest extends AbstractTest {
                         "contexts"),
                     "voms"),
                 "certificates")), 
-                m_url.getPort()
+                8443
             )
         );
-        System.out.println("Registered protocol");
-        super.setUp();
     }
         
     /** Implicitly invoked after executing each test method */
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @AfterClass
+    public static void unregisterProtocol() throws Exception {
         Protocol.unregisterProtocol("https");
     }
 

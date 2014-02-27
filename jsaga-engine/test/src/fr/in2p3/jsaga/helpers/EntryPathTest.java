@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.helpers;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -14,7 +15,7 @@ import junit.framework.TestCase;
 /**
  *
  */
-public class EntryPathTest extends TestCase {
+public class EntryPathTest extends Assert {
     private static final String DIR_PATH = "path/to//directory///";
     private static final String FILE_PATH = "path/to//file.txt";
     private static final String DIR = "directory///";
@@ -24,48 +25,56 @@ public class EntryPathTest extends TestCase {
     private static final String EXPECTED_DIR_NAME = "directory";
     private static final String EXPECTED_FILE_NAME = "file.txt";
 
+    @Test
     public void test_absolute_dir_path() {
         EntryPath path = new EntryPath("/"+DIR_PATH);
         assertEquals("/"+EXPECTED_BASE_DIR, path.getBaseDir());
         assertEquals(EXPECTED_DIR_NAME, path.getEntryName());
     }
 
+    @Test
     public void test_absolute_file_path() {
         EntryPath path = new EntryPath("/"+FILE_PATH);
         assertEquals("/"+EXPECTED_BASE_DIR, path.getBaseDir());
         assertEquals(EXPECTED_FILE_NAME, path.getEntryName());
     }
 
+    @Test
     public void test_absolute_dir() {
         EntryPath path = new EntryPath("/"+DIR);
         assertEquals("/", path.getBaseDir());
         assertEquals(EXPECTED_DIR_NAME, path.getEntryName());
     }
 
+    @Test
     public void test_absolute_file() {
         EntryPath path = new EntryPath("/"+FILE);
         assertEquals("/", path.getBaseDir());
         assertEquals(EXPECTED_FILE_NAME, path.getEntryName());
     }
 
+    @Test
     public void test_relative_dir_path() {
         EntryPath path = new EntryPath(DIR_PATH);
         assertEquals(EXPECTED_BASE_DIR, path.getBaseDir());
         assertEquals(EXPECTED_DIR_NAME, path.getEntryName());
     }
 
+    @Test
     public void test_relative_file_path() {
         EntryPath path = new EntryPath(FILE_PATH);
         assertEquals(EXPECTED_BASE_DIR, path.getBaseDir());
         assertEquals(EXPECTED_FILE_NAME, path.getEntryName());
     }
 
+    @Test
     public void test_relative_dir() {
         EntryPath path = new EntryPath(DIR);
         assertEquals("", path.getBaseDir());
         assertEquals(EXPECTED_DIR_NAME, path.getEntryName());
     }
 
+    @Test
     public void test_relative_file() {
         EntryPath path = new EntryPath(FILE);
         assertEquals("", path.getBaseDir());

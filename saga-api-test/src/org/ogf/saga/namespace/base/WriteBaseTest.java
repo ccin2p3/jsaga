@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSFactory;
+import org.ogf.saga.namespace.abstracts.AbstractData;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,7 +18,7 @@ import org.ogf.saga.namespace.NSFactory;
 /**
  *
  */
-public abstract class WriteBaseTest extends DataBaseTest {
+public abstract class WriteBaseTest extends AbstractData {
     public WriteBaseTest(String protocol) throws Exception {
         super(protocol);
     }

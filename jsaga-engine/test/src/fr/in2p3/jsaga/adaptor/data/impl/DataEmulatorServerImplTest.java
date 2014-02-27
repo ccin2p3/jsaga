@@ -2,7 +2,11 @@ package fr.in2p3.jsaga.adaptor.data.impl;
 
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.DirectoryType;
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.File;
-import junit.framework.TestCase;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.ogf.saga.error.DoesNotExistException;
 
 /* ***************************************************
@@ -17,10 +21,11 @@ import org.ogf.saga.error.DoesNotExistException;
 /**
  *
  */
-public class DataEmulatorServerImplTest extends TestCase {
+public class DataEmulatorServerImplTest {
     private DataEmulatorConnection m_server;
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         // connect to server
         m_server = new DataEmulatorConnection("test", "emulator1.test.org", 1234);
         DirectoryType parent = m_server.getDirectory("/");
@@ -30,7 +35,8 @@ public class DataEmulatorServerImplTest extends TestCase {
         file.setContent("Content of file 1...");
     }
 
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         // disconnect from server (no commit)
         m_server.removeFile("/path/to/file1.txt");
         m_server.removeDirectory("/path/to/");
@@ -38,43 +44,38 @@ public class DataEmulatorServerImplTest extends TestCase {
         m_server = null;
     }
 
+    @Test
     public void test_getParentDirectory() throws DoesNotExistException {
-        assertEquals(
+        Assert.assertEquals(
                 "to",
                 m_server.getParentDirectory("/path/to/file1.txt").getName());
-        assertEquals(
+        Assert.assertEquals(
                 "path",
                 m_server.getParentDirectory("/path/to/").getName());
-        assertEquals(
+        Assert.assertEquals(
                 "to",
                 m_server.getParentDirectory("/path/to/unexisting file").getName());
     }
 
+    @Test(expected=DoesNotExistException.class)
     public void test_getEntry() throws DoesNotExistException {
-        assertEquals(
+        Assert.assertEquals(
                 "file1.txt",
                 m_server.getEntry("/path/to/file1.txt").getName());
-        assertEquals(
+        Assert.assertEquals(
                 "to",
                 m_server.getEntry("/path/to/").getName());
-        try {
-            m_server.getEntry("/path/to/file2.txt");
-            fail("Expected exception: "+ DoesNotExistException.class);
-        } catch(DoesNotExistException e) {
-        }
+        m_server.getEntry("/path/to/file2.txt");
     }
 
+    @Test(expected=DoesNotExistException.class)
     public void test_listChildEntries() throws DoesNotExistException {
-        assertEquals(
+        Assert.assertEquals(
                 "file1.txt",
                 m_server.listEntries("/path/to/file1.txt")[0].getName());
-        assertEquals(
+        Assert.assertEquals(
                 "file1.txt",
                 m_server.listEntries("/path/to/")[0].getName());
-        try {
-            m_server.listEntries("/path/to/file2.txt");
-            fail("Expected exception: "+ DoesNotExistException.class);
-        } catch(DoesNotExistException e) {
-        }
+        m_server.listEntries("/path/to/file2.txt");
     }
 }

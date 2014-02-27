@@ -1,8 +1,10 @@
 package fr.in2p3.jsaga.impl.url;
 
-import junit.framework.TestCase;
-
 import java.io.IOException;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -16,12 +18,13 @@ import java.io.IOException;
 /**
  *
  */
-public class UniversalFileTest extends TestCase {
+public class UniversalFileTest extends Assert {
     private UniversalFile m_winAbsolute;
     private UniversalFile m_absolute;
     private UniversalFile m_relative;
     private UniversalFile m_directory;
 
+    @Before
     public void setUp() {
         m_winAbsolute = new UniversalFile("C:/path/to/file");
         m_absolute = new UniversalFile("/path/to/file");
@@ -29,6 +32,7 @@ public class UniversalFileTest extends TestCase {
         m_directory = new UniversalFile("/dir/");
     }
 
+    @Test
     public void test_getPath() {
         assertEquals("C:/path/to/file", m_winAbsolute.getPath());
         assertEquals("/path/to/file", m_absolute.getPath());
@@ -38,6 +42,7 @@ public class UniversalFileTest extends TestCase {
         assertEquals("/path/to/file", new UniversalFile("///////path/to/file").getPath());
     }
 
+    @Test
     public void test_getParent() {
         assertEquals("C:/path/to/", m_winAbsolute.getParent());
         assertEquals("/path/to/", m_absolute.getParent());
@@ -47,6 +52,7 @@ public class UniversalFileTest extends TestCase {
         assertEquals("./", new UniversalFile("file").getParent());
     }
 
+    @Test
     public void test_getCanonicalPath() throws IOException {
     	
         assertEquals("C:/path/to/file", m_winAbsolute.getCanonicalPath());
@@ -74,6 +80,7 @@ public class UniversalFileTest extends TestCase {
         assertEquals("/dir/", new UniversalFile("/./dir/../dir2/./dir3/../.././dir/").getCanonicalPath());
     }
 
+    @Test
     public void test_isAbsolute() {
         assertEquals(System.getProperty("os.name").startsWith("Windows"), m_winAbsolute.isAbsolute());
         assertTrue(m_absolute.isAbsolute());
@@ -81,6 +88,7 @@ public class UniversalFileTest extends TestCase {
         assertTrue(m_directory.isAbsolute());
     }
 
+    @Test
     public void test_isDirectory() {
         assertFalse(m_winAbsolute.isDirectory());
         assertFalse(m_absolute.isDirectory());

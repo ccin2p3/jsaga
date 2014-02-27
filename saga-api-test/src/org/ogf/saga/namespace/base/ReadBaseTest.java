@@ -1,6 +1,7 @@
 package org.ogf.saga.namespace.base;
 
 import org.junit.Test;
+import org.ogf.saga.namespace.abstracts.AbstractData;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -14,7 +15,7 @@ import org.junit.Test;
 /**
  *
  */
-public abstract class ReadBaseTest extends DataBaseTest {
+public abstract class ReadBaseTest extends AbstractData {
     public ReadBaseTest(String protocol) throws Exception {
         super(protocol);
     }

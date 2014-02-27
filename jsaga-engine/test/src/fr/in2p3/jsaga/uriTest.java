@@ -1,6 +1,8 @@
 package fr.in2p3.jsaga;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
+
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -14,39 +16,41 @@ import junit.framework.TestCase;
 /**
  *
  */
-public class uriTest extends TestCase {
+public class uriTest {
+    @Test
     public void test_basedirPath() throws Exception {
-        assertEquals(
+        Assert.assertEquals(
                 "/path/to/",
                 uri.basedirPath("http://host:1234/path/to/file.txt"));
-        assertEquals(
+        Assert.assertEquals(
                 "/path/to/",
                 uri.basedirPath("http://host:1234/path/to/directory/"));
-        assertEquals(
+        Assert.assertEquals(
                 "/C:/Program Files/app/",
                 uri.basedirPath("file:///C:/Program Files/app/file.dll"));
-        assertEquals(
+        Assert.assertEquals(
                 "/",
                 uri.basedirPath("gsiftp://host:2811/"));
-        assertEquals(
+        Assert.assertEquals(
                 "/",
                 uri.basedirPath("gsiftp://host:2811"));
     }
 
+    @Test
     public void test_filename() throws Exception {
-        assertEquals(
+        Assert.assertEquals(
                 "file.txt",
                 uri.filename("http://host:1234/path/to/file.txt"));
-        assertEquals(
+        Assert.assertEquals(
                 "directory",
                 uri.filename("http://host:1234/path/to/directory/"));
-        assertEquals(
+        Assert.assertEquals(
                 "file.dll",
                 uri.filename("file:///C:/Program Files/app/file.dll"));
-        assertEquals(
+        Assert.assertEquals(
                 "",
                 uri.filename("gsiftp://host:2811/"));
-        assertEquals(
+        Assert.assertEquals(
                 "",
                 uri.filename("gsiftp://host:2811"));
     }

@@ -2,22 +2,15 @@ package fr.in2p3.jsaga.adaptor.bes.job;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 
-import org.ogf.saga.AbstractTest;
+import org.junit.Assert;
+import org.junit.Test;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.session.Session;
-import org.ogf.saga.session.SessionFactory;
-import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 import org.xml.sax.SAXException;
 
 import fr.in2p3.jsaga.adaptor.bes.BesUtils;
-import fr.in2p3.jsaga.engine.descriptors.AdaptorDescriptors;
-import fr.in2p3.jsaga.engine.factories.JobAdaptorFactory;
 import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType;
-import fr.in2p3.jsaga.impl.context.ContextImpl;
-import fr.in2p3.jsaga.impl.session.SessionImpl;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -31,7 +24,7 @@ import fr.in2p3.jsaga.impl.session.SessionImpl;
 /**
  *
  */
-public class BesJobAdaptorTest extends AbstractTest {
+public class BesJobAdaptorTest {
 	
 	public BesJobAdaptorTest() throws Exception {
 		super();
@@ -64,12 +57,14 @@ public class BesJobAdaptorTest extends AbstractTest {
 		"</ns2:Metadata>" +
 		"</ns2:EndpointReferenceType>";
 
+	@Test
     public void test_getScheme() {
-        assertEquals(
+        Assert.assertEquals(
                 "bes",
                 new BesJobControlAdaptor().getType());
     }
 
+	@Test
     public void test_jobSerialize() throws NoSuccessException, NoSuchAlgorithmException, SAXException {
     	EndpointReferenceType epr = (EndpointReferenceType) BesUtils.deserialize(ACTIVITY_IDENTIFIER, EndpointReferenceType.class);
 
@@ -77,16 +72,16 @@ public class BesJobAdaptorTest extends AbstractTest {
     	BesJob job = new BesJob();
     	job.setActivityId(epr, true);
 		File xmlJob = job.getXmlJob();
-		assertTrue(xmlJob.exists());
+		Assert.assertTrue(xmlJob.exists());
 		
 		// deserialization of the result
 		BesJob job_deserialized = new BesJob();
 		job_deserialized.setNativeId(job.getNativeId());
 		EndpointReferenceType epr_deserialized = job_deserialized.getActivityIdentifier();
-		assertEquals(epr, epr_deserialized);
+		Assert.assertEquals(epr, epr_deserialized);
 
 		// clean and check that file is removed
 		xmlJob.delete();
-		assertFalse(xmlJob.exists());
+		Assert.assertFalse(xmlJob.exists());
     }
 }

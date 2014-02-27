@@ -6,7 +6,6 @@ import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
-import org.ogf.saga.job.abstracts.AbstractJobTest;
 import org.ogf.saga.job.base.JobBaseTest;
 import org.ogf.saga.task.State;
 

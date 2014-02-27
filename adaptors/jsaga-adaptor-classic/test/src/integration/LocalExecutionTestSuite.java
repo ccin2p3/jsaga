@@ -1,7 +1,20 @@
 package integration;
 
-import junit.framework.Test;
-import org.ogf.saga.job.*;
+
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+import org.ogf.saga.job.description.DescriptionTest;
+import org.ogf.saga.job.run.InfoTest;
+import org.ogf.saga.job.run.InteractiveTest;
+import org.ogf.saga.job.run.MinimalTest;
+import org.ogf.saga.job.run.OptionalTest;
+import org.ogf.saga.job.run.RequiredTest;
+import org.ogf.saga.job.run.RequirementsTest;
+import org.ogf.saga.job.run.SandboxTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -11,51 +24,77 @@ import org.ogf.saga.job.*;
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   15 avril 2008
 ****************************************************/
+@RunWith(Suite.class)
+@SuiteClasses({
+    LocalExecutionTestSuite.LocalJobDescriptionTest.class,
+    LocalExecutionTestSuite.LocalJobRunRequiredTest.class,
+    LocalExecutionTestSuite.LocalJobRunOptionalTest.class,
+    LocalExecutionTestSuite.LocalJobRunDescriptionTest.class,
+    LocalExecutionTestSuite.LocalJobRunSandboxTest.class,
+    LocalExecutionTestSuite.LocalJobRunInteractiveTest.class,
+    LocalExecutionTestSuite.LocalJobRunInfoTest.class
+})
+public class LocalExecutionTestSuite {
 
-public class LocalExecutionTestSuite extends JSAGATestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new LocalExecutionTestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(LocalExecutionTestSuite.class);}}
+    protected static String TYPE = "local";
 
     // test cases
-    public static class LocalJobDescriptionTest extends JobDescriptionTest {
-        public LocalJobDescriptionTest() throws Exception {super("local");}
-        public void test_spmdVariation() { super.ignore("not supported"); }
-        public void test_totalCPUCount() { super.ignore("not supported"); }
-        public void test_numberOfProcesses() { super.ignore("not supported"); }
-        public void test_processesPerHost() { super.ignore("not supported"); }
-        public void test_threadsPerProcess() { super.ignore("not supported"); }
-        public void test_input() { super.ignore("not supported"); }
-        public void test_output() { super.ignore("not supported"); }
-        public void test_error() { super.ignore("not supported"); }
-        public void test_fileTransfer() { super.ignore("not supported"); }
-        public void test_cleanup() { super.ignore("not supported"); }
-        public void test_totalCPUTime() { super.ignore("not supported"); }
-        public void test_totalPhysicalMemory() { super.ignore("not supported"); }
-        public void test_cpuArchitecture() { super.ignore("not supported"); }
-        public void test_operatingSystemType() { super.ignore("not supported"); }
-        public void test_candidateHosts() { super.ignore("not supported"); }
-        public void test_queue() { super.ignore("not supported"); }
-        public void test_wallTimeLimit() { super.ignore("not supported"); }
+    public static class LocalJobDescriptionTest extends DescriptionTest {
+        public LocalJobDescriptionTest() throws Exception {super(TYPE);}
+        @Test @Ignore("Not supported")
+        public void test_spmdVariation() { }
+        @Test  @Ignore("Not supported")
+        public void test_totalCPUCount() { }
+        @Test  @Ignore("Not supported")
+        public void test_numberOfProcesses() { }
+        @Test  @Ignore("Not supported")
+        public void test_processesPerHost() { }
+        @Test  @Ignore("Not supported")
+        public void test_threadsPerProcess() { }
+        @Test  @Ignore("Not supported")
+        public void test_input() { }
+        @Test  @Ignore("Not supported")
+        public void test_output() { }
+        @Test  @Ignore("Not supported")
+        public void test_error() { }
+        @Test  @Ignore("Not supported")
+        public void test_fileTransfer() { }
+        @Test  @Ignore("Not supported")
+        public void test_cleanup() { }
+        @Test  @Ignore("Not supported")
+        public void test_totalCPUTime() { }
+        @Test  @Ignore("Not supported")
+        public void test_totalPhysicalMemory() { }
+        @Test  @Ignore("Not supported")
+        public void test_cpuArchitecture() { }
+        @Test  @Ignore("Not supported")
+        public void test_operatingSystemType() { }
+        @Test  @Ignore("Not supported")
+        public void test_candidateHosts() { }
+        @Test  @Ignore("Not supported")
+        public void test_queue() { }
+        @Test  @Ignore("Not supported")
+        public void test_wallTimeLimit() { }
      }
     
     // test cases
-    public static class LocalJobRunMinimalTest extends JobRunMinimalTest {
-        public LocalJobRunMinimalTest() throws Exception {super("local");}
+    public static class LocalJobRunMinimalTest extends MinimalTest {
+        public LocalJobRunMinimalTest() throws Exception {super(TYPE);}
     }
     
     // test cases
-    public static class LocalJobRunRequiredTest extends JobRunRequiredTest {
-        public LocalJobRunRequiredTest() throws Exception {super("local");}
-        public void test_run_long() throws Exception {super.ignore("test working but too long");}        
+    public static class LocalJobRunRequiredTest extends RequiredTest {
+        public LocalJobRunRequiredTest() throws Exception {super(TYPE);}
+        @Test  @Ignore("test working but too long")
+        public void test_run_long() throws Exception {}        
     }
 
     // test cases
-    public static class LocalJobRunSandboxTest extends JobRunSandboxTest {
-        public LocalJobRunSandboxTest() throws Exception {super("local");}
+    public static class LocalJobRunSandboxTest extends SandboxTest {
+        public LocalJobRunSandboxTest() throws Exception {super(TYPE);}
 
         @Override
+        @Before
         public void setUp() {
             if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
                 m_scriptExplicit = m_scriptExplicit.replace("file:", "file:/");
@@ -79,30 +118,38 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
     }
     
     // test cases
-    public static class LocalJobRunOptionalTest extends JobRunOptionalTest {
-        public LocalJobRunOptionalTest() throws Exception {super("local");}
-        public void test_resume_done() { super.ignore("not supported"); }
-        public void test_suspend_done() { super.ignore("not supported"); }
-        public void test_simultaneousLongJob() throws Exception {super.ignore("test working but too long");}        
-        public void test_TaskContainer_ShortJob() throws Exception {super.ignore("this test hangs"); }
+    public static class LocalJobRunOptionalTest extends OptionalTest {
+        public LocalJobRunOptionalTest() throws Exception {super(TYPE);}
+        @Test  @Ignore("Not supported")
+        public void test_resume_done() { }
+        @Test  @Ignore("Not supported")
+        public void test_suspend_done() { }
+        @Test  @Ignore("test working but too long")
+        public void test_simultaneousLongJob() throws Exception {}
+        @Test  @Ignore("this test hangs")
+        public void test_TaskContainer_ShortJob() throws Exception {}
     }
     
  	// test cases
-    public static class LocalJobRunDescriptionTest extends JobRunDescriptionTest {
-        public LocalJobRunDescriptionTest() throws Exception {super("local");}
-        public void test_run_queueRequirement() { super.ignore("not supported"); }
-        public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
-        public void test_run_memoryRequirement() { super.ignore("not supported"); }
+    public static class LocalJobRunDescriptionTest extends RequirementsTest {
+        public LocalJobRunDescriptionTest() throws Exception {super(TYPE);}
+        @Test @Override @Ignore("Not supported")
+        public void test_run_queueRequirement() { }
+        @Test @Override @Ignore("Not supported")
+        public void test_run_cpuTimeRequirement() { }
+        @Test @Override @Ignore("Not supported")
+        public void test_run_memoryRequirement() { }
     }
     
     // test cases
-    public static class LocalJobRunInteractiveTest extends JobRunInteractiveTest {
-        public LocalJobRunInteractiveTest() throws Exception {super("local");}
-	    public void test_simultaneousStdin() throws Exception {super.ignore("this test hangs"); }
+    public static class LocalJobRunInteractiveTest extends InteractiveTest {
+        public LocalJobRunInteractiveTest() throws Exception {super(TYPE);}
+        @Test @Override @Ignore("this test hangs")
+        public void test_simultaneousStdin() throws Exception {}
     }
     
     // test cases
-    public static class LocalJobRunInfoTest extends JobRunInfoTest {
-		public LocalJobRunInfoTest() throws Exception {super("local");}
+    public static class LocalJobRunInfoTest extends InfoTest {
+		public LocalJobRunInfoTest() throws Exception {super(TYPE);}
     }
 }

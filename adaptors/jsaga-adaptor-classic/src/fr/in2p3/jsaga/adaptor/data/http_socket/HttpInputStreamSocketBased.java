@@ -36,7 +36,7 @@ public class HttpInputStreamSocketBased extends InputStream {
         } else {
             int readlen = m_response.read();
             if (readlen > -1) {
-                m_nbBytesTransfered += readlen;
+                m_nbBytesTransfered ++;
             }
             return readlen;
         }

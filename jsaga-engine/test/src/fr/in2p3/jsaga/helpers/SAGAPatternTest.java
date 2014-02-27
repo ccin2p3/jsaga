@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.helpers;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -14,7 +15,8 @@ import junit.framework.TestCase;
 /**
  *
  */
-public class SAGAPatternTest extends TestCase {
+public class SAGAPatternTest extends Assert {
+    @Test
     public void test_toRegexp() throws Exception {
         assertNull(SAGAPattern.toRegexp("*"));
         assertEquals(

@@ -1,6 +1,12 @@
 package integration;
 
-import junit.framework.Test;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+import org.ogf.saga.error.AlreadyExistsException;
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.permissions.PermissionsTest;
@@ -11,38 +17,47 @@ import org.ogf.saga.url.URL;
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
 * File:   SRMIntegrationTestSuite
-* Author:
-* Date:
+* Author: lionel.schwarz@in2p3.fr
+* Date:   29 JAN 2014
 * ***************************************************
 * Description:                                      */
+@RunWith(Suite.class)
+@SuiteClasses({
+    SRMIntegrationTestSuite.SRMNSEntryTest.class,
+    SRMIntegrationTestSuite.SRMDirectoryMakeTest.class,
+    SRMIntegrationTestSuite.SRMDirectoryTest.class,
+    SRMIntegrationTestSuite.SRMFileReadTest.class,
+    SRMIntegrationTestSuite.SRMFileWriteTest.class,
+    SRMIntegrationTestSuite.SRMDataMovementTest.class,
+    SRMIntegrationTestSuite.SRMEmulatorDataMovementTest.class,
+    SRMIntegrationTestSuite.SRMPermissionsTest.class,
+    })
 /**
  *
  */
-public class SRMIntegrationTestSuite extends JSAGATestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new SRMIntegrationTestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(SRMIntegrationTestSuite.class);}}
+public class SRMIntegrationTestSuite {
+    private final static String TYPE = "srm";
 
     /** test cases */
-    public static class SRMNSSetUpTest extends NSSetUpTest {
-        public SRMNSSetUpTest() throws Exception {super("srm");}
+    public static class SRMCleanUp extends DataCleanUp {
+        public SRMCleanUp() throws Exception {super(TYPE);}
     }
-    public static class SRMNSEntryTest extends NSEntryTest {
-        public SRMNSEntryTest() throws Exception {super("srm");}
+    public static class SRMNSSetUpTest extends SetUpTest {
+        public SRMNSSetUpTest() throws Exception {super(TYPE);}
     }
-    public static class SRMDirectoryListTest extends DirectoryListTest {
-        public SRMDirectoryListTest() throws Exception {super("srm");}
+    public static class SRMNSEntryTest extends EntryTest {
+        public SRMNSEntryTest() throws Exception {super(TYPE);}
     }
-    public static class SRMDirectoryMakeTest extends DirectoryMakeTest {
-        public SRMDirectoryMakeTest() throws Exception {super("srm");}
+    public static class SRMDirectoryMakeTest extends MakeDirTest {
+        public SRMDirectoryMakeTest() throws Exception {super(TYPE);}
     }
-    public static class SRMDirectoryTest extends DirectoryTest {
-        public SRMDirectoryTest() throws Exception {super("srm");}
+    public static class SRMDirectoryTest extends DirTest {
+        public SRMDirectoryTest() throws Exception {super(TYPE);}
     }
-    public static class SRMFileReadTest extends FileReadTest {
-        public SRMFileReadTest() throws Exception {super("srm");}
-        /*
+    public static class SRMFileReadTest extends ReadTest {
+        public SRMFileReadTest() throws Exception {super(TYPE);}
+        
+        @Test @Ignore("comment this line to test big files")
         public void test_size_2GB() throws Exception {
         	// this test only works with srm.base.url=srm://ccsrm02.in2p3.fr:8443/pnfs/in2p3.fr/data/dteam/JSAGA/
         	long size = 2150643248L;
@@ -52,32 +67,32 @@ public class SRMIntegrationTestSuite extends JSAGATestSuite {
                     size,
                     ((File)file2BG).getSize());
         }
-        */
     }
-    public static class SRMFileWriteTest extends FileWriteTest {
-        public SRMFileWriteTest() throws Exception {super("srm");}
-        public void test_read_and_write() throws Exception {super.ignore("Not supported: Timeout, SRM_request blocked in status SRM_REQUEST_INPROGRESS");}
-        public void test_write_append() throws Exception {super.ignore("Not supported: SRM ends SRM_DUPLICATION_ERROR on SrmPrepareToPut");}
+    public static class SRMFileWriteTest extends WriteTest {
+        public SRMFileWriteTest() throws Exception {super(TYPE);}
+        @Test @Ignore("Not supported: Timeout, SRM_request blocked in status SRM_REQUEST_INPROGRESS")
+        public void test_read_and_write() throws Exception {}
+        @Test @Ignore("Not supported: SRM ends SRM_DUPLICATION_ERROR on SrmPrepareToPut")
+        public void test_write_append() throws Exception {}
+        @Test @Ignore("Some characters are not supported by SrmPrepareToPut")
+        public void test_write_encoded_filename() throws Exception {}
+        @Test(expected=AlreadyExistsException.class)
+        public void test_outputStream_overwrite() throws Exception {
+            super.test_outputStream_overwrite();
+        }
+        @Test(expected=BadParameterException.class)
+        public void test_outputStream_append() throws Exception {
+            super.test_outputStream_append();
+        }
+
     }
-    public static class SRMNSCopyTest extends NSCopyTest {
-        public SRMNSCopyTest() throws Exception {super("srm", "srm");}
+    public static class SRMDataMovementTest extends DataMovementTest {
+        public SRMDataMovementTest() throws Exception {super(TYPE, TYPE);}
     }
-    public static class SRMNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public SRMNSCopyRecursiveTest() throws Exception {super("srm", "srm");}
-    }
-    public static class SRMNSMoveTest extends NSMoveTest {
-        public SRMNSMoveTest() throws Exception {super("srm", "srm");}
-    }
-    public static class SRM_to_EmulatorNSCopyTest extends NSCopyTest {
-        public SRM_to_EmulatorNSCopyTest() throws Exception {super("srm", "test");}
-    }
-    public static class SRM_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public SRM_to_EmulatorNSCopyRecursiveTest() throws Exception {super("srm", "test");}
-    }
-    public static class SRM_to_EmulatorNSMoveTest extends NSMoveTest {
-        public SRM_to_EmulatorNSMoveTest() throws Exception {super("srm", "test");}
+    public static class SRMEmulatorDataMovementTest extends DataMovementTest {
+        public SRMEmulatorDataMovementTest() throws Exception {super(TYPE, "test");}
     }
     public static class SRMPermissionsTest extends PermissionsTest {
-        public SRMPermissionsTest() throws Exception {super("srm");}
+        public SRMPermissionsTest() throws Exception {super(TYPE);}
     }
 }

@@ -2,7 +2,10 @@ package fr.in2p3.jsaga.impl.file;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
 import org.apache.log4j.Logger;
-import org.ogf.saga.AbstractTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.file.Directory;
@@ -25,7 +28,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableDirectoryImplTest extends AbstractTest {
+public class TimeoutableDirectoryImplTest extends JSAGABaseTest {
     private static final String m_urlRoot = "waitforever://host/directory/";
     private static final String m_urlDir = m_urlRoot+"?hangatconnect";
     private static final String m_urlFile = m_urlRoot+"file?hangatconnect";
@@ -36,36 +39,31 @@ public class TimeoutableDirectoryImplTest extends AbstractTest {
         super();
     }
 
+    @Before
     public void setUp() throws Exception {
         Session emptySession = SessionFactory.createSession(false);
         URL url = URLFactory.createURL(m_urlRoot);
         m_directory = FileFactory.createDirectory(emptySession, url, Flags.NONE.getValue());
     }
 
+    @After
     public void tearDown() throws Exception {
         m_directory.close();
     }
 
     /** timeout not supported */
+    @Test(expected=NotImplementedException.class)
     public void test_openDirectory() throws Exception {
-        try {
             m_directory.openDirectory(URLFactory.createURL(m_urlDir), Flags.CREATE.getValue());
-            fail("Expected exception: "+ NotImplementedException.class);
-        } catch (NotImplementedException e) {
-            s_logger.info(e.getMessage());
-        }
     }
 
     /** timeout not supported */
+    @Test(expected=NotImplementedException.class)
     public void test_openFile() throws Exception {
-        try {
             m_directory.openFile(URLFactory.createURL(m_urlFile), Flags.READ.getValue());
-            fail("Expected exception: "+ NotImplementedException.class);
-        } catch (NotImplementedException e) {
-            s_logger.info(e.getMessage());
-        }
     }
 
+    @Test
     public void test_openFileInputStream() throws Exception {
         try {
             m_directory.openFileInputStream(URLFactory.createURL(m_urlFile));
@@ -75,6 +73,7 @@ public class TimeoutableDirectoryImplTest extends AbstractTest {
         }
     }
 
+    @Test
     public void test_openFileOutputStream() throws Exception {
         try {
             m_directory.openFileOutputStream(URLFactory.createURL(m_urlFile));

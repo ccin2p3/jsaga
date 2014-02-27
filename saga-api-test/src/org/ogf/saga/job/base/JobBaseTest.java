@@ -1,6 +1,6 @@
 package org.ogf.saga.job.base;
 
-import org.ogf.saga.BaseTest;
+import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
@@ -28,7 +28,7 @@ import java.util.Date;
 * ***************************************************
 * Description:                                      */
 
-public abstract class JobBaseTest extends BaseTest {
+public abstract class JobBaseTest extends JSAGABaseTest {
     protected static final String MODEL = "JSAGA";
 	
 	// values

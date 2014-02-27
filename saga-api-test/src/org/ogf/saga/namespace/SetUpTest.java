@@ -2,7 +2,7 @@ package org.ogf.saga.namespace;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.ogf.saga.namespace.base.DataBaseTest;
+import org.ogf.saga.namespace.abstracts.AbstractData;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -16,7 +16,7 @@ import org.ogf.saga.namespace.base.DataBaseTest;
 /**
  *
  */
-public abstract class SetUpTest extends DataBaseTest {
+public abstract class SetUpTest extends AbstractData {
     protected SetUpTest(String protocol) throws Exception {
         super(protocol);
     }

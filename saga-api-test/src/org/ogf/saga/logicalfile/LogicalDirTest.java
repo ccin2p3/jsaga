@@ -6,7 +6,8 @@ import org.junit.Test;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSDirectory;
 import org.ogf.saga.namespace.NSEntry;
-import org.ogf.saga.namespace.base.DirBaseTest;
+import org.ogf.saga.namespace.abstracts.AbstractDirectory;
+import org.ogf.saga.namespace.base.DirectoryBaseTest;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
@@ -22,7 +23,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public abstract class LogicalDirTest extends DirBaseTest {
+public abstract class LogicalDirTest extends DirectoryBaseTest {
     protected LogicalDirTest(String protocol) throws Exception {
         super(protocol);
     }

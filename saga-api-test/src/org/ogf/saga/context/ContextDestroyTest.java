@@ -1,6 +1,7 @@
 package org.ogf.saga.context;
 
-import org.ogf.saga.AbstractTest;
+import org.junit.Test;
+import org.ogf.saga.JSAGABaseTest;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,7 +18,7 @@ import java.lang.reflect.Method;
 /**
  *
  */
-public abstract class ContextDestroyTest extends AbstractTest {
+public abstract class ContextDestroyTest extends JSAGABaseTest {
     private String m_contextId;
 
     protected ContextDestroyTest(String contextId) throws Exception {
@@ -25,16 +26,17 @@ public abstract class ContextDestroyTest extends AbstractTest {
         m_contextId = contextId;
     }
 
-    public void test_destroy() throws Exception {
+    @Test
+    public void destroy() throws Exception {
         // create context
         Context context = ContextFactory.createContext();
         context.setAttribute(Context.TYPE, m_contextId);
 
         // destroy context
-        destroy(context);
+        destroyContext(context);
     }
 
-    private static void destroy(Context context) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    private static void destroyContext(Context context) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Method m = context.getClass().getMethod("destroy");
         if (m != null) {
             m.invoke(context);

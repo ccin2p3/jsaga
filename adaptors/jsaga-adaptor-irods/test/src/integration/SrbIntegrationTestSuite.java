@@ -1,8 +1,15 @@
 package integration;
 
-import junit.framework.Test;
-import org.ogf.saga.file.*;
-import org.ogf.saga.namespace.*;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+import org.ogf.saga.file.DirTest;
+import org.ogf.saga.file.MakeDirTest;
+import org.ogf.saga.file.ReadTest;
+import org.ogf.saga.file.WriteTest;
+import org.ogf.saga.namespace.DataMovementTest;
+import org.ogf.saga.namespace.EntryTest;
+
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -16,39 +23,35 @@ import org.ogf.saga.namespace.*;
 /**
  *
  */
-public class SrbIntegrationTestSuite extends JSAGATestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new SrbIntegrationTestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(SrbIntegrationTestSuite.class);}}
+@RunWith(Suite.class)
+@SuiteClasses({
+    SrbIntegrationTestSuite.SrbNSEntryTest.class,
+    SrbIntegrationTestSuite.SrbDirectoryMakeTest.class,
+    SrbIntegrationTestSuite.SrbDirectoryTest.class,
+    SrbIntegrationTestSuite.SrbFileReadTest.class,
+    SrbIntegrationTestSuite.SrbFileWriteTest.class,
+    SrbIntegrationTestSuite.Srb_to_EmulatorDataMovementTest.class,
+    })
+public class SrbIntegrationTestSuite{
 
     // test SRB as a protocol for physical entries
-    public static class SrbNSEntryTest extends NSEntryTest {
+    public static class SrbNSEntryTest extends EntryTest {
         public SrbNSEntryTest() throws Exception {super("srb");}
     }
-	public static class SrbDirectoryListTest extends DirectoryListTest {
-        public SrbDirectoryListTest() throws Exception {super("srb");}
-    }
-    public static class SrbDirectoryMakeTest extends DirectoryMakeTest {
+    public static class SrbDirectoryMakeTest extends MakeDirTest {
         public SrbDirectoryMakeTest() throws Exception {super("srb");}
     }
-    public static class SrbDirectoryTest extends DirectoryTest {
+    public static class SrbDirectoryTest extends DirTest {
         public SrbDirectoryTest() throws Exception {super("srb");}
     }
-    public static class SrbFileReadTest extends FileReadTest {
+    public static class SrbFileReadTest extends ReadTest {
         public SrbFileReadTest() throws Exception {super("srb");}
     }
-    public static class SrbFileWriteTest extends FileWriteTest {
+    public static class SrbFileWriteTest extends WriteTest {
         public SrbFileWriteTest() throws Exception {super("srb");}
     }
-    public static class Srb_to_EmulatorNSCopyTest extends NSCopyTest {
-        public Srb_to_EmulatorNSCopyTest() throws Exception {super("srb", "test");}
-    }
-    public static class Srb_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public Srb_to_EmulatorNSCopyRecursiveTest() throws Exception {super("srb", "test");}
-    }
-    public static class Srb_to_EmulatorNSMoveTest extends NSMoveTest {
-        public Srb_to_EmulatorNSMoveTest() throws Exception {super("srb", "test");}
+    public static class Srb_to_EmulatorDataMovementTest extends DataMovementTest {
+        public Srb_to_EmulatorDataMovementTest() throws Exception {super("srb", "test");}
     }
 
 /*

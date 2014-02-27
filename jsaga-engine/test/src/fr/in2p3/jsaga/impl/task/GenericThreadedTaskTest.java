@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.task;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.NotImplementedException;
@@ -20,7 +21,9 @@ import org.ogf.saga.task.TaskMode;
 /**
  *
  */
-public class GenericThreadedTaskTest extends TestCase implements Callback {
+public class GenericThreadedTaskTest extends Assert implements Callback {
+    
+    @Test
     public void test_sync() throws Exception {
         Task<AsyncTest,String> task = new AsyncTest().getHello(TaskMode.SYNC, "test");
         assertEquals(
@@ -28,6 +31,7 @@ public class GenericThreadedTaskTest extends TestCase implements Callback {
                 task.getResult());
     }
 
+    @Test
     public void test_task() throws Exception {
         Task<AsyncTest,String> task = new AsyncTest().getHello(TaskMode.TASK, "test");
         task.addCallback(Task.TASK_STATE, this);

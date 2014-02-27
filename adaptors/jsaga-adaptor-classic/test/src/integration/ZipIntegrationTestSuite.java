@@ -1,6 +1,11 @@
 package integration;
 
-import junit.framework.Test;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 
@@ -16,50 +21,34 @@ import org.ogf.saga.namespace.*;
 /**
  *
  */
-public class ZipIntegrationTestSuite extends JSAGATestSuite {
-    /** create test suite */
-    public static Test suite() throws Exception {return new ZipIntegrationTestSuite();}
-    /** index of test cases */
-    public static class index extends IndexTest {public index(){super(ZipIntegrationTestSuite.class);}}
+@RunWith(Suite.class)
+@SuiteClasses({
+    ZipIntegrationTestSuite.ZipNSEntryTest.class,
+    ZipIntegrationTestSuite.ZipDirectoryTest.class,
+    ZipIntegrationTestSuite.ZipFileReadTest.class,
+    ZipIntegrationTestSuite.Zip_to_EmulatorNSCopyTest.class
+})
+public class ZipIntegrationTestSuite {
+
+    protected static String TYPE = "zip";
 
     /** test cases */
-    public static class ZipNSEntryTest extends NSEntryTest {
-        public ZipNSEntryTest() throws Exception {super("zip");}
+    public static class ZipNSEntryTest extends EntryTest {
+        public ZipNSEntryTest() throws Exception {super(TYPE);}
     }
-    public static class ZipDirectoryListTest extends DirectoryListTest {
-        public ZipDirectoryListTest() throws Exception {super("zip");}
+    public static class ZipDirectoryTest extends DirTest {
+        public ZipDirectoryTest() throws Exception {super(TYPE);}
+        @Test(expected=NotImplementedException.class)
+        public void test_getSizeRecursive() throws Exception {
+            super.test_getSizeRecursive();
+        }
+        @Test @Ignore("Read-only adaptor: cannot delete file to test empty directory")
+        public void test_list_empty() throws Exception {}
     }
-    public static class ZipDirectoryTest extends DirectoryTest {
-        public ZipDirectoryTest() throws Exception {super("zip");}
+    public static class ZipFileReadTest extends ReadTest {
+        public ZipFileReadTest() throws Exception {super(TYPE);}
     }
-    public static class ZipFileReadTest extends FileReadTest {
-        public ZipFileReadTest() throws Exception {super("zip");}
-    }
-    //TODO: uncomment these test cases when they will be supported
-/*
-    public static class ZipDirectoryMakeTest extends DirectoryMakeTest {
-        public ZipDirectoryMakeTest() throws Exception {super("zip");}
-    }
-    public static class ZipFileWriteTest extends FileWriteTest {
-        public ZipFileWriteTest() throws Exception {super("zip");}
-    }
-    public static class ZipNSCopyTest extends NSCopyTest {
-        public ZipNSCopyTest() throws Exception {super("zip", "zip");}
-    }
-    public static class ZipNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public ZipNSCopyRecursiveTest() throws Exception {super("zip", "zip");}
-    }
-    public static class ZipNSMoveTest extends NSMoveTest {
-        public ZipNSMoveTest() throws Exception {super("zip", "zip");}
-    }
-    public static class Zip_to_EmulatorNSMoveTest extends NSMoveTest {
-        public Zip_to_EmulatorNSMoveTest() throws Exception {super("zip", "test");}
-    }
-*/
-    public static class Zip_to_EmulatorNSCopyTest extends NSCopyTest {
-        public Zip_to_EmulatorNSCopyTest() throws Exception {super("zip", "test");}
-    }
-    public static class Zip_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
-        public Zip_to_EmulatorNSCopyRecursiveTest() throws Exception {super("zip", "test");}
+    public static class Zip_to_EmulatorNSCopyTest extends DataReadOnlyMovementTest {
+        public Zip_to_EmulatorNSCopyTest() throws Exception {super(TYPE, "test");}
     }
 }
