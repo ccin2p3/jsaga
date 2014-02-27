@@ -1,7 +1,6 @@
 package org.ogf.saga.job;
 
 import org.junit.Test;
-import org.ogf.saga.AbstractTest;
 import org.ogf.saga.AbstractTest_JUNIT4;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;

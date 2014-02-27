@@ -5,7 +5,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.ogf.saga.namespace.abstracts.AbstractData;
-import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 import org.ogf.saga.url.URL;
 
 /* ***************************************************

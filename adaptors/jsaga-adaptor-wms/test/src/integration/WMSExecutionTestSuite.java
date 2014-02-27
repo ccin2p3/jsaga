@@ -11,7 +11,6 @@ import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.job.JobService;
 import org.ogf.saga.job.ListTest;
-import org.ogf.saga.job.abstracts.AbstractJobTest;
 import org.ogf.saga.job.base.JobBaseTest;
 import org.ogf.saga.job.description.DescriptionTest;
 import org.ogf.saga.job.run.InfoTest;
