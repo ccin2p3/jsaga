@@ -133,9 +133,10 @@ public abstract class RequiredTest extends JobBaseTest {
     }
     
     /*
-     * Runs a simple job, waits for done state, cancels it and expects exception
+     * Runs a simple job, waits for done state, cancels it
+     * expect nothing happens and job stays DONE
      */
-    @Test(expected=IncorrectStateException.class)
+    @Test
     public void test_cancel_done() throws Exception {
         
     	// prepare
