@@ -59,6 +59,7 @@ import org.globus.gsi.X509Credential;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 
 import eu.emi.security.authn.x509.impl.CertificateUtils;
@@ -146,7 +147,7 @@ public class CreamClient {
         
     }
     
-    public Result[] jobStart(String nativeJobId) throws NoSuccessException, RemoteException, Authorization_Fault, Generic_Fault, InvalidArgument_Fault {
+    public Result[] jobStart(String nativeJobId) throws NoSuccessException, RemoteException, Authorization_Fault, Generic_Fault, InvalidArgument_Fault, IncorrectStateException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         JobStartRequest request = new JobStartRequest();
@@ -158,7 +159,7 @@ public class CreamClient {
         return r;
     }
     
-    public Result[] jobCancel(String nativeJobId) throws NoSuccessException, RemoteException, Authorization_Fault, Generic_Fault, InvalidArgument_Fault {
+    public Result[] jobCancel(String nativeJobId) throws NoSuccessException, RemoteException, Authorization_Fault, Generic_Fault, InvalidArgument_Fault, IncorrectStateException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         JobCancelRequest request = new JobCancelRequest();
@@ -170,7 +171,7 @@ public class CreamClient {
         return r;
     }
     
-    public Result[] jobClean(String nativeJobId) throws NoSuccessException, RemoteException, Authorization_Fault, Generic_Fault, InvalidArgument_Fault {
+    public Result[] jobClean(String nativeJobId) throws NoSuccessException, RemoteException, Authorization_Fault, Generic_Fault, InvalidArgument_Fault, IncorrectStateException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         JobPurgeRequest request = new JobPurgeRequest();
@@ -182,7 +183,8 @@ public class CreamClient {
         return r;
     }
     
-    public Result[] jobSuspend(String nativeJobId) throws NoSuccessException, RemoteException, OperationNotSupported_Fault, Authorization_Fault, Generic_Fault, InvalidArgument_Fault {
+    public Result[] jobSuspend(String nativeJobId) throws NoSuccessException, RemoteException, OperationNotSupported_Fault, 
+                                Authorization_Fault, Generic_Fault, InvalidArgument_Fault, IncorrectStateException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         JobSuspendRequest request = new JobSuspendRequest();
@@ -194,7 +196,8 @@ public class CreamClient {
         return r;
     }
     
-    public Result[] jobResume(String nativeJobId) throws NoSuccessException, RemoteException, OperationNotSupported_Fault, Authorization_Fault, Generic_Fault, InvalidArgument_Fault {
+    public Result[] jobResume(String nativeJobId) throws NoSuccessException, RemoteException, OperationNotSupported_Fault, 
+                                Authorization_Fault, Generic_Fault, InvalidArgument_Fault, IncorrectStateException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         JobResumeRequest request = new JobResumeRequest();
@@ -331,7 +334,7 @@ public class CreamClient {
         return filter;
     }
 
-    private void rethrowException(Result[] r) throws NoSuccessException, Authorization_Fault, InvalidArgument_Fault {
+    private void rethrowException(Result[] r) throws IncorrectStateException, NoSuccessException, Authorization_Fault, InvalidArgument_Fault {
         ResultChoice_type0  rc = r[0].getResultChoice_type0();
         if (rc!=null) {
             if (rc.isDateMismatchFaultSpecified()) {
@@ -339,7 +342,7 @@ public class CreamClient {
             } else if (rc.isDelegationIdMismatchFaultSpecified()) {
                 throw new Authorization_Fault(rc.getDelegationIdMismatchFault().getDescription());
             } else if (rc.isJobStatusInvalidFaultSpecified()) {
-                throw new NoSuccessException(rc.getJobStatusInvalidFault().getDescription());
+                throw new IncorrectStateException(rc.getJobStatusInvalidFault().getDescription());
             } else if (rc.isJobUnknownFaultSpecified()) {
                 throw new InvalidArgument_Fault(rc.getJobUnknownFault().getDescription());
             }

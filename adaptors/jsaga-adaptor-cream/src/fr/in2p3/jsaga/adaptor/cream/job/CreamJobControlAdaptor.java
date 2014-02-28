@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.data.GsiftpInputStream;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.HoldableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.SuspendableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
@@ -50,7 +51,7 @@ import java.util.regex.Pattern;
  *
  */
 public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StagingJobAdaptorTwoPhase, CleanableJobAdaptor,
-	HoldableJobAdaptor {
+    SuspendableJobAdaptor {
 
     // parameters extracted from URI
     private static final String BATCH_SYSTEM = "BatchSystem";
@@ -93,22 +94,22 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
     
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
-    	
+        
         m_logger.debug("Submitting job described as:\n" + jobDesc);
         JobRegisterResponse response;
-		try {
-			response = m_client.jobRegister(jobDesc);
-		} catch (Authorization_Fault e) {
-			throw new PermissionDeniedException(e);
-		} catch (Generic_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (InvalidArgument_Fault e) {
-			throw new BadResource(e);
-		} catch (JobSubmissionDisabled_Fault e) {
-			throw new PermissionDeniedException(e);
-		} catch (RemoteException e) {
-			throw new NoSuccessException(e);
-		}
+        try {
+            response = m_client.jobRegister(jobDesc);
+        } catch (Authorization_Fault e) {
+            throw new PermissionDeniedException(e);
+        } catch (Generic_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (InvalidArgument_Fault e) {
+            throw new BadResource(e);
+        } catch (JobSubmissionDisabled_Fault e) {
+            throw new PermissionDeniedException(e);
+        } catch (RemoteException e) {
+            throw new NoSuccessException(e);
+        }
         // rethrow exception if any fault in result
         JobRegisterResult[] resultArray = response.getResult();
         m_logger.debug("Job submitted");
@@ -149,7 +150,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
     
     public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-    	StagingTransfer[] st;
+        StagingTransfer[] st;
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
         // First check if the status is ABORTED because of Unauthorized Request BLAH Error, this would be useless to stage files
         for (Status stat: jobInfo.getStatus()) {
@@ -173,11 +174,11 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         
         // If bug has already been checked build the appropriate list
         if (m_hasOutputSandboxBug != null) {
-	        if (m_hasOutputSandboxBug) {
-	        	return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI());
-	        } else if (!m_hasOutputSandboxBug) {
-	        	return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI()+"/");
-	        }
+            if (m_hasOutputSandboxBug) {
+                return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI());
+            } else if (!m_hasOutputSandboxBug) {
+                return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI()+"/");
+            }
         }
         
         // First build list of transfers with OSB/...
@@ -187,54 +188,54 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         if (st.length == 0) return st;
         
         // Otherwise, check if CREAM CE has the bug on OSB
-		try {
-	        // get the job working directory
-	        String outputSandboxURI = jobInfo.getCREAMOutputSandboxURI();
-	        // build the job wrapper URI
-	        URI jobWrapper_uri = new URI(outputSandboxURI.substring(0, outputSandboxURI.length()-4) + "/" + jobInfo.getJobId().getId() + "_jobWrapper.sh");
-	        // connect to GridFTP
-	        GsiftpClient client = GsiftpDataAdaptorAbstract.createConnection(m_credential, jobWrapper_uri.getHost(), 2811, 1024*16, false);
-	        // Read the job wrapper
-	        BufferedReader in = new BufferedReader(new InputStreamReader(new GsiftpInputStream(client, jobWrapper_uri.getPath())));
-	        String line = null;
+        try {
+            // get the job working directory
+            String outputSandboxURI = jobInfo.getCREAMOutputSandboxURI();
+            // build the job wrapper URI
+            URI jobWrapper_uri = new URI(outputSandboxURI.substring(0, outputSandboxURI.length()-4) + "/" + jobInfo.getJobId().getId() + "_jobWrapper.sh");
+            // connect to GridFTP
+            GsiftpClient client = GsiftpDataAdaptorAbstract.createConnection(m_credential, jobWrapper_uri.getHost(), 2811, 1024*16, false);
+            // Read the job wrapper
+            BufferedReader in = new BufferedReader(new InputStreamReader(new GsiftpInputStream(client, jobWrapper_uri.getPath())));
+            String line = null;
 
-	        while((line = in.readLine()) != null) {
-	        	// Search for line starting with "__output_file_dest[0]"
-	            if (line.startsWith("__output_file_dest[0]=")) {
-	            	int lastSlashIndex = line.lastIndexOf("/");
-	            	// if there is OSB before last /, return st
-	            	if (line.substring(lastSlashIndex-3, lastSlashIndex).equals("OSB")) {
-	        	        client.close();
-	                	m_hasOutputSandboxBug = false;
-	            		return st;
-	            	} else {
-	        	        client.close();
-	                	m_hasOutputSandboxBug = true;
-	            		return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI());
-	            	}
-	            }
-	        }
-	        client.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-    		Logger.getLogger(CreamJobAdaptorAbstract.class).warn("Could not check if CREAM CE has the OSB bug");
-		}
-		return st;
+            while((line = in.readLine()) != null) {
+                // Search for line starting with "__output_file_dest[0]"
+                if (line.startsWith("__output_file_dest[0]=")) {
+                    int lastSlashIndex = line.lastIndexOf("/");
+                    // if there is OSB before last /, return st
+                    if (line.substring(lastSlashIndex-3, lastSlashIndex).equals("OSB")) {
+                        client.close();
+                        m_hasOutputSandboxBug = false;
+                        return st;
+                    } else {
+                        client.close();
+                        m_hasOutputSandboxBug = true;
+                        return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI());
+                    }
+                }
+            }
+            client.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Logger.getLogger(CreamJobAdaptorAbstract.class).warn("Could not check if CREAM CE has the OSB bug");
+        }
+        return st;
     }
     
     private JobInfo getJobInfo(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfoResult[] resultArray;
         try {
-			resultArray = m_client.jobInfo(nativeJobId);
-		} catch (Authorization_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (Generic_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (InvalidArgument_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (RemoteException e) {
-			throw new TimeoutException(e);
-		}
+            resultArray = m_client.jobInfo(nativeJobId);
+        } catch (Authorization_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (Generic_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (InvalidArgument_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (RemoteException e) {
+            throw new TimeoutException(e);
+        }
 
         // return job info
         if (resultArray.length == 1) {
@@ -252,16 +253,18 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         // cancel job
         Result[] resultArray;
         try {
-			resultArray = m_client.jobStart(nativeJobId);
-		} catch (Authorization_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (Generic_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (InvalidArgument_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (RemoteException e) {
-			throw new NoSuccessException(e);
-		}
+            resultArray = m_client.jobStart(nativeJobId);
+        } catch (Authorization_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (Generic_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (InvalidArgument_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (RemoteException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        }
 
     }
 
@@ -270,15 +273,17 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         Result[] resultArray;
         try {
             resultArray = m_client.jobCancel(nativeJobId);
-		} catch (Authorization_Fault e) {
-			throw new PermissionDeniedException(e);
-		} catch (Generic_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (InvalidArgument_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (RemoteException e) {
-			throw new NoSuccessException(e);
-		}
+        } catch (Authorization_Fault e) {
+            throw new PermissionDeniedException(e);
+        } catch (Generic_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (InvalidArgument_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (RemoteException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        }
 
     }
 
@@ -287,74 +292,78 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         Result[] resultArray;
         try {
             resultArray = m_client.jobClean(nativeJobId);
-		} catch (Authorization_Fault e) {
-			throw new PermissionDeniedException(e);
-		} catch (Generic_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (InvalidArgument_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (RemoteException e) {
-			throw new NoSuccessException(e);
-		}
+        } catch (Authorization_Fault e) {
+            throw new PermissionDeniedException(e);
+        } catch (Generic_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (InvalidArgument_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (RemoteException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        }
     }
 
-	public boolean hold(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    public boolean suspend(String nativeJobId) throws IncorrectStateException, PermissionDeniedException, TimeoutException, NoSuccessException {
         // cancel job
         Result[] resultArray;
         try {
             resultArray = m_client.jobSuspend(nativeJobId);
-		} catch (Authorization_Fault e) {
-			throw new PermissionDeniedException(e);
-		} catch (Generic_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (InvalidArgument_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (RemoteException e) {
-			throw new NoSuccessException(e);
-		} catch (OperationNotSupported_Fault e) {
-			return false;
-		}
-        return getBooleanResult(resultArray[0]);
-	}
+        } catch (Authorization_Fault e) {
+            throw new PermissionDeniedException(e);
+        } catch (Generic_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (InvalidArgument_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (RemoteException e) {
+            throw new NoSuccessException(e);
+        } catch (OperationNotSupported_Fault e) {
+            return false;
+        }
+        //return getBooleanResult(resultArray[0]);
+        return true;
+    }
 
-	public boolean release(String nativeJobId) throws PermissionDeniedException, TimeoutException,	NoSuccessException {
+    public boolean resume(String nativeJobId) throws IncorrectStateException, PermissionDeniedException, TimeoutException,    NoSuccessException {
         // cancel job
         Result[] resultArray;
         try {
             resultArray = m_client.jobResume(nativeJobId);
-		} catch (Authorization_Fault e) {
-			throw new PermissionDeniedException(e);
-		} catch (Generic_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (InvalidArgument_Fault e) {
-			throw new NoSuccessException(e);
-		} catch (RemoteException e) {
-			throw new NoSuccessException(e);
-		} catch (OperationNotSupported_Fault e) {
-			return false;
-		}
-        return getBooleanResult(resultArray[0]);
-	}
-
-	private boolean getBooleanResult(Result res) throws NoSuccessException, PermissionDeniedException {
-        ResultChoice_type0 err = res.getResultChoice_type0();
-        if (err != null) {
-        	if (err.isJobStatusInvalidFaultSpecified()) {
-        		return false;
-        	} else if (err.isJobUnknownFaultSpecified()) {
-        		throw new NoSuccessException(err.getJobUnknownFault().getDescription());
-        	} else if (err.isDateMismatchFaultSpecified()) {
-        		throw new NoSuccessException(err.getDateMismatchFault().getDescription());
-        	} else if (err.isDelegationIdMismatchFaultSpecified()) {
-        		throw new PermissionDeniedException(err.getDelegationIdMismatchFault().getDescription());
-        	} else if (err.isGenericFaultSpecified()) {
-        		throw new NoSuccessException(err.getGenericFault().getDescription());
-        	} else if (err.isLeaseIdMismatchFaultSpecified()) {
-        		throw new NoSuccessException(err.getLeaseIdMismatchFault().getDescription());
-        	} else {
-        		throw new NoSuccessException("Unable to get Fault");
-        	}
+        } catch (Authorization_Fault e) {
+            throw new PermissionDeniedException(e);
+        } catch (Generic_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (InvalidArgument_Fault e) {
+            throw new NoSuccessException(e);
+        } catch (RemoteException e) {
+            throw new NoSuccessException(e);
+        } catch (OperationNotSupported_Fault e) {
+            return false;
         }
+        //return getBooleanResult(resultArray[0]);
         return true;
-	}
+    }
+
+//    private boolean getBooleanResult(Result res) throws NoSuccessException, PermissionDeniedException {
+//        ResultChoice_type0 err = res.getResultChoice_type0();
+//        if (err != null) {
+//            if (err.isJobStatusInvalidFaultSpecified()) {
+//                return false;
+//            } else if (err.isJobUnknownFaultSpecified()) {
+//                throw new NoSuccessException(err.getJobUnknownFault().getDescription());
+//            } else if (err.isDateMismatchFaultSpecified()) {
+//                throw new NoSuccessException(err.getDateMismatchFault().getDescription());
+//            } else if (err.isDelegationIdMismatchFaultSpecified()) {
+//                throw new PermissionDeniedException(err.getDelegationIdMismatchFault().getDescription());
+//            } else if (err.isGenericFaultSpecified()) {
+//                throw new NoSuccessException(err.getGenericFault().getDescription());
+//            } else if (err.isLeaseIdMismatchFaultSpecified()) {
+//                throw new NoSuccessException(err.getLeaseIdMismatchFault().getDescription());
+//            } else {
+//                throw new NoSuccessException("Unable to get Fault");
+//            }
+//        }
+//        return true;
+//    }
 }
