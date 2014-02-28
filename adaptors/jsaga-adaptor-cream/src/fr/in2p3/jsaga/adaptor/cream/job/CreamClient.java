@@ -41,6 +41,7 @@ import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobResumeRequest;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobStartRequest;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobSuspendRequest;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.Result;
+import org.glite.ce.creamapi.ws.cream2.CREAMStub.ResultChoice_type0;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.ServiceInfo;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.ServiceInfoRequest;
 import org.glite.ce.creamapi.ws.cream2.Generic_Fault;
@@ -153,6 +154,7 @@ public class CreamClient {
 
         this.registerProtocol();
         Result[] r = m_creamStub.jobStart(request).getJobStartResponse().getResult();
+        rethrowException(r);
         return r;
     }
     
@@ -164,6 +166,7 @@ public class CreamClient {
         
         this.registerProtocol();
         Result[] r = m_creamStub.jobCancel(request).getJobCancelResponse().getResult();
+        rethrowException(r);
         return r;
     }
     
@@ -175,6 +178,7 @@ public class CreamClient {
         
         this.registerProtocol();
         Result[] r = m_creamStub.jobPurge(request).getJobPurgeResponse().getResult();
+        rethrowException(r);
         return r;
     }
     
@@ -186,6 +190,7 @@ public class CreamClient {
         
         this.registerProtocol();
         Result[] r = m_creamStub.jobSuspend(request).getJobSuspendResponse().getResult();
+        rethrowException(r);
         return r;
     }
     
@@ -197,6 +202,7 @@ public class CreamClient {
         
         this.registerProtocol();
         Result[] r = m_creamStub.jobResume(request).getJobResumeResponse().getResult();
+        rethrowException(r);
         return r;
         
     }
@@ -300,17 +306,7 @@ public class CreamClient {
     }
 
     public void disconnect() {
-//        try {
-//            m_creamStub._getServiceClient().cleanup();
-//        } catch (AxisFault e) {
-//            m_logger.warn("Could not clean Stub", e);
-//        }
         m_creamStub = null;
-//        try {
-//            m_delegationStub.cleanup();
-//        } catch (AxisFault e) {
-//            m_logger.warn("Could not clean Stub", e);
-//        }
         this.m_delegationStub = null;
         m_creamUrl = null;
     }
@@ -335,4 +331,18 @@ public class CreamClient {
         return filter;
     }
 
+    private void rethrowException(Result[] r) throws NoSuccessException, Authorization_Fault, InvalidArgument_Fault {
+        ResultChoice_type0  rc = r[0].getResultChoice_type0();
+        if (rc!=null) {
+            if (rc.isDateMismatchFaultSpecified()) {
+                throw new NoSuccessException(rc.getDateMismatchFault().getDescription());
+            } else if (rc.isDelegationIdMismatchFaultSpecified()) {
+                throw new Authorization_Fault(rc.getDelegationIdMismatchFault().getDescription());
+            } else if (rc.isJobStatusInvalidFaultSpecified()) {
+                throw new NoSuccessException(rc.getJobStatusInvalidFault().getDescription());
+            } else if (rc.isJobUnknownFaultSpecified()) {
+                throw new InvalidArgument_Fault(rc.getJobUnknownFault().getDescription());
+            }
+        }
+    }
 }
