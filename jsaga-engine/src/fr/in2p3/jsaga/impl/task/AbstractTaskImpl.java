@@ -195,7 +195,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
             case CANCELED:
             case FAILED:
                 // just ignore
-                break;
+//                break;
             case RUNNING:
                 // try to cancel synchronously
                 this.doCancel();
