@@ -30,7 +30,7 @@ import org.ogf.saga.url.URL;
     SRMIntegrationTestSuite.SRMFileWriteTest.class,
     SRMIntegrationTestSuite.SRMDataMovementTest.class,
     SRMIntegrationTestSuite.SRMEmulatorDataMovementTest.class,
-    SRMIntegrationTestSuite.SRMPermissionsTest.class,
+    SRMIntegrationTestSuite.SRMPermissionsTest.class
     })
 /**
  *
