@@ -21,12 +21,12 @@ public interface SuspendableJobAdaptor extends JobControlAdaptor {
      * @param nativeJobId the identifier of the job in the grid
      * @return true if the job has been successfully suspended, false if it was not active
      */
-    public boolean suspend(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException;
+    public boolean suspend(String nativeJobId) throws IncorrectStateException, PermissionDeniedException, TimeoutException, NoSuccessException;
 
     /**
      * resume a suspended job
      * @param nativeJobId the identifier of the job in the grid
      * @return true if the job has been successfully resumed, false if it was not suspended
      */
-    public boolean resume(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException;
+    public boolean resume(String nativeJobId) throws IncorrectStateException, PermissionDeniedException, TimeoutException, NoSuccessException;
 }
