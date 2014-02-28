@@ -30,7 +30,7 @@ import org.ogf.saga.namespace.EntryTest;
     SrbIntegrationTestSuite.SrbDirectoryTest.class,
     SrbIntegrationTestSuite.SrbFileReadTest.class,
     SrbIntegrationTestSuite.SrbFileWriteTest.class,
-    SrbIntegrationTestSuite.Srb_to_EmulatorDataMovementTest.class,
+    SrbIntegrationTestSuite.Srb_to_EmulatorDataMovementTest.class
     })
 public class SrbIntegrationTestSuite{
 

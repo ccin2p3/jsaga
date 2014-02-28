@@ -32,7 +32,7 @@ import org.ogf.saga.namespace.SetUpTest;
     IrodsIntegrationTestSuite.IrodsDirectoryTest.class,
     IrodsIntegrationTestSuite.IrodsFileReadTest.class,
     IrodsIntegrationTestSuite.IrodsFileWriteTest.class,
-    IrodsIntegrationTestSuite.Irods_to_EmulatorDataMovementTest.class,
+    IrodsIntegrationTestSuite.Irods_to_EmulatorDataMovementTest.class
     })
 public class IrodsIntegrationTestSuite {
 
