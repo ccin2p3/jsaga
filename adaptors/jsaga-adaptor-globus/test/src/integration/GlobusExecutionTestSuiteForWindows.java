@@ -26,7 +26,6 @@ import org.ogf.saga.task.State;
 * Date:   9 nov. 2007
 * ***************************************************
 * Description:                                      */
-@SuppressWarnings("deprecation")
 /**
  *
  */
@@ -37,7 +36,7 @@ import org.ogf.saga.task.State;
     GlobusExecutionTestSuite.GlobusJobDescriptionTest.class,
     GlobusExecutionTestSuite.GlobusJobRunDescriptionTest.class,
     GlobusExecutionTestSuite.GlobusJobRunSandboxTest.class,
-    GlobusExecutionTestSuite.GlobusJobRunInteractiveTest.class,
+    GlobusExecutionTestSuite.GlobusJobRunInteractiveTest.class
     })
 public class GlobusExecutionTestSuiteForWindows {
 
