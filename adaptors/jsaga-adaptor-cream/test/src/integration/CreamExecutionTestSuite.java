@@ -25,7 +25,6 @@ import org.ogf.saga.job.run.RequiredTest;
 import org.ogf.saga.job.run.RequirementsTest;
 import org.ogf.saga.job.run.SandboxTest;
 import org.ogf.saga.task.State;
-import fr.in2p3.jsaga.adaptor.cream.job.DelegationStub;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -183,7 +182,6 @@ public class CreamExecutionTestSuite {
         }
         @Test
         public void test_destroy_delegation() throws Exception {
-//            DelegationStub stub = new DelegationStub(m_url.getHost(), m_url.getPort(), DelegationStub.ANY_VO);
             DelegationServiceStub stub = new DelegationServiceStub(new URL("https", m_url.getHost(), m_url.getPort(), "/ce-cream/services/gridsite-delegation").toString());
             Destroy destroy = new Destroy();
             destroy.setDelegationID(m_delegationId);
