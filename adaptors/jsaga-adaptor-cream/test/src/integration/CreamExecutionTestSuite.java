@@ -162,6 +162,8 @@ public class CreamExecutionTestSuite {
 
     public static class CreamAlternativeTest extends CreamAbstractTest {
         public CreamAlternativeTest() throws Exception {  super();}
+        
+        // TODO: use CreamClient to do this
         @Test
         public void test_purge_jobs() throws Exception {
             // set filter
