@@ -1,9 +1,12 @@
 package integration;
 
+import java.net.URL;
+
 import org.glite.ce.creamapi.ws.cream2.CREAMStub;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobFilter;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobPurgeRequest;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.Result;
+import org.glite.ce.security.delegation.DelegationServiceStub;
 import org.glite.ce.security.delegation.DelegationServiceStub.Destroy;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -91,7 +94,7 @@ public class CreamExecutionTestSuite {
     	/**
          * Runs a long job, waits for running state and suspends it
          */
-        @Test
+        @Test @Ignore
         public void test_suspend_queued() throws Exception {
             
         	// prepare
@@ -180,7 +183,8 @@ public class CreamExecutionTestSuite {
         }
         @Test
         public void test_destroy_delegation() throws Exception {
-            DelegationStub stub = new DelegationStub(m_url.getHost(), m_url.getPort(), DelegationStub.ANY_VO);
+//            DelegationStub stub = new DelegationStub(m_url.getHost(), m_url.getPort(), DelegationStub.ANY_VO);
+            DelegationServiceStub stub = new DelegationServiceStub(new URL("https", m_url.getHost(), m_url.getPort(), "/ce-cream/services/gridsite-delegation").toString());
             Destroy destroy = new Destroy();
             destroy.setDelegationID(m_delegationId);
             stub.destroy(destroy);
