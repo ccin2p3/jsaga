@@ -91,56 +91,6 @@ public class CreamExecutionTestSuite {
 
     public static class CreamJobRunOptionalTest extends OptionalTest {
         public CreamJobRunOptionalTest() throws Exception {super(TYPE);}
-        
-        // TODO: move this test to OptionalTest???
-        /**
-         * Runs a long job, waits for running state and suspends it
-         */
-        @Test(expected=IncorrectStateException.class)
-        public void test_suspend_queued() throws Exception {
-            
-            // prepare
-            JobDescription desc = createLongJob();
-            
-            // submit
-            Job job = runJob(desc);
-            
-            // wait for RUNNING state (deviation from SAGA specification)
-            if (! super.waitForSubState(job, MODEL+":PENDING")) {
-                job.waitFor(Float.valueOf(FINALY_TIMEOUT));
-                fail("Job did not enter PENDING state within "+MAX_QUEUING_TIME+" seconds");
-            }
-            
-//            try {
-                
-                // suspend job
-                job.suspend();
-                
-                // wait for 1 second because suspend is an asynchronous method
-//                job.waitFor(1);
-//                
-//                // check job status
-//                assertEquals(
-//                        State.SUSPENDED,
-//                        job.getState());
-//
-//                // resume job
-//                job.resume();
-//                
-//                // wait for 1 second
-//                job.waitFor(1);
-//                
-//                // check job status
-//                assertEquals(
-//                        State.RUNNING,
-//                        job.getState());
-//            }
-//            finally {
-//                job.waitFor(Float.valueOf(FINALY_TIMEOUT));
-//            }
-        }
-        
-
     }
 
     public static class CreamJobRunSandboxTest extends SandboxTest {
