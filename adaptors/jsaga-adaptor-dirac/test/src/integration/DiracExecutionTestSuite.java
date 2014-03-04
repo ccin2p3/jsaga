@@ -89,8 +89,6 @@ public class DiracExecutionTestSuite {
         @Override @Test @Ignore("Not supported")
         public void test_resume_done() {  }
         @Override @Test @Ignore("Not supported")
-        public void test_resume_running() {  }
-        @Override @Test @Ignore("Not supported")
         public void test_suspend_done() {  }
         @Override @Test @Ignore("Not supported")
         public void test_suspend_running() {  }
