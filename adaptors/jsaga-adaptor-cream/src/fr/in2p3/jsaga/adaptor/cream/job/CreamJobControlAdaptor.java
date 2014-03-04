@@ -16,7 +16,6 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.apache.axis2.databinding.types.URI;
 import org.apache.log4j.Logger;
 import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
-import org.glite.ce.creamapi.ws.cream2.CREAMStub.ResultChoice_type0;
 import org.glite.ce.creamapi.ws.cream2.Generic_Fault;
 import org.glite.ce.creamapi.ws.cream2.InvalidArgument_Fault;
 import org.glite.ce.creamapi.ws.cream2.JobSubmissionDisabled_Fault;
@@ -51,7 +50,7 @@ import java.util.regex.Pattern;
  *
  */
 public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StagingJobAdaptorTwoPhase, CleanableJobAdaptor,
-    SuspendableJobAdaptor {
+    SuspendableJobAdaptor, HoldableJobAdaptor {
 
     // parameters extracted from URI
     private static final String BATCH_SYSTEM = "BatchSystem";
@@ -345,25 +344,14 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         return true;
     }
 
-//    private boolean getBooleanResult(Result res) throws NoSuccessException, PermissionDeniedException {
-//        ResultChoice_type0 err = res.getResultChoice_type0();
-//        if (err != null) {
-//            if (err.isJobStatusInvalidFaultSpecified()) {
-//                return false;
-//            } else if (err.isJobUnknownFaultSpecified()) {
-//                throw new NoSuccessException(err.getJobUnknownFault().getDescription());
-//            } else if (err.isDateMismatchFaultSpecified()) {
-//                throw new NoSuccessException(err.getDateMismatchFault().getDescription());
-//            } else if (err.isDelegationIdMismatchFaultSpecified()) {
-//                throw new PermissionDeniedException(err.getDelegationIdMismatchFault().getDescription());
-//            } else if (err.isGenericFaultSpecified()) {
-//                throw new NoSuccessException(err.getGenericFault().getDescription());
-//            } else if (err.isLeaseIdMismatchFaultSpecified()) {
-//                throw new NoSuccessException(err.getLeaseIdMismatchFault().getDescription());
-//            } else {
-//                throw new NoSuccessException("Unable to get Fault");
-//            }
-//        }
-//        return true;
-//    }
+    public boolean hold(String nativeJobId) 
+            throws PermissionDeniedException, TimeoutException, NoSuccessException, IncorrectStateException {
+        return this.suspend(nativeJobId);
+    }
+
+    public boolean release(String nativeJobId) 
+            throws PermissionDeniedException, TimeoutException, NoSuccessException, IncorrectStateException {
+        return this.resume(nativeJobId);
+    }
+
 }
