@@ -39,7 +39,8 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-        return new Default[]{new Default(PROTECTION, "none")};
+        return new Default[]{new Default(PROTECTION, "none"),
+                                new Default(TCP_BUFFER_SIZE, "1048576")};
     }
 
     /** override super.connect() to set data channel protection level */
