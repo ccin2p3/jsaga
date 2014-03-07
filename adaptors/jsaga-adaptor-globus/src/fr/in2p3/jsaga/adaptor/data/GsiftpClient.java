@@ -27,7 +27,7 @@ public class GsiftpClient extends GridFTPClient {
 			ServerException {
 		super(host, port);
 
-		welcomeMessage = controlChannel.getLastReply().getMessage();
+		welcomeMessage = getLastReply().getMessage();
 	}
 
 	public String getWelcome() {
