@@ -52,9 +52,11 @@ public class GsiftpClient extends GridFTPClient {
 	public void disconnect() throws ServerException, IOException {
 		try{
 			super.close();
-		}catch(EOFException e){
+		} catch(EOFException e){
 			//Already closed ?
 			logger.warn("The GSIFTP connection seems already closed: " + e.getMessage());
+		} catch (ServerException se) {
+            logger.warn(se.getCustomMessage());
 		}
 	}
 }
