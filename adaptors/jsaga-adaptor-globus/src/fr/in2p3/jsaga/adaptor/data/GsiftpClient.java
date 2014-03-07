@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.globus.ftp.GridFTPClient;
 import org.globus.ftp.exception.ServerException;
+import org.globus.ftp.vanilla.BasicClientControlChannel;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -28,6 +29,8 @@ public class GsiftpClient extends GridFTPClient {
 		super(host, port);
 
 		welcomeMessage = getLastReply().getMessage();
+		// disable maxWait=600s otherwise transfers stop after 600s ...
+		this.session.maxWait = BasicClientControlChannel.WAIT_FOREVER;
 	}
 
 	public String getWelcome() {

@@ -1,7 +1,8 @@
 package fr.in2p3.jsaga.adaptor.data;
 
+import org.globus.ftp.Session;
 import org.globus.ftp.exception.FTPException;
-import org.globus.io.streams.GridFTPOutputStream;
+import org.globus.io.streams.FTPOutputStream;
 import org.ietf.jgss.GSSCredential;
 
 import java.io.IOException;
@@ -18,10 +19,14 @@ import java.io.IOException;
 /**
  * This class is used to catch the SocketException in IOException sent by close() when the socket is already closed
  */
-public class GsiftpOutputStream extends GridFTPOutputStream {
-    public GsiftpOutputStream(GSSCredential cred, GsiftpClient ftpClient,
-			String file, boolean append) throws IOException, FTPException {
-		super(cred, ftpClient.getAuthorization(), ftpClient.getHost(), ftpClient.getPort(), file, append, false);
+public class GsiftpOutputStream extends FTPOutputStream {
+
+    public GsiftpOutputStream(GsiftpClient ftpClient, String file, boolean append) 
+            throws IOException, FTPException {
+	    
+	    ftp = ftpClient;
+	    
+	    put(true, Session.TYPE_IMAGE, file, append);
 	}
 
     /** override super.close() catch the exception at close() */
