@@ -1,6 +1,9 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import edu.sdsc.grid.io.GeneralFile;
+import java.io.File;
+
+import org.irods.jargon.core.pub.io.IRODSFile;
+
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 
@@ -17,9 +20,9 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
  *
  */
 public class GeneralFileAttributes extends FileAttributes {
-    private GeneralFile m_generalFile;
+    private File m_generalFile;
     
-    public GeneralFileAttributes(GeneralFile generalFile) {
+    public GeneralFileAttributes(File generalFile) {
         m_generalFile = generalFile;
     }
 

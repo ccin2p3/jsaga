@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.io.IRODSFile;
+import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 
@@ -36,7 +38,7 @@ import org.ogf.saga.error.*;
  *
  */
 public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
-	protected IRODSFileSystem fileSystem;
+//	protected IRODSFileSystem fileSystem;
 	protected final static String SEPARATOR = "/";
 	protected final static String FILE = "file";
 	protected final static String DIR = "dir";
@@ -45,6 +47,9 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
 	protected String srbHost, srbPort, userName, passWord, mdasDomainName, mcatZone, defaultStorageResource, metadataValue;
 	protected SecurityCredential credential;
 	protected GSSCredential cert;
+	protected IRODSAccount m_account;
+	protected IRODSFileSystem m_fileSystem;
+	protected IRODSFileFactory m_fileFactory;
 
     public Usage getUsage() {
         // TODO: upgrade to .and
@@ -121,12 +126,14 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
                 
                 m_account = IRODSAccount.instance(host, port, userName, passWord, basePath, mcatZone, defaultStorageResource);
             }
+            
             m_fileSystem = IRODSFileSystem.instance();
             // FIXME: with 3.1.4: the following line gives -806000 CAT_SQL_ERR
             //with 3.2 stuck
             m_fileFactory = m_fileSystem.getIRODSFileFactory(m_account);
         } catch (JargonException je) {
-            rethrow(je);
+            //rethrow(je);
+            throw new NoSuccessException(je);
         } catch (Exception e) {
             throw new NoSuccessException(e);
         }
@@ -134,7 +141,7 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
 
     public void disconnect() throws NoSuccessException {
         try {
-            ((IRODSFileSystem)fileSystem).close();
+            ((IRODSFileSystem)m_fileSystem).close();
         } catch (JargonException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -144,7 +151,7 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
     private FileAttributes[] listAttributesClassic(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         // methode offcielle    
         try {
-            GeneralFile[] files = FileFactory.newFile(fileSystem, absolutePath).listFiles();
+            File[] files = m_fileFactory.instanceIRODSFile(absolutePath).listFiles();
             FileAttributes[] fileAttributes = new FileAttributes[files.length];
             for (int i=0; i<files.length;i++) {
                 fileAttributes[i] = new GeneralFileAttributes(files[i]);
@@ -153,154 +160,136 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
         } catch (Exception e) {throw new NoSuccessException(e);}
     }
 
-    private FileAttributes[] listAttributesOptimized(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        boolean listDir = true;
-        boolean listFile = true;
-
-        if (additionalArgs != null && additionalArgs.equals(DIR)) { listFile=false;}
-        if (additionalArgs != null && additionalArgs.equals(FILE)) { listDir=false;}
-        
-        if (!absolutePath.equals("/")) {
-            absolutePath = absolutePath.substring(0,absolutePath.length()-1);
-        }
-
-        try {
-            // Select for directories
-            MetaDataRecordList[] rlDir = null;
-            if (listDir) {
-                MetaDataCondition conditionsDir[] = new MetaDataCondition[1];
-                MetaDataSelect selectsDir[] ={    MetaDataSet.newSelection(IRODSMetaDataSet.DIRECTORY_NAME) };
-                conditionsDir[0] = IRODSMetaDataSet.newCondition(IRODSMetaDataSet.PARENT_DIRECTORY_NAME,MetaDataCondition.EQUAL, absolutePath);
-                rlDir = fileSystem.query(conditionsDir, selectsDir);
-            }
-            
-            // Select for files
-            MetaDataRecordList[] rlFile = null;
-            if (listFile) {    
-                MetaDataCondition conditionsFile[] = new MetaDataCondition[1];
-                MetaDataSelect selectsFile[] ={MetaDataSet.newSelection(MetaDataSet.FILE_NAME),
-                MetaDataSet.newSelection(IRODSMetaDataSet.SIZE),
-                MetaDataSet.newSelection(IRODSMetaDataSet.MODIFICATION_DATE)};
-                
-                conditionsFile[0] = IRODSMetaDataSet.newCondition(
-                IRODSMetaDataSet.DIRECTORY_NAME,MetaDataCondition.EQUAL, absolutePath);
-                rlFile = fileSystem.query(conditionsFile, selectsFile);
-            }
-            
-            int file =0;
-            int dir = 0;
-            if (rlDir != null) {dir=rlDir.length;}
-            if (rlFile != null) {file=rlFile.length;}
-            
-            // Supppres "/" when list /
-            int root =0;
-            for (int i = 0; i < dir; i++) {
-                String m_name = (String) rlDir[i].getValue(rlDir[i].getFieldIndex(IRODSMetaDataSet.DIRECTORY_NAME));
-                if (m_name.equals(SEPARATOR)) {root++;}
-            }
-            
-            int ind=0;
-            FileAttributes[] fileAttributes = new FileAttributes[dir+file-root];
-            for (int i = 0; i < dir; i++) {
-                String m_name = (String) rlDir[i].getValue(rlDir[i].getFieldIndex(IRODSMetaDataSet.DIRECTORY_NAME));
-                if (!m_name.equals(SEPARATOR)) {
-                    fileAttributes[ind] = new IrodsFileAttributesOptimized(rlDir[i],null);
-                    ind++;
-                }
-            }
-            
-            for (int i = 0; i < file; i++) {
-                fileAttributes[ind] = new IrodsFileAttributesOptimized(null,rlFile[i]);
-                ind++;
-            }
-            return fileAttributes;
-        } catch (IOException e) {throw new NoSuccessException(e);}
-    }
+//    private FileAttributes[] listAttributesOptimized(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+//        boolean listDir = true;
+//        boolean listFile = true;
+//
+//        if (additionalArgs != null && additionalArgs.equals(DIR)) { listFile=false;}
+//        if (additionalArgs != null && additionalArgs.equals(FILE)) { listDir=false;}
+//        
+//        if (!absolutePath.equals("/")) {
+//            absolutePath = absolutePath.substring(0,absolutePath.length()-1);
+//        }
+//
+//        try {
+//            // Select for directories
+//            MetaDataRecordList[] rlDir = null;
+//            if (listDir) {
+//                MetaDataCondition conditionsDir[] = new MetaDataCondition[1];
+//                MetaDataSelect selectsDir[] ={    MetaDataSet.newSelection(IRODSMetaDataSet.DIRECTORY_NAME) };
+//                conditionsDir[0] = IRODSMetaDataSet.newCondition(IRODSMetaDataSet.PARENT_DIRECTORY_NAME,MetaDataCondition.EQUAL, absolutePath);
+//                rlDir = fileSystem.query(conditionsDir, selectsDir);
+//            }
+//            
+//            // Select for files
+//            MetaDataRecordList[] rlFile = null;
+//            if (listFile) {    
+//                MetaDataCondition conditionsFile[] = new MetaDataCondition[1];
+//                MetaDataSelect selectsFile[] ={MetaDataSet.newSelection(MetaDataSet.FILE_NAME),
+//                MetaDataSet.newSelection(IRODSMetaDataSet.SIZE),
+//                MetaDataSet.newSelection(IRODSMetaDataSet.MODIFICATION_DATE)};
+//                
+//                conditionsFile[0] = IRODSMetaDataSet.newCondition(
+//                IRODSMetaDataSet.DIRECTORY_NAME,MetaDataCondition.EQUAL, absolutePath);
+//                rlFile = fileSystem.query(conditionsFile, selectsFile);
+//            }
+//            
+//            int file =0;
+//            int dir = 0;
+//            if (rlDir != null) {dir=rlDir.length;}
+//            if (rlFile != null) {file=rlFile.length;}
+//            
+//            // Supppres "/" when list /
+//            int root =0;
+//            for (int i = 0; i < dir; i++) {
+//                String m_name = (String) rlDir[i].getValue(rlDir[i].getFieldIndex(IRODSMetaDataSet.DIRECTORY_NAME));
+//                if (m_name.equals(SEPARATOR)) {root++;}
+//            }
+//            
+//            int ind=0;
+//            FileAttributes[] fileAttributes = new FileAttributes[dir+file-root];
+//            for (int i = 0; i < dir; i++) {
+//                String m_name = (String) rlDir[i].getValue(rlDir[i].getFieldIndex(IRODSMetaDataSet.DIRECTORY_NAME));
+//                if (!m_name.equals(SEPARATOR)) {
+//                    fileAttributes[ind] = new IrodsFileAttributesOptimized(rlDir[i],null);
+//                    ind++;
+//                }
+//            }
+//            
+//            for (int i = 0; i < file; i++) {
+//                fileAttributes[ind] = new IrodsFileAttributesOptimized(null,rlFile[i]);
+//                ind++;
+//            }
+//            return fileAttributes;
+//        } catch (IOException e) {throw new NoSuccessException(e);}
+//    }
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (this.isClassic()) {
+//        if (this.isClassic()) {
             return this.listAttributesClassic(absolutePath, additionalArgs);
-        } else {
-            return this.listAttributesOptimized(absolutePath, additionalArgs);
-        }
+//        } else {
+//            return this.listAttributesOptimized(absolutePath, additionalArgs);
+//        }
     }
 
     public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath + directoryName+SEPARATOR);
+        IRODSFile irodsFile;
+        try {
+            irodsFile = m_fileFactory.instanceIRODSFile(parentAbsolutePath + directoryName+SEPARATOR);
+        } catch (JargonException e) {
+            throw new NoSuccessException(e);
+        }
         boolean  bool= irodsFile.delete(); 
         FileAttributes[] test = listAttributes( parentAbsolutePath + directoryName+SEPARATOR,additionalArgs);
         if (!bool) {throw new NoSuccessException("Directory not empty"+test.length);}
     }
 
     public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + fileName);
+        IRODSFile irodsFile;
+        try {
+            irodsFile = m_fileFactory.instanceIRODSFile(parentAbsolutePath +SEPARATOR + fileName);
+        } catch (JargonException e) {
+            throw new NoSuccessException(e);
+        }
         irodsFile.delete();
     }
     
     
-    void parseValue(Map attributes, String userInfo) throws NoSuccessException {
-        
+	public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+		IRODSFile generalFile;
         try {
-            if (userInfo!=null) {
-                int pos =userInfo.indexOf(":");
-                if (pos<0) {
-                    userName = userInfo;
-                } else {
-                    userName = userInfo.substring(0, pos); 
-                    passWord = userInfo.substring(pos+1, userInfo.length());
-                }
-            } else {
-                if (credential instanceof GSSCredentialSecurityCredential) {
-                    userName =  (String) attributes.get(Context.USERID);
-                } else {
-                    userName = credential.getUserID();
-                }
-            }
-        } catch (Exception e) {
+            generalFile = m_fileFactory.instanceIRODSFile(absolutePath);
+        } catch (JargonException e) {
             throw new NoSuccessException(e);
         }
-
-        if (credential instanceof UserPassSecurityCredential) {
-            passWord = ((UserPassSecurityCredential) credential).getUserPass();
-        } else if (credential instanceof GSSCredentialSecurityCredential) {
-            passWord = null;
-        }
-        
-        // Parsing for defaultResource
-        Set set = attributes.entrySet();
-        Iterator iterator = set.iterator();
-
-        while (iterator.hasNext()) {
-            Map.Entry me = (Map.Entry) iterator.next();
-            String key = ((String)me.getKey()).toLowerCase();
-            String value =(String)me.getValue();
-            
-            if (key.equals(DEFAULTRESOURCE)) {
-                defaultStorageResource = value;
-            } else if (key.equals(DOMAIN)) {
-                mdasDomainName  = value;
-            } else if (key.equals(ZONE)) {
-                mcatZone  = value;
-            } else if (key.equals(METADATAVALUE)) {
-                metadataValue = value;
-            }
-        }
-    }
-	public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		IRODSFile generalFile = new IRODSFileFactoryImpl(null, null).instanceIRODSFile(absolutePath);
         return generalFile.exists();
 	}
 
 	public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-		GeneralFile generalFile =  FileFactory.newFile(fileSystem, absolutePath);
-		return new GeneralFileAttributes(generalFile);
+		IRODSFile generalFile;
+        try {
+            generalFile = m_fileFactory.instanceIRODSFile(absolutePath);
+        } catch (JargonException e) {
+            throw new NoSuccessException(e);
+        }
+		return new GeneralFileAttributes(generalFile.getAbsoluteFile());
     }
 
 	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
-		GeneralFile parentFile =  FileFactory.newFile(fileSystem, parentAbsolutePath);
+		IRODSFile parentFile;
+        try {
+            parentFile = m_fileFactory.instanceIRODSFile(parentAbsolutePath);
+        } catch (JargonException e) {
+            throw new NoSuccessException(e);
+        }
 		if (!parentFile.exists()) {throw new ParentDoesNotExist(parentAbsolutePath);}
 	
-		GeneralFile generalFile =  FileFactory.newFile(fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
+		IRODSFile generalFile;
+        try {
+            generalFile = m_fileFactory.instanceIRODSFile(parentAbsolutePath +SEPARATOR + directoryName);
+        } catch (JargonException e) {
+            throw new NoSuccessException(e);
+        }
 		if (generalFile.exists()) {throw new AlreadyExistsException(parentAbsolutePath+SEPARATOR + directoryName);}
 
 		generalFile.mkdir();
