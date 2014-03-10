@@ -171,7 +171,11 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
 
     public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception {
         // get attributes
-        GSSCredential cred = load(new File((String) attributes.get(Context.USERPROXY)));
+        File proxy = new File((String) attributes.get(Context.USERPROXY));
+        if (!proxy.exists()) {
+            return;
+        }
+        GSSCredential cred = load(proxy);
         DestroyParams proxyParameters = new DestroyParams();
 
         String myProxyServer = (String) attributes.get(VOMSContext.MYPROXYSERVER);
