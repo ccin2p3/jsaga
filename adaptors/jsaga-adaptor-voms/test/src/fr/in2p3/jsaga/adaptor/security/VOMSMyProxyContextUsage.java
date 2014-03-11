@@ -27,6 +27,19 @@ public class VOMSMyProxyContextUsage extends VOMSContextUsage {
         m_tmpFile = File.createTempFile("jsaga-test-" + m_type, ".tmp");
     }
     
+    @Test @Override
+    public void userProxyExists() throws Exception {
+        m_context.removeAttribute(GlobusContext.USERPROXYOBJECT);
+        Assert.assertEquals(GlobusSecurityAdaptor.USAGE_LOAD, getMatchingUsage());
+    }
+    
+    @Test @Override
+    public void initialProxy() throws Exception {
+        prepareContextForProxyInit();
+        m_context.setAttribute(GlobusContext.DELEGATIONLIFETIME, "PT12H");
+        Assert.assertEquals(VOMSSecurityAdaptor.USAGE_INIT_PROXY, getMatchingUsage());
+    }
+    
     @Test
     public void getDelegatedFromMemory() throws Exception {
         m_context.setAttribute(GlobusContext.DELEGATIONLIFETIME, "PT12H");
