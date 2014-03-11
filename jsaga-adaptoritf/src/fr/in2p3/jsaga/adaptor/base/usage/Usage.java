@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.base.usage;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
 
+import java.io.FileNotFoundException;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,8 +38,9 @@ public interface Usage {
      * @param attributes a map containing all the attributes
      * @return the first matching usage
      * @throws DoesNotExistException if no usage matches the attributes
+     * @throws FileNotFoundException 
      */
-    public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException, BadParameterException;
+    public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException, BadParameterException, FileNotFoundException;
 
     /**
      * Build a usage instance containing missing attributes only

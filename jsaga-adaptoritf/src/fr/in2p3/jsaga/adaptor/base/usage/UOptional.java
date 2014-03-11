@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.base.usage;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
 
+import java.io.FileNotFoundException;
 import java.util.Map;
 
 /* ***************************************************
@@ -30,7 +31,9 @@ public class UOptional extends U {
     public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException, BadParameterException {
         try {
             super.getFirstMatchingUsage(attributes);
-        } catch (DoesNotExistException e) {}
+        } catch (DoesNotExistException e) {
+        } catch (FileNotFoundException e) {
+        }
         return m_id;
     }
     

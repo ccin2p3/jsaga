@@ -13,6 +13,7 @@ import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.*;
 
@@ -279,6 +280,9 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
                 throw new NoSuccessException("[INTERNAL ERROR] Unexpected exception", this);
             }
         } catch (BadParameterException e) {
+            throw new IncorrectStateException("Invalid attribute(s): " + e.getMessage(), e);
+        } catch (FileNotFoundException e) {
+            // Should not happen
             throw new IncorrectStateException("Invalid attribute(s): " + e.getMessage(), e);
         }
         m_credential = m_adaptor.createSecurityCredential(

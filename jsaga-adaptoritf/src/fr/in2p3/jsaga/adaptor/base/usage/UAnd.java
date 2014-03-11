@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.base.usage;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
 
+import java.io.FileNotFoundException;
 import java.util.*;
 
 /* ***************************************************
@@ -40,10 +41,24 @@ public class UAnd extends ULogicalOperation {
         m_id = id;
     }
 
+    /**
+     * If 1 of Usages does not exist or is BadParameter, rethrow
+     * Otherwise, if 1 of Usages is FileNotFound return -1
+     * Otherwise, returns firstMatchingUsage if != -1
+     * Otherwise, returns m_id
+     */
+    @Override
     public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException, BadParameterException {
         int firstMatchingUsage = -1;
         for (Iterator<Usage> i = this.iterator(); i.hasNext();) {
-            int id = i.next().getFirstMatchingUsage(attributes);
+            Usage nextU = i.next();
+            // validate usage: if FileNotFound
+            int id;
+            try {
+                id = nextU.getFirstMatchingUsage(attributes);
+            } catch (FileNotFoundException e) {
+                return -1;
+            }
             if (firstMatchingUsage==-1 && id>-1) {
                 firstMatchingUsage = id;
             }

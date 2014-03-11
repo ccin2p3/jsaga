@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.base.usage;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
 
+import java.io.FileNotFoundException;
 import java.util.*;
 
 /* ***************************************************
@@ -38,6 +39,8 @@ public class UOr extends ULogicalOperation {
                     return id;
                 }
             } catch(DoesNotExistException e) {
+                // try next
+            } catch (FileNotFoundException e) {
                 // try next
             }
         }
