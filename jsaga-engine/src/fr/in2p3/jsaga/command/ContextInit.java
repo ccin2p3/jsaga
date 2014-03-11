@@ -56,7 +56,7 @@ public class ContextInit extends AbstractCommand {
                     Context context = ConfigurableContextFactory.createContext(configContexts[i]);
                     // set password
                     setUserPass(context);
-                    ((ContextImpl) context).destroy();
+                    //((ContextImpl) context).destroy();
                     // add context to session (and init context)
                     session.addContext(context);
                 }
