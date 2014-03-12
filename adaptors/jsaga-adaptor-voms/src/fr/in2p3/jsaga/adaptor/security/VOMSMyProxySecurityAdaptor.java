@@ -98,13 +98,13 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
                     GSSCredential cred = adaptor.getGSSCredential();
 
                     // send it to MyProxy server
-                    storeCredential(cred, attributes);
-
-                    // destroy local temporary proxy (requires anonymous to be authorized by server's default trusted_retrievers policy)
-                    //Util.destroy(tempFile);
-
-                    // returns
-                    return this.createSecurityAdaptor(cred, attributes);
+                    try {
+                        storeCredential(cred, attributes);
+                        return this.createSecurityAdaptor(cred, attributes);
+                    } catch (Exception e) {
+                        super.destroySecurityAdaptor(attributes, contextId);
+                        throw e;
+                    }
                 }
                 case GlobusSecurityAdaptor.USAGE_MEMORY:
                 case GlobusSecurityAdaptor.USAGE_LOAD: {
