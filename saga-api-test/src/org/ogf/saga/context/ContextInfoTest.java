@@ -1,7 +1,6 @@
 package org.ogf.saga.context;
 
 import org.junit.Test;
-import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 
@@ -17,30 +16,32 @@ import org.ogf.saga.session.SessionFactory;
 /**
  *
  */
-public abstract class ContextInfoTest extends JSAGABaseTest {
-    private String m_type = null;
+public abstract class ContextInfoTest extends ContextTest {
+    private static String ALL_CONTEXTS = "all";
     
     protected ContextInfoTest() throws Exception {
-        super();
+        super(ALL_CONTEXTS);
     }
 
-    protected ContextInfoTest(String contextType) throws Exception {
-        super();
-        this.m_type = contextType;
+    protected ContextInfoTest(String contextId) throws Exception {
+        super(contextId);
     }
     
     @Test
     public void info() throws Exception {
-        Session session = SessionFactory.createSession();
-        Context[] contexts = session.listContexts();
-        for (int i=0; i<contexts.length; i++) {
-            if (this.m_type == null || this.m_type.equals((String)contexts[i].getAttribute(Context.TYPE))) {
+        
+        // Keep old mechanism for printing all contexts in default session
+        if (this.m_contextId.equals(ALL_CONTEXTS)) {
+            Session session = SessionFactory.createSession();
+            Context[] contexts = session.listContexts();
+            for (int i=0; i<contexts.length; i++) {
                 Context context = contexts[i];
     
                 // print title
                 System.out.println("Security context: "+context.getAttribute(Context.TYPE));
     
                 // trigger initialization of context
+                // TODO: check if this is useful (init is done in session(true)...)
                 try {
                 	session.addContext(context);
                 } catch(Exception e) {
@@ -50,7 +51,25 @@ public abstract class ContextInfoTest extends JSAGABaseTest {
                 // print context
                 System.out.println(context);
             }
+            session.close();
+        } else {
+            Session session = SessionFactory.createSession(false);
+            Context context = ContextFactory.createContext();
+            context.setAttribute(Context.TYPE, m_contextId);
+        
+            // set context-specific attributes
+            this.updateContextAttributes(context);
+    
+            // trigger initialization of context
+            try {
+                session.addContext(context);
+            } catch(Exception e) {
+                System.out.println("  Context not initialized ["+e.getMessage()+"]");
+            }
+        
+            // print context
+            System.out.println(context);
+            session.close();
         }
-        session.close();
     }
 }

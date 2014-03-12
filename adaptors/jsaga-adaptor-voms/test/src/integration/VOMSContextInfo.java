@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextInfoTest;
  */
 public class VOMSContextInfo extends ContextInfoTest {
     public VOMSContextInfo() throws Exception {
-        super();
+        super("VOMS");
     }
 }

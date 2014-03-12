@@ -1,7 +1,6 @@
 package org.ogf.saga.context;
 
 import org.junit.Test;
-import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 
@@ -20,8 +19,7 @@ import java.awt.*;
 /**
  *
  */
-public abstract class ContextInitTest extends JSAGABaseTest {
-    private String m_contextId;
+public abstract class ContextInitTest extends ContextTest {
     private boolean m_hasUserPass;
 
     protected ContextInitTest(String contextId) throws Exception {
@@ -29,16 +27,8 @@ public abstract class ContextInitTest extends JSAGABaseTest {
     }
 
     protected ContextInitTest(String contextId, boolean hasUserPass) throws Exception {
-        super();
-        m_contextId = contextId;
+        super(contextId);
         m_hasUserPass = hasUserPass;
-    }
-
-    /**
-     * Override this method to add context-specific attributes at run-time.
-     */
-    protected void updateContextAttributes(Context context) throws Exception {
-        // do nothing
     }
 
     @Test
