@@ -100,6 +100,10 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
                     // send it to MyProxy server
                     try {
                         storeCredential(cred, attributes);
+                        // get delegated proxy from the one we just put ...
+                        cred = getDelegatedCredential(cred, attributes);
+                        // overwrite local VOMS proxy
+                        save(new File((String) attributes.get(Context.USERPROXY)), cred);
                         return this.createSecurityAdaptor(cred, attributes);
                     } catch (Exception e) {
                         super.destroySecurityAdaptor(attributes, contextId);
