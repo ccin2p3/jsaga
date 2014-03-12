@@ -34,11 +34,11 @@
             <attribute name="UserCert" value="${user.home}/.jsaga/contexts/globus/usercert.pem"/>
             <attribute name="UserKey" value="${user.home}/.jsaga/contexts/globus/userkey.pem"/>
             <attribute name="LifeTime" value="PT72H"/>
-            <attribute name="MyProxyServer" value="cclcgsrvli02.in2p3.fr:7512"/>
+            <attribute name="MyProxyServer" value="myproxy.cern.ch:7512"/>
             <attribute name="DelegationLifeTime" value="PT120H"/> 
             <!--  Optional attributes (equivalent to "-d -n" if not specified) -->
             <attribute name="MyProxyUserID" value="jsaga"/>
-            <!-- <attribute name="MyProxyPass" value="tototo"/> -->
+            <attribute name="MyProxyPass" value="tototo"/>
         </context>
     </contexts>
     <session>
