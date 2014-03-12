@@ -69,26 +69,14 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
                     .or(new UAnd.Builder()
                             .and(new UFile(USAGE_INIT_PROXY, VOMSContext.INITIALPROXY))
                             .and(getInitProxyUsages())
-                            // TODO: why not UDuration?
-                            .and(new UOptional(GlobusContext.DELEGATIONLIFETIME) {
-                                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
-                                        return (value != null ? super.throwExceptionIfInvalid(value) : null);
-                                    }
-                                }
-                            )
+                            .and(new UOptionalDuration(GlobusContext.DELEGATIONLIFETIME))
                             .build()
                        )
                     .or(new UAnd.Builder()
                             .and(fr.in2p3.jsaga.adaptor.security.usage.Util.buildCertsUsage())
                             .and(new UHidden(Context.USERPASS))
                             .and(getInitProxyUsages())
-                            // TODO: why not UDuration?
-                            .and(new UOptional(GlobusContext.DELEGATIONLIFETIME) {
-                                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
-                                        return (value != null ? super.throwExceptionIfInvalid(value) : null);
-                                    }
-                                }
-                            )
+                            .and(new UOptionalDuration(GlobusContext.DELEGATIONLIFETIME))
                             .build()
                        )
                     .build()

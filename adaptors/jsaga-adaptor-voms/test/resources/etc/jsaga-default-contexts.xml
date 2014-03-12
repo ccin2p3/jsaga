@@ -42,7 +42,7 @@
         </context>
     </contexts>
     <session>
-        <context type="VOMSMyProxy" id="dteam"/>
-        <!-- <context type="VOMSMyProxy" id="myproxy"/> -->
+        <context type="VOMS" id="dteam"/>
+        <context type="VOMSMyProxy" id="myproxy"/>
     </session>
 </jsaga-default>
