@@ -34,16 +34,17 @@ import org.globus.gsi.util.ProxyCertificateUtil;
  */
 public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
 
-    protected String _genuineLifeTime;
-    protected String _localLifeTime;
+//    protected String _genuineLifeTime;
+//    protected String _localLifeTime;
 
     public VOMSMyProxySecurityCredential(GSSCredential proxy, Map attributes) {
         super(proxy, attributes);
-        this._genuineLifeTime = (String) attributes.get(Context.LIFETIME);
-        this._localLifeTime = (String) attributes.get(GlobusContext.DELEGATIONLIFETIME);
-        if (_localLifeTime == null) {
-            _localLifeTime = VOMSSecurityAdaptor.DEFAULT_LIFETIME;
-        }
+        // TODO: what is this?
+//        this._genuineLifeTime = (String) attributes.get(Context.LIFETIME);
+//        this._localLifeTime = (String) attributes.get(GlobusContext.DELEGATIONLIFETIME);
+//        if (_localLifeTime == null) {
+//            _localLifeTime = VOMSSecurityAdaptor.DEFAULT_LIFETIME;
+//        }
     }
 
     /**
@@ -51,7 +52,7 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
      */
     public String getAttribute(String key) throws NotImplementedException, NoSuccessException {
         // get attribute
-        if (Context.LIFETIME.equals(key) || GlobusContext.DELEGATIONLIFETIME.equals(key)) {
+        if (GlobusContext.DELEGATIONLIFETIME.equals(key)) {
             // same as globus
             X509Credential globusProxy;
             if (m_proxy instanceof GlobusGSSCredentialImpl) {
@@ -59,17 +60,17 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
             } else {
                 throw new NoSuccessException("Not a globus proxy");
             }
-            List<VOMSAttribute> v = VOMSValidators.newValidator().validate(globusProxy.getCertificateChain());
+            List<VOMSAttribute> v = VOMSValidators.newParser().parse(globusProxy.getCertificateChain());
             VOMSAttribute attr = (VOMSAttribute) v.get(0);
-            try {
+//            try {
                 long timeleft = (attr.getNotAfter().getTime() - System.currentTimeMillis()) / 1000;
-                if (Context.LIFETIME.equals(key)) {
-                    timeleft = timeleft + UDuration.toInt(this._genuineLifeTime) - UDuration.toInt(_localLifeTime);
-                }
+//                if (Context.LIFETIME.equals(key)) {
+//                    timeleft = timeleft + UDuration.toInt(this._genuineLifeTime) - UDuration.toInt(_localLifeTime);
+//                }
                 return "" + (timeleft > 0 ? timeleft : 0);
-            } catch (ParseException e) {
-                throw new NoSuccessException(e);
-            }
+//            } catch (ParseException e) {
+//                throw new NoSuccessException(e);
+//            }
         } else {
             return super.getAttribute(key);
         }
@@ -93,7 +94,8 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
         out.println("  type     : " + ProxyCertificateUtil.getProxyTypeAsString(globusProxy.getProxyType()));
         out.println("  strength : " + globusProxy.getStrength() + " bits");
         // the genuine lifetime is the one on the server (set by the user config)
-        out.println("  timeleft : " + Util.formatTimeSec(globusProxy.getTimeLeft() + UDuration.toInt(this._genuineLifeTime) - UDuration.toInt(_localLifeTime)));
+//        out.println("  timeleft : " + Util.formatTimeSec(globusProxy.getTimeLeft() + UDuration.toInt(this._genuineLifeTime) - UDuration.toInt(_localLifeTime)));
+        out.println("  timeleft : " + Util.formatTimeSec(globusProxy.getTimeLeft()));
 
         // VOMS specific
         List<VOMSAttribute> v = VOMSValidators.newParser().parse(globusProxy.getCertificateChain());
@@ -108,7 +110,7 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
             }
             long timeleft = (attr.getNotAfter().getTime() - System.currentTimeMillis()) / 1000;
             // the genuine lifetime is the one on the server (set by the user config)
-            timeleft = timeleft + UDuration.toInt(this._genuineLifeTime) - UDuration.toInt(_localLifeTime);
+//            timeleft = timeleft + UDuration.toInt(this._genuineLifeTime) - UDuration.toInt(_localLifeTime);
             if (timeleft < 0) {
                 timeleft = 0;
             }
