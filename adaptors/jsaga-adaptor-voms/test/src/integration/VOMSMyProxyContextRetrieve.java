@@ -25,6 +25,8 @@ public class VOMSMyProxyContextRetrieve extends ContextInitTest {
 
     protected void updateContextAttributes(Context context) throws Exception {
     	// "DelegationLifeTime" activates USAGE_GET_DELEGATED_* usage
-        context.setAttribute(GlobusContext.DELEGATIONLIFETIME, "PT4H");
+        if (!context.existsAttribute(GlobusContext.DELEGATIONLIFETIME)) {
+            context.setAttribute(GlobusContext.DELEGATIONLIFETIME, "PT4H");
+        }
     }
 }
