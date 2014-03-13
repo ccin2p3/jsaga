@@ -20,13 +20,13 @@ import java.util.*;
  */
 public class UOr extends ULogicalOperation {
 
-    public UOr(Collection<Usage> c) {
+    protected UOr(Collection<Usage> c) {
         super(c);
     }
     
 
     @Deprecated
-    protected UOr(Usage[] array) {
+    public UOr(Usage[] array) {
         super(array);
     }
 
