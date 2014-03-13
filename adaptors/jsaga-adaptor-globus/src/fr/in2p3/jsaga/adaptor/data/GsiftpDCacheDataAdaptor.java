@@ -1,11 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import org.globus.ftp.exception.UnexpectedReplyCodeException;
 import org.ogf.saga.error.*;
-
-import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -24,18 +20,6 @@ public class GsiftpDCacheDataAdaptor extends Gsiftp2DataAdaptor {
         return "gsiftp-dcache";
     }
 
-//    /** setting protection level is not supported */
-//    public Usage getUsage() {
-//        return null;
-//    }
-//
-//    /** setting protection level is not supported */
-//    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-//        return null;
-//    }
-//
-    // TODO override connect to check Protection attribute
-    
     protected void rethrowParsedException(UnexpectedReplyCodeException e) throws DoesNotExistException, AlreadyExistsException, PermissionDeniedException, NoSuccessException {
         String message = e.getReply().getMessage();
         if (message.indexOf("not a plain file") > -1 || message.indexOf("Local error") > -1 || message.indexOf("File not found") > -1) {
