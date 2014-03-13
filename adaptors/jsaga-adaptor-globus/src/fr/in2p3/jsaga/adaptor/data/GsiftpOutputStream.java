@@ -3,8 +3,6 @@ package fr.in2p3.jsaga.adaptor.data;
 import org.globus.ftp.Session;
 import org.globus.ftp.exception.FTPException;
 import org.globus.io.streams.FTPOutputStream;
-import org.ietf.jgss.GSSCredential;
-
 import java.io.IOException;
 
 /* ***************************************************
