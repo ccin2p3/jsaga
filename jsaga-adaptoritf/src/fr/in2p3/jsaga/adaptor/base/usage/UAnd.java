@@ -21,11 +21,8 @@ import java.util.*;
 public class UAnd extends ULogicalOperation {
     private int m_id;
 
-    public UAnd(Collection<Usage> c) {
-        this(-1, c);
-    }
     
-    public UAnd(int id, Collection<Usage> c) {
+    protected UAnd(int id, Collection<Usage> c) {
         super(c);
         m_id = id;
     }

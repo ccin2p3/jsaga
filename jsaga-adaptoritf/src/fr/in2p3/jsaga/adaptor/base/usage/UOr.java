@@ -26,7 +26,7 @@ public class UOr extends ULogicalOperation {
     
 
     @Deprecated
-    public UOr(Usage[] array) {
+    protected UOr(Usage[] array) {
         super(array);
     }
 
