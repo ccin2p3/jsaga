@@ -12,7 +12,7 @@ package fr.in2p3.jsaga.adaptor.data;
 /**
  * workaround for DPM
  */
-public class GsiftpDPMDataAdaptor extends Gsiftp2DataAdaptor /*implements DataCopy, DataRename, FileReaderGetter, FileWriterPutter*/ {
+public class GsiftpDPMDataAdaptor extends Gsiftp2DataAdaptor {
 
     public String getType() {
         return "gsiftp-dpm";
