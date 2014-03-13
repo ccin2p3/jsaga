@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <contexts>
-        <context type="Globus">
+        <!-- <context type="Globus">
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>
-        </context>
-<!--         <context type="UserPass">
-            <attribute name="UserPass" value="XXXXXX"/>
+        </context> -->
+         <context type="UserPass">
+            <attribute name="UserPass" value="xxx"/>
             <attribute name="LifeTime" value="PT12H"/>
         </context>
- -->    </contexts>
+    </contexts>
     <session>
-        <context type="Globus" id="proxy">
-            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>
+        <context type="UserPass" id="proxy">
+            <!-- <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/> -->
             <!-- iRODS physical files -->
             <data type="irods">
                 <attribute name="DefaultResource" value="demoResc1"/>
