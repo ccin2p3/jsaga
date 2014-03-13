@@ -1,7 +1,5 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import org.globus.common.ChainedIOException;
-import org.globus.ftp.GridFTPClient;
 import org.globus.ftp.Session;
 import org.globus.ftp.exception.FTPException;
 import org.globus.io.streams.FTPInputStream;
