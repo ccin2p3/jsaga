@@ -87,10 +87,10 @@ public class DiracJobAdaptorAbstract extends DiracAdaptorAbstract implements Job
 	}
 
     public Usage getUsage() {
-        return new UAnd(new Usage[]{
-                new UOptional(P_GROUP),
-                new UOptional(P_SETUP)
-        });
+        return new UAnd.Builder()
+                .and(new UOptional(P_GROUP))
+                .and(new UOptional(P_SETUP))
+                .build();
     }
 
 

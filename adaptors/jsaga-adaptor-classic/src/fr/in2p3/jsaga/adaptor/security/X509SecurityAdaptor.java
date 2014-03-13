@@ -69,10 +69,10 @@ public class X509SecurityAdaptor implements SecurityAdaptor {
     }
 
     public Usage getUsage() {
-        return new UAnd(new Usage[]{
-                new UFile(Context.USERCERT),
-                new UHidden(Context.USERPASS)
-        });
+        return new UAnd.Builder()
+                .and(new UFile(Context.USERCERT))
+                .and(new UHidden(Context.USERPASS))
+                .build();
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {

@@ -48,32 +48,42 @@ public abstract class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor 
     }
 
     public Usage getUsage() {
-        return new UAnd(new Usage[]{
-                new UOr(new Usage[]{
-                        new UNoPrompt(USAGE_MEMORY, GlobusContext.USERPROXYOBJECT),
-                        new UFile(USAGE_LOAD, Context.USERPROXY),
-                        new UAnd(new Usage[]{
-                                new UOr(new Usage[]{
-                                        new UFile(USAGE_INIT_PKCS12, GlobusContext.USERCERTKEY),
-                                        new UAnd(USAGE_INIT_PEM, new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)})
-                                }),
-                                new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS),
-                                new UDuration(Context.LIFETIME),
-                                new UOptional(GlobusContext.DELEGATION) {
-                                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
-                                        if (super.throwExceptionIfInvalid(value) != null) {
-                                            String v = (String) value;
-                                            if (!v.equalsIgnoreCase("limited") && !v.equalsIgnoreCase("full")) {
-                                                throw new BadParameterException("Expected: limited | full");
-                                            }
-                                        }
-                                        return value;
-                                    }
-                                }
-                        })
-                }),
-                new UFile(Context.CERTREPOSITORY)
-        });
+        Usage PKCS12 = new UFile(USAGE_INIT_PKCS12, GlobusContext.USERCERTKEY);
+        Usage PEM = new UAnd.Builder()
+                            .id(USAGE_INIT_PEM)
+                            .and(new UFile(Context.USERCERT))
+                            .and(new UFile(Context.USERKEY))
+                            .build();
+        Usage PKCS12orPEM = new UOr.Builder().or(PKCS12).or(PEM).build();
+
+        Usage deleg = new UOptional(GlobusContext.DELEGATION) {
+            protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                if (super.throwExceptionIfInvalid(value) != null) {
+                    String v = (String) value;
+                    if (!v.equalsIgnoreCase("limited") && !v.equalsIgnoreCase("full")) {
+                        throw new BadParameterException("Expected: limited | full");
+                    }
+                }
+                return value;
+            }
+        };
+        
+        return new UAnd.Builder()
+                .and(new UOr.Builder()
+                        .or(new UNoPrompt(USAGE_MEMORY, GlobusContext.USERPROXYOBJECT))
+                        .or(new UFile(USAGE_LOAD, Context.USERPROXY))
+                        .or(new UAnd.Builder()
+                                .and(PKCS12orPEM)
+                                .and(new UFilePath(Context.USERPROXY))
+                                .and(new UHidden(Context.USERPASS))
+                                .and(new UDuration(Context.LIFETIME))
+                                .and(deleg)
+                                .build()
+                        )
+                        .build()
+                )
+                .and(new UFile(Context.CERTREPOSITORY))
+                .build();
     }
 
     public Default[] getDefaults(Map map) throws IncorrectStateException {

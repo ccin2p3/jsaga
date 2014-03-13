@@ -37,20 +37,20 @@ public class LCGCEJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract impleme
 
     /** override super.getUsage() */
     public Usage getUsage() {
-    	return new UAnd(new Usage[] {
-        		new UOptional(IP_ADDRESS),
-        		new UOptional(TCP_PORT_RANGE)
-        });
+        return new UAnd.Builder()
+                        .and(new UOptional(IP_ADDRESS))
+                        .and(new UOptional(TCP_PORT_RANGE))
+                        .build();
     }
 
     /** override super.getDefaults() */
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         String defaultIp;
-    	try {
+        try {
             defaultIp = InetAddress.getLocalHost().getHostAddress();
-		} catch (UnknownHostException e) {
-			defaultIp = null;
-		}
+        } catch (UnknownHostException e) {
+            defaultIp = null;
+        }
         return new Default[]{
                 new Default(IP_ADDRESS, defaultIp),
                 new Default(TCP_PORT_RANGE, "40000,45000")

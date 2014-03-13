@@ -26,28 +26,28 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
  */
 public class AxisJKSSecurityAdaptor extends JKSSecurityAdaptor {
 
-	public String getType() {
-    	return "AxisJKS";
+    public String getType() {
+        return "AxisJKS";
     }
 
     public Default[] getDefaults(Map map) throws IncorrectStateException {
-    	return new Default[]{};
+        return new Default[]{};
     }
 
     public Usage getUsage() {
-    	return new UAnd(
-    			 new Usage[]{
-    					 new UOptional(USER_ALIAS),
-    					 new UOptional(Context.USERPASS)});
+        return new UAnd.Builder()
+                        .and(new UOptional(USER_ALIAS))
+                        .and(new UOptional(Context.USERPASS))
+                        .build();
     }
 
     public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
-    	// keystore and truststore MUST NOT be define in configuration
-		if (attributes.containsKey(KEYSTORE) || attributes.containsKey(KEYSTORE_PASS) || 
-				attributes.containsKey(TRUSTSTORE) || attributes.containsKey(TRUSTSTORE_PASS)) {
-			throw new IncorrectStateException("Keystore and Truststore values must be setup in system properties, not in the adaptor configuration");
-		}
-		return super.createSecurityCredential(usage, attributes, contextId);
+        // keystore and truststore MUST NOT be define in configuration
+        if (attributes.containsKey(KEYSTORE) || attributes.containsKey(KEYSTORE_PASS) || 
+                attributes.containsKey(TRUSTSTORE) || attributes.containsKey(TRUSTSTORE_PASS)) {
+            throw new IncorrectStateException("Keystore and Truststore values must be setup in system properties, not in the adaptor configuration");
+        }
+        return super.createSecurityCredential(usage, attributes, contextId);
     }
 
 }

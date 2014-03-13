@@ -36,9 +36,10 @@ public class GatekeeperJobMonitorAdaptor extends GkCommonJobMonitorAdaptor imple
 
     /** override super.getUsage() */
     public Usage getUsage() {
-    	return new UAnd(new Usage[] {
-        		new UOptional(IP_ADDRESS),
-        		new UOptional(TCP_PORT_RANGE)});
+        return new UAnd.Builder()
+                        .and(new UOptional(IP_ADDRESS))
+                        .and(new UOptional(TCP_PORT_RANGE))
+                        .build();
     }
 
     /** override super.getDefaults() */

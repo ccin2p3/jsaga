@@ -30,7 +30,7 @@ import java.util.Map;
  * TODO: remove stdin file and stop gass server when cleanup
  */
 public class GatekeeperJobControlAdaptor extends GkCommonJobControlAdaptor implements JobControlAdaptor, CleanableJobAdaptor, StreamableJobInteractiveSet {
-	private static final String SHELLPATH = "ShellPath";
+    private static final String SHELLPATH = "ShellPath";
     private Logger logger = Logger.getLogger(GatekeeperJobControlAdaptor.class);
 
     /** override super.getType() */
@@ -40,21 +40,22 @@ public class GatekeeperJobControlAdaptor extends GkCommonJobControlAdaptor imple
 
     /** override super.getUsage() */
     public Usage getUsage() {
-        return new UAnd(new Usage[] {
-        		new UOptional(SHELLPATH),
-        		new UOptional(IP_ADDRESS),
-        		new UOptional(TCP_PORT_RANGE)});
+        return new UAnd.Builder()
+                .and(new UOptional(SHELLPATH))
+                .and(new UOptional(IP_ADDRESS))
+                .and(new UOptional(TCP_PORT_RANGE))
+                .build();
     }
 
     /** override super.getDefaults() */
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-    	try {
-			String defaultIp = InetAddress.getLocalHost().getHostAddress();
-			String defaultTcpPortRange="40000,45000";
-	    	return new Default[]{new Default(IP_ADDRESS, defaultIp),new Default(TCP_PORT_RANGE, defaultTcpPortRange)};
-		} catch (UnknownHostException e) {
-			return null;
-		}
+        try {
+            String defaultIp = InetAddress.getLocalHost().getHostAddress();
+            String defaultTcpPortRange="40000,45000";
+            return new Default[]{new Default(IP_ADDRESS, defaultIp),new Default(TCP_PORT_RANGE, defaultTcpPortRange)};
+        } catch (UnknownHostException e) {
+            return null;
+        }
     }
 
     /** override super.getDefaultJobMonitor() */

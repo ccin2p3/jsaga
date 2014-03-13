@@ -35,20 +35,21 @@ public class GatekeeperCondorJobControlAdaptor extends GkCommonJobControlAdaptor
 
     /** override super.getUsage() */
     public Usage getUsage() {
-        return new UAnd(new Usage[] {
-        		new UOptional(IP_ADDRESS),
-        		new UOptional(TCP_PORT_RANGE)});
+        return new UAnd.Builder()
+                .and(new UOptional(IP_ADDRESS))
+                .and(new UOptional(TCP_PORT_RANGE))
+                .build();
     }
 
     /** override super.getDefaults() */
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-    	try {
-			String defaultIp = InetAddress.getLocalHost().getHostAddress();
-			String defaultTcpPortRange="40000,45000";
-	    	return new Default[]{new Default(IP_ADDRESS, defaultIp),new Default(TCP_PORT_RANGE, defaultTcpPortRange)};
-		} catch (UnknownHostException e) {
-			return null;
-		}
+        try {
+            String defaultIp = InetAddress.getLocalHost().getHostAddress();
+            String defaultTcpPortRange="40000,45000";
+            return new Default[]{new Default(IP_ADDRESS, defaultIp),new Default(TCP_PORT_RANGE, defaultTcpPortRange)};
+        } catch (UnknownHostException e) {
+            return null;
+        }
     }
 
     /** override super.getDefaultJobMonitor() */
