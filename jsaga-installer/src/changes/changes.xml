@@ -9,6 +9,7 @@
             <action dev="lschwarz" type="remove">Old SSH adaptor (urls like "DEPRECATED-SSH") has been removed</action>
             <action dev="lschwarz" type="update">Upgrade Jglobus myproxy to 2.0.7-custom3</action>
             <action dev="lschwarz" type="update">GridFTP: set default TCP buffer to 1MB</action>
+            <action dev="lschwarz" type="remove">SSH: attribute "CompressionLevel" is not supported yet</action>
             <action dev="lschwarz" type="update">Upgrade tests to JUnit4</action>
         </release>
         <release version="1.0.2">
