@@ -32,10 +32,10 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
     }
 
     public Usage getUsage() {
-        return new UOr(new U[]{
-                new UOptional(TCP_BUFFER_SIZE),
-                new UOptional(PROTECTION)
-        });
+        return new UAnd.Builder()
+                .and(new UOptional(TCP_BUFFER_SIZE))
+                .and(new UOptional(PROTECTION))
+                .build();
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
