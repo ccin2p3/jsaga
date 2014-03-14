@@ -85,7 +85,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
 
     public void disconnect() throws NoSuccessException {
         try {
-        	m_client.disconnect();
+            m_client.disconnect();
         } catch (Exception e) {
             throw new NoSuccessException(e);
         }
@@ -120,7 +120,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         // create input stream
         try {
-        	return new GsiftpInputStream(m_client, absolutePath);
+            return new GsiftpInputStream(m_client, absolutePath);
         } catch (Exception e) {
             throw rethrowException(e);
         }
@@ -144,20 +144,20 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
     
     public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         
-    	// Check if Append is supported
-    	if (append && !m_client.isAppendSupported())
-    		throw new BadParameterException("'Append' flag will probably not work on the remote server");
-    	
-    	String absolutePath = parentAbsolutePath+"/"+fileName;
+        // Check if Append is supported
+        if (append && !m_client.isAppendSupported())
+            throw new BadParameterException("'Append' flag will probably not work on the remote server");
+        
+        String absolutePath = parentAbsolutePath+"/"+fileName;
 
         // test existence
         if (exclusive) {
-        	checkExists(absolutePath);
+            checkExists(absolutePath);
         }
 
         // create output stream
         try {
-        	return new GsiftpOutputStream(m_client, absolutePath, append);
+            return new GsiftpOutputStream(m_client, absolutePath, append);
         } catch (Exception e) {
             try {
                 throw rethrowExceptionFull(e);
@@ -168,13 +168,13 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
     }
 
     public void copy(String sourceAbsolutePath, 
-    					String targetHost, 
-    					int targetPort, 
-    					String targetAbsolutePath, 
-    					boolean overwrite, 
-    					String additionalArgs,
-    					DataCopyMonitor progressMonitor) 
-    		throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+                        String targetHost, 
+                        int targetPort, 
+                        String targetAbsolutePath, 
+                        boolean overwrite, 
+                        String additionalArgs,
+                        DataCopyMonitor progressMonitor) 
+            throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         // connect to peer server
         GsiftpDataAdaptorAbstract targetAdaptor;
         String type = this.getType();
@@ -213,9 +213,9 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
             targetAdaptor.m_client.setMode(GridFTPSession.MODE_EBLOCK);
             m_client.setStripedActive(targetAdaptor.m_client.setStripedPassive());
             if (progressMonitor == null) {
-            	m_client.extendedTransfer(sourceAbsolutePath, targetAdaptor.m_client, targetAbsolutePath, null);
+                m_client.extendedTransfer(sourceAbsolutePath, targetAdaptor.m_client, targetAbsolutePath, null);
             } else {
-            	m_client.extendedTransfer(sourceAbsolutePath, targetAdaptor.m_client, targetAbsolutePath, new CopyListener(progressMonitor));
+                m_client.extendedTransfer(sourceAbsolutePath, targetAdaptor.m_client, targetAbsolutePath, new CopyListener(progressMonitor));
             }
         } catch (Exception e) {
             throw rethrowExceptionFull(e);
@@ -332,11 +332,9 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
             }
         }
         
-    	Logger.getLogger(GsiftpDataAdaptorAbstract.class).info(client.getWelcome());
+        Logger.getLogger(GsiftpDataAdaptorAbstract.class).info(client.getWelcome());
 
         try {
-    		// TODO: alternative service name
-    		// Authorization authorization = new org.globus.wsrf.impl.security.authorization.HostAuthorization("/DC=IN/DC=GARUDAINDIA/O=C-DAC/OU=CTSF/CN=xn03.ctsf.cdacb.in");
             client.setAuthorization(HostAuthorization.getInstance());
             client.authenticate(cred);
 
