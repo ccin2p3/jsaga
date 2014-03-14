@@ -97,7 +97,13 @@ public class UAnd extends ULogicalOperation {
             return this;
         }
         public Builder and(Usage newAnd) {
-            this.m_coll.add(newAnd);
+            if (newAnd instanceof UAnd) {
+                for (Iterator<Usage> i = ((UAnd)newAnd).iterator(); i.hasNext();) {
+                    this.m_coll.add(i.next());
+                }
+            } else {
+                this.m_coll.add(newAnd);
+            }
             return this;
         }
         public UAnd build() {

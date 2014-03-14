@@ -55,6 +55,12 @@ public class UsageTest {
                        .and(new U("B"))
                        .build();
         Assert.assertEquals("(A  B)", u.toString());
+        
+        UAnd u2 = new UAnd.Builder()
+                        .and(u)
+                        .and(new U("C"))
+                        .build();
+        Assert.assertEquals("(A  B  C)", u2.toString());
     }
     
     @Test
