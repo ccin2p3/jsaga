@@ -126,14 +126,13 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
   
   public Usage getUsage() 
   { 
-	return new UAnd(
-                 new Usage[]{
-                		 super.getUsage(),
-                         new U(ATTRIBUTES_TITLE),
-                         new U(MIXIN_OS_TPL),
-                         new U(MIXIN_RESOURCE_TPL),
-                         new UOptional(PREFIX)
-                 });
+    return new UAnd.Builder()
+                    .and(super.getUsage())
+                    .and(new U(ATTRIBUTES_TITLE))
+                    .and(new U(MIXIN_OS_TPL))
+                    .and(new U(MIXIN_RESOURCE_TPL))
+                    .and(new UOptional(PREFIX))
+                    .build();
   }
 
   public boolean testIpAddress(byte[] testAddress)
@@ -162,37 +161,37 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
 
       try
       {
-    	Process p = Runtime.getRuntime().exec(action);
+        Process p = Runtime.getRuntime().exec(action);
 
-    	BufferedReader in = new BufferedReader(
-        	            new InputStreamReader(p.getInputStream()));
+        BufferedReader in = new BufferedReader(
+                        new InputStreamReader(p.getInputStream()));
 
-     	ACTION_TYPE type = ACTION_TYPE.valueOf(action_type);
+         ACTION_TYPE type = ACTION_TYPE.valueOf(action_type);
      
-	while ((line = in.readLine()) != null) 
-	{         
+    while ((line = in.readLine()) != null) 
+    {         
             // Skip blank lines.
             if (line.trim().length() > 0) {
             
-            	switch (type) {
-		    case list:
+                switch (type) {
+            case list:
                         list_rOCCI.add(line.trim());                        
-			break;
+            break;
 
-		    case create:
+            case create:
                         list_rOCCI.add(line.trim());
                         log.info("");
                         log.info("A new OCCI compute location has been created with the following ID:");
                         break;
 
-		    case describe:
+            case describe:
                         list_rOCCI.add(line.trim());                        
                         break;
-	
-		    case delete:
+    
+            case delete:
                         break;
-            	} // end switch
-	    } // end if
+                } // end switch
+        } // end if
         } // end while
 
         in.close();
@@ -206,9 +205,9 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
             log.info(list_rOCCI.get(i));
    
         } catch (IOException ex) { 
-		//ex.printStackTrace(System.out); 
-		log.error(ex);
-	}
+        //ex.printStackTrace(System.out); 
+        log.error(ex);
+    }
                         
         return list_rOCCI;
     }
@@ -240,7 +239,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
 
        // Check if OCCI path is set                
        if ((prefix != null) && (new File((prefix)).exists()))
-       	prefix += System.getProperty("file.separator");
+           prefix += System.getProperty("file.separator");
        else prefix = "";
             
        Endpoint = "https://" 
@@ -282,7 +281,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                 log.info("Listing active OCCI flavours... ");                
 
             String Execute = prefix +
-			     "occi --endpoint " + Endpoint +
+                 "occi --endpoint " + Endpoint +
                              " --action " + action +
                              " --resource " + resource +
                              " --auth " + auth +
@@ -294,7 +293,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
             
             try {
                 results = run_OCCI("list", Execute);
-		if (results.isEmpty())
+        if (results.isEmpty())
                     throw new NoSuccessException(
                     "Some problems occurred while contacting the server. "
                     + "Please check your settings.");
@@ -313,7 +312,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                 
 
             String Execute = prefix +
-			     "occi --endpoint " + Endpoint +
+                 "occi --endpoint " + Endpoint +
                              " --action " + action +
                              " --resource " + resource +
                              " --resource " + resourceID +
@@ -326,7 +325,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
 
             try {
                 results = run_OCCI("describe", Execute);
-		if (results.isEmpty())
+        if (results.isEmpty())
                     throw new NoSuccessException(
                     "Some problems occurred while contacting the server. "
                     + "Please check your settings.");
@@ -344,7 +343,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                 log.info("ResourceID = " + resourceID);
 
            String Execute = prefix +
-			    "occi --endpoint " + Endpoint +
+                "occi --endpoint " + Endpoint +
                             " --action " + action +
                             " --resource " + resource +
                             " --resource " + resourceID +
@@ -377,7 +376,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
             sshControlAdaptor.connect(null, _publicIP, 22, null, new HashMap());            
             sshControlAdaptor.start(_nativeJobId);                         
     
-	} catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
+    } catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
           catch (AuthenticationFailedException ex) { throw new PermissionDeniedException(ex); }
           catch (AuthorizationFailedException ex) { throw new PermissionDeniedException(ex); }
           catch (BadParameterException ex) { throw new NoSuccessException(ex); }        
@@ -393,7 +392,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
         try {                        
             sshControlAdaptor.connect(null, _publicIP, 22, null, new HashMap());            
             sshControlAdaptor.cancel(_nativeJobId);
-	} catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
+    } catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
           catch (AuthenticationFailedException ex) { throw new PermissionDeniedException(ex); }
           catch (AuthorizationFailedException ex) { throw new PermissionDeniedException(ex); }
           catch (BadParameterException ex) { throw new NoSuccessException(ex); }
@@ -412,7 +411,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
         String _resourceId = nativeJobId.substring(nativeJobId.indexOf("#")+1);
         
         String Execute = prefix + 
-			 "occi --endpoint " + Endpoint +
+             "occi --endpoint " + Endpoint +
                          " --action " + "delete" +
                          " --resource " + "compute" +
                          " --resource " + _resourceId +
@@ -434,7 +433,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
             // Stopping the VM Server
             results = run_OCCI("delete", Execute);
     
-	 } catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
+     } catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
           catch (AuthenticationFailedException ex) { throw new PermissionDeniedException(ex); }
           catch (AuthorizationFailedException ex) { throw new PermissionDeniedException(ex); }
           catch (BadParameterException ex) { throw new NoSuccessException(ex); }        
@@ -465,7 +464,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                     log.info("Flavour   = " + mixin_resource_tpl);
                     
                 String Execute = prefix +
-				 "occi --endpoint " + Endpoint +
+                 "occi --endpoint " + Endpoint +
                                  //" --action " + action +
                                  " --action " + "create" +
                                  " --resource " + resource +
@@ -482,7 +481,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                  
                 try {                        
                         results = run_OCCI("create", Execute);
-			if (results.isEmpty())
+            if (results.isEmpty())
                             throw new NoSuccessException(
                             "Some problems occurred while contacting the server. "
                             + "Please check your settings.");
@@ -498,7 +497,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                     resourceID = results.get(0);
                     
                     Execute = prefix +
-			      "occi --endpoint " + Endpoint +
+                  "occi --endpoint " + Endpoint +
                               " --action " + "describe" +
                               " --resource " + resource +
                               " --resource " + resourceID +
@@ -624,23 +623,23 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
                     log.info(ft.format(date));
                 }              
             
-	        rOCCIJobMonitorAdaptor.setSSHHost(publicIP);
+            rOCCIJobMonitorAdaptor.setSSHHost(publicIP);
         
-        	try {            
-	            sshControlAdaptor.connect(null, publicIP, 22, null, new HashMap());            
+            try {            
+                sshControlAdaptor.connect(null, publicIP, 22, null, new HashMap());            
                 } catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
                   catch (AuthenticationFailedException ex) { throw new PermissionDeniedException(ex); }
                   catch (AuthorizationFailedException ex) { throw new PermissionDeniedException(ex); }
                   catch (BadParameterException ex) { throw new NoSuccessException(ex); }
-		 
-        	return sshControlAdaptor.submit(jobDesc, checkMatch, uniqId) 
-                	+ "@" 
-	                + publicIP
-        	        + "#"
-                	+ resourceID;
-	   } // end creating
+         
+            return sshControlAdaptor.submit(jobDesc, checkMatch, uniqId) 
+                    + "@" 
+                    + publicIP
+                    + "#"
+                    + resourceID;
+       } // end creating
 
-	else return null;
+    else return null;
     }
     
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) 
@@ -653,11 +652,11 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
         String _nativeJobId = nativeJobId.substring(0, nativeJobId.indexOf("@"));
         
         try {
-        	sshControlAdaptor.setSecurityCredential(credential.getSSHCredential());
+            sshControlAdaptor.setSecurityCredential(credential.getSSHCredential());
             sshControlAdaptor.connect(null, _publicIP, 22, null, new HashMap());
             result = sshControlAdaptor.getInputStagingTransfer(_nativeJobId);
             
-	} catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
+    } catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
           catch (AuthenticationFailedException ex) { throw new PermissionDeniedException(ex); }
           catch (AuthorizationFailedException ex) { throw new PermissionDeniedException(ex); }
           catch (BadParameterException ex) { throw new NoSuccessException(ex); }
@@ -683,23 +682,23 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
           catch (AuthenticationFailedException ex) { throw new PermissionDeniedException(ex); }
           catch (AuthorizationFailedException ex) { throw new PermissionDeniedException(ex); }
           catch (BadParameterException ex) { throw new NoSuccessException(ex); }               
-	 
+     
         // change URL sftp:// tp rocci://
         return sftp2rocci(result);
     }
     
     private StagingTransfer[] sftp2rocci(StagingTransfer[] transfers) {
-    	int index=0;
-    	StagingTransfer[] newTransfers = new StagingTransfer[transfers.length];
-    	for (StagingTransfer tr: transfers) {
-    		StagingTransfer newTr = new StagingTransfer(
-    				tr.getFrom().replace("sftp://", "rocci://"),
-    				tr.getTo().replace("sftp://", "rocci://"),
-    				tr.isAppend()
-    		);
-    		newTransfers[index++] = newTr;
-    	}
-    	return newTransfers;
+        int index=0;
+        StagingTransfer[] newTransfers = new StagingTransfer[transfers.length];
+        for (StagingTransfer tr: transfers) {
+            StagingTransfer newTr = new StagingTransfer(
+                    tr.getFrom().replace("sftp://", "rocci://"),
+                    tr.getTo().replace("sftp://", "rocci://"),
+                    tr.isAppend()
+            );
+            newTransfers[index++] = newTr;
+        }
+        return newTransfers;
     }
     
     public String getStagingDirectory(String nativeJobId) 
@@ -714,7 +713,7 @@ public class rOCCIJobControlAdaptor extends rOCCIAdaptorCommon
         try {            
             sshControlAdaptor.connect(null, _publicIP, 22, null, new HashMap());            
             result = sshControlAdaptor.getStagingDirectory(_nativeJobId);
-	} catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
+    } catch (NotImplementedException ex) { throw new NoSuccessException(ex); }
           catch (AuthenticationFailedException ex) { throw new PermissionDeniedException(ex); }
           catch (AuthorizationFailedException ex) { throw new PermissionDeniedException(ex); }
           catch (BadParameterException ex) { throw new NoSuccessException(ex); }

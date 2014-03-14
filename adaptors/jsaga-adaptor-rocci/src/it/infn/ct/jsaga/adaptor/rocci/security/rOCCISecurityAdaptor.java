@@ -10,7 +10,9 @@ import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.TimeoutException;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.ssh3.security.SSHSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
@@ -29,44 +31,43 @@ import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential;
 
 public class rOCCISecurityAdaptor extends VOMSSecurityAdaptor {
 
-	private SSHSecurityAdaptor m_sshAdaptor;
-	
-	public rOCCISecurityAdaptor() {
-		super();
-		m_sshAdaptor = new SSHSecurityAdaptor();
-	}
-	
-	public String getType() {
-		return "rocci";
-	}
+    private SSHSecurityAdaptor m_sshAdaptor;
+    
+    public rOCCISecurityAdaptor() {
+        super();
+        m_sshAdaptor = new SSHSecurityAdaptor();
+    }
+    
+    public String getType() {
+        return "rocci";
+    }
 
-	public Usage getUsage() {
-		return new UAnd(
-			new Usage[]{
-					super.getUsage(),
-					new SSHSecurityAdaptor().getUsage()}
-			);
-	}
+    public Usage getUsage() {
+        return new UAnd.Builder()
+                        .and(super.getUsage())
+                        .and(new SSHSecurityAdaptor().getUsage())
+                        .build();
+    }
 
-	public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-		Default[] vomsDefault = super.getDefaults(attributes);
-		Default[] sshDefault = m_sshAdaptor.getDefaults(attributes);
-		List<Default> both = new ArrayList<Default>(vomsDefault.length+sshDefault.length);
-		Collections.addAll(both, vomsDefault);
-		Collections.addAll(both, sshDefault);
-		return both.toArray(new Default[both.size()]);
-	}
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
+        Default[] vomsDefault = super.getDefaults(attributes);
+        Default[] sshDefault = m_sshAdaptor.getDefaults(attributes);
+        List<Default> both = new ArrayList<Default>(vomsDefault.length+sshDefault.length);
+        Collections.addAll(both, vomsDefault);
+        Collections.addAll(both, sshDefault);
+        return both.toArray(new Default[both.size()]);
+    }
 
-	public Class getSecurityCredentialClass() {
-		return rOCCISecurityCredential.class;
-	}
+    public Class getSecurityCredentialClass() {
+        return rOCCISecurityCredential.class;
+    }
 
-	public SecurityCredential createSecurityCredential(int usage,
-			Map attributes, String contextId) throws IncorrectStateException,
-			TimeoutException, NoSuccessException {
-		VOMSSecurityCredential proxy = (VOMSSecurityCredential)super.createSecurityCredential(usage, attributes, contextId);
-		SSHSecurityCredential sshCred = (SSHSecurityCredential)m_sshAdaptor.createSecurityCredential(usage, attributes, contextId);
-		return new rOCCISecurityCredential(proxy, sshCred);
-	}
+    public SecurityCredential createSecurityCredential(int usage,
+            Map attributes, String contextId) throws IncorrectStateException,
+            TimeoutException, NoSuccessException {
+        VOMSSecurityCredential proxy = (VOMSSecurityCredential)super.createSecurityCredential(usage, attributes, contextId);
+        SSHSecurityCredential sshCred = (SSHSecurityCredential)m_sshAdaptor.createSecurityCredential(usage, attributes, contextId);
+        return new rOCCISecurityCredential(proxy, sshCred);
+    }
 
 }

@@ -107,12 +107,11 @@ public class rOCCIAdaptorCommon extends Object implements ClientAdaptor {
 
   public Usage getUsage() 
   { 
-	return new UAnd(
-                 new Usage[]{
-                         new U(AUTH),
-                         new U(RESOURCE),
-                         new U(ACTION)
-                 });
+	return new UAnd.Builder()
+                    .and(new U(AUTH))
+                    .and(new U(RESOURCE))
+                    .and(new U(ACTION))
+                    .build();
   }
 
   public Default[] getDefaults(Map map) throws IncorrectStateException 

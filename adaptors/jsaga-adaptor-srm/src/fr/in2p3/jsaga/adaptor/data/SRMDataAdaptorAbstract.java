@@ -82,10 +82,10 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
     }
 
     public Usage getUsage() {
-        return new UAnd(new U[]{
-                new UOptional(TRANSFER_PROTOCOLS),
-                new UOptional(PREPARE_TIMEOUT)
-        });
+        return new UAnd.Builder()
+                        .and(new UOptional(TRANSFER_PROTOCOLS))
+                        .and(new UOptional(PREPARE_TIMEOUT))
+                        .build();
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {

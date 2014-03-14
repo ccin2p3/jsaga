@@ -53,10 +53,10 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
     			};
     }
     public Usage getUsage() {
-        return new UAnd(new Usage[]{
-                new UOptional(TRANSFER_PROTOCOLS),
-                super.getUsage(),
-        });
+        return new UAnd.Builder()
+                        .and(new UOptional(TRANSFER_PROTOCOLS))
+                        .and(super.getUsage())
+                        .build();
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {

@@ -40,21 +40,21 @@ import fr.in2p3.jsaga.adaptor.unicore.security.UnicoreSecurityProperties;
 
 public abstract class UnicoreAbstract implements ClientAdaptor {
 
-	protected static final String SERVICE_NAME = "ServiceName";
-	protected static final String RES = "Res";
-	protected static final String TARGET = "Target";
-	protected String m_target;
-	protected JKSSecurityCredential m_credential;
-	protected UnicoreSecurityProperties m_uassecprop = null;
-	protected EndpointReferenceType m_epr = null;
+    protected static final String SERVICE_NAME = "ServiceName";
+    protected static final String RES = "Res";
+    protected static final String TARGET = "Target";
+    protected String m_target;
+    protected JKSSecurityCredential m_credential;
+    protected UnicoreSecurityProperties m_uassecprop = null;
+    protected EndpointReferenceType m_epr = null;
     private Logger logger = Logger.getLogger(UnicoreAbstract.class);
     
     public Class[] getSupportedSecurityCredentialClasses() {
-    	return new Class[]{JKSSecurityCredential.class};
+        return new Class[]{JKSSecurityCredential.class};
     }
 
     public void setSecurityCredential(SecurityCredential credential) {
-    	 m_credential = (JKSSecurityCredential) credential;
+         m_credential = (JKSSecurityCredential) credential;
     }
 
     public int getDefaultPort() {
@@ -66,32 +66,33 @@ public abstract class UnicoreAbstract implements ClientAdaptor {
     }
 
     public Usage getUsage() {
-    	return new UAnd(new Usage[]{new U(TARGET),
-    								new U(SERVICE_NAME), 
-    								new U(RES),
-    								});
+        return new UAnd.Builder()
+                        .and(new U(TARGET))
+                        .and(new U(SERVICE_NAME))
+                        .and(new U(RES))
+                        .build();
     }
 
-	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         
-    	m_target = (String) attributes.get(TARGET);
-    	String serverUrl = "https://"+host+":"+port+"/"+m_target+"/services/"+(String) attributes.get(SERVICE_NAME)+"?res="+(String) attributes.get(RES);
-    	
-//    	Properties p = new Properties();
-    	
-    	try {
-			m_uassecprop = new UnicoreSecurityProperties(m_credential);
-		} catch (UnrecoverableKeyException e) {
-			throw new AuthenticationFailedException(e);
-		} catch (KeyStoreException e) {
-			throw new AuthenticationFailedException(e);
-		} catch (NoSuchAlgorithmException e) {
-			throw new NoSuccessException(e);
-		} catch (CertificateException e) {
-			throw new NoSuccessException(e);
-		} catch (IOException e) {
-			throw new NoSuccessException(e);
-		}
+        m_target = (String) attributes.get(TARGET);
+        String serverUrl = "https://"+host+":"+port+"/"+m_target+"/services/"+(String) attributes.get(SERVICE_NAME)+"?res="+(String) attributes.get(RES);
+        
+//        Properties p = new Properties();
+        
+        try {
+            m_uassecprop = new UnicoreSecurityProperties(m_credential);
+        } catch (UnrecoverableKeyException e) {
+            throw new AuthenticationFailedException(e);
+        } catch (KeyStoreException e) {
+            throw new AuthenticationFailedException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new NoSuccessException(e);
+        } catch (CertificateException e) {
+            throw new NoSuccessException(e);
+        } catch (IOException e) {
+            throw new NoSuccessException(e);
+        }
 
 //        m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL, "true");
 //        m_uassecprop.setProperty(ISecurityProperties.WSRF_SSL_CLIENTAUTH, "true");
@@ -106,15 +107,15 @@ public abstract class UnicoreAbstract implements ClientAdaptor {
 //        }
 
         m_epr = EndpointReferenceType.Factory.newInstance();
-	    m_epr.addNewAddress().setStringValue(serverUrl);
-	    logger.debug("Connected to " + m_epr.toString());
+        m_epr.addNewAddress().setStringValue(serverUrl);
+        logger.debug("Connected to " + m_epr.toString());
     }
 
-	public void disconnect() throws NoSuccessException {
+    public void disconnect() throws NoSuccessException {
         m_credential = null;
         m_target = null;
         m_epr = null;
         m_uassecprop = null;
     }    
-	
+    
 }

@@ -37,16 +37,21 @@ public class UserPassSecurityAdaptor implements ExpirableSecurityAdaptor {
     }
 
     public Usage getUsage() {
-        return new UAnd(new Usage[]{
-                new U(Context.USERID),
-                new UOr(new Usage[]{
-                        new UAnd(USAGE_INIT, new Usage[]{
-                                new UHidden(Context.USERPASS), new U(Context.LIFETIME), new UFilePath(USERPASSFILE)
-                        }),
-                        new U(USAGE_VOLATILE, Context.USERPASS),
-                        new UFile(USAGE_LOAD, USERPASSFILE)
-                })
-        });
+        return new UAnd.Builder()
+                        .and(new U(Context.USERID))
+                        .and(new UOr.Builder()
+                                     .or(new UAnd.Builder()
+                                                 .id(USAGE_INIT)
+                                                 .and(new UHidden(Context.USERPASS))
+                                                 .and(new U(Context.LIFETIME))
+                                                 .and(new UFilePath(USERPASSFILE))
+                                                 .build()
+                                     )
+                                     .or(new U(USAGE_VOLATILE, Context.USERPASS))
+                                     .or(new UFile(USAGE_LOAD, USERPASSFILE))
+                                     .build()
+                        )
+                        .build();
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {

@@ -104,22 +104,21 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }
 
     public Usage getUsage() {
-        return new UOr(new U[]{
-                    new UOptional(DEFAULT_JDL_FILE),
-                    // JDL attributes
-                    new UOptional("LBAddress"),
-                    new UOptional("requirements"),
-                    new UOptional("rank"),
-                    new UOptional("virtualorganisation"),
-                    new UOptionalInteger("RetryCount"),
-                    new UOptionalInteger("ShallowRetryCount"),
-                    new UOptional("OutputStorage"),
-                    new UOptionalBoolean("AllowZippedISB"),
-                    new UOptionalBoolean("PerusalFileEnable"),
-                    new UOptional("ListenerStorage"),
-                    new UOptional("MyProxyServer"),
-                    new UOptional("DelegationID")
-                });
+        return new UOr.Builder()
+                       .or(new UOptional(DEFAULT_JDL_FILE))
+                       .or(new UOptional("LBAddress"))
+                       .or(new UOptional("requirements"))
+                       .or(new UOptional("rank"))
+                       .or(new UOptional("virtualorganisation"))
+                       .or(new UOptionalInteger("RetryCount"))
+                       .or(new UOptionalInteger("ShallowRetryCount"))
+                       .or(new UOptional("OutputStorage"))
+                       .or(new UOptionalBoolean("AllowZippedISB"))
+                       .or(new UOptionalBoolean("PerusalFileEnable"))
+                       .or(new UOptional("ListenerStorage"))
+                       .or(new UOptional("MyProxyServer"))
+                       .or(new UOptional("DelegationID"))
+                       .build();
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {

@@ -45,7 +45,7 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
     }
 
     public Usage getUsage() {
-        return new UOr(new Usage[]{new U(BASE_URL), new U(AUTO_REFRESH)});
+        return new UOr.Builder().or(new U(BASE_URL)).or(new U(AUTO_REFRESH)).build();
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {

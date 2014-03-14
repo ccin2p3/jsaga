@@ -25,12 +25,6 @@ public class UOr extends ULogicalOperation {
     }
     
 
-    @Deprecated
-    public UOr(Usage[] array) {
-        super(array);
-    }
-
-
     public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException, BadParameterException {
         for (Iterator<Usage> i = this.iterator(); i.hasNext();) {
             try {

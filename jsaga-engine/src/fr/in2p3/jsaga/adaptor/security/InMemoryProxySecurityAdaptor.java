@@ -37,7 +37,10 @@ public class InMemoryProxySecurityAdaptor implements SecurityAdaptor {
     }
 
     public Usage getUsage() {
-        return new UAnd(new Usage[]{new UNoPrompt(Context.USERPROXY), new UFile(Context.CERTREPOSITORY)});
+        return new UAnd.Builder()
+                        .and(new UNoPrompt(Context.USERPROXY))
+                        .and(new UFile(Context.CERTREPOSITORY))
+                        .build();
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
