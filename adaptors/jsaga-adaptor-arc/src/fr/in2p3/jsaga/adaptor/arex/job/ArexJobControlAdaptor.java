@@ -192,22 +192,22 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptor implements Stagi
      * Extract the staging URL from the JSDL as follows:
      * 
      * <jsdl:DataStaging>
-     *   <jsdl:FileName>xxx<jsdl:FileName>
+     *   <jsdl:FileName>file<jsdl:FileName>
      *   <jsdl:Source/>
-     *   <jsaga:Source><jsaga:URI>file:/tmp/xxx</jsaga:URI></jsaga:Source>	
+     *   <jsaga:Source><jsaga:URI>file:/tmp/file</jsaga:URI></jsaga:Source>	
      * </jsdl:DataStaging>
      * 
      * or
      * <jsdl:DataStaging>
-     *   <jsdl:FileName>xxx<jsdl:FileName>
+     *   <jsdl:FileName>file<jsdl:FileName>
      *   <jsdl:Target/>
-     *   <jsaga:Target><jsaga:URI>file:/tmp/xxx</jsaga:URI></jsaga:Source>	
+     *   <jsaga:Target><jsaga:URI>file:/tmp/file</jsaga:URI></jsaga:Source>	
      * </jsdl:DataStaging>
      * 
      * <jsdl:Source/> means A-REX will wait for the file to be uploaded in the SD
-     * The target will be SD/FileName e;g. https://xxx:2010/arex-x509/XXXXX
+     * The target will be SD/FileName e;g. https://host:2010/arex-x509/file
      * 
-     * For PostTransfers, the source URL will be SD/FileName e;g. https://xxx:2010/arex-x509/XXXXX
+     * For PostTransfers, the source URL will be SD/FileName e;g. https://host:2010/arex-x509/file
      * 
      * @param nativeJobId the native job identifier
      * @param jsdl_type the JSDL Job Definition
