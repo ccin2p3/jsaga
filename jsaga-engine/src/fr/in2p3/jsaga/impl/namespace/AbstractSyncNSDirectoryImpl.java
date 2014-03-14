@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.impl.namespace;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
-import fr.in2p3.jsaga.adaptor.data.optimise.DataFilteredList;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
@@ -172,11 +171,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
         // get list
         FileAttributes[] childs;
         try {
-            if (m_adaptor instanceof DataFilteredList && pattern.endsWith("/")) {
-                childs = ((DataFilteredList) m_adaptor).listDirectories(
-                        m_url.getPath(),
-                        m_url.getQuery());
-            } else if (m_adaptor instanceof DataReaderAdaptor) {
+            if (m_adaptor instanceof DataReaderAdaptor) {
                 childs = ((DataReaderAdaptor) m_adaptor).listAttributes(
                         m_url.getPath(),
                         m_url.getQuery());
