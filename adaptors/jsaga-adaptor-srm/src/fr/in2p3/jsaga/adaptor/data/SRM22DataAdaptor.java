@@ -139,11 +139,11 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         }
         // Get implementation name
         try {
-        	this.ping();
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Connected to " + this.m_impl_name + " instance at " + serviceUrl.toString());
+            this.ping();
+            Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Connected to " + this.m_impl_name + " instance at " + serviceUrl.toString());
         } catch (Exception e) {
-			Logger.getLogger(this.getClass().getName()).log(Level.WARN, "Could not ping " + serviceUrl.toString());
-        	this.m_impl_name = "UNKNOWN";
+            Logger.getLogger(this.getClass().getName()).log(Level.WARN, "Could not ping " + serviceUrl.toString());
+            this.m_impl_name = "UNKNOWN";
         }
     }
 
@@ -152,7 +152,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
     }
 
     public String getImplementationName() {
-    	return this.m_impl_name;
+        return this.m_impl_name;
     }
     protected void ping() throws BadParameterException, NoSuccessException {
         try {
@@ -160,13 +160,13 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             if (response.getVersionInfo() == null) {
                 throw new NoSuccessException("Unknown version");
             } else {
-            	String otherInfo = "[";
-            	for (TExtraInfo info : response.getOtherInfo().getExtraInfoArray()) {
-            		otherInfo += info.getKey() + "=" + info.getValue() + ";";
-            		if (info.getKey().equals("backend_type")) this.m_impl_name = info.getValue();
-            	}
-            	otherInfo += "]";
-    			Logger.getLogger(this.getClass().getName()).log(Level.INFO, "SRM Version is " + response.getVersionInfo() + " " + otherInfo);
+                String otherInfo = "[";
+                for (TExtraInfo info : response.getOtherInfo().getExtraInfoArray()) {
+                    otherInfo += info.getKey() + "=" + info.getValue() + ";";
+                    if (info.getKey().equals("backend_type")) this.m_impl_name = info.getValue();
+                }
+                otherInfo += "]";
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "SRM Version is " + response.getVersionInfo() + " " + otherInfo);
             }
         } catch (RemoteException e) {
             throw new BadParameterException(e);
@@ -193,7 +193,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 TAccessPattern.TRANSFER_MODE, TConnectionType.WAN, null, new ArrayOfString(m_transferProtocols)));
         try {
             // send request
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + absolutePath);
+            Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + absolutePath);
             SrmPrepareToGetResponse response = m_stub.srmPrepareToGet(request);
             long deadline = System.currentTimeMillis() + m_prepareTimeout;
 
@@ -216,7 +216,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             while (status.getStatusCode().equals(TStatusCode.SRM_REQUEST_QUEUED) ||
                    status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS))
             {
-    			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Response is asynchronous");
+                Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Response is asynchronous");
                 if (System.currentTimeMillis() > deadline) {
                     throw new TimeoutException("SRM request blocked in status: "+status.getStatusCode().getValue());
                 }
@@ -224,7 +224,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                     Thread.sleep(period);
                     period *= 2;
                 } catch (InterruptedException e) {/*ignore*/}
-    			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request2.getClass().getName() + " : " + token);
+                Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request2.getClass().getName() + " : " + token);
                 SrmStatusOfGetRequestResponse response2 = m_stub.srmStatusOfGetRequest(request2);
                 status = response2.getReturnStatus();
                 if (response2.getArrayOfFileStatuses()!=null && response2.getArrayOfFileStatuses().getStatusArray().length>0) {
@@ -291,7 +291,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         SrmReleaseFilesResponse response;
         try {
             // send request
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + absolutePath);
+            Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + absolutePath);
             response = m_stub.srmReleaseFiles(request);
         } catch (RemoteException e) {
             throw new TimeoutException(e);
@@ -331,7 +331,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 TAccessPattern.TRANSFER_MODE, TConnectionType.WAN, null, new ArrayOfString(m_transferProtocols)));
         try {
             // send request
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + absolutePath);
+            Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + absolutePath);
             SrmPrepareToPutResponse response = m_stub.srmPrepareToPut(request);
             long deadline = System.currentTimeMillis() + m_prepareTimeout;
 
@@ -354,7 +354,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             while (status.getStatusCode().equals(TStatusCode.SRM_REQUEST_QUEUED) ||
                    status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS))
             {
-    			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Response is asynchronous");
+                Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Response is asynchronous");
                 if (System.currentTimeMillis() > deadline) {
                     throw new TimeoutException("SRM request blocked in status: "+status.getStatusCode().getValue());
                 }
@@ -362,7 +362,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                     Thread.sleep(period);
                     period *= 2;
                 } catch (InterruptedException e) {/*ignore*/}
-    			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request2.getClass().getName() + " : " + token);
+                Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request2.getClass().getName() + " : " + token);
                 SrmStatusOfPutRequestResponse response2 = m_stub.srmStatusOfPutRequest(request2);
                 status = response2.getReturnStatus();
                 if (response2.getArrayOfFileStatuses()!=null && response2.getArrayOfFileStatuses().getStatusArray().length>0) {
@@ -396,8 +396,8 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
     }
     public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         // APPEND is not supported by SRM : server sends SRM_DUPLICATION_ERROR on SrmPrepareToPut()
-    	// BadParameterException is thrown in this case, but this is a deviation from SAGA
-    	if (append) {throw new BadParameterException("APPEND is not supported by this adaptor");}
+        // BadParameterException is thrown in this case, but this is a deviation from SAGA
+        if (append) {throw new BadParameterException("APPEND is not supported by this adaptor");}
         // send srmPrepareToPut message
         String absolutePath = parentAbsolutePath+"/"+fileName;
         SRMResponse srmResponse = this.srmPrepareToPut(absolutePath);
@@ -427,7 +427,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         SrmPutDoneResponse response;
         try {
             // send request
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + token);
+            Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + token);
             response = m_stub.srmPutDone(request);
         } catch (RemoteException e) {
             throw new TimeoutException(e);
@@ -487,7 +487,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         SrmMkdirResponse response;
         try {
             // send request
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + uri.toString());
+            Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + uri.toString());
             response = m_stub.srmMkdir(request);
         } catch (RemoteException e) {
             throw new NoSuccessException(e);
@@ -512,7 +512,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         SrmRmdirResponse response;
         try {
             // send request
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + uri.toString());
+            Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + uri.toString());
             response = m_stub.srmRmdir(request);
         } catch (RemoteException e) {
             throw new NoSuccessException(e);
@@ -536,7 +536,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         SrmRmResponse response;
         try {
             // send request
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + uri.toString());
+            Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + uri.toString());
             response = m_stub.srmRm(request);
         } catch (RemoteException e) {
             throw new NoSuccessException(e);
@@ -567,55 +567,55 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
     }
     
     public int[] getSupportedScopes() {
-		return new int[]{SCOPE_USER,SCOPE_GROUP,SCOPE_ANY};
-	}
+        return new int[]{SCOPE_USER,SCOPE_GROUP,SCOPE_ANY};
+    }
 
-	public void permissionsAllow(String absolutePath, int scope, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		FileAttributes srmFileAttributes;
-		try {
-			srmFileAttributes = getAttributes(absolutePath, null);
-		} catch (DoesNotExistException e) {
-			throw new NoSuccessException(e);
-		}
-		
-		SrmSetPermissionRequest setPermissionRequest = new SrmSetPermissionRequest();
-		setPermissionRequest.setSURL(toSrmURI(absolutePath));
-		setPermissionRequest.setPermissionType(TPermissionType.CHANGE);
-		setPermissionRequest.setArrayOfUserPermissions(null);
-		switch (scope) {
-			case SCOPE_USER:
-					if(srmFileAttributes.getUserPermission().containsAll(permissions.getValue())){
-						return;
-					}else{
-						setPermissionRequest.setOwnerPermission(getSRMPermissions(srmFileAttributes.getUserPermission().or(permissions)));
-					}
-				break;
-			case SCOPE_GROUP:
-					if(srmFileAttributes.getGroupPermission().containsAll(permissions.getValue())){
-						return;
-					}else{
-						setPermissionRequest.setArrayOfGroupPermissions(new ArrayOfTGroupPermission(new TGroupPermission[]{new TGroupPermission(srmFileAttributes.getGroup(), getSRMPermissions(srmFileAttributes.getGroupPermission().or(permissions)))}));
-					}
-				break;
-			case SCOPE_ANY:
-					if(srmFileAttributes.getAnyPermission().containsAll(permissions.getValue())){
-						return;
-					}else{
-						setPermissionRequest.setOtherPermission(getSRMPermissions(srmFileAttributes.getAnyPermission().or(permissions)));
-					}
-				break;
-			default:
-				throw new RuntimeException("Unkown scope: "+scope);
-		}
-		
-		SrmSetPermissionResponse response = null;
-		try{
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + setPermissionRequest.getClass().getName() + " : " + absolutePath);
-			response = m_stub.srmSetPermission(setPermissionRequest);
-		} catch (RemoteException e) {
-	        throw new NoSuccessException(e);
-	    }
-		
+    public void permissionsAllow(String absolutePath, int scope, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        FileAttributes srmFileAttributes;
+        try {
+            srmFileAttributes = getAttributes(absolutePath, null);
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
+        }
+        
+        SrmSetPermissionRequest setPermissionRequest = new SrmSetPermissionRequest();
+        setPermissionRequest.setSURL(toSrmURI(absolutePath));
+        setPermissionRequest.setPermissionType(TPermissionType.CHANGE);
+        setPermissionRequest.setArrayOfUserPermissions(null);
+        switch (scope) {
+            case SCOPE_USER:
+                    if(srmFileAttributes.getUserPermission().containsAll(permissions.getValue())){
+                        return;
+                    }else{
+                        setPermissionRequest.setOwnerPermission(getSRMPermissions(srmFileAttributes.getUserPermission().or(permissions)));
+                    }
+                break;
+            case SCOPE_GROUP:
+                    if(srmFileAttributes.getGroupPermission().containsAll(permissions.getValue())){
+                        return;
+                    }else{
+                        setPermissionRequest.setArrayOfGroupPermissions(new ArrayOfTGroupPermission(new TGroupPermission[]{new TGroupPermission(srmFileAttributes.getGroup(), getSRMPermissions(srmFileAttributes.getGroupPermission().or(permissions)))}));
+                    }
+                break;
+            case SCOPE_ANY:
+                    if(srmFileAttributes.getAnyPermission().containsAll(permissions.getValue())){
+                        return;
+                    }else{
+                        setPermissionRequest.setOtherPermission(getSRMPermissions(srmFileAttributes.getAnyPermission().or(permissions)));
+                    }
+                break;
+            default:
+                throw new RuntimeException("Unkown scope: "+scope);
+        }
+        
+        SrmSetPermissionResponse response = null;
+        try{
+            Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + setPermissionRequest.getClass().getName() + " : " + absolutePath);
+            response = m_stub.srmSetPermission(setPermissionRequest);
+        } catch (RemoteException e) {
+            throw new NoSuccessException(e);
+        }
+        
         TReturnStatus status = response.getReturnStatus();
         if (! status.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
             try {
@@ -623,111 +623,66 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             } catch (DoesNotExistException e) {
                 throw new NoSuccessException(e);
             } catch (AlreadyExistsException e) {
-            	throw new NoSuccessException(e);
-			} catch (BadParameterException e) {
-				throw new NoSuccessException(e);
-			}
+                throw new NoSuccessException(e);
+            } catch (BadParameterException e) {
+                throw new NoSuccessException(e);
+            }
             throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
         }
-	}
+    }
 
-//Will be needed when full permissions will be implemented.
-/*
-	public boolean permissionsCheck(String absolutePath, int scope, PermissionBytes permissions, String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
-		if(id == null){
-			//TODO: Check it!
-		}
-		
-		if(permissions.contains(Permission.QUERY)){
-			throw new BadParameterException("The QUERY permission is not supported by the SRM");
-		}
-		
-		if(permissions.contains(Permission.OWNER)){
-			throw new BadParameterException("The OWNER permission is not yet supported by the SRM adaptor");
-		}
-		
-		FileAttributes srmFileAttributes;
-		try {
-			srmFileAttributes = getAttributes(absolutePath, null);
-		} catch (DoesNotExistException e) {
-			throw new NoSuccessException(e);
-		}
-		
-		PermissionBytes actualScopePermissions;
-		switch (scope) {
-			case SCOPE_USER:
-				actualScopePermissions = srmFileAttributes.getUserPermission();
-				break;
-			case SCOPE_GROUP:
-				actualScopePermissions = srmFileAttributes.getGroupPermission();
-				break;
-			case SCOPE_ANY:
-				actualScopePermissions = srmFileAttributes.getAnyPermission();
-				break;
-			default:
-				throw new RuntimeException("Unkown scope: "+scope);
-		}
-		
-		if(actualScopePermissions.containsAll(permissions.getValue())){
-			return true;
-		}else{
-			return false;
-		}
-	}
-*/
-
-	public void permissionsDeny(String absolutePath, int scope, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		FileAttributes srmFileAttributes;
-		try {
-			srmFileAttributes = getAttributes(absolutePath, null);
-		} catch (DoesNotExistException e) {
-			throw new NoSuccessException(e);
-		}
-		
-		SrmSetPermissionRequest setPermissionRequest = new SrmSetPermissionRequest();
-		setPermissionRequest.setSURL(toSrmURI(absolutePath));
-		setPermissionRequest.setPermissionType(TPermissionType.CHANGE);
-		setPermissionRequest.setArrayOfUserPermissions(null);
-		switch (scope) {
-			case SCOPE_USER:
-				PermissionBytes userPermissions = srmFileAttributes.getUserPermission();
-				PermissionBytes newUserPermissions = removePermissions(userPermissions, permissions);
-				if(userPermissions == newUserPermissions){
-					return;
-				}else{
-					setPermissionRequest.setOwnerPermission(getSRMPermissions(newUserPermissions));
-				}
-				break;
-			case SCOPE_GROUP:
-				PermissionBytes groupPermissions = srmFileAttributes.getGroupPermission();
-				PermissionBytes newGroupPermissions = removePermissions(groupPermissions, permissions);
-				if(groupPermissions == newGroupPermissions){
-					return;
-				}else{
-					setPermissionRequest.setArrayOfGroupPermissions(new ArrayOfTGroupPermission(new TGroupPermission[]{new TGroupPermission(srmFileAttributes.getGroup(), getSRMPermissions(newGroupPermissions))}));
-				}
-				break;
-			case SCOPE_ANY:
-				PermissionBytes anyPermissions = srmFileAttributes.getAnyPermission();
-				PermissionBytes newAnyPermissions = removePermissions(anyPermissions, permissions);
-				if(anyPermissions == newAnyPermissions){
-					return;
-				}else{
-					setPermissionRequest.setOtherPermission(getSRMPermissions(newAnyPermissions));
-				}
-				break;
-			default:
-				throw new RuntimeException("Unkown scope: "+scope);
-		}
-		
-		SrmSetPermissionResponse response = null;
-		try{
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + setPermissionRequest.getClass().getName() + " : " + absolutePath);
-			response = m_stub.srmSetPermission(setPermissionRequest);
-		} catch (RemoteException e) {
-	        throw new NoSuccessException(e);
-	    }
-		
+    public void permissionsDeny(String absolutePath, int scope, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        FileAttributes srmFileAttributes;
+        try {
+            srmFileAttributes = getAttributes(absolutePath, null);
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
+        }
+        
+        SrmSetPermissionRequest setPermissionRequest = new SrmSetPermissionRequest();
+        setPermissionRequest.setSURL(toSrmURI(absolutePath));
+        setPermissionRequest.setPermissionType(TPermissionType.CHANGE);
+        setPermissionRequest.setArrayOfUserPermissions(null);
+        switch (scope) {
+            case SCOPE_USER:
+                PermissionBytes userPermissions = srmFileAttributes.getUserPermission();
+                PermissionBytes newUserPermissions = removePermissions(userPermissions, permissions);
+                if(userPermissions == newUserPermissions){
+                    return;
+                }else{
+                    setPermissionRequest.setOwnerPermission(getSRMPermissions(newUserPermissions));
+                }
+                break;
+            case SCOPE_GROUP:
+                PermissionBytes groupPermissions = srmFileAttributes.getGroupPermission();
+                PermissionBytes newGroupPermissions = removePermissions(groupPermissions, permissions);
+                if(groupPermissions == newGroupPermissions){
+                    return;
+                }else{
+                    setPermissionRequest.setArrayOfGroupPermissions(new ArrayOfTGroupPermission(new TGroupPermission[]{new TGroupPermission(srmFileAttributes.getGroup(), getSRMPermissions(newGroupPermissions))}));
+                }
+                break;
+            case SCOPE_ANY:
+                PermissionBytes anyPermissions = srmFileAttributes.getAnyPermission();
+                PermissionBytes newAnyPermissions = removePermissions(anyPermissions, permissions);
+                if(anyPermissions == newAnyPermissions){
+                    return;
+                }else{
+                    setPermissionRequest.setOtherPermission(getSRMPermissions(newAnyPermissions));
+                }
+                break;
+            default:
+                throw new RuntimeException("Unkown scope: "+scope);
+        }
+        
+        SrmSetPermissionResponse response = null;
+        try{
+            Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + setPermissionRequest.getClass().getName() + " : " + absolutePath);
+            response = m_stub.srmSetPermission(setPermissionRequest);
+        } catch (RemoteException e) {
+            throw new NoSuccessException(e);
+        }
+        
         TReturnStatus status = response.getReturnStatus();
         if (! status.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
             try {
@@ -735,95 +690,95 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             } catch (DoesNotExistException e) {
                 throw new NoSuccessException(e);
             } catch (AlreadyExistsException e) {
-            	throw new NoSuccessException(e);
-			} catch (BadParameterException e) {
-				throw new NoSuccessException(e);
-			}
+                throw new NoSuccessException(e);
+            } catch (BadParameterException e) {
+                throw new NoSuccessException(e);
+            }
             throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
         }
-	}
+    }
 
-	public void setGroup(String absolutePath, String id) throws DoesNotExistException, PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
-		throw new PermissionDeniedException("Only root can do that on SRM.");
-	}
+    public void setGroup(String absolutePath, String id) throws DoesNotExistException, PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
+        throw new PermissionDeniedException("Only root can do that on SRM.");
+    }
 
-	public String[] getGroupsOf(String id) throws BadParameterException, NoSuccessException {
-		String userId = null;
-		try {
-			userId = m_credential.getName().toString();
-		} catch (GSSException e) {
-			throw new BadParameterException("Unable to extract the user ID from the certificate");
-		}
-		if(!userId.equals(id)){
-			throw new BadParameterException("The id is not the actual user");
-		}
-		X509Credential globusCred = null;
-		if (m_credential instanceof GlobusGSSCredentialImpl) {
-			globusCred = ((GlobusGSSCredentialImpl)m_credential).getX509Credential();
-		} else {
-			throw new BadParameterException("Not a globus proxy");
-		}
+    public String[] getGroupsOf(String id) throws BadParameterException, NoSuccessException {
+        String userId = null;
+        try {
+            userId = m_credential.getName().toString();
+        } catch (GSSException e) {
+            throw new BadParameterException("Unable to extract the user ID from the certificate");
+        }
+        if(!userId.equals(id)){
+            throw new BadParameterException("The id is not the actual user");
+        }
+        X509Credential globusCred = null;
+        if (m_credential instanceof GlobusGSSCredentialImpl) {
+            globusCred = ((GlobusGSSCredentialImpl)m_credential).getX509Credential();
+        } else {
+            throw new BadParameterException("Not a globus proxy");
+        }
 
-		List<VOMSAttribute> v = VOMSValidators.newParser().parse(globusCred.getCertificateChain());
-		for (int i=0; i<v.size(); i++) {
-			VOMSAttribute attr = (VOMSAttribute) v.get(i);
-			if(m_vo.equals(attr.getVO())){
-				String[] groups = new String[attr.getFQANs().size()];
-				int index = 0;
-				for (Iterator<String> it=attr.getFQANs().iterator(); it.hasNext(); ) {
-					groups[index] = (String) it.next();
-					if(groups[index].startsWith("/")){
-						groups[index] = groups[index].substring(1);
-					}
-					index++;
-				}
-				return groups;
-			}
-		}
-		return new String[0];
-	}
+        List<VOMSAttribute> v = VOMSValidators.newParser().parse(globusCred.getCertificateChain());
+        for (int i=0; i<v.size(); i++) {
+            VOMSAttribute attr = (VOMSAttribute) v.get(i);
+            if(m_vo.equals(attr.getVO())){
+                String[] groups = new String[attr.getFQANs().size()];
+                int index = 0;
+                for (Iterator<String> it=attr.getFQANs().iterator(); it.hasNext(); ) {
+                    groups[index] = (String) it.next();
+                    if(groups[index].startsWith("/")){
+                        groups[index] = groups[index].substring(1);
+                    }
+                    index++;
+                }
+                return groups;
+            }
+        }
+        return new String[0];
+    }
 
     //////////////////////////////////////// private methods ////////////////////////////////////////
-	
-	/**
-	 * @param actualPermissions The permissions to potentially modify.
-	 * @param permissionsToRemove The permissions that have to be removed
-	 * @return The new permissions 
-	 */
-	private static PermissionBytes removePermissions(PermissionBytes actualPermissions, PermissionBytes permissionsToRemove){
-		PermissionBytes newPermissionBytes = actualPermissions;
-		if(permissionsToRemove.contains(Permission.EXEC) && actualPermissions.contains(Permission.EXEC)){
-			newPermissionBytes = new PermissionBytes(newPermissionBytes.getValue() - Permission.EXEC.getValue());
-		}
-		if(permissionsToRemove.contains(Permission.READ) && actualPermissions.contains(Permission.READ)){
-			newPermissionBytes = new PermissionBytes(newPermissionBytes.getValue() - Permission.READ.getValue());
-		}
-		if(permissionsToRemove.contains(Permission.WRITE) && actualPermissions.contains(Permission.WRITE)){
-			newPermissionBytes = new PermissionBytes(newPermissionBytes.getValue() - Permission.WRITE.getValue());
-		}
-		return newPermissionBytes;
-	}
-	
+    
+    /**
+     * @param actualPermissions The permissions to potentially modify.
+     * @param permissionsToRemove The permissions that have to be removed
+     * @return The new permissions 
+     */
+    private static PermissionBytes removePermissions(PermissionBytes actualPermissions, PermissionBytes permissionsToRemove){
+        PermissionBytes newPermissionBytes = actualPermissions;
+        if(permissionsToRemove.contains(Permission.EXEC) && actualPermissions.contains(Permission.EXEC)){
+            newPermissionBytes = new PermissionBytes(newPermissionBytes.getValue() - Permission.EXEC.getValue());
+        }
+        if(permissionsToRemove.contains(Permission.READ) && actualPermissions.contains(Permission.READ)){
+            newPermissionBytes = new PermissionBytes(newPermissionBytes.getValue() - Permission.READ.getValue());
+        }
+        if(permissionsToRemove.contains(Permission.WRITE) && actualPermissions.contains(Permission.WRITE)){
+            newPermissionBytes = new PermissionBytes(newPermissionBytes.getValue() - Permission.WRITE.getValue());
+        }
+        return newPermissionBytes;
+    }
+    
     private static TPermissionMode getSRMPermissions(PermissionBytes permissions) {
-    	String perms = "";
-    	if(permissions.contains(Permission.READ)){
-			perms += "R";
-		}
-		if(permissions.contains(Permission.WRITE)){
-			perms += "W";
-		}
-		if(permissions.contains(Permission.EXEC)){
-			perms += "X";
-		}
-		
-		if(perms.equals("")){
-			perms = "NONE";
-		}
-		
-		return TPermissionMode.fromValue(perms);
+        String perms = "";
+        if(permissions.contains(Permission.READ)){
+            perms += "R";
+        }
+        if(permissions.contains(Permission.WRITE)){
+            perms += "W";
+        }
+        if(permissions.contains(Permission.EXEC)){
+            perms += "X";
+        }
+        
+        if(perms.equals("")){
+            perms = "NONE";
+        }
+        
+        return TPermissionMode.fromValue(perms);
     }
     private TMetaDataPathDetail getMetaData(String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-    	return this.getMetaData(absolutePath, false);
+        return this.getMetaData(absolutePath, false);
     }
     
     private TMetaDataPathDetail getMetaData(String absolutePath, Boolean justCheckExist) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -837,12 +792,12 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             request.setCount(0);
             request.setNumOfLevels(0);
         } else {
-        	request.setFullDetailedList(Boolean.TRUE);
+            request.setFullDetailedList(Boolean.TRUE);
         }
         SrmLsResponse response;
         try {
             // send request
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + (justCheckExist?"(CHECKEXIST)":"") + " : " + absolutePath);
+            Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + (justCheckExist?"(CHECKEXIST)":"") + " : " + absolutePath);
             response = m_stub.srmLs(request);
         } catch (AxisFault e) {
             if (EOFException.class.getName().equals(e.getFaultString())) {
@@ -868,7 +823,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         while (status.getStatusCode().equals(TStatusCode.SRM_REQUEST_QUEUED) ||
                status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS))
         {
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Response is asynchronous");
+            Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Response is asynchronous");
             if (System.currentTimeMillis() > deadline) {
                 throw new TimeoutException("SRM request blocked in status: "+status.getStatusCode().getValue());
             }
@@ -877,17 +832,17 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 period *= 2;
             } catch (InterruptedException e) {}
             SrmStatusOfLsRequestResponse response2;
-			try {
-				Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request2.getClass().getName() + " : " + token);
-				response2 = m_stub.srmStatusOfLsRequest(request2);
-			} catch (RemoteException e) {
-	            throw new TimeoutException(e);
-			}
+            try {
+                Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request2.getClass().getName() + " : " + token);
+                response2 = m_stub.srmStatusOfLsRequest(request2);
+            } catch (RemoteException e) {
+                throw new TimeoutException(e);
+            }
 
             status = response2.getReturnStatus();
             if (!status.getStatusCode().equals(TStatusCode.SRM_REQUEST_QUEUED) && !status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS)) {
-            	// report details to first response
-            	response.setDetails(response2.getDetails());
+                // report details to first response
+                response.setDetails(response2.getDetails());
             }
         }
         request2 = null;
@@ -899,24 +854,24 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         detailedStatus = (metadata!=null ? metadata.getStatus() : null);
 
         if (detailedStatus!=null && detailedStatus.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
-        	// StoRM does not return subpaths in arrayOfSubPaths but in pathDetailArray[1->N]
-        	// In this case (arrayOfSubPaths == null): copy pathDetailArray[1->N] to arrayOfSubPaths
-        	if (metadata.getArrayOfSubPaths() == null && response.getDetails().getPathDetailArray().length>1) {
-        		ArrayOfTMetaDataPathDetail subpaths = new ArrayOfTMetaDataPathDetail(new TMetaDataPathDetail[response.getDetails().getPathDetailArray().length-1]);
-        		for (int i=1; i<response.getDetails().getPathDetailArray().length; i++) {
-        			subpaths.setPathDetailArray(i-1, response.getDetails().getPathDetailArray(i));
-        		}
-        		metadata.setArrayOfSubPaths(subpaths);
-        	}
+            // StoRM does not return subpaths in arrayOfSubPaths but in pathDetailArray[1->N]
+            // In this case (arrayOfSubPaths == null): copy pathDetailArray[1->N] to arrayOfSubPaths
+            if (metadata.getArrayOfSubPaths() == null && response.getDetails().getPathDetailArray().length>1) {
+                ArrayOfTMetaDataPathDetail subpaths = new ArrayOfTMetaDataPathDetail(new TMetaDataPathDetail[response.getDetails().getPathDetailArray().length-1]);
+                for (int i=1; i<response.getDetails().getPathDetailArray().length; i++) {
+                    subpaths.setPathDetailArray(i-1, response.getDetails().getPathDetailArray(i));
+                }
+                metadata.setArrayOfSubPaths(subpaths);
+            }
             return metadata;
         }
 
         try {
-        	if (detailedStatus != null) {
-        		rethrowException(detailedStatus);
-        	} else {
-        		rethrowException(status);
-        	}
+            if (detailedStatus != null) {
+                rethrowException(detailedStatus);
+            } else {
+                rethrowException(status);
+            }
             throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
         } catch (BadParameterException e) {
             throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
@@ -927,15 +882,15 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 
     private org.apache.axis.types.URI toSrmURI(String absolutePath) throws NoSuccessException {
         try {
-        	// path with French chars (if encoded) are not supported by SRM
-        	// So better here to not encode and let URI throw an exception
+            // path with French chars (if encoded) are not supported by SRM
+            // So better here to not encode and let URI throw an exception
             String encodedPath = PathEncoder.encode(absolutePath);
             return new org.apache.axis.types.URI("srm", null, m_host, m_port, SERVICE_PATH, "SFN="+encodedPath, null);
         } catch (org.apache.axis.types.URI.MalformedURIException e) {
             throw new NoSuccessException(e);
         } catch (UnsupportedEncodingException e) {
             throw new NoSuccessException(e);
-		}
+        }
     }
 
     private void rethrowException(TReturnStatus status) throws PermissionDeniedException, BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException {
@@ -960,29 +915,29 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
     }
     
     private java.net.URI modifyScheme(java.net.URI transferUrl) {
-    	
-	    if (!"gsiftp".equals(transferUrl.getScheme()))
-	    		return transferUrl;
-    	try {
+        
+        if (!"gsiftp".equals(transferUrl.getScheme()))
+                return transferUrl;
+        try {
             if ("DPM".equals(this.m_impl_name)) {
-            	transferUrl = new java.net.URI("gsiftp-dpm",
-            			transferUrl.getUserInfo(), transferUrl.getHost(),
-            			transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
-            			transferUrl.getFragment());
+                transferUrl = new java.net.URI("gsiftp-dpm",
+                        transferUrl.getUserInfo(), transferUrl.getHost(),
+                        transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
+                        transferUrl.getFragment());
             } else if ("dCache".equals(this.m_impl_name)) {
-            	transferUrl = new java.net.URI("gsiftp-dcache",
-            			transferUrl.getUserInfo(), transferUrl.getHost(),
-            			transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
-            			transferUrl.getFragment());               	
+                transferUrl = new java.net.URI("gsiftp-dcache",
+                        transferUrl.getUserInfo(), transferUrl.getHost(),
+                        transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
+                        transferUrl.getFragment());                   
             } else if ("StoRM".equals(this.m_impl_name)) {
-            	transferUrl = new java.net.URI("gsiftp-storm",
-            			transferUrl.getUserInfo(), transferUrl.getHost(),
-            			transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
-            			transferUrl.getFragment());               	
+                transferUrl = new java.net.URI("gsiftp-storm",
+                        transferUrl.getUserInfo(), transferUrl.getHost(),
+                        transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
+                        transferUrl.getFragment());                   
             }
-    	} catch (java.net.URISyntaxException e) {
-    		// No modification
-    	}
-		return transferUrl;
+        } catch (java.net.URISyntaxException e) {
+            // No modification
+        }
+        return transferUrl;
     }
 }
