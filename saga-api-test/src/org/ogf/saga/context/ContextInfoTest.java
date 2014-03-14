@@ -40,15 +40,6 @@ public abstract class ContextInfoTest extends ContextTest {
                 // print title
                 System.out.println("Security context: "+context.getAttribute(Context.TYPE));
     
-                // trigger initialization of context
-                // TODO: check if this is useful (init is done in session(true)...)
-                try {
-                	session.addContext(context);
-                } catch(Exception e) {
-                    System.out.println("  Context not initialized ["+e.getMessage()+"]");
-                }
-    
-                // print context
                 System.out.println(context);
             }
             session.close();
