@@ -9,9 +9,9 @@ import java.util.*;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   UAnd
-* Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   14 juin 2007
+* File:   ULogicalOperation
+* Author: lionel.schwarz@in2p3.fr
+* Date:   25 dec 2013 (just kidding)
 * ***************************************************
 * Description:                                      */
 /**
