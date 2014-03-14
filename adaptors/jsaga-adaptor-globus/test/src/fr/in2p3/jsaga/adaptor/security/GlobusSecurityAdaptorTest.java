@@ -51,6 +51,8 @@ public class GlobusSecurityAdaptorTest {
     @Test
     public void usage() throws Exception {
         String u = "((_UserProxyObject_ | <UserProxy> | ((<UserCertKey> | (<UserCert>  <UserKey>))  UserProxy  *UserPass*  LifeTime  [Delegation]))  <CertRepository>)";
+//        System.out.println(u);
+//        System.out.println(m_adaptor_usage.toString());
         Assert.assertEquals(u, m_adaptor_usage.toString());
     }
 
