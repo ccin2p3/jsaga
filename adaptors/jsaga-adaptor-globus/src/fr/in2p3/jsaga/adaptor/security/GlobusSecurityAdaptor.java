@@ -47,16 +47,24 @@ public abstract class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor 
         return GlobusSecurityCredential.class;
     }
 
-    public Usage getUsage() {
+    protected Usage getPKCS12orPEM() {
         Usage PKCS12 = new UFile(USAGE_INIT_PKCS12, GlobusContext.USERCERTKEY);
         Usage PEM = new UAnd.Builder()
                             .id(USAGE_INIT_PEM)
                             .and(new UFile(Context.USERCERT))
                             .and(new UFile(Context.USERKEY))
                             .build();
-        Usage PKCS12orPEM = new UOr.Builder().or(PKCS12).or(PEM).build();
-
-        Usage deleg = new UOptional(GlobusContext.DELEGATION) {
+        return new UAnd.Builder()
+                                .and(new UOr.Builder().or(PKCS12).or(PEM).build())
+                                .and(new UFilePath(Context.USERPROXY))
+                                .and(new UHidden(Context.USERPASS))
+                                .and(new UDuration(Context.LIFETIME))
+                                .and(getDelegation())
+                                .build();
+    }
+    
+    protected Usage getDelegation() {
+        return new UOptional(GlobusContext.DELEGATION) {
             protected Object throwExceptionIfInvalid(Object value) throws Exception {
                 if (super.throwExceptionIfInvalid(value) != null) {
                     String v = (String) value;
@@ -67,19 +75,15 @@ public abstract class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor 
                 return value;
             }
         };
-        
+    }
+    
+    public Usage getUsage() {
+
         return new UAnd.Builder()
                 .and(new UOr.Builder()
                         .or(new UNoPrompt(USAGE_MEMORY, GlobusContext.USERPROXYOBJECT))
                         .or(new UFile(USAGE_LOAD, Context.USERPROXY))
-                        .or(new UAnd.Builder()
-                                .and(PKCS12orPEM)
-                                .and(new UFilePath(Context.USERPROXY))
-                                .and(new UHidden(Context.USERPASS))
-                                .and(new UDuration(Context.LIFETIME))
-                                .and(deleg)
-                                .build()
-                        )
+                        .or(getPKCS12orPEM())
                         .build()
                 )
                 .and(new UFile(Context.CERTREPOSITORY))
@@ -178,7 +182,7 @@ public abstract class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor 
         Util.destroy(proxyFile);
     }
 
-    private static GSSCredential load(File proxyFile) throws IOException, GSSException {
+    protected static GSSCredential load(File proxyFile) throws IOException, GSSException {
         byte [] proxyBytes = new byte[(int) proxyFile.length()];
         FileInputStream in = new FileInputStream(proxyFile);
         in.read(proxyBytes);

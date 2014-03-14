@@ -16,7 +16,6 @@ import org.globus.myproxy.DestroyParams;
 import org.globus.myproxy.GetParams;
 import org.globus.util.Util;
 import org.gridforum.jgss.ExtendedGSSCredential;
-import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
@@ -40,85 +39,89 @@ import java.util.Map;
 /**
  *
  */
-public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
-//    private static final int USAGE_INIT_PKCS12 = 1;
-    private static final int USAGE_INIT_PEM = 2;
-    private static final int USAGE_LOCAL_MEMORY = 3;
-    private static final int USAGE_LOCAL_LOAD = 4;
-    private static final int USAGE_GET_DELEGATED_MEMORY = 5;
-    private static final int USAGE_GET_DELEGATED_LOAD = 6;
+// TODO: move to RFC3820 ???
+public class MyProxySecurityAdaptor extends GlobusSecurityAdaptorExtendedLegacy {
+    public static final int USAGE_GET_DELEGATED_MEMORY = 20;
+    public static final int USAGE_GET_DELEGATED_LOAD = 21;
 
-    private static final int MIN_LIFETIME_FOR_USING = 3*3600;   // 3 hours
-//    private static final int MIN_LIFETIME_FOR_RENEW = 30*60;    // 30 minutes
+//    private static final int MIN_LIFETIME_FOR_USING = 3*3600;   // 3 hours
     private static final int DEFAULT_STORED_PROXY_LIFETIME = 7*24*3600;
     private static final int DEFAULT_DELEGATED_PROXY_LIFETIME = 12*3600;
 
+    @Override
     public String getType() {
         return "MyProxy";
     }
 
+    @Override
     public Class getSecurityCredentialClass() {
         return MyProxySecurityCredential.class;
     }
 
+    @Override
     public Usage getUsage() {
-        return new UAnd(new Usage[]{
-                new UOr(new Usage[]{
+        return new UAnd.Builder()
+                .and(new UOr.Builder()
                         // get delegated proxy from server
-                        new UAnd(USAGE_GET_DELEGATED_MEMORY, new Usage[]{
-                                new UNoPrompt(GlobusContext.USERPROXYOBJECT),
-                                new UDuration(GlobusContext.DELEGATIONLIFETIME)
-                        }),
-                        new UAnd(USAGE_GET_DELEGATED_LOAD, new Usage[]{
-                                new UFile(Context.USERPROXY),
-                                new UDuration(GlobusContext.DELEGATIONLIFETIME)
-                        }),
-
+                        .or(new UAnd.Builder()
+                                    .id(USAGE_GET_DELEGATED_MEMORY)
+                                    .and(new UNoPrompt(GlobusContext.USERPROXYOBJECT))
+                                    .and(new UDuration(GlobusContext.DELEGATIONLIFETIME))
+                                    .build()
+                        )
+                        .or(new UAnd.Builder()
+                                    .id(USAGE_GET_DELEGATED_LOAD)
+                                    .and(new UFile(Context.USERPROXY))
+                                    .and(new UDuration(GlobusContext.DELEGATIONLIFETIME))
+                                    .build()
+                        )
                         // local proxy
-                        new UProxyObject(USAGE_LOCAL_MEMORY, GlobusContext.USERPROXYOBJECT, MIN_LIFETIME_FOR_USING),
-                        new UProxyFile(USAGE_LOCAL_LOAD, Context.USERPROXY, MIN_LIFETIME_FOR_USING),
+                        .or(new UNoPrompt(USAGE_MEMORY, GlobusContext.USERPROXYOBJECT/*, MIN_LIFETIME_FOR_USING*/))
+                        .or(new UFile(USAGE_LOAD, Context.USERPROXY/*, MIN_LIFETIME_FOR_USING*/))
 
                         // create and store proxy
-                        new UAnd(USAGE_INIT_PEM, new Usage[]{
-                                new UFile(Context.USERCERT), new UFile(Context.USERKEY),
-                                new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS),
-                                new UDuration(Context.LIFETIME),
-                        }),
-
-                }),
-                new U(Context.SERVER),
-                new UOptional(Context.USERID),
-                new UOptional(GlobusContext.MYPROXYPASS),
-                new UFile(Context.CERTREPOSITORY)
-        });
+                        .or(getPKCS12orPEM())
+                        .build()
+                )
+                .and(new U(Context.SERVER))
+                .and(new UOptional(Context.USERID))
+                .and(new UOptional(GlobusContext.MYPROXYPASS))
+                .and(new UFile(Context.CERTREPOSITORY))
+                .build();
     }
 
+    @Override
     public Default[] getDefaults(Map map) throws IncorrectStateException {
         EnvironmentVariables env = EnvironmentVariables.getInstance();
-        return new Default[]{
-                // concat with ".myproxy" to avoid conflict with Globus context type
-                new Default(Context.USERPROXY, new String[]{
-                        env.getProperty("X509_USER_PROXY")!=null ? env.getProperty("X509_USER_PROXY")+".myproxy" : null,
-                        System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u"+
-                                (System.getProperty("os.name").toLowerCase().startsWith("windows")
-                                        ? "_"+System.getProperty("user.name").toLowerCase()
-                                        : (env.getProperty("UID")!=null
-                                                ? env.getProperty("UID")
-                                                : GlobusSecurityAdaptor.getUnixUID()
-                                          )
-                                )+".myproxy"}),
-                new Default(Context.USERCERT, new File[]{
-                        new File(env.getProperty("X509_USER_CERT")+""),
-                        new File(System.getProperty("user.home")+"/.globus/usercert.pem")}),
-                new Default(Context.USERKEY, new File[]{
-                        new File(env.getProperty("X509_USER_KEY")+""),
-                        new File(System.getProperty("user.home")+"/.globus/userkey.pem")}),
-                new Default(Context.CERTREPOSITORY, new File[]{
-                        new File(env.getProperty("X509_CERT_DIR")+""),
-                        new File(System.getProperty("user.home")+"/.globus/certificates/"),
-                        new File("/etc/grid-security/certificates/")}),
-                new Default(Context.SERVER, env.getProperty("MYPROXY_SERVER")),
-        };
+//        return new Default[]{
+//                // concat with ".myproxy" to avoid conflict with Globus context type
+//                new Default(Context.USERPROXY, new String[]{
+//                        env.getProperty("X509_USER_PROXY")!=null ? env.getProperty("X509_USER_PROXY")+".myproxy" : null,
+//                        System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u"+
+//                                (System.getProperty("os.name").toLowerCase().startsWith("windows")
+//                                        ? "_"+System.getProperty("user.name").toLowerCase()
+//                                        : (env.getProperty("UID")!=null
+//                                                ? env.getProperty("UID")
+//                                                : getUnixUID()
+//                                          )
+//                                )+".myproxy"}),
+//                new Default(Context.USERCERT, new File[]{
+//                        new File(env.getProperty("X509_USER_CERT")+""),
+//                        new File(System.getProperty("user.home")+"/.globus/usercert.pem")}),
+//                new Default(Context.USERKEY, new File[]{
+//                        new File(env.getProperty("X509_USER_KEY")+""),
+//                        new File(System.getProperty("user.home")+"/.globus/userkey.pem")}),
+//                new Default(Context.CERTREPOSITORY, new File[]{
+//                        new File(env.getProperty("X509_CERT_DIR")+""),
+//                        new File(System.getProperty("user.home")+"/.globus/certificates/"),
+//                        new File("/etc/grid-security/certificates/")}),
+//                new Default(Context.SERVER, env.getProperty("MYPROXY_SERVER")),
+//        };
+        Default[] parentDefault = super.getDefaults(map);
+        Default[] thisDefault = new Default[parentDefault.length+1];
+        System.arraycopy(parentDefault, 0, thisDefault, 0, parentDefault.length);
+        thisDefault[parentDefault.length] = new Default(Context.SERVER, env.getProperty("MYPROXY_SERVER"));
+        return thisDefault;
     }
 
     public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
@@ -126,10 +129,10 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
             switch(usage) {
                 case USAGE_INIT_PEM:
                 {
-                    // create local temporary proxy
-                    //String tempFile = File.createTempFile("myproxy", "txt").getAbsolutePath();
-                    //attributes.put(Context.USERPROXY, tempFile);
-                    GSSCredential cred = new GlobusProxyFactory(attributes, GlobusProxyFactory.OID_OLD, GlobusProxyFactory.CERTIFICATE_PEM).createProxy();
+                    // build proxy
+//                    GSSCredential cred = new GlobusProxyFactory(attributes, GlobusProxyFactory.OID_OLD, GlobusProxyFactory.CERTIFICATE_PEM).createProxy();
+                    GSSCredential cred = ((GlobusSecurityCredential)super.createSecurityCredential(usage, attributes, contextId)).getGSSCredential();
+
                     InitParams proxyParameters = new InitParams();
 
                     // send it to MyProxy server
@@ -154,16 +157,17 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
                     // returns
                     return this.createSecurityAdaptor(cred, attributes);
                 }
-                case USAGE_LOCAL_MEMORY:
+                case USAGE_MEMORY:
+//                {
+//                    GSSCredential cred = InMemoryProxySecurityCredential.toGSSCredential((String) attributes.get(GlobusContext.USERPROXYOBJECT));
+//                    return this.createSecurityAdaptor(cred, attributes);
+//                }
+                case USAGE_LOAD:
                 {
-                    GSSCredential cred = InMemoryProxySecurityCredential.toGSSCredential((String) attributes.get(GlobusContext.USERPROXYOBJECT));
-                    return this.createSecurityAdaptor(cred, attributes);
-                }
-                case USAGE_LOCAL_LOAD:
-                {
-                    CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
-                    GSSCredential cred = load(new File((String) attributes.get(Context.USERPROXY)));
-                    return this.createSecurityAdaptor(cred, attributes);
+//                    CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
+//                    GSSCredential cred = load(new File((String) attributes.get(Context.USERPROXY)));
+//                    return this.createSecurityAdaptor(cred, attributes);
+                    return super.createSecurityCredential(usage, attributes, contextId);
                 }
                 case USAGE_GET_DELEGATED_MEMORY:
                 {
@@ -196,6 +200,7 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
             throw new NoSuccessException(e);
         }
     }
+    
     private SecurityCredential createSecurityAdaptor(GSSCredential cred, Map attributes) throws IncorrectStateException {
         File certRepository = new File((String) attributes.get(Context.CERTREPOSITORY));
         String server = (String) attributes.get(Context.SERVER);
@@ -213,7 +218,11 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
 
     public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception {
         // get attributes
-        GSSCredential cred = load(new File((String) attributes.get(Context.USERPROXY)));
+        File proxy = new File((String) attributes.get(Context.USERPROXY));
+        if (!proxy.exists()) {
+            return;
+        }
+        GSSCredential cred = load(proxy);
         DestroyParams proxyParameters = new DestroyParams();
 
         String userId = getUserName(cred, attributes);
@@ -226,8 +235,10 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
         // destroy remote proxy
         MyProxy server = getServer(attributes);
         server.destroy(cred, proxyParameters);
+        
         // destroy local proxy
-        Util.destroy((String) attributes.get(Context.USERPROXY));
+//        Util.destroy(proxy);
+        super.destroySecurityAdaptor(attributes, contextId);
     }
 
     private static GSSCredential getDelegatedCredential(GSSCredential oldCred, Map attributes) throws ParseException, URISyntaxException, MyProxyException, GSSException {
@@ -266,20 +277,6 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
         }
 */
         return myProxy;
-    }
-
-    private static GSSCredential load(File proxyFile) throws IOException, GSSException {
-        byte [] proxyBytes = new byte[(int) proxyFile.length()];
-        FileInputStream in = new FileInputStream(proxyFile);
-        in.read(proxyBytes);
-        in.close();
-        ExtendedGSSManager manager = (ExtendedGSSManager) ExtendedGSSManager.getInstance();
-        return manager.createCredential(
-                proxyBytes,
-                ExtendedGSSCredential.IMPEXP_OPAQUE,
-                GSSCredential.DEFAULT_LIFETIME,
-                null, // use default mechanism: GSI
-                GSSCredential.INITIATE_AND_ACCEPT);
     }
 
     private static void save(File proxyFile, GSSCredential cred) throws GSSException, IOException {
