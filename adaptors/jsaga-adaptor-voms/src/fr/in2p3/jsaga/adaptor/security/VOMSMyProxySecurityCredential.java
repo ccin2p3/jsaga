@@ -5,15 +5,10 @@ import org.globus.util.Util;
 import org.ietf.jgss.GSSCredential;
 import org.italiangrid.voms.VOMSAttribute;
 import org.italiangrid.voms.VOMSValidators;
-import org.ogf.saga.context.Context;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 
-import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
-
-import java.io.File;
 import java.io.PrintStream;
-import java.text.ParseException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -34,17 +29,8 @@ import org.globus.gsi.util.ProxyCertificateUtil;
  */
 public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
 
-//    protected String _genuineLifeTime;
-//    protected String _localLifeTime;
-
     public VOMSMyProxySecurityCredential(GSSCredential proxy, Map attributes) {
         super(proxy, attributes);
-        // TODO: what is this?
-//        this._genuineLifeTime = (String) attributes.get(Context.LIFETIME);
-//        this._localLifeTime = (String) attributes.get(GlobusContext.DELEGATIONLIFETIME);
-//        if (_localLifeTime == null) {
-//            _localLifeTime = VOMSSecurityAdaptor.DEFAULT_LIFETIME;
-//        }
     }
 
     /**
@@ -62,19 +48,11 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
             }
             List<VOMSAttribute> v = VOMSValidators.newParser().parse(globusProxy.getCertificateChain());
             VOMSAttribute attr = (VOMSAttribute) v.get(0);
-//            try {
-                long timeleft = (attr.getNotAfter().getTime() - System.currentTimeMillis()) / 1000;
-//                if (Context.LIFETIME.equals(key)) {
-//                    timeleft = timeleft + UDuration.toInt(this._genuineLifeTime) - UDuration.toInt(_localLifeTime);
-//                }
-                return "" + (timeleft > 0 ? timeleft : 0);
-//            } catch (ParseException e) {
-//                throw new NoSuccessException(e);
-//            }
+            long timeleft = (attr.getNotAfter().getTime() - System.currentTimeMillis()) / 1000;
+            return "" + (timeleft > 0 ? timeleft : 0);
         } else {
             return super.getAttribute(key);
         }
-
     }
 
     /**
@@ -93,8 +71,6 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
         out.println("  identity : " + globusProxy.getIdentity());
         out.println("  type     : " + ProxyCertificateUtil.getProxyTypeAsString(globusProxy.getProxyType()));
         out.println("  strength : " + globusProxy.getStrength() + " bits");
-        // the genuine lifetime is the one on the server (set by the user config)
-//        out.println("  timeleft : " + Util.formatTimeSec(globusProxy.getTimeLeft() + UDuration.toInt(this._genuineLifeTime) - UDuration.toInt(_localLifeTime)));
         out.println("  timeleft : " + Util.formatTimeSec(globusProxy.getTimeLeft()));
 
         // VOMS specific
@@ -109,8 +85,6 @@ public class VOMSMyProxySecurityCredential extends VOMSSecurityCredential {
                 out.println("  attribute : " + it.next());
             }
             long timeleft = (attr.getNotAfter().getTime() - System.currentTimeMillis()) / 1000;
-            // the genuine lifetime is the one on the server (set by the user config)
-//            timeleft = timeleft + UDuration.toInt(this._genuineLifeTime) - UDuration.toInt(_localLifeTime);
             if (timeleft < 0) {
                 timeleft = 0;
             }
