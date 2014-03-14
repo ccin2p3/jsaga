@@ -27,14 +27,6 @@ public abstract class ULogicalOperation extends Vector<Usage> implements Usage {
         super(c);
     }
     
-    @Deprecated
-    public ULogicalOperation(Usage[] usage) {
-        super(usage.length);
-        for (Usage u: usage) {
-            this.add(u);
-        }
-    }
-
     public Set<String> getKeys() {
         Set<String> keys = new HashSet<String>(this.size());
         for (Iterator<Usage> i = this.iterator(); i.hasNext(); ) {

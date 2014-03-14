@@ -42,10 +42,10 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 	}		
 
     public Usage getUsage() {
-        return new UAnd(new Usage[]{
-                new UFile(MDASENV),
-                new UOptional(USE_TRASH)
-        });
+        return new UAnd.Builder()
+                        .and(new UFile(MDASENV))
+                        .and(new UOptional(USE_TRASH))
+                        .build();
     }
 
 	public int getDefaultPort() {

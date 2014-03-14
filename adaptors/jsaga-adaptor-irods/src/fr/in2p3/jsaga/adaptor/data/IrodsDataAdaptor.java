@@ -41,10 +41,10 @@ public class  IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 	}		
 
 	public Usage getUsage() {
-        return new UAnd(new Usage[]{
-				new UFile(IRODSENV),
-                new UOptional(USERID)
-        });
+        return new UAnd.Builder()
+				        .and(new UFile(IRODSENV))
+				        .and(new UOptional(USERID))
+				        .build();
     }
 
 	public int getDefaultPort() {

@@ -27,17 +27,6 @@ public class UAnd extends ULogicalOperation {
         m_id = id;
     }
     
-    @Deprecated
-    public UAnd(Usage[] usage) {
-        this(-1, usage);
-    }
-    
-    @Deprecated
-    public UAnd(int id, Usage[] usage) {
-        super(usage);
-        m_id = id;
-    }
-
     /**
      * If 1 of Usages does not exist or is BadParameter, rethrow
      * Otherwise, if 1 of Usages is FileNotFound return -1
