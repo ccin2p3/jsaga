@@ -36,8 +36,6 @@ public class PipedOutputStreamImpl extends PipedOutputStream implements Runnable
 
         try {
             // pipe must be connected before writing (else will hang on 2nd test case)
-            // TODO: use constuctor(this, int buffer_size) to a buffer > 1024 (default for PipedInputStream)
-            // This can be implemented by adding a method getDefaultBufferSize() in FileWriterPutter
             if (adaptor.getBufferSize() > 0) {
                 m_in = new PipedInputStream(this, adaptor.getBufferSize());
             } else {
