@@ -1,14 +1,12 @@
 package fr.in2p3.jsaga.adaptor.data;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
-import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
@@ -17,6 +15,7 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import org.ietf.jgss.GSSCredential;
+import org.irods.jargon.core.connection.GSIIRODSAccount;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.AuthenticationException;
 import org.irods.jargon.core.exception.JargonException;
@@ -98,7 +97,8 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
                 /* 3.1.4 */
 //                m_account = IRODSAccount.instance(host, port, cert);
                 /* 3.2.1.4 and 3.3.1.1 */
-                m_account = org.irods.jargon.core.connection.GSIIRODSAccount.instance(host, port, cert, defaultStorageResource);
+                m_account = GSIIRODSAccount.instance(host, port, cert, defaultStorageResource);
+                ((GSIIRODSAccount)m_account).setCertificateAuthority(((GSSCredentialSecurityCredential) credential).getCertRepository().getAbsolutePath());
                 m_account.setZone(mcatZone);
                 
                 m_account.setDefaultStorageResource(defaultStorageResource);
