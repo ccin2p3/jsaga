@@ -18,6 +18,7 @@ import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import org.ietf.jgss.GSSCredential;
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.exception.AuthenticationException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.io.IRODSFile;
@@ -119,11 +120,10 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
                 m_account = IRODSAccount.instance(host, port, userName, passWord, basePath, mcatZone, defaultStorageResource);
             }
             
-            // FIXME: with 3.1.4: the following line gives -806000 CAT_SQL_ERR
-            //with 3.2 stuck
             m_fileFactory = IRODSFileSystem.instance().getIRODSFileFactory(m_account);
+        } catch (AuthenticationException je) {
+            throw new AuthenticationFailedException(je.getMessage());
         } catch (JargonException je) {
-            //rethrow(je);
             throw new NoSuccessException(je);
         } catch (Exception e) {
             throw new NoSuccessException(e);
@@ -211,6 +211,7 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
 //    }
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+        // TODO
 //        if (this.isClassic()) {
             return this.listAttributesClassic(absolutePath, additionalArgs);
 //        } else {
@@ -224,10 +225,7 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
         } catch (JargonException e) {
             // TODO specialize exception
             throw new NoSuccessException(e);
-        }//  new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath + directoryName+SEPARATOR);
-        // TODO check this
-//        FileAttributes[] test = listAttributes( parentAbsolutePath + directoryName+SEPARATOR,additionalArgs);
-//        if (!bool) {throw new NoSuccessException("Directory not empty"+test.length);}
+        }
     }
 
     public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -261,22 +259,15 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
     }
 
 	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
-		IRODSFile parentFile;
         try {
-            parentFile = m_fileFactory.instanceIRODSFile(parentAbsolutePath);
+            IRODSFile parentFile = m_fileFactory.instanceIRODSFile(parentAbsolutePath);
+            if (!parentFile.exists()) {throw new ParentDoesNotExist(parentAbsolutePath);}
+            IRODSFile generalFile = m_fileFactory.instanceIRODSFile(parentAbsolutePath, directoryName);
+            if (generalFile.exists()) {throw new AlreadyExistsException(parentAbsolutePath+SEPARATOR + directoryName);}
+            generalFile.mkdir();
         } catch (JargonException e) {
             throw new NoSuccessException(e);
         }
-		if (!parentFile.exists()) {throw new ParentDoesNotExist(parentAbsolutePath);}
 	
-		IRODSFile generalFile;
-        try {
-            generalFile = m_fileFactory.instanceIRODSFile(parentAbsolutePath +SEPARATOR + directoryName);
-        } catch (JargonException e) {
-            throw new NoSuccessException(e);
-        }
-		if (generalFile.exists()) {throw new AlreadyExistsException(parentAbsolutePath+SEPARATOR + directoryName);}
-
-		generalFile.mkdir();
 	}
 }
