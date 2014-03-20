@@ -4,9 +4,11 @@ import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 
 import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.pub.io.FileIOOperations.SeekWhenceType;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileInputStream;
 import org.irods.jargon.core.pub.io.IRODSFileOutputStream;
+import org.irods.jargon.core.pub.io.IRODSRandomAccessFile;
 import org.ogf.saga.error.*;
 
 import java.io.*;
@@ -38,22 +40,13 @@ public class IrodsDataAdaptorPhysical extends IrodsDataAdaptorAbstract implement
         String fileName = split[split.length-1];
 
         String dir = absolutePath.substring(0,absolutePath.length()-fileName.length());
-        IRODSFile generalFile;
         try {
-            generalFile = m_fileFactory.instanceIRODSFile( dir, fileName );
-        } catch (JargonException e) {
-            throw new NoSuccessException(e);
-        }
-
-        try {
+            IRODSFile generalFile = m_fileFactory.instanceIRODSFile( dir, fileName );
             return new BufferedInputStream(m_fileFactory.instanceIRODSFileInputStream(generalFile));
-           } catch (java.lang.NullPointerException e) {
-            if (!generalFile.exists()) {
-                throw new DoesNotExistException(e);
-            } else {
-                throw new NoSuccessException(e);
+        } catch (JargonException e) {
+            if (e.getCause() instanceof FileNotFoundException) {
+                throw new DoesNotExistException(e.getMessage());
             }
-        } catch (java.lang.Exception e) {
             throw new NoSuccessException(e);
         }
     }
@@ -78,10 +71,10 @@ public class IrodsDataAdaptorPhysical extends IrodsDataAdaptorAbstract implement
             if (!generalFile.createNewFile()) {
                 if (exclusive) {
                     throw new AlreadyExistsException("File already exists");
-//                } else if (append) {
-//                    GeneralRandomAccessFile randomAccessFile = FileFactory.newRandomAccessFile( generalFile, "rw" );
-//                    randomAccessFile.seek( generalFile.length() );
-//                    return new BufferedOutputStream(new IrodsAppendedOutputStream(randomAccessFile));
+                } else if (append) {
+                    IRODSRandomAccessFile randomAccessFile = m_fileFactory.instanceIRODSRandomAccessFile(generalFile );
+                    randomAccessFile.seek(0, SeekWhenceType.SEEK_END);
+                    return new BufferedOutputStream(new IrodsAppendedOutputStream(randomAccessFile));
                 } else {
                     generalFile.delete();
                     return new BufferedOutputStream(m_fileFactory.instanceIRODSFileOutputStream(generalFile));   //overwrite

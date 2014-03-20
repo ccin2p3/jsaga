@@ -38,28 +38,20 @@ import org.ogf.saga.error.*;
  *
  */
 public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
-//	protected IRODSFileSystem fileSystem;
 	protected final static String SEPARATOR = "/";
-	protected final static String FILE = "file";
-	protected final static String DIR = "dir";
-	protected final static String DOT =  "\\.";
 	protected final static String DEFAULTRESOURCE	= "defaultresource", DOMAIN="domain", ZONE="zone", METADATAVALUE="metadatavalue";
 	protected String srbHost, srbPort, userName, passWord, mdasDomainName, mcatZone, defaultStorageResource, metadataValue;
 	protected SecurityCredential credential;
 	protected GSSCredential cert;
 	protected IRODSAccount m_account;
-	protected IRODSFileSystem m_fileSystem;
 	protected IRODSFileFactory m_fileFactory;
 
     public Usage getUsage() {
-        // TODO: upgrade to .and
-        return new UAnd(new Usage[]{
-                new UOptional(Context.USERID)
-        });
+        return new UOptional(Context.USERID);
     }
 
     public int getDefaultPort() {
-        return NO_PORT;
+        return 1247;
     }
     
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
@@ -103,10 +95,10 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
             if (credential instanceof GSSCredentialSecurityCredential) {
                 cert = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
                 /* 3.1.4 */
-                m_account = IRODSAccount.instance(host, port, cert);
-                /* 3.2.1.4 and 3.3.1.1
+//                m_account = IRODSAccount.instance(host, port, cert);
+                /* 3.2.1.4 and 3.3.1.1 */
                 m_account = org.irods.jargon.core.connection.GSIIRODSAccount.instance(host, port, cert, defaultStorageResource);
-                m_account.setZone(mcatZone);*/
+                m_account.setZone(mcatZone);
                 
                 m_account.setDefaultStorageResource(defaultStorageResource);
                 m_account.setHomeDirectory(basePath);
@@ -127,10 +119,9 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
                 m_account = IRODSAccount.instance(host, port, userName, passWord, basePath, mcatZone, defaultStorageResource);
             }
             
-            m_fileSystem = IRODSFileSystem.instance();
             // FIXME: with 3.1.4: the following line gives -806000 CAT_SQL_ERR
             //with 3.2 stuck
-            m_fileFactory = m_fileSystem.getIRODSFileFactory(m_account);
+            m_fileFactory = IRODSFileSystem.instance().getIRODSFileFactory(m_account);
         } catch (JargonException je) {
             //rethrow(je);
             throw new NoSuccessException(je);
@@ -140,12 +131,6 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
     }
 
     public void disconnect() throws NoSuccessException {
-        try {
-            ((IRODSFileSystem)m_fileSystem).close();
-        } catch (JargonException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     private FileAttributes[] listAttributesClassic(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -160,6 +145,7 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
         } catch (Exception e) {throw new NoSuccessException(e);}
     }
 
+    // TODO
 //    private FileAttributes[] listAttributesOptimized(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
 //        boolean listDir = true;
 //        boolean listFile = true;
@@ -233,25 +219,24 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
     }
 
     public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        IRODSFile irodsFile;
         try {
-            irodsFile = m_fileFactory.instanceIRODSFile(parentAbsolutePath + directoryName+SEPARATOR);
+            m_fileFactory.instanceIRODSFile(parentAbsolutePath, directoryName).delete();
         } catch (JargonException e) {
+            // TODO specialize exception
             throw new NoSuccessException(e);
-        }
-        boolean  bool= irodsFile.delete(); 
-        FileAttributes[] test = listAttributes( parentAbsolutePath + directoryName+SEPARATOR,additionalArgs);
-        if (!bool) {throw new NoSuccessException("Directory not empty"+test.length);}
+        }//  new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath + directoryName+SEPARATOR);
+        // TODO check this
+//        FileAttributes[] test = listAttributes( parentAbsolutePath + directoryName+SEPARATOR,additionalArgs);
+//        if (!bool) {throw new NoSuccessException("Directory not empty"+test.length);}
     }
 
     public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        IRODSFile irodsFile;
         try {
-            irodsFile = m_fileFactory.instanceIRODSFile(parentAbsolutePath +SEPARATOR + fileName);
+            m_fileFactory.instanceIRODSFile(parentAbsolutePath, fileName).delete();
         } catch (JargonException e) {
+            // TODO specialize exception
             throw new NoSuccessException(e);
         }
-        irodsFile.delete();
     }
     
     
