@@ -21,7 +21,6 @@
         <module>dbus-java</module>
         <module>file-system</module>
         <module>glite</module>
-        <module>jargon</module>
         <module>jeldoclet</module>
         <module>secret-service-api-java</module>
     </modules>
