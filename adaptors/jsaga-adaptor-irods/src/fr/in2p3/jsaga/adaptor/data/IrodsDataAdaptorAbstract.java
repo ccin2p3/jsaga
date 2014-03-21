@@ -1,10 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.U;
@@ -51,21 +48,18 @@ import org.ogf.saga.error.*;
  *
  */
 public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
-	protected final static String SEPARATOR = "/";
-	protected final static String DEFAULTRESOURCE	= "defaultresource", DOMAIN="domain", ZONE="zone", METADATAVALUE="metadatavalue";
-	protected String userName, passWord, mdasDomainName, mcatZone, defaultStorageResource, metadataValue;
-	protected SecurityCredential credential;
-	protected GSSCredential cert;
-	protected IRODSAccount m_account;
-	protected IRODSFileFactory m_fileFactory;
+    protected final static String SEPARATOR = "/";
+    protected final static String DEFAULTRESOURCE    = "DefaultResource";
+    protected final static String ZONE="Zone";
+    protected SecurityCredential credential;
+    protected IRODSAccount m_account;
+    protected IRODSFileFactory m_fileFactory;
 
     public Usage getUsage() {
         return new UAnd.Builder()
-                    .and(new U(Context.USERID))
                     .and(new U(ZONE))
                     .and(new U(DEFAULTRESOURCE))
-                    .and(new UOptional(DOMAIN))
-                    .and(new UOptional(METADATAVALUE))
+                    .and(new UOptional(Context.USERID))
                     .build();
         
     }
@@ -92,40 +86,23 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
     }
     
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
-        // Parsing for defaultResource
-        Set set = attributes.entrySet();
-        Iterator iterator = set.iterator();
-
-        while (iterator.hasNext()) {
-            Map.Entry me = (Map.Entry) iterator.next();
-            String key = ((String)me.getKey()).toLowerCase();
-            String value =(String)me.getValue();
-            
-            if (key.equals(DEFAULTRESOURCE)) {
-                defaultStorageResource = value;
-            } else if (key.equals(DOMAIN)) {
-                mdasDomainName  = value;
-            } else if (key.equals(ZONE)) {
-                mcatZone  = value;
-            } else if (key.equals(METADATAVALUE)) {
-                metadataValue = value;
-            }
-        }
+        
+        String defaultStorageResource=null;
+        String mcatZone=null;
+        
+        if (attributes.containsKey(DEFAULTRESOURCE)) defaultStorageResource = (String)attributes.get(DEFAULTRESOURCE);
+        if (attributes.containsKey(ZONE)) mcatZone = (String)attributes.get(ZONE);
+        
         try {
-            IRODSAccount account = null;
-            
             if (credential instanceof GSSCredentialSecurityCredential) {
-                cert = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
-                /* 3.1.4 */
-//                m_account = IRODSAccount.instance(host, port, cert);
-                /* 3.2.1.4 and 3.3.1.1 */
+                GSSCredential cert = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
                 m_account = GSIIRODSAccount.instance(host, port, cert, defaultStorageResource);
                 ((GSIIRODSAccount)m_account).setCertificateAuthority(((GSSCredentialSecurityCredential) credential).getCertRepository().getAbsolutePath());
                 m_account.setZone(mcatZone);
-                
-                m_account.setDefaultStorageResource(defaultStorageResource);
                 m_account.setHomeDirectory(basePath);
             } else {
+                String userName=null;
+                String passWord=null;
                 if (userInfo!=null) {
                     int pos =userInfo.indexOf(":");
                     if (pos<0) {
@@ -299,27 +276,27 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
     }
     
     
-	public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		IRODSFile generalFile;
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        IRODSFile generalFile;
         try {
             generalFile = m_fileFactory.instanceIRODSFile(absolutePath);
         } catch (JargonException e) {
             throw new NoSuccessException(e);
         }
         return generalFile.exists();
-	}
+    }
 
-	public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-		IRODSFile generalFile;
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+        IRODSFile generalFile;
         try {
             generalFile = m_fileFactory.instanceIRODSFile(absolutePath);
         } catch (JargonException e) {
             throw new NoSuccessException(e);
         }
-		return new GeneralFileAttributes(generalFile.getAbsoluteFile());
+        return new GeneralFileAttributes(generalFile.getAbsoluteFile());
     }
 
-	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         try {
             IRODSFile parentFile = m_fileFactory.instanceIRODSFile(parentAbsolutePath);
             if (!parentFile.exists()) {throw new ParentDoesNotExist(parentAbsolutePath);}
@@ -329,6 +306,6 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
         } catch (JargonException e) {
             throw new NoSuccessException(e);
         }
-	
-	}
+    
+    }
 }
