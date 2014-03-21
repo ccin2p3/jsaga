@@ -15,8 +15,21 @@
     <part id="security">
         <title>Security</title>
         <faq id="env">
-            <question>How to use the .MdasEnv (for SRB) or .IrodsEnv (iRoDS) files ?</question>
-            <answer>These files are used when you provide no configuration for these protocols.</answer>
+            <question>What kind of security context can I use?</question>
+            <answer>Both user/password ("UserPass") and Globus proxy ("Globus") are supported</answer>
+        </faq>
+    </part>
+    <part id="usage">
+        <title>Usage</title>
+        <faq id="url">
+            <question>What is the URL syntax understood by this plug-in ?</question>
+            <answer>The URL must be:
+                <pre><![CDATA[irods://<HOSTNAME>[:<PORT>]/
+Where:
+    <HOSTNAME> is the name of the host running the iRods service,
+    <PORT> is 1247 by default,
+]]></pre>
+            </answer>
         </faq>
     </part>
 </faqs>

@@ -7,6 +7,7 @@
             <action dev="lschwarz" type="update">GridFTP: removed the 10mn limit on file transfer</action>
             <action dev="lschwarz" type="update">SFTP: increase buffer size from 1024 to 32768 when writing to SFTP</action>
             <action dev="lschwarz" type="remove">Old SSH adaptor (urls like "DEPRECATED-SSH") has been removed</action>
+            <action dev="lschwarz" type="remove">SRB adaptor has been removed</action>
             <action dev="lschwarz" type="update">Upgrade Jglobus myproxy to 2.0.7-custom3</action>
             <action dev="lschwarz" type="update">GridFTP: set default TCP buffer to 1MB</action>
             <action dev="lschwarz" type="remove">SSH: attribute "CompressionLevel" is not supported yet</action>
