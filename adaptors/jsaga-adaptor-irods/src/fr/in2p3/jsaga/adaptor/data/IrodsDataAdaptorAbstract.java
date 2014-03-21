@@ -49,7 +49,7 @@ import org.ogf.saga.error.*;
  */
 public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
     protected final static String SEPARATOR = "/";
-    protected final static String DEFAULTRESOURCE    = "DefaultResource";
+    protected final static String DEFAULTRESOURCE = "DefaultResource";
     protected final static String ZONE="Zone";
     protected SecurityCredential credential;
     protected IRODSAccount m_account;
@@ -61,7 +61,6 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
                     .and(new U(DEFAULTRESOURCE))
                     .and(new UOptional(Context.USERID))
                     .build();
-        
     }
 
     public int getDefaultPort() {
