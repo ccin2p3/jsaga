@@ -7,8 +7,8 @@ public class IrodsAdaptorTest {
 
     @Test
     public void usage() throws Exception {
-        String u = "(UserID  zone  defaultresource  [domain]  [metadatavalue])";
-        Assert.assertEquals(u, new IrodsDataAdaptor().toString());
+        String u = "(Zone  DefaultResource  [UserID])";
+        Assert.assertEquals(u, new IrodsDataAdaptor().getUsage().toString());
     }
 
 }
