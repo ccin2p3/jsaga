@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -18,10 +19,21 @@ import org.ietf.jgss.GSSCredential;
 import org.irods.jargon.core.connection.GSIIRODSAccount;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.AuthenticationException;
+import org.irods.jargon.core.exception.FileNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.exception.JargonRuntimeException;
 import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.jargon.core.pub.IRODSGenQueryExecutor;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
+import org.irods.jargon.core.query.GenQueryBuilderException;
+import org.irods.jargon.core.query.IRODSGenQueryBuilder;
+import org.irods.jargon.core.query.IRODSGenQueryFromBuilder;
+import org.irods.jargon.core.query.IRODSQueryResultRow;
+import org.irods.jargon.core.query.IRODSQueryResultSetInterface;
+import org.irods.jargon.core.query.JargonQueryException;
+import org.irods.jargon.core.query.QueryConditionOperators;
+import org.irods.jargon.core.query.RodsGenQueryEnum;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 
@@ -53,6 +65,8 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
     public int getDefaultPort() {
         return 1247;
     }
+    
+    protected abstract boolean isClassic();
     
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         EnvironmentVariables env = EnvironmentVariables.getInstance();
@@ -142,32 +156,54 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
                 fileAttributes[i] = new GeneralFileAttributes(files[i]);
             }
             return fileAttributes;
-        } catch (Exception e) {throw new NoSuccessException(e);}
+            // TODO: specialize exception
+        } catch (JargonRuntimeException e) {
+            if (e.getCause() instanceof FileNotFoundException) {
+                throw new DoesNotExistException(e.getMessage());
+            }
+            throw new NoSuccessException(e);
+        } catch (JargonException e) {
+            if (e.getCause() instanceof FileNotFoundException) {
+                throw new DoesNotExistException(e.getMessage());
+            }
+            throw new NoSuccessException(e);
+        }
     }
 
     // TODO
-//    private FileAttributes[] listAttributesOptimized(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-//        boolean listDir = true;
-//        boolean listFile = true;
-//
+    private FileAttributes[] listAttributesOptimized(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+        boolean listDir = true;
+        boolean listFile = true;
+
 //        if (additionalArgs != null && additionalArgs.equals(DIR)) { listFile=false;}
 //        if (additionalArgs != null && additionalArgs.equals(FILE)) { listDir=false;}
-//        
-//        if (!absolutePath.equals("/")) {
-//            absolutePath = absolutePath.substring(0,absolutePath.length()-1);
-//        }
-//
-//        try {
-//            // Select for directories
+        
+        if (!absolutePath.equals("/")) {
+            absolutePath = absolutePath.substring(0,absolutePath.length()-1);
+        }
+
+        try {
+            // Select for directories
 //            MetaDataRecordList[] rlDir = null;
-//            if (listDir) {
+            IRODSQueryResultSetInterface rlDir;
+            if (listDir) {
+                IRODSGenQueryBuilder builder = new IRODSGenQueryBuilder(true, null);
+                builder.addSelectAsGenQueryValue(RodsGenQueryEnum.COL_DATA_NAME);
 //                MetaDataCondition conditionsDir[] = new MetaDataCondition[1];
 //                MetaDataSelect selectsDir[] ={    MetaDataSet.newSelection(IRODSMetaDataSet.DIRECTORY_NAME) };
 //                conditionsDir[0] = IRODSMetaDataSet.newCondition(IRODSMetaDataSet.PARENT_DIRECTORY_NAME,MetaDataCondition.EQUAL, absolutePath);
+                builder.addConditionAsGenQueryField(RodsGenQueryEnum.COL_D_DATA_PATH, QueryConditionOperators.EQUAL, absolutePath);
 //                rlDir = fileSystem.query(conditionsDir, selectsDir);
-//            }
-//            
-//            // Select for files
+                IRODSGenQueryFromBuilder irodsQuery = builder.exportIRODSQueryFromBuilder(1);
+                IRODSGenQueryExecutor irodsGenQueryExecutor = IRODSFileSystem.instance().getIRODSAccessObjectFactory().getIRODSGenQueryExecutor(m_account);
+                rlDir = irodsGenQueryExecutor.executeIRODSQuery(irodsQuery, 0);
+                for (IRODSQueryResultRow row : rlDir.getResults()) {
+                    System.out.println("--> " + row.getColumn(0));
+                }
+            }
+
+            
+            // Select for files
 //            MetaDataRecordList[] rlFile = null;
 //            if (listFile) {    
 //                MetaDataCondition conditionsFile[] = new MetaDataCondition[1];
@@ -179,7 +215,7 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
 //                IRODSMetaDataSet.DIRECTORY_NAME,MetaDataCondition.EQUAL, absolutePath);
 //                rlFile = fileSystem.query(conditionsFile, selectsFile);
 //            }
-//            
+            
 //            int file =0;
 //            int dir = 0;
 //            if (rlDir != null) {dir=rlDir.length;}
@@ -207,8 +243,15 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
 //                ind++;
 //            }
 //            return fileAttributes;
-//        } catch (IOException e) {throw new NoSuccessException(e);}
-//    }
+        } catch (JargonException e) {
+            throw new NoSuccessException(e);
+        } catch (GenQueryBuilderException e) {
+            throw new NoSuccessException(e);
+        } catch (JargonQueryException e) {
+            throw new NoSuccessException(e);
+        }
+            return null;
+    }
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         // TODO
@@ -220,19 +263,30 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
     }
 
     public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        try {
-            m_fileFactory.instanceIRODSFile(parentAbsolutePath, directoryName).delete();
-        } catch (JargonException e) {
-            // TODO specialize exception
-            throw new NoSuccessException(e);
-        }
+//        try {
+//            m_fileFactory.instanceIRODSFile(parentAbsolutePath, directoryName).delete();
+//        } catch (JargonException e) {
+//            if (e instanceof FileNotFoundException) {
+//                throw new DoesNotExistException(e.getMessage());
+//            }
+//            throw new NoSuccessException(e);
+//        }
+        // TODO check this
+        removeFile(parentAbsolutePath, directoryName, additionalArgs);
     }
 
     public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
-            m_fileFactory.instanceIRODSFile(parentAbsolutePath, fileName).delete();
+            // Jargon does not treat file_not_found as an error: first test exist
+            IRODSFile f = m_fileFactory.instanceIRODSFile(parentAbsolutePath, fileName);
+            if (!f.exists()) {
+                throw new DoesNotExistException(f.getAbsolutePath());
+            }
+            if (!f.delete()) {
+                throw new NoSuccessException("Jargon returned false");
+            }
+            f.close();
         } catch (JargonException e) {
-            // TODO specialize exception
             throw new NoSuccessException(e);
         }
     }
