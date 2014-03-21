@@ -79,6 +79,18 @@ public abstract class MakeDirBaseTest extends AbstractDirectory {
         NSFactory.createNSDirectory(m_session, m_subDirUrl, Flags.NONE.getValue());
     }
 
+    @Test(expected=IncorrectStateException.class)
+    public void test_remove_notexist() throws Exception {
+        m_subDir.remove(Flags.RECURSIVE.getValue());
+        m_subDir.remove(Flags.NONE.getValue());
+    }
+
+    @Test(expected=IncorrectStateException.class)
+    public void test_remove_recursive_notexist() throws Exception {
+        m_subDir.remove(Flags.RECURSIVE.getValue());
+        m_subDir.remove(Flags.RECURSIVE.getValue());
+    }
+
     @Test(expected=BadParameterException.class)
     public void test_remove_norecursive() throws Exception {
     	m_subDir2 = m_dir.openDir(m_subDirUrl2, Flags.CREATE.getValue());

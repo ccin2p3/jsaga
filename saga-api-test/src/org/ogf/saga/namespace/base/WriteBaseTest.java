@@ -2,6 +2,7 @@ package org.ogf.saga.namespace.base;
 
 import org.junit.Test;
 import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.namespace.abstracts.AbstractData;
@@ -27,5 +28,11 @@ public abstract class WriteBaseTest extends AbstractData {
     public void test_remove() throws Exception {
         m_file.remove(Flags.NONE.getValue());
         NSFactory.createNSEntry(m_session, m_fileUrl, Flags.NONE.getValue());
+    }
+
+    @Test(expected = IncorrectStateException.class)
+    public void test_remove_notexist() throws Exception {
+        m_file.remove(Flags.NONE.getValue());
+        m_file.remove(Flags.NONE.getValue());
     }
 }
