@@ -1,13 +1,14 @@
 package fr.in2p3.jsaga.adaptor.data;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
@@ -52,14 +53,21 @@ import org.ogf.saga.error.*;
 public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
 	protected final static String SEPARATOR = "/";
 	protected final static String DEFAULTRESOURCE	= "defaultresource", DOMAIN="domain", ZONE="zone", METADATAVALUE="metadatavalue";
-	protected String srbHost, srbPort, userName, passWord, mdasDomainName, mcatZone, defaultStorageResource, metadataValue;
+	protected String userName, passWord, mdasDomainName, mcatZone, defaultStorageResource, metadataValue;
 	protected SecurityCredential credential;
 	protected GSSCredential cert;
 	protected IRODSAccount m_account;
 	protected IRODSFileFactory m_fileFactory;
 
     public Usage getUsage() {
-        return new UOptional(Context.USERID);
+        return new UAnd.Builder()
+                    .and(new U(Context.USERID))
+                    .and(new U(ZONE))
+                    .and(new U(DEFAULTRESOURCE))
+                    .and(new UOptional(DOMAIN))
+                    .and(new UOptional(METADATAVALUE))
+                    .build();
+        
     }
 
     public int getDefaultPort() {
@@ -156,7 +164,6 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
                 fileAttributes[i] = new GeneralFileAttributes(files[i]);
             }
             return fileAttributes;
-            // TODO: specialize exception
         } catch (JargonRuntimeException e) {
             if (e.getCause() instanceof FileNotFoundException) {
                 throw new DoesNotExistException(e.getMessage());
