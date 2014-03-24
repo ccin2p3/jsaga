@@ -30,7 +30,7 @@ import org.ogf.saga.namespace.SetUpTest;
 @SuiteClasses({
 //    IrodsLogicalIntegrationTestSuite.IrodsNSEntryTest.class,
 //    IrodsLogicalIntegrationTestSuite.IrodsDirectoryMakeTest.class,
-    IrodsLogicalIntegrationTestSuite.IrodsLogicalDirectoryTest.class,
+    IrodsLogicalIntegrationTestSuite.IrodsLogicalDirectoryTest.class
 //    IrodsLogicalIntegrationTestSuite.IrodsFileReadTest.class,
 //    IrodsLogicalIntegrationTestSuite.IrodsFileWriteTest.class,
 //    IrodsLogicalIntegrationTestSuite.Irods_to_EmulatorDataMovementTest.class
