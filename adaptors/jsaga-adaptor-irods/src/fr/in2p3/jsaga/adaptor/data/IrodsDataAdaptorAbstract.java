@@ -13,13 +13,18 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
+
+import org.apache.log4j.Logger;
 import org.ietf.jgss.GSSCredential;
 import org.irods.jargon.core.connection.GSIIRODSAccount;
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.connection.IRODSServerProperties;
+import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.exception.AuthenticationException;
 import org.irods.jargon.core.exception.FileNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.exception.JargonRuntimeException;
+import org.irods.jargon.core.pub.IRODSAccessObject;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.IRODSGenQueryExecutor;
 import org.irods.jargon.core.pub.io.IRODSFile;
@@ -55,6 +60,8 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
     protected IRODSAccount m_account;
     protected IRODSFileFactory m_fileFactory;
 
+    private Logger m_logger = Logger.getLogger(IrodsDataAdaptorAbstract.class);
+    
     public Usage getUsage() {
         return new UAnd.Builder()
                     .and(new U(ZONE))
@@ -117,7 +124,11 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
                 
                 m_account = IRODSAccount.instance(host, port, userName, passWord, basePath, mcatZone, defaultStorageResource);
             }
-            
+            IRODSServerProperties s = IRODSFileSystem.instance().getIRODSAccessObjectFactory().getIRODSServerProperties(m_account);
+            m_logger.info(s.toString());
+            if (mcatZone != null && !(mcatZone.equals(s.getRodsZone()))) {
+                m_logger.warn("Zone \"" + mcatZone + "\" does not match with server zone \"" + s.getRodsZone() + "\"");
+            }
             m_fileFactory = IRODSFileSystem.instance().getIRODSFileFactory(m_account);
         } catch (AuthenticationException je) {
             throw new AuthenticationFailedException(je.getMessage());
@@ -129,6 +140,11 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
     }
 
     public void disconnect() throws NoSuccessException {
+        try {
+            IRODSFileSystem.instance().getIrodsSession().closeSession(m_account);
+        } catch (JargonException e) {
+            throw new NoSuccessException(e);
+        }
     }
 
     private FileAttributes[] listAttributesClassic(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -263,9 +279,11 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
             // Jargon does not treat file_not_found as an error: first test exist
             IRODSFile f = m_fileFactory.instanceIRODSFile(parentAbsolutePath, fileName);
             if (!f.exists()) {
+                f.close();
                 throw new DoesNotExistException(f.getAbsolutePath());
             }
             if (!f.delete()) {
+                f.close();
                 throw new NoSuccessException("Jargon returned false");
             }
             f.close();
@@ -279,10 +297,12 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
         IRODSFile generalFile;
         try {
             generalFile = m_fileFactory.instanceIRODSFile(absolutePath);
+            boolean ex = generalFile.exists();
+            generalFile.close();
+            return ex;
         } catch (JargonException e) {
             throw new NoSuccessException(e);
         }
-        return generalFile.exists();
     }
 
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -299,9 +319,17 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
         try {
             IRODSFile parentFile = m_fileFactory.instanceIRODSFile(parentAbsolutePath);
             if (!parentFile.exists()) {throw new ParentDoesNotExist(parentAbsolutePath);}
+            parentFile.close();
             IRODSFile generalFile = m_fileFactory.instanceIRODSFile(parentAbsolutePath, directoryName);
-            if (generalFile.exists()) {throw new AlreadyExistsException(parentAbsolutePath+SEPARATOR + directoryName);}
-            generalFile.mkdir();
+            if (generalFile.exists()) {
+                generalFile.close();
+                throw new AlreadyExistsException(parentAbsolutePath+SEPARATOR + directoryName);
+            }
+            if (!generalFile.mkdir()) {
+                generalFile.close();
+                throw new PermissionDeniedException("Could not makeDir " + directoryName + ". Probably a misconfiguration");
+            }
+            generalFile.close();
         } catch (JargonException e) {
             throw new NoSuccessException(e);
         }
