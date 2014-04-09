@@ -21,27 +21,32 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
  */
 public class GeneralFileAttributes extends FileAttributes {
     private File m_generalFile;
+    private int m_type = -1;
     
     public GeneralFileAttributes(File generalFile) {
         m_generalFile = generalFile;
+        this.m_relativePath = m_generalFile.getName();
     }
 
     public String getName() {
-        return m_generalFile.getName();
+        return this.m_relativePath;
     }
 
     public int getType() {
-        if (m_generalFile.isDirectory()) {
-            return TYPE_DIRECTORY;
-        } else if (m_generalFile.isFile()) {
-            return TYPE_FILE;
-        } else {
-            return TYPE_UNKNOWN;
+        if (m_type == -1) {
+            if (m_generalFile.isDirectory()) {
+                this.m_type = TYPE_DIRECTORY;
+            } else if (m_generalFile.isFile()) {
+                this.m_type = TYPE_FILE;
+            } else {
+                this.m_type = TYPE_UNKNOWN;
+            }
         }
+        return this.m_type;
     }
 
     public long getSize() {
-        if (m_generalFile.isFile()) {
+        if (this.getType() == TYPE_FILE) {
             return m_generalFile.length() ;
         } else {
             return SIZE_UNKNOWN;
