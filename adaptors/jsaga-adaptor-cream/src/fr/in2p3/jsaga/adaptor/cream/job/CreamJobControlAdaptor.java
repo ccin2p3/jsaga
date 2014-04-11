@@ -204,17 +204,20 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
                     int lastSlashIndex = line.lastIndexOf("/");
                     // if there is OSB before last /, return st
                     if (line.substring(lastSlashIndex-3, lastSlashIndex).equals("OSB")) {
-                        client.close();
+                        in.close();
+                        client.disconnect();
                         m_hasOutputSandboxBug = false;
                         return st;
                     } else {
-                        client.close();
+                        in.close();
+                        client.disconnect();
                         m_hasOutputSandboxBug = true;
                         return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI());
                     }
                 }
             }
-            client.close();
+            in.close();
+            client.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
             Logger.getLogger(CreamJobAdaptorAbstract.class).warn("Could not check if CREAM CE has the OSB bug");
