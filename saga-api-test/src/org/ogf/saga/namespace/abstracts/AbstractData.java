@@ -128,7 +128,7 @@ public abstract class AbstractData extends JSAGABaseTest {
         if (m_file != null) {
             m_file.close();
         }
-        if (m_toBeRemoved) {
+        if (m_toBeRemoved && m_dir != null) {
             m_dir.remove(Flags.RECURSIVE.getValue());
         }
         if (m_dir != null) {
