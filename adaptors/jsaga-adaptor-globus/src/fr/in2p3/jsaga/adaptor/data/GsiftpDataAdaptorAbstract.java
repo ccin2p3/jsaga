@@ -157,7 +157,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
 
         // create output stream
         try {
-            return new GsiftpOutputStream(m_client, absolutePath, append);
+            return new GsiftpOutputStream(m_credential, m_client, absolutePath, append);
         } catch (Exception e) {
             try {
                 throw rethrowExceptionFull(e);
