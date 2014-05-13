@@ -26,7 +26,7 @@ public class GlobusSecurityAdaptorTest {
     
     @BeforeClass
     public static void createUsage() throws Exception {
-        SecurityAdaptor a = new GlobusSecurityAdaptorExtended();
+        SecurityAdaptor a = new GlobusSecurityAdaptor();
         m_adaptor_usage = a.getUsage();
         m_type = a.getType();
         m_tmpFile = File.createTempFile("jsaga-test-" + m_type, ".tmp");
@@ -50,7 +50,7 @@ public class GlobusSecurityAdaptorTest {
     
     @Test
     public void usage() throws Exception {
-        String u = "((_UserProxyObject_ | <UserProxy> | ((<UserCertKey> | (<UserCert>  <UserKey>))  UserProxy  *UserPass*  LifeTime  [Delegation]))  <CertRepository>)";
+        String u = "((_UserProxyObject_ | <UserProxy> | ((<UserCertKey> | (<UserCert>  <UserKey>))  UserProxy  *UserPass*  LifeTime  [ProxyType]  [Delegation]))  <CertRepository>)";
 //        System.out.println(u);
 //        System.out.println(m_adaptor_usage.toString());
         Assert.assertEquals(u, m_adaptor_usage.toString());

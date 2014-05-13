@@ -30,7 +30,7 @@ public class MyProxySecurityAdaptorTest extends GlobusSecurityAdaptorTest {
     
     @Test @Override
     public void usage() throws Exception {
-        String u = "(((_UserProxyObject_  DelegationLifeTime) | (<UserProxy>  DelegationLifeTime) | _UserProxyObject_ | <UserProxy> | ((<UserCertKey> | (<UserCert>  <UserKey>))  UserProxy  *UserPass*  LifeTime  [Delegation]))  Server  [UserID]  [MyProxyPass]  <CertRepository>)";
+        String u = "(((_UserProxyObject_  DelegationLifeTime) | (<UserProxy>  DelegationLifeTime) | _UserProxyObject_ | <UserProxy> | ((<UserCertKey> | (<UserCert>  <UserKey>))  UserProxy  *UserPass*  LifeTime  [ProxyType]  [Delegation]))  Server  [UserID]  [MyProxyPass]  <CertRepository>)";
         System.out.println(u);
         System.out.println(m_adaptor_usage.toString());
         Assert.assertEquals(u, m_adaptor_usage.toString());
