@@ -27,10 +27,12 @@ import java.util.*;
 public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
     private static final String PROTECTION = "Protection";
 
+    @Override
     public String getType() {
         return "gsiftp-v2";
     }
 
+    @Override
     public Usage getUsage() {
         return new UAnd.Builder()
                 .and(new UOptional(TCP_BUFFER_SIZE))
@@ -38,12 +40,14 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
                 .build();
     }
 
+    @Override
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{new Default(PROTECTION, "none"),
                                 new Default(TCP_BUFFER_SIZE, "1048576")};
     }
 
     /** override super.connect() to set data channel protection level */
+    @Override
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         super.connect(userInfo, host, port, basePath, attributes);
         if (attributes!=null && attributes.containsKey(PROTECTION)) {
@@ -75,7 +79,6 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
         }
     }
 
-    /** override super.getAttributes() to use mlst command */
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         MlsxEntry entry;
         try {
@@ -91,7 +94,6 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
         return new Gsiftp2FileAttributes(entry);
     }
 
-    /** override super.listAttributes() to use mlsd command */
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         Vector v;
         try {
