@@ -5,13 +5,17 @@
     <body>
         <release version="1.1.0">
             <action dev="lschwarz" type="update">GridFTP: removed the 10mn limit on file transfer</action>
-            <action dev="lschwarz" type="update">SFTP: increase buffer size from 1024 to 32768 when writing to SFTP</action>
-            <action dev="lschwarz" type="remove">Old SSH adaptor (urls like "DEPRECATED-SSH") has been removed</action>
-            <action dev="lschwarz" type="remove">SRB adaptor has been removed</action>
-            <action dev="lschwarz" type="update">Upgrade Jglobus to 2.0.7-custom4. This release fixes a delegation issue with certificates using SHA-2 algo</action>
             <action dev="lschwarz" type="update">GridFTP: set default TCP buffer to 1MB</action>
             <action dev="lschwarz" type="remove">SSH: attribute "CompressionLevel" is not supported yet</action>
+            <action dev="lschwarz" type="update">SFTP: increase buffer size from 1024 to 32768 when writing to SFTP</action>
+            <action dev="lschwarz" type="remove">Old SSH adaptor (urls like "DEPRECATED-SSH") has been removed</action>
+            <action dev="lschwarz" type="update">Upgrade Jglobus to 2.0.7-custom4. This release fixes a delegation issue with certificates using SHA-2 algo</action>
+            <action dev="lschwarz" type="update">Globus security adaptor: add attribute "ProxyType"="OLD|GLOBUS|RFC3820". Default is "RFC3820". 
+            Security context named "GlobusRFC3820" must be replaced by "Globus" with attribute "ProxyType"="RFC3820".
+            Security context named "GlobusLegacy" must be replaced by "Globus" with attribute "ProxyType"="OLD".</action>
+            <action dev="lschwarz" type="update">MyProxy security adaptor: add attribute "ProxyType"="OLD|GLOBUS|RFC3820". Default is "RFC3820".</action> 
             <action dev="lschwarz" type="update">iRods: upgrade to jargon-3.3.1.1</action>
+            <action dev="lschwarz" type="remove">SRB adaptor has been removed</action>
             <action dev="lschwarz" type="update">Upgrade tests to JUnit4</action>
         </release>
         <release version="1.0.2">

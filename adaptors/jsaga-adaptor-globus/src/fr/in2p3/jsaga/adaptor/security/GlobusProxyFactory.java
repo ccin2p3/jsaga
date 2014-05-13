@@ -55,7 +55,7 @@ public class GlobusProxyFactory {
     private CertificateType m_proxyType = null;
     private String m_cadir = null;
 
-    public GlobusProxyFactory(Map attributes, int oid, int certificateFormat) throws BadParameterException, ParseException {
+    public GlobusProxyFactory(Map attributes, int certificateFormat) throws BadParameterException, ParseException {
         // required attributes
     	String passphrase = (String) attributes.get(Context.USERPASS);        
         m_cadir = (String) attributes.get(Context.CERTREPOSITORY);
@@ -109,6 +109,7 @@ public class GlobusProxyFactory {
         if (attributes.containsKey(GlobusContext.DELEGATION)) {
             limited = ((String)attributes.get(GlobusContext.DELEGATION)).equalsIgnoreCase("limited");
         }
+        int oid = ProxyTypeMap.toProxyType((String)attributes.get(GlobusContext.PROXYTYPE));
         switch(oid) {
             case OID_OLD:
             	m_proxyType = (limited) ?

@@ -39,8 +39,7 @@ import java.util.Map;
 /**
  *
  */
-// TODO: move to RFC3820 ???
-public class MyProxySecurityAdaptor extends GlobusSecurityAdaptorExtendedLegacy {
+public class MyProxySecurityAdaptor extends GlobusSecurityAdaptor {
     public static final int USAGE_GET_DELEGATED_MEMORY = 20;
     public static final int USAGE_GET_DELEGATED_LOAD = 21;
 

@@ -33,16 +33,15 @@ import org.globus.gsi.X509Credential;
 /**
  *
  */
-public abstract class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor {
+public class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor {
     public static final int USAGE_INIT_PKCS12 = 1;
     public static final int USAGE_INIT_PEM = 2;
     public static final int USAGE_MEMORY = 3;
     public static final int USAGE_LOAD = 4;
 
-    public abstract String getType();
-    protected abstract int getGlobusType();
-    protected abstract boolean checkType(GSSCredential proxy);
-
+    public String getType() {
+        return "Globus";
+    }
     public Class getSecurityCredentialClass() {
         return GlobusSecurityCredential.class;
     }
@@ -59,17 +58,32 @@ public abstract class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor 
                                 .and(new UFilePath(Context.USERPROXY))
                                 .and(new UHidden(Context.USERPASS))
                                 .and(new UDuration(Context.LIFETIME))
+                                .and(getProxyType())
                                 .and(getDelegation())
                                 .build();
     }
     
+    protected Usage getProxyType() {
+        return new UOptional(GlobusContext.PROXYTYPE) {
+            protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                if (super.throwExceptionIfInvalid(value) != null) {
+                    String v = (String) value;
+                    if (!ProxyTypeMap.isValid(v)) {
+                        throw new BadParameterException(ProxyTypeMap.getExpected());
+                    }
+                }
+                return value;
+            }
+        };
+    }
+
     protected Usage getDelegation() {
         return new UOptional(GlobusContext.DELEGATION) {
             protected Object throwExceptionIfInvalid(Object value) throws Exception {
                 if (super.throwExceptionIfInvalid(value) != null) {
                     String v = (String) value;
-                    if (!v.equalsIgnoreCase("limited") && !v.equalsIgnoreCase("full")) {
-                        throw new BadParameterException("Expected: limited | full");
+                    if (!DelegationTypeMap.isValid(v)) {
+                        throw new BadParameterException(DelegationTypeMap.getExpected());
                     }
                 }
                 return value;
@@ -114,7 +128,8 @@ public abstract class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor 
                         new File(System.getProperty("user.home")+"/.globus/certificates/"),
                         new File("/etc/grid-security/certificates/")}),
                 new Default(Context.LIFETIME, "PT12H"),
-                new Default(GlobusContext.DELEGATION, "full")
+                new Default(GlobusContext.PROXYTYPE, ProxyTypeMap.TYPE_RFC3820),
+                new Default(GlobusContext.DELEGATION, DelegationTypeMap.FULL)
         };
     }
     protected static String getUnixUID() throws IncorrectStateException {
@@ -134,13 +149,13 @@ public abstract class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor 
             switch(usage) {
                 case USAGE_INIT_PKCS12:
                 {
-                    GlobusProxyFactory factory = new GlobusProxyFactory(attributes, this.getGlobusType(), GlobusProxyFactory.CERTIFICATE_PKCS12);
+                    GlobusProxyFactory factory = new GlobusProxyFactory(attributes, GlobusProxyFactory.CERTIFICATE_PKCS12);
                     GSSCredential cred = factory.createProxy();
                     return this.createSecurityAdaptor(cred, attributes);
                 }
                 case USAGE_INIT_PEM:
                 {
-                    GlobusProxyFactory factory = new GlobusProxyFactory(attributes, this.getGlobusType(), GlobusProxyFactory.CERTIFICATE_PEM);
+                    GlobusProxyFactory factory = new GlobusProxyFactory(attributes, GlobusProxyFactory.CERTIFICATE_PEM);
                     GSSCredential cred = factory.createProxy();
                     return this.createSecurityAdaptor(cred, attributes);
                 }
@@ -169,7 +184,7 @@ public abstract class GlobusSecurityAdaptor implements ExpirableSecurityAdaptor 
         }
     }
     private SecurityCredential createSecurityAdaptor(GSSCredential cred, Map attributes) throws IncorrectStateException {
-        if (this.checkType(cred) && !hasNonCriticalExtensions(cred)) {
+        if (!hasNonCriticalExtensions(cred)) {
             File certRepository = new File((String) attributes.get(Context.CERTREPOSITORY));
             return new GlobusSecurityCredential(cred, certRepository);
         } else {

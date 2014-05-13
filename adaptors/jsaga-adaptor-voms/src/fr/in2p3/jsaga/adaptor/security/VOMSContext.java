@@ -16,6 +16,8 @@ public class VOMSContext {
     public static final String VOMSDIR = "VomsDir";
     public static final String VOMSES = "Vomses";
     public static final String USERFQAN = "UserFQAN";
+    // TODO: use GlobusContext
+    @Deprecated
     public static final String PROXYTYPE = "ProxyType";
     public static final String INITIALPROXY = "InitialUserProxy";
     public static final String USERPROXYSTRING = "UserProxyString";
