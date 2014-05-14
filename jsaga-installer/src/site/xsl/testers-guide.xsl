@@ -68,7 +68,7 @@ public class <i>_MyGrid_</i>TestSuite {
     }
     public static class <i>_MyGrid_</i>ContextInfo extends <a
         href="saga-api-test/xref/org/ogf/saga/context/ContextInfoTest.html">ContextInfoTest</a> {
-        public <i>_MyGrid_</i>ContextInfo() throws Exception {super();}
+        public <i>_MyGrid_</i>ContextInfo() throws Exception {super("<i>mygrid</i>");}
     }
     public static class <i>_MyGrid_</i>ContextDestroy extends <a
         href="saga-api-test/xref/org/ogf/saga/context/ContextDestroyTest.html">ContextDestroyTest</a> {
@@ -92,7 +92,7 @@ public class <i>_MyGrid_</i>TestSuite {
                 </p>
                 <pre>package integration;
 
-public class <i>_MyProtocol_</i>CleanUp extends DataCleanUp {
+public class <i>_MyProtocol_</i>CleanUp extends <a href="saga-api-test/xref/org/ogf/saga/namespace/DataCleanUp.html">DataCleanUp</a> {
     public <i>_MyProtocol_</i>CleanUp() throws Exception {
         super("<i>myprotocol</i>", "<i>myprotocol</i>");
     }
