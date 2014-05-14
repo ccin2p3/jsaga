@@ -97,6 +97,11 @@ public class CreamExecutionTestSuite {
         public CreamJobRunSandboxTest() throws Exception {super(TYPE);}
         @Test @Ignore("Not supported")
         public void test_output_workingDirectory() throws Exception {  }
+        
+        @Test
+        public void rfc3820_proxy_delegation() throws Exception {
+            super.test_output_only_implicit();
+        }
     }
     
     public static class CreamJobRunInteractiveTest extends InteractiveTest {
