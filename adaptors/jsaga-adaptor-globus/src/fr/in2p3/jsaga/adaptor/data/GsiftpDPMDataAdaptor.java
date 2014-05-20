@@ -11,8 +11,6 @@ import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.globus.ftp.*;
 import org.ogf.saga.error.*;
-import org.ogf.saga.task.Task;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
@@ -33,7 +31,31 @@ public class GsiftpDPMDataAdaptor implements DataCopy, DataRename, FileReaderGet
     private Gsiftp2DataAdaptor m_adaptor;
 
     public GsiftpDPMDataAdaptor() {
-        m_adaptor = new Gsiftp2DataAdaptor();
+        m_adaptor = new Gsiftp2DataAdaptor() {
+            // DPM from version 1.8.8 writes an empty file in GridFTP probably at srmPrepareToPut
+            // But the directory which contains the empty file does not exist !!!
+            @Override
+            public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+                boolean ex = super.exists(absolutePath, additionalArgs);
+                if (ex) {
+                    try {
+                        FileAttributes fa = this.getAttributes(absolutePath, null);
+                        if (fa.getType() == FileAttributes.TYPE_FILE && fa.getSize() == 0) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    } catch (DoesNotExistException e) {
+                        return false;
+                    }
+                } else {
+                    if (absolutePath.endsWith("/")) {
+                        return true;
+                    }
+                    return ex;
+                }
+            }
+        };
     }
 
     public String getType() {
