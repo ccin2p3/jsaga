@@ -8,6 +8,8 @@
             (fix was not included in 1.0.1)</action>
             <action dev="lschwarz" type="fix" issue="6408">VOMSMyProxy destroy: exception thrown if proxy does not exist</action>
             <action dev="lschwarz" type="fix" issue="6410">VOMSMyProxy init: if the proxy does not exist, an exception is thrown instead of creating it</action>
+            <action dev="lschwarz" type="fix" issue="7188">DPM: DoesNotExistException when reading file on DPM server 1.8.8</action> 
+            <action dev="lschwarz" type="fix" issue="7195">DPM: AlreadyExists when writing file on DPM server 1.8.8</action> 
         </release>
         <release version="1.0.1" date="2014-02-26" description="Fixes for SFTP, HTTP and CREAM adaptors">
             <action dev="lschwarz" type="fix" issue="6229">SFTP: data corruption when writing to SFTP</action>
