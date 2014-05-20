@@ -22,18 +22,6 @@ public class SRMResponse {
         // set token
         m_token = token;
 
-        //todo: remove this workaround when the bug will be fixed in DPM
-        try {
-            if (transferUrl.getPath()!=null && transferUrl.getPath().indexOf(':')>-1) {
-                transferUrl.setPath(transferUrl.getPath().substring(transferUrl.getPath().indexOf(':')+1));
-            }
-            if (transferUrl.getPort() == -1) {
-                transferUrl.setPort(2811);
-            }
-        } catch (org.apache.axis.types.URI.MalformedURIException e) {
-            throw new NoSuccessException("INTERNAL ERROR: failed to correct transfer URI: "+transferUrl);
-        }
-
         // set transfer URL
         try {
             m_transferUrl = new java.net.URI(transferUrl.toString());
