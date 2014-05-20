@@ -58,6 +58,7 @@ public class SRMIntegrationTestSuite extends JSAGATestSuite {
         public SRMFileWriteTest() throws Exception {super("srm");}
         public void test_read_and_write() throws Exception {super.ignore("Not supported: Timeout, SRM_request blocked in status SRM_REQUEST_INPROGRESS");}
         public void test_write_append() throws Exception {super.ignore("Not supported: SRM ends SRM_DUPLICATION_ERROR on SrmPrepareToPut");}
+        public void test_write_encoded_filename() throws Exception {super.ignore("Not supported");}
     }
     public static class SRMNSCopyTest extends NSCopyTest {
         public SRMNSCopyTest() throws Exception {super("srm", "srm");}
