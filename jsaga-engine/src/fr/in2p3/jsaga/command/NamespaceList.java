@@ -82,6 +82,7 @@ public class NamespaceList extends AbstractCommand {
                     System.out.println(entry.getString());
                 }
             }
+            System.exit(0);
         }
     }
 

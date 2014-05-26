@@ -124,6 +124,7 @@ public class NSLogicalMetaData extends AbstractCommand {
 
             // close connection
             ((NSEntry)entry).close();
+            System.exit(0);
         }
     }
 

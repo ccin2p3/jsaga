@@ -55,6 +55,7 @@ public class NamespaceChmod extends AbstractCommand {
             setUnixPermissions(entry, "group-"+entry.getGroup(), mode/10%10);
             setUnixPermissions(entry, "*", mode%10%10);
             entry.close();
+            System.exit(0);
         }
     }
 

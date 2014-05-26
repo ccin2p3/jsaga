@@ -53,6 +53,7 @@ public class NamespaceMove extends AbstractCommand {
             this.changeBehavior(session, target);
             entry.move(target, flags);
             entry.close();
+            System.exit(0);
         }
     }
 

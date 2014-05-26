@@ -48,6 +48,7 @@ public class NamespaceMakeDir extends AbstractCommand {
             Session session = SessionFactory.createSession(true);
             NSDirectory dir = NSFactory.createNSDirectory(session, url, flags);
             dir.close();
+            System.exit(0);
         }
     }
 

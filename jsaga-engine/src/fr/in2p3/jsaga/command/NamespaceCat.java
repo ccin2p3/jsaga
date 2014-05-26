@@ -66,6 +66,7 @@ public class NamespaceCat extends AbstractCommand {
             } finally {
                 entry.close();
             }
+            System.exit(0);
         }
     }
 

@@ -43,6 +43,7 @@ public class NamespaceRmdir extends AbstractCommand {
             NSDirectory dir = NSFactory.createNSDirectory(session, url, Flags.NONE.getValue());
             dir.remove(Flags.NONE.getValue());
             dir.close();
+            System.exit(0);
         }
     }
 

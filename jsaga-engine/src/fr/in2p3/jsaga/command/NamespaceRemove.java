@@ -45,6 +45,7 @@ public class NamespaceRemove extends AbstractCommand {
             NSEntry entry = NSFactory.createNSEntry(session, url, Flags.NONE.getValue());
             entry.remove(flags.getValue());
             entry.close();
+            System.exit(0);
         }
     }
 

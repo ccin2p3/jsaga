@@ -61,6 +61,7 @@ public class JobGetOutput extends AbstractCommand {
             // execute post-staging and cleanup
             ((JobImpl)job).postStagingAndCleanup();
             System.out.println("Job output have been retrieved successfully (if it exists)");
+            System.exit(0);
         }
     }
 

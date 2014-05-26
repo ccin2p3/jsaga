@@ -74,6 +74,7 @@ public class JobCancel extends AbstractCommand {
             } else {
                 throw new Exception("Unexpected state: "+ state);
             }
+            System.exit(0);
         }
     }
 

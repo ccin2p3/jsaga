@@ -93,6 +93,7 @@ public class NamespaceCopy extends AbstractCommand {
                 entry.copy(target, flags);
             }
             entry.close();
+            System.exit(0);
         }
     }
 

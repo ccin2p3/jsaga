@@ -79,6 +79,7 @@ public class NamespaceStat extends AbstractCommand {
                 System.out.println("Modify: "+ getMTime(entry));
             }
             entry.close();
+            System.exit(0);
         }
     }
 

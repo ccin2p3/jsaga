@@ -50,6 +50,7 @@ public class JobList extends AbstractCommand {
             for (String jobid : list) {
                 System.out.println(jobid);
             }
+            System.exit(0);
         }
     }
 

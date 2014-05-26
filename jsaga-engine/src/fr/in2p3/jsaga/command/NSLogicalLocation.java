@@ -50,6 +50,7 @@ public class NSLogicalLocation extends AbstractCommand {
             }
             file.addLocation(URLFactory.createURL(line.getOptionValue(OPT_REGISTER)));
             file.close();
+            System.exit(0);
         }
         else if (line.hasOption(OPT_UNREGISTER))
         {
@@ -59,6 +60,7 @@ public class NSLogicalLocation extends AbstractCommand {
                 file.remove();
             }
             file.close();
+            System.exit(0);
         }
         else if (line.hasOption(OPT_LIST))
         {
@@ -67,6 +69,7 @@ public class NSLogicalLocation extends AbstractCommand {
                 System.out.println(location);
             }
             file.close();
+            System.exit(0);
         }
     }
 

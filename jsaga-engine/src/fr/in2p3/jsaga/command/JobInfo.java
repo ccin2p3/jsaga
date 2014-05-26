@@ -68,6 +68,7 @@ public class JobInfo extends AbstractCommand {
             for (int i=0; i<hosts.length; i++) {
                 System.out.println("\t"+hosts[i]);
             }
+            System.exit(0);
         }
     }
     private static String getAttribute(Job job, String key) throws SagaException {
