@@ -3,7 +3,7 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
-        <release version="1.0.2">
+        <release version="1.0.2" date="2014-05-26" description="Fixes for Cream, VOMSMyProxy and DPM-SRM">
             <action dev="lschwarz" type="fix" issue="6270">Cream: really fix: remaining axis2-tmp* after job finished 
             (fix was not included in 1.0.1)</action>
             <action dev="lschwarz" type="fix" issue="6408">VOMSMyProxy destroy: exception thrown if proxy does not exist</action>
