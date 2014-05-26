@@ -2,7 +2,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jsaga-adaptor-srm</artifactId>
@@ -65,13 +65,13 @@
         <dependency><!-- needed for security context -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-voms</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.3-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
         <dependency><!-- needed for gsiftp (WARNING: order of dependencies matters) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.3-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
