@@ -223,12 +223,4 @@
             </plugin>
         </plugins>
     </reporting>
-    <repositories>
-    <!--  IN2P3 repo for saga-api, externals and maven customized plugins -->
-        <repository>
-            <id>IN2P3</id>
-            <name>IN2P3</name>
-            <url>http://maven.in2p3.fr</url>
-        </repository>
-    </repositories>
 </project>
