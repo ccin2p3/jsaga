@@ -3,7 +3,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
+        <version>1.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jsaga-adaptor-bes-unicore6</artifactId>
@@ -25,7 +25,7 @@
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-classic</artifactId>
-			<version>1.1.0-SNAPSHOT</version>
+			<version>1.1.0</version>
 			<!-- requested for HttpRequest -->
 			<!--  TODO: back to runtime when HttpRequest no more needed at submission -->
 		</dependency>
@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-bes</artifactId>
-			<version>1.1.0-SNAPSHOT</version>
+			<version>1.1.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-unicore</artifactId>
-			<version>1.1.0-SNAPSHOT</version>
+			<version>1.1.0</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
