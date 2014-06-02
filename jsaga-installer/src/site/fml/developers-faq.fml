@@ -72,6 +72,7 @@ mvn release:perform
                             <li>maven/maven-archetype-jsaga/resources/archetype-resources/pom.xml:parent</li>
                         </ul>
                     </li>
+                    <li>Close version in https://forge.in2p3.fr/projects/jsaga/settings/versions</li>
                 </ul>
             </answer>
         </faq>
