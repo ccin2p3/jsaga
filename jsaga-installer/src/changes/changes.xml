@@ -3,7 +3,7 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
-        <release version="1.1.0">
+        <release version="1.1.0" date="2014-06-02" description="Library upgrades">
             <action dev="lschwarz" type="update">GridFTP: removed the 10mn limit on file transfer</action>
             <action dev="lschwarz" type="update">GridFTP: set default TCP buffer to 1MB</action>
             <action dev="lschwarz" type="remove">SSH: attribute "CompressionLevel" is not supported yet</action>
