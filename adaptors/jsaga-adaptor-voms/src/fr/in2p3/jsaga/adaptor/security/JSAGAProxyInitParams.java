@@ -38,7 +38,7 @@ public class JSAGAProxyInitParams extends ProxyInitParams {
         this.m_attributes = attributes;
         
         setGeneratedProxyFile((String)attributes.get(Context.USERPROXY));
-        setProxyType(ProxyTypeMap.toProxyType((String)attributes.get(VOMSContext.PROXYTYPE)));
+        setProxyType(EMIProxyTypeMap.toEMIProxyType((String)attributes.get(GlobusContext.PROXYTYPE)));
         setVomsdir((String) attributes.get(VOMSContext.VOMSDIR));
         setTrustAnchorsDir((String) attributes.get(Context.CERTREPOSITORY));
         

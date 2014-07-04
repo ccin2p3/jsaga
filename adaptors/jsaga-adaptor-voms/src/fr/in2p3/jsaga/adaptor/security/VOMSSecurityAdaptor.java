@@ -114,13 +114,13 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                     }
                 }
             )
-            .and(new UOptional(VOMSContext.PROXYTYPE) {
+            .and(new UOptional(GlobusContext.PROXYTYPE) {
                     @Override
                     protected Object throwExceptionIfInvalid(Object value) throws Exception {
                         if (super.throwExceptionIfInvalid(value) != null) {
                             String v = (String) value;
-                            if (!ProxyTypeMap.isValid(v)) {
-                                throw new BadParameterException(ProxyTypeMap.getExpected());
+                            if (!EMIProxyTypeMap.isValid(v)) {
+                                throw new BadParameterException(EMIProxyTypeMap.getExpected());
                             }
                         }
                         return value;
@@ -163,7 +163,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                         new File("/etc/vomses/")}),
                 new Default(Context.LIFETIME, DEFAULT_LIFETIME),
                 new Default(GlobusContext.DELEGATION, DelegationTypeMap.NONE),
-                new Default(VOMSContext.PROXYTYPE, ProxyTypeMap.TYPE_RFC3820)
+                new Default(GlobusContext.PROXYTYPE, EMIProxyTypeMap.TYPE_RFC3820)
         };
     }
 
