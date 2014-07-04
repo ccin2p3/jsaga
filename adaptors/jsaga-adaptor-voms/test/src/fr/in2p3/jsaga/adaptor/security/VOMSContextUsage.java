@@ -119,7 +119,7 @@ public class VOMSContextUsage {
     @Test(expected=BadParameterException.class)
     public void invalidProxyType() throws Exception {
         prepareContextForProxyInit();
-        m_context.setAttribute(VOMSContext.PROXYTYPE, "invalid");
+        m_context.setAttribute(GlobusContext.PROXYTYPE, "invalid");
         getMatchingUsage();
     }
     
