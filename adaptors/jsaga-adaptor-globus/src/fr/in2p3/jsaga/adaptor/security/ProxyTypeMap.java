@@ -19,7 +19,7 @@ public class ProxyTypeMap {
     public static final String TYPE_GLOBUS2 = "OLD";
     public static final String TYPE_GLOBUS3 = "GLOBUS";
     public static final String TYPE_RFC3820 = "RFC3820";
-    private static Map<String, Integer> map = createMap();
+    protected static Map<String, Integer> map = createMap();
     
     private static Map<String, Integer> createMap() {  
        Map<String, Integer> map = new HashMap<String, Integer>();
