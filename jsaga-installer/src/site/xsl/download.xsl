@@ -84,15 +84,16 @@
                         </li>
                     </ul>
                 </subsection>
-                <subsection name="Other releases">
+                <subsection name="Previous releases">
                     <ul>
+                        <li><a href="http://maven.in2p3.fr/fr/in2p3/jsaga/jsaga-installer/1.1.0">1.1.0</a> CAUTION: you may encounter a java class conflict, please consider downloading 1.1.1</li>
                         <li><a href="http://maven.in2p3.fr/fr/in2p3/jsaga/jsaga-installer/1.0.2">1.0.2</a> The latest of the 1.0 series. Does not support X509 certificates using SHA-2 algorithm</li>
                         <li><a href="http://maven.in2p3.fr/fr/in2p3/jsaga/jsaga-installer/1.0.1">1.0.1</a> CAUTION: this release does not support DPM-1.8.8</li>
                         <li><a href="http://maven.in2p3.fr/fr/in2p3/jsaga/jsaga-installer/1.0.0">1.0.0</a> CAUTION: this release has serious bug in SFTP and CREAM adaptors</li>
                     </ul>
                 </subsection>
-                <subsection name="Previous Releases (CAUTION: none of these are supported yet)">
-                    <p>Previous releases of JSAGA can be downloaded from the <a href="http://grid.in2p3.fr/maven2/fr/in2p3/jsaga/jsaga-installer/">archives</a>.</p>
+                <subsection name="Other Releases (CAUTION: none of these are supported yet)">
+                    <p>Other releases of JSAGA can be downloaded from the <a href="http://grid.in2p3.fr/maven2/fr/in2p3/jsaga/jsaga-installer/">archives</a>.</p>
                 </subsection>
             </section>
         </body></document>
