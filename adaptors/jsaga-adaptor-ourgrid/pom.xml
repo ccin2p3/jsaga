@@ -4,7 +4,7 @@
   <parent>
     <artifactId>adaptors</artifactId>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
-    <version>1.1.1</version>
+    <version>1.1.2-SNAPSHOT</version>
   </parent>
   <artifactId>jsaga-adaptor-ourgrid</artifactId>
   <name>Adaptor for OurGrid middleware</name>
@@ -58,7 +58,7 @@
 		<dependency><!-- for data staging (scope runtime) and for class LocalJobProcess (scope compile) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-classic</artifactId>
-            <version>1.1.1</version>
+            <version>1.1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 <!--     	<dependency>
