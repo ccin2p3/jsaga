@@ -50,6 +50,7 @@
                 <subsection name="Current development snapshot">
                         <p>Download the current snapshot from this <a href="http://maven.in2p3.fr/fr/in2p3/jsaga/jsaga-installer/?C=M;O=D">directory</a>:</p>
                         <ul>
+                            <li>Click on the lastest snapshot (the first in the list)</li>
                             <li>Choose one of the 3 biggest files: tar.gz, zip or the Graphical Installer (jar)</li>
                             <li>Download it</li>
                         </ul>
