@@ -225,7 +225,7 @@ public class CreamClient {
             gtt.setDelegationID(m_delegationId);
             this.registerProtocol();
             Calendar cal = m_delegationStub.getTerminationTime(gtt).getGetTerminationTimeReturn();
-            m_logger.debug("DelegationID " + m_delegationId + " termination time is: " + DateFormat.getTimeInstance().format(cal.getTime()));
+            m_logger.debug("DelegationID " + m_delegationId + " termination time is: " + DateFormat.getDateTimeInstance().format(cal.getTime()));
             if (cal.after(Calendar.getInstance())) {
                 return;
             }
@@ -259,9 +259,9 @@ public class CreamClient {
             }
         }
         // set delegation lifetime
-        int hours = (int) (globusProxy.getTimeLeft() / 3600) - 1;
-        if (hours < 0) {
-            throw new AuthenticationFailedException("Proxy is expired or about to expire: "+globusProxy.getIdentity());
+        int proxyLifeTime = (int)globusProxy.getTimeLeft();
+        if (proxyLifeTime < 3600) {
+            throw new AuthenticationFailedException("Proxy is expired or will expire in less than 1 hour: "+globusProxy.getIdentity());
         }
 
         try {
@@ -272,7 +272,7 @@ public class CreamClient {
             PKCS10CertificationRequest proxytReq = (PKCS10CertificationRequest) pemReader.readObject();
             pemReader.close();
             ProxyRequestOptions csrOpt = new ProxyRequestOptions(parentChain, proxytReq);
-            csrOpt.setLifetime(hours*3600);
+            csrOpt.setLifetime(proxyLifeTime);
             
             X509Certificate[] certChain = ProxyGenerator.generate(csrOpt, pKey);
             
@@ -286,7 +286,7 @@ public class CreamClient {
             PutProxy pp = new PutProxy();
             pp.setDelegationID(m_delegationId);
             pp.setProxy(delegProxy);
-            m_logger.debug("Sending the proxy to delegationID= " + m_delegationId);
+            m_logger.debug("Sending the proxy to delegationID= " + m_delegationId + " with lifeTime=" + proxyLifeTime);
             this.registerProtocol();
             m_delegationStub.putProxy(pp);
         } catch (InvalidKeyException e) {
