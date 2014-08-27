@@ -35,6 +35,7 @@ public class SessionConfigurationTest {
     private static final String CONFIG_SUCCESS = "/config/jsaga-default-contexts-success.xml";
     private static final String CONFIG_FAILURE = "/config/jsaga-default-contexts-failure.xml";
     private static final String CONFIG_SCHEMES = "/config/jsaga-default-contexts-schemes.xml";
+    private static final String CONFIG_INVALID_ATTRIBUTE = "/config/jsaga-default-contexts-invalidAttribute.xml";
     
     @Test
     public void test_dumpXML() throws Exception {
@@ -77,6 +78,13 @@ public class SessionConfigurationTest {
         createConfiguredSession(CONFIG_SUCCESS);
     }
 
+    @Test
+    public void test_invalidAttribute() throws Exception {
+        thrown.expect(NoSuccessException.class);
+        thrown.expectMessage("Invalid");
+        createConfiguredSession(CONFIG_INVALID_ATTRIBUTE);
+    }
+    
     @Test
     public void test_findContext() throws Exception {
         SessionImpl session = (SessionImpl) createConfiguredSession(CONFIG_SUCCESS);

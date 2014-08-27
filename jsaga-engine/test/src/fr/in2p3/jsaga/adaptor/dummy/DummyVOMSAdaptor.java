@@ -1,5 +1,8 @@
 package fr.in2p3.jsaga.adaptor.dummy;
 
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.dummy.abstracts.AbstractDummySecurityAdaptor;
 
 /* ***************************************************
@@ -18,4 +21,12 @@ public class DummyVOMSAdaptor extends AbstractDummySecurityAdaptor {
     public String getType() {
         return "VOMS";
     }
+    
+    public Usage getUsage() {
+        return new UAnd.Builder()
+            .and(new UOptional("Att"))
+            .and(new UOptional("UserProxy"))
+            .build();
+    }
+
 }

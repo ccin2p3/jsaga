@@ -269,6 +269,28 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     public synchronized SecurityCredential createCredential() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         Usage usage = m_adaptor.getUsage();
         Map attributes = super._getAttributesMap();
+        
+        // Check attributes
+        if (!attributes.isEmpty()) {
+            Set<String> adaptorAttributes;
+            if (usage == null) {
+                adaptorAttributes = new HashSet<String>();
+            } else {
+                adaptorAttributes = usage.getKeys();
+            }
+            adaptorAttributes.addAll(Arrays.asList(Context.TYPE, ContextImpl.URL_PREFIX,
+                    ContextImpl.BASE_URL_INCLUDES, ContextImpl.BASE_URL_EXCLUDES,
+                    ContextImpl.JOB_SERVICE_ATTRIBUTES, ContextImpl.DATA_SERVICE_ATTRIBUTES));
+            Iterator i = attributes.keySet().iterator();
+            while (i.hasNext()) {
+                Object attr = i.next();
+                if (!adaptorAttributes.contains(attr)) {
+                    throw new IncorrectStateException("Invalid attribute: " + attr);
+                }
+            }
+        }
+        
+        
         int matching;
         try {
             matching = (usage!=null ? usage.getFirstMatchingUsage(attributes) : -1);

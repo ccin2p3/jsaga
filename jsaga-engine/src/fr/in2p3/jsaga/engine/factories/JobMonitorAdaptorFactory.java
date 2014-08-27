@@ -32,6 +32,9 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
             throw new IncorrectURLException("Invalid entry name: "+monitorURL);
         }
 
+        // check attributes
+        this.checkAttributesValidity(monitorAttributes, monitorAdaptor.getUsage());
+        
         // set security adaptor
         SecurityCredential credential = getCredential(monitorURL, context, monitorAdaptor);
 

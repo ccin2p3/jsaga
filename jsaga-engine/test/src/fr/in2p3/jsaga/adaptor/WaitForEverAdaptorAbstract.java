@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.ogf.saga.error.*;
@@ -23,7 +24,7 @@ public abstract class WaitForEverAdaptorAbstract implements ClientAdaptor {
     private static boolean s_isHanging = false;
 
     public Usage getUsage() {
-        return null;
+        return new UOptional("hangatconnect");
     }
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return null;
