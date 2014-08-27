@@ -4,10 +4,11 @@
     </properties>
     <body>
         <release version="1.1.2" description="Fixes">
-            <action dev="lschwarz" type="fix">Fix for Output sandboxes bug on some CreamCE</action>
+            <action dev="lschwarz" type="fix">[Cream adaptor] Fix for delegation lifetime issue</action>
+            <action dev="lschwarz" type="fix">[Cream adaptor] Fix for Output sandboxes bug on some CreamCE</action>
         </release>
         <release version="1.1.1" date="2014-08-18" description="Fixes">
-            <action dev="lschwarz" type="fix" issue="7617">Conflict with class ProxyTypeMap</action>
+            <action dev="lschwarz" type="fix" issue="7617">[VOMS/Globus adaptor] Conflict with class ProxyTypeMap</action>
         </release>
         <release version="1.1.0" date="2014-06-02" description="Library upgrades">
             <action dev="lschwarz" type="update">GridFTP: removed the 10mn limit on file transfer</action>
