@@ -1,9 +1,11 @@
 package fr.in2p3.jsaga.impl.file;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
-
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.ogf.saga.JSAGABaseTest;
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.namespace.Flags;
@@ -31,6 +33,9 @@ public class TimeoutableFileFactoryImplTest extends JSAGABaseTest {
     public TimeoutableFileFactoryImplTest() throws Exception {
         super();
     }
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void test_createFile() throws Exception {
@@ -79,4 +84,14 @@ public class TimeoutableFileFactoryImplTest extends JSAGABaseTest {
             assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
         }
     }
+
+    @Test
+    public void test_invalidAttribute() throws Exception {
+        Session emptySession = SessionFactory.createSession(false);
+        URL url = URLFactory.createURL(m_urlFile+"&invalid");
+        thrown.expect(BadParameterException.class);
+        thrown.expectMessage("Invalid");
+        FileFactory.createDirectory(emptySession, url, Flags.READWRITE.getValue());
+    }
+
 }

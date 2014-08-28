@@ -4,8 +4,6 @@ import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.context.attrs.DataServiceConfigAttribute;
 import fr.in2p3.jsaga.impl.context.attrs.JobServiceConfigAttribute;
 import fr.in2p3.jsaga.impl.context.attrs.ServiceConfigAttribute;
-import junit.framework.TestCase;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.ogf.saga.error.BadParameterException;

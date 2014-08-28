@@ -1,6 +1,11 @@
 package fr.in2p3.jsaga.engine.factories;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.engine.descriptors.AdaptorDescriptors;
@@ -58,6 +63,8 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
         // set security adaptor
         SecurityCredential credential = getCredential(url, context, jobAdaptor);
 
+        this.checkAttributesValidity(attributes, jobAdaptor.getUsage());
+        
         // connect
         connect(jobAdaptor, credential, url, attributes);
     }

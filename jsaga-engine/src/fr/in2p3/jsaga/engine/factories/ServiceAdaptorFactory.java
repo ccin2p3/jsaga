@@ -1,6 +1,8 @@
 package fr.in2p3.jsaga.engine.factories;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.engine.descriptors.SecurityAdaptorDescriptor;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
@@ -77,6 +79,24 @@ public class ServiceAdaptorFactory {
             return null;
         } else {
             throw new AuthenticationFailedException("No security context configured for URL: "+url);
+        }
+    }
+    
+    protected void checkAttributesValidity(Map<String, ?> attributes, Usage usage) throws BadParameterException {
+        if (attributes.isEmpty()) return;
+        Set<String> adaptorAttributes;
+        if (usage != null) {
+            adaptorAttributes = usage.getKeys();
+        } else {
+            adaptorAttributes = new HashSet<String>();
+        }
+        adaptorAttributes.add(JobAdaptor.CHECK_AVAILABILITY);
+        Iterator<String> i = attributes.keySet().iterator();
+        while (i.hasNext()) {
+            Object attr = i.next();
+            if (!adaptorAttributes.contains(attr)) {
+                throw new BadParameterException("Invalid attribute: " + attr.toString());
+            }
         }
     }
 }

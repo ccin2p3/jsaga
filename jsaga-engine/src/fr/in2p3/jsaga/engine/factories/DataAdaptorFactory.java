@@ -94,6 +94,9 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
         // get service attributes
         Map attributes = getAttributes(url, context, m_descriptor.getDefaultsMap(scheme), ContextImpl.DATA_SERVICE_ATTRIBUTES);
 
+        // check attributes
+        this.checkAttributesValidity(attributes, dataAdaptor.getUsage());
+
         // set credential
         SecurityCredential credential = getCredential(url, context, dataAdaptor);
         dataAdaptor.setSecurityCredential(credential);
