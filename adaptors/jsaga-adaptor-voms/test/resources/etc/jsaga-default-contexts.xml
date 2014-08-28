@@ -4,7 +4,7 @@
         <context type="VOMS">
             <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
-            <attribute name="LifeTime" value="PT70M"/>
+            <attribute name="LifeTime" value="PT12H"/>
             <attribute name="ProxyType" value="old"/>
             <!--  PEM -->
             <attribute name="Vomses" value="${user.home}/.jsaga/contexts/voms/vomses/"/>
