@@ -19,7 +19,7 @@ Quick Start Guide
     * List supported security context types (with attributes to be set):
 
 ---
-examples/jsaga-help -s missing
+examples/jsaga-help.sh -s missing
 ---
 
     * Example: create a VOMS proxy
@@ -33,14 +33,14 @@ examples/jsaga-context-init VOMS
     * List supported data management protocols (with supported contexts):
 
 ---
-examples/jsaga-help -d context
+examples/jsaga-help.sh -d context
 ---
 
     * Example: list entries of local root directory
 
 ---
 URL=file:///
-examples/jsaga-ls -l $URL
+examples/jsaga-ls.sh -l $URL
 ---
 
 * Execution management
@@ -48,14 +48,14 @@ examples/jsaga-ls -l $URL
     * List supported execution management technologies (with supported contexts):
 
 ---
-examples/jsaga-help -j context
+examples/jsaga-help.sh -j context
 ---
 
     * Example: get the coordinated universal time on standard output
 
 ---
 URL=local://localhost
-examples/jsaga-job-run -Executable /bin/date -Arguments --utc -r $URL
+examples/jsaga-job-run.sh -Executable /bin/date -Arguments --utc -r $URL
 ---
 
     * Example: get the woker node host name in output file
@@ -72,5 +72,5 @@ Executable /bin/hostname
 Output output.txt
 FileTransfer result.txt<output.txt
 EOF
-examples/jsaga-job-run -f job.txt -r $URL
+examples/jsaga-job-run.sh -f job.txt -r $URL
 ---
