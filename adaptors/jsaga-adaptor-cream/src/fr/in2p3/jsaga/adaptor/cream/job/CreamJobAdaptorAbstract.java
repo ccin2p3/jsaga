@@ -56,15 +56,10 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
 
     private static final String DELEGATION_ID = "delegationId";
 
-    protected GSSCredential m_credential;
-    // TODO: m_vo may be useless
-    protected String m_vo;
-    protected File m_certRepository;
-
-//    protected String m_delegationId;
+    protected GSSCredentialSecurityCredential m_credential;
+//    protected File m_certRepository;
 
     protected CreamClient m_client = null;
-    protected String m_creamVersion = "";
     
     public String getType() {
         return "cream";
@@ -75,17 +70,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     }
 
     public void setSecurityCredential(SecurityCredential credential) {
-        m_credential = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
-        try {
-            m_vo = credential.getAttribute(Context.USERVO);
-        } catch (Exception e) {
-            /* ignore */
-        }
-        try {
-            m_certRepository = ((GSSCredentialSecurityCredential) credential).getCertRepository();
-        } catch (Exception e) {
-            /* ignore */
-        }
+        m_credential = ((GSSCredentialSecurityCredential) credential); //.getGSSCredential();
     }
 
     public int getDefaultPort() {
@@ -106,9 +91,9 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
 
         try {
             if (attributes.containsKey(DELEGATION_ID)) {
-                m_client = new CreamClient(host, port, m_credential, m_certRepository, (String) attributes.get(DELEGATION_ID));
+                m_client = new CreamClient(host, port, m_credential, (String) attributes.get(DELEGATION_ID));
             } else {
-                m_client = new CreamClient(host, port, m_credential, m_certRepository);
+                m_client = new CreamClient(host, port, m_credential);
             }
         } catch (MalformedURLException e) {
             throw new BadParameterException(e.getMessage(), e);
@@ -122,7 +107,6 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
                                 service_info.getInterfaceVersion() + ",service version=" + 
                                 service_info.getServiceVersion() + ")";
             Logger.getLogger(CreamJobAdaptorAbstract.class).info("Connecting to "+cream_desc);
-            m_creamVersion = service_info.getServiceVersion();
         } catch (Authorization_Fault af) {
             throw new AuthorizationFailedException(af.getFaultMessage().getDescription());
         } catch (Exception e) {

@@ -81,8 +81,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
 
         // renew/create delegated proxy
-        m_client.renewDelegation(((GlobusGSSCredentialImpl)m_credential).getX509Credential());
-//        throw new NoSuccessException("END");
+        m_client.renewDelegation(((GlobusGSSCredentialImpl)m_credential.getGSSCredential()).getX509Credential());
 
     }
 
@@ -194,7 +193,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
             // build the job wrapper URI
             URI jobWrapper_uri = new URI(outputSandboxURI.substring(0, outputSandboxURI.length()-4) + "/" + jobInfo.getJobId().getId() + "_jobWrapper.sh");
             // connect to GridFTP
-            GsiftpClient client = GsiftpDataAdaptorAbstract.createConnection(m_credential, jobWrapper_uri.getHost(), 2811, 1024*16, false);
+            GsiftpClient client = GsiftpDataAdaptorAbstract.createConnection(m_credential.getGSSCredential(), jobWrapper_uri.getHost(), 2811, 1024*16, false);
             // Read the job wrapper
             BufferedReader in = new BufferedReader(new InputStreamReader(new GsiftpInputStream(client, jobWrapper_uri.getPath())));
             String line = null;

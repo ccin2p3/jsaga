@@ -68,6 +68,7 @@ import eu.emi.security.authn.x509.proxy.ProxyGenerator;
 import eu.emi.security.authn.x509.proxy.ProxyRequestOptions;
 import fr.in2p3.jsaga.adaptor.cream.CreamConfigurationContext;
 import fr.in2p3.jsaga.adaptor.cream.CreamSocketFactory;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -88,16 +89,16 @@ public class CreamClient {
     private String m_delegationId;
     private Logger m_logger;
 
-    public CreamClient(String host, int port, GSSCredential cred, File certs) throws MalformedURLException, AxisFault, AuthenticationFailedException {
-        this(host, port, cred, certs, "jsaga-generated-" + UUID.randomUUID().toString());
+    public CreamClient(String host, int port, GSSCredentialSecurityCredential cred) throws MalformedURLException, AxisFault, AuthenticationFailedException {
+        this(host, port, cred, "jsaga-generated-" + UUID.randomUUID().toString());
     }
     
-    public CreamClient(String host, int port, GSSCredential cred, File certs, String delegId) throws MalformedURLException, AxisFault, AuthenticationFailedException {
+    public CreamClient(String host, int port, GSSCredentialSecurityCredential cred, String delegId) throws MalformedURLException, AxisFault, AuthenticationFailedException {
         ConfigurationContext cc = CreamConfigurationContext.getInstance();
         m_creamUrl = new URL("https", host, port, "/ce-cream/services/CREAM2");
         m_creamStub = new CREAMStub(cc, m_creamUrl.toString());
         m_delegationStub = new DelegationServiceStub(cc, new URL("https", host, port, "/ce-cream/services/gridsite-delegation").toString());
-        m_socketFactory = new CreamSocketFactory(cred, certs);
+        m_socketFactory = new CreamSocketFactory(cred.getGSSCredential(), cred.getCertRepository());
         m_delegationId = delegId;
 
         m_logger = Logger.getLogger(CreamClient.class);
