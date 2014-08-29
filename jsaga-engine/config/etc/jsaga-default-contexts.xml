@@ -14,8 +14,6 @@
     </contexts>
     <session>
         <context type="VOMS">
-            <attribute name="Server" value="voms://voms.hellasgrid.gr:15004/C=GR/O=HellasGrid/OU=hellasgrid.gr/CN=voms.hellasgrid.gr"/>
-            <attribute name="VomsDir" value="etc/vomsdir"/>
         </context>
         <context type="UserPass">
             <attribute name="UserID" value="anonymous"/>
