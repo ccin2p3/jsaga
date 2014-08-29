@@ -14,12 +14,15 @@ import org.apache.axis2.databinding.types.URI.MalformedURIException;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.log4j.Logger;
+import org.bouncycastle.util.encoders.Hex;
 import org.glite.ce.creamapi.ws.cream2.Authorization_Fault;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobFilter;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.JobId;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.ServiceInfo;
 import org.glite.ce.creamapi.ws.cream2.CREAMStub.ServiceInfoRequest;
+import org.globus.gsi.CredentialException;
+import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
@@ -28,8 +31,13 @@ import org.ogf.saga.error.*;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -53,7 +61,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     protected String m_vo;
     protected File m_certRepository;
 
-    protected String m_delegationId;
+//    protected String m_delegationId;
 
     protected CreamClient m_client = null;
     protected String m_creamVersion = "";
@@ -96,21 +104,12 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
             throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, 
             BadParameterException, TimeoutException, NoSuccessException {
 
-        // set DELEGATION_ID
-        if (attributes.containsKey(DELEGATION_ID)) {
-            m_delegationId = (String) attributes.get(DELEGATION_ID);
-        } else {
-            try {
-                String dn = m_credential.getName().toString();
-                m_delegationId = "delegation-";
-                   m_delegationId += (m_vo != null)?m_vo+"-":"";
-                m_delegationId += Math.abs(dn.hashCode());
-            } catch (GSSException e) {
-                throw new NoSuccessException(e);
-            }
-        }
         try {
-            m_client = new CreamClient(host, port, m_credential, m_certRepository, m_delegationId);
+            if (attributes.containsKey(DELEGATION_ID)) {
+                m_client = new CreamClient(host, port, m_credential, m_certRepository, (String) attributes.get(DELEGATION_ID));
+            } else {
+                m_client = new CreamClient(host, port, m_credential, m_certRepository);
+            }
         } catch (MalformedURLException e) {
             throw new BadParameterException(e.getMessage(), e);
         } catch (AxisFault e) {
@@ -135,5 +134,4 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
         m_client.disconnect();
     }
     
-
 }

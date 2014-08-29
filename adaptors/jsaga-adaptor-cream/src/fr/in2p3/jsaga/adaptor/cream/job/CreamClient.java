@@ -16,6 +16,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.UUID;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
@@ -87,6 +88,10 @@ public class CreamClient {
     private String m_delegationId;
     private Logger m_logger;
 
+    public CreamClient(String host, int port, GSSCredential cred, File certs) throws MalformedURLException, AxisFault, AuthenticationFailedException {
+        this(host, port, cred, certs, "jsaga-generated-" + UUID.randomUUID().toString());
+    }
+    
     public CreamClient(String host, int port, GSSCredential cred, File certs, String delegId) throws MalformedURLException, AxisFault, AuthenticationFailedException {
         ConfigurationContext cc = CreamConfigurationContext.getInstance();
         m_creamUrl = new URL("https", host, port, "/ce-cream/services/CREAM2");
@@ -94,6 +99,7 @@ public class CreamClient {
         m_delegationStub = new DelegationServiceStub(cc, new URL("https", host, port, "/ce-cream/services/gridsite-delegation").toString());
         m_socketFactory = new CreamSocketFactory(cred, certs);
         m_delegationId = delegId;
+
         m_logger = Logger.getLogger(CreamClient.class);
     }
 
@@ -136,7 +142,6 @@ public class CreamClient {
             }
         }
         JobFilter filter = new JobFilter();
-        filter.setDelegationId(m_delegationId);
         filter.setJobId(jobIdList);
         JobInfoRequest request = new JobInfoRequest();
         request.setJobInfoRequest(filter);

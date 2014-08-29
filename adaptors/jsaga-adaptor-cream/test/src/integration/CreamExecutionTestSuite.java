@@ -91,6 +91,27 @@ public class CreamExecutionTestSuite {
 
     public static class CreamJobRunOptionalTest extends OptionalTest {
         public CreamJobRunOptionalTest() throws Exception {super(TYPE);}
+        
+        /**
+         * Runs a long job, waits for done state and resumes it
+         * Cream send UnknownJob instead of Invalid
+         */
+        @Override
+        @Test(expected=IncorrectStateException.class)
+        public void test_resume_done() throws Exception {
+            super.test_resume_done();
+        }
+        
+        /**
+         * Runs a long job, waits for running state and suspends it
+         * Cream send UnknownJob instead of Invalid
+         */
+        @Override
+        @Test(expected=IncorrectStateException.class)
+        public void test_suspend_done() throws Exception {
+            super.test_suspend_done();
+        }
+
     }
 
     public static class CreamJobRunSandboxTest extends SandboxTest {
