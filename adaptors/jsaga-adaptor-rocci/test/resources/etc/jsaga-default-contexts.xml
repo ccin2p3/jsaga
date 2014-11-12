@@ -10,8 +10,8 @@
             <attribute name="UserPublicKey" value="${user.home}/.jsaga/contexts/rOCCI/id_rOCCI.pub"/>
             <data type="rocci"/>
             <job type="rocci">
-                <attribute name="attributes_title" value="MyDebianROCCITest"/>
-                <attribute name="mixin_os_tpl" value="generic_vm"/>
+                <attribute name="attributes_title" value="rOCCI"/>
+                <attribute name="mixin_os_tpl" value="uuid_generic_vm_19"/>
                 <attribute name="mixin_resource_tpl" value="small"/>
             </job>
          </context>
