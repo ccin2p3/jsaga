@@ -182,7 +182,7 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
             BesJob j = new BesJob();
             // transform Element into EndpointReferenceType
             fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType epr = new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType();
-            epr.setAddress(new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.AttributedURIType(addr.getFirstChild().getTextContent()));
+            epr.setAddress(new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.AttributedURIType(addr.getFirstChild().getNodeValue()));
 
             Element ref = (Element) ident.getElementsByTagName("add:ReferenceParameters").item(0);
     		if (ref == null)
