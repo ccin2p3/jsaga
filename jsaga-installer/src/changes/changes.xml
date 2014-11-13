@@ -5,7 +5,8 @@
     <body>
         <release version="1.2.0" description="">
             <action dev="lschwarz" type="update" issue="7892">[All adaptors] check the validity of provided attributes</action>
-            <action dev="lschwarz" type="update" issue="6215">[Cream] If the "delegationId" attribute is not provided, JSAGA will generate a random one (instead of hashing the certificate DN)</action>
+            <action dev="lschwarz" type="update" issue="6215">[Cream adaptor] If the "delegationId" attribute is not provided, JSAGA will generate a random one (instead of hashing the certificate DN)</action>
+            <action dev="glarocca" type="update">[rOCCI adaptor] upgrade to rocci-client v4.2.1</action>
         </release>
         <release version="1.1.2" date="2014-08-28" description="Cream Fixes">
             <action dev="lschwarz" type="fix">[Cream adaptor] Fix for delegation lifetime issue (if the initial proxy has less than 2 hours left)</action>
