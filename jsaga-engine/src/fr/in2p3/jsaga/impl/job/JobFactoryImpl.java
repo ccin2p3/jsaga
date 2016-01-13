@@ -32,7 +32,7 @@ public class JobFactoryImpl extends AbstractAsyncJobFactoryImpl {
     protected JobService doCreateJobService(Session session, URL rm) throws NotImplementedException, BadParameterException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         float timeout = this.getTimeout("createJobService", rm);
         if (timeout == SagaObject.WAIT_FOREVER) {
-            return this.doCreateJobServiceSync(session, rm);
+            return super.doCreateJobServiceSync(session, rm);
         } else {
             try {
                 return (JobService) this.getResult(super.doCreateJobService(TaskMode.ASYNC, session, rm), timeout);
