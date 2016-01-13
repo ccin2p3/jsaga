@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.impl.namespace;
 
-import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileReader;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
@@ -30,8 +29,6 @@ import org.ogf.saga.url.URL;
  *
  */
 public abstract class AbstractSyncNSFactoryImpl extends NSFactory implements SyncNSFactory {
-    protected static final String JSAGA_FACTORY = Base.getSagaFactory();
-
     private static final boolean PLUGIN_TYPE = DataAdaptorFactory.PHYSICAL;
     private DataAdaptorFactory m_adaptorFactory;
 

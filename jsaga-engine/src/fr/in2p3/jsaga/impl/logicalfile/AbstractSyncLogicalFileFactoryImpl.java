@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
-import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileReader;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
@@ -26,8 +25,6 @@ import org.ogf.saga.url.URL;
  *
  */
 public abstract class AbstractSyncLogicalFileFactoryImpl extends LogicalFileFactory implements SyncLogicalFileFactory {
-    protected static final String JSAGA_FACTORY = Base.getSagaFactory();
-
     private final static boolean PLUGIN_TYPE = DataAdaptorFactory.LOGICAL;
     private DataAdaptorFactory m_adaptorFactory;
 
