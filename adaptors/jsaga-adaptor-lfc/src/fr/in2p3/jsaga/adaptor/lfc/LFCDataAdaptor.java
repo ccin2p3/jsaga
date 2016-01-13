@@ -259,6 +259,12 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
                 throw new NoSuccessException("Unable to get the file size of "+replicaEntry, e);
             } catch (AuthorizationFailedException e) {
                 throw new NoSuccessException("Unable to get the file size of "+replicaEntry, e);
+            } finally {
+                try {
+                    replicaFile.close();
+                } catch (NotImplementedException e) {
+                    logger.debug("Could not close file", e);
+                }
             }
             
             String guid = m_lfcConnector.statg(connection, logicalEntry, null).getGuid();

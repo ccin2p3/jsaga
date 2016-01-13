@@ -34,25 +34,6 @@
                 </ul>
             </answer>
         </faq>
-        <faq id="adaptor-modify">
-            <question>How to modify an existing adaptor for JSAGA ?</question>
-            <answer>
-                <ul>
-                    <li>Download and extract the latest version of the adaptor from
-                        <a href="http://maven.in2p3.fr/fr/in2p3/jsaga/adaptor/sources/latest/">here</a>.
-                    </li>
-                    <li>Modify the code.
-                    </li>
-                    <li>Run the non-regression test-suite.
-                    </li>
-                    <li>Generate a patch (WARNING: no slash at the end of directory name)
-                        <pre>diff -Naur -xbuild &lt;origin&gt; &lt;modified&gt;</pre>
-                    </li>
-                    <li>Send it to JSAGA developers for inclusion in future JSAGA releases.
-                    </li>
-                </ul>
-            </answer>
-        </faq>
         <faq id="soap-debug">
         	<question>How to print Web service messages to a local file ?</question>
         	<answer>Add the following lines
@@ -71,24 +52,12 @@ log4j.appender.A1.layout.ConversionPattern=%-4r [%t] %-5p %c %x  %m%n
         </faq>
         <faq id="git">
             <question>How to push my contribution to GIT ?</question>
-            <answer>First, request for access to the jsaga-contrib repository and configure your SSH client
-                (see <a href="https://git.in2p3.fr/index-en.html">CC-IN2P3 VCS guide</a>).
-                <pre># initialization
-git clone git://git.in2p3.fr/jsaga
-cd jsaga
-git remote add jsaga-contrib ssh://git.in2p3.fr/jsaga-contrib
-
-# list existing branches
-git ls-remote ssh://git.in2p3.fr/jsaga-contrib
-
-# create your own branch
-git checkout -b myBranch
-# modify your code
-...
-# commit your modifications
-git commit ...
-# push your commits to your remote branch in the jsaga-contrib repository
-git push jsaga-contrib HEAD:myBranch</pre>
+            <answer>
+              <ul>
+                <li>Make sure you have an account on https://gitlab.in2p3.fr. If not, please ask one.</li>
+                <li>Fork the project at https://gitlab.in2p3.fr/cc-in2p3-dev/jsaga</li>
+                <li>Ask for a pull request for your contribution to be integrated into the main trunk</li>
+              </ul>
             </answer>
         </faq>
         <faq id="eclipse">
