@@ -35,7 +35,7 @@ public class JobFactoryImpl extends AbstractAsyncJobFactoryImpl {
             return this.doCreateJobServiceSync(session, rm);
         } else {
             try {
-                return (JobService) this.getResult(createJobService(JSAGA_FACTORY, TaskMode.ASYNC, session, rm), timeout);
+                return (JobService) this.getResult(super.doCreateJobService(TaskMode.ASYNC, session, rm), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}

@@ -35,7 +35,7 @@ public class NSFactoryImpl extends AbstractAsyncNSFactoryImpl {
             return super.doCreateNSEntrySync(session, name, flags);
         } else {
             try {
-                return (NSEntry) this.getResult(createNSEntry(JSAGA_FACTORY, TaskMode.ASYNC, session, name, flags), timeout);
+                return (NSEntry) this.getResult(super.doCreateNSEntry(TaskMode.ASYNC, session, name, flags), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
             catch (SagaIOException e) {throw new NoSuccessException(e);}
@@ -48,7 +48,7 @@ public class NSFactoryImpl extends AbstractAsyncNSFactoryImpl {
             return super.doCreateNSDirectorySync(session, name, flags);
         } else {
             try {
-                return (NSDirectory) this.getResult(createNSDirectory(JSAGA_FACTORY, TaskMode.ASYNC, session, name, flags), timeout);
+                return (NSDirectory) this.getResult(super.doCreateNSDirectory(TaskMode.ASYNC, session, name, flags), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
             catch (SagaIOException e) {throw new NoSuccessException(e);}

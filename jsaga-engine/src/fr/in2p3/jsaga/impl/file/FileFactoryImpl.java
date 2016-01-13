@@ -35,7 +35,7 @@ public class FileFactoryImpl extends AbstractAsyncFileFactoryImpl {
             return super.doCreateFileSync(session, name, flags);
         } else {
             try {
-                return (File) this.getResult(createFile(JSAGA_FACTORY, TaskMode.ASYNC, session, name, flags), timeout);
+                return (File) this.getResult(super.doCreateFile(TaskMode.ASYNC, session, name, flags), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
             catch (SagaIOException e) {throw new NoSuccessException(e);}
@@ -48,7 +48,7 @@ public class FileFactoryImpl extends AbstractAsyncFileFactoryImpl {
             return super.doCreateFileInputStreamSync(session, name);
         } else {
             try {
-                return (FileInputStream) this.getResult(createFileInputStream(JSAGA_FACTORY, TaskMode.ASYNC, session, name), timeout);
+                return (FileInputStream) this.getResult(super.doCreateFileInputStream(TaskMode.ASYNC, session, name), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
             catch (SagaIOException e) {throw new NoSuccessException(e);}
@@ -61,7 +61,7 @@ public class FileFactoryImpl extends AbstractAsyncFileFactoryImpl {
             return super.doCreateFileOutputStreamSync(session, name, append);
         } else {
             try {
-                return (FileOutputStream) this.getResult(createFileOutputStream(JSAGA_FACTORY, TaskMode.ASYNC, session, name, append), timeout);
+                return (FileOutputStream) this.getResult(super.doCreateFileOutputStream(TaskMode.ASYNC, session, name, append), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
             catch (SagaIOException e) {throw new NoSuccessException(e);}
@@ -74,7 +74,7 @@ public class FileFactoryImpl extends AbstractAsyncFileFactoryImpl {
             return super.doCreateDirectorySync(session, name, flags);
         } else {
             try {
-                return (Directory) this.getResult(createDirectory(JSAGA_FACTORY, TaskMode.ASYNC, session, name, flags), timeout);
+                return (Directory) this.getResult(super.doCreateDirectory(TaskMode.ASYNC, session, name, flags), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
             catch (SagaIOException e) {throw new NoSuccessException(e);}

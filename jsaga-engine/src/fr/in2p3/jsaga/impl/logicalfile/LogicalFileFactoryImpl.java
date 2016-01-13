@@ -35,7 +35,7 @@ public class LogicalFileFactoryImpl extends AbstractAsyncLogicalFileFactoryImpl 
             return super.doCreateLogicalFileSync(session, name, flags);
         } else {
             try {
-                return (LogicalFile) this.getResult(createLogicalFile(JSAGA_FACTORY, TaskMode.ASYNC, session, name, flags), timeout);
+                return (LogicalFile) this.getResult(super.doCreateLogicalFile(TaskMode.ASYNC, session, name, flags), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
             catch (SagaIOException e) {throw new NoSuccessException(e);}
@@ -48,7 +48,7 @@ public class LogicalFileFactoryImpl extends AbstractAsyncLogicalFileFactoryImpl 
             return super.doCreateLogicalDirectorySync(session, name, flags);
         } else {
             try {
-                return (LogicalDirectory) this.getResult(createLogicalDirectory(JSAGA_FACTORY, TaskMode.ASYNC, session, name, flags), timeout);
+                return (LogicalDirectory) this.getResult(super.doCreateLogicalDirectory(TaskMode.ASYNC, session, name, flags), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
             catch (SagaIOException e) {throw new NoSuccessException(e);}
