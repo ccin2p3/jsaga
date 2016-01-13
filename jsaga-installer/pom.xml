@@ -12,9 +12,9 @@
 
     <!-- set as project root -->
     <scm>
-        <connection>scm:git:git://git.in2p3.fr/jsaga</connection>
-        <developerConnection>scm:git:ssh://git.in2p3.fr/jsaga</developerConnection>
-        <url>https://git.in2p3.fr/public/jsaga</url>
+        <connection>scm:git:git://gitlab.in2p3.fr:cc-in2p3-dev/treqs2.git</connection>
+        <developerConnection>scm:git:ssh://gitlab.in2p3.fr:cc-in2p3-dev/treqs2.git</developerConnection>
+        <url>https://gitlab.in2p3.fr/cc-in2p3-dev/jsaga</url>
     </scm>
     <!-- Override for changes report : bug in the support of Redmine in maven-report-plugin with URL like "/issues/show/" -->
     <issueManagement>
