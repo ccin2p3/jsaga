@@ -21,7 +21,7 @@ import java.util.List;
  * The resource manager can translate resource requests into stateful resource handles.
  * It also manages the persistence of those resource handles, and of resource pools.
  */
-public interface ResourceManager<R extends Resource, RD extends ResourceDescription> extends SagaObject, Async {
+public interface ResourceManager extends SagaObject, Async {
     /**
      * Obtains the list of pilot/vm/ar (etc.) instances that are currently
      * known to the resource manager.
@@ -88,7 +88,7 @@ public interface ResourceManager<R extends Resource, RD extends ResourceDescript
      *      is thrown when the JobService can handle the job id, but the
      *      referenced job is not alive.
      */
-    public R getResource(String id) throws NotImplementedException,
+    public Resource getResource(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException;
 
@@ -109,7 +109,7 @@ public interface ResourceManager<R extends Resource, RD extends ResourceDescript
      *          the template identifier
      * @return the template description
      */
-    public RD getTemplate(String id) throws NotImplementedException,
+    public ResourceDescription getTemplate(String id) throws NotImplementedException,
             NoSuccessException;
 
     //----------------------------------------------------------------
