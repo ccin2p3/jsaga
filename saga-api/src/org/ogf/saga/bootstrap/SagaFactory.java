@@ -9,6 +9,7 @@ import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.monitoring.MonitoringFactory;
 import org.ogf.saga.namespace.NSFactory;
+import org.ogf.saga.resource.ResourceFactory;
 import org.ogf.saga.rpc.RPCFactory;
 import org.ogf.saga.sd.SDFactory;
 import org.ogf.saga.session.SessionFactory;
@@ -144,4 +145,11 @@ public interface SagaFactory {
      */
     ISNFactory createISNFactory() throws NotImplementedException;
     // END REMOVE FROM GFD DOC
+
+    /**
+     * Creates a factory for the Saga resource package.
+     *
+     * @return the resource manager factory.
+     */
+    ResourceFactory createManagerFactory();
 }

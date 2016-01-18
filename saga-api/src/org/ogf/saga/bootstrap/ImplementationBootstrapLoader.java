@@ -13,6 +13,7 @@ import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.monitoring.MonitoringFactory;
 import org.ogf.saga.namespace.NSFactory;
+import org.ogf.saga.resource.ResourceFactory;
 import org.ogf.saga.rpc.RPCFactory;
 import org.ogf.saga.sd.SDFactory;
 import org.ogf.saga.session.SessionFactory;
@@ -70,7 +71,9 @@ public class ImplementationBootstrapLoader {
     private TaskFactory taskFactory;
     
     private URLFactory URLFactory;
-    
+
+    private ResourceFactory resourceFactory;
+
     private static synchronized ImplementationBootstrapLoader getLoader(String factoryName) throws NoSuccessException {
         
 	// Deterimine SagaFactory classname if not specified.
@@ -415,4 +418,23 @@ public class ImplementationBootstrapLoader {
 	}
     } 
     // END REMOVE FROM GFD DOC
+
+    /**
+     * Creates a manager factory, using the specified SagaFactory.
+     *
+     * @param factoryName classname of the Saga factory to be used, or null.
+     * @return an URL factory.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     */
+    public static ResourceFactory getManagerFactory(String factoryName)
+            throws NoSuccessException {
+        ImplementationBootstrapLoader l = getLoader(factoryName);
+        synchronized(l) {
+            if (l.resourceFactory == null) {
+                l.resourceFactory = l.sagaFactory.createManagerFactory();
+            }
+            return l.resourceFactory;
+        }
+    }
 }
