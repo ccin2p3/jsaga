@@ -83,10 +83,10 @@ public interface ResourceManager extends SagaObject, Async {
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      * @exception BadParameterException
-     *      is thrown when the JobService cannot parse the job id.
+     *      is thrown when the resource manager cannot parse the resource id.
      * @exception DoesNotExistException
-     *      is thrown when the JobService can handle the job id, but the
-     *      referenced job is not alive.
+     *      is thrown when the resource manager can handle the resource id,
+     *      but the referenced resource is not alive.
      */
     public Resource getResource(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
@@ -100,7 +100,7 @@ public interface ResourceManager extends SagaObject, Async {
      * @return the list of templates
      */
     public List<String> listTemplates(Type type) throws NotImplementedException,
-            NoSuccessException;
+            TimeoutException, NoSuccessException;
 
     /**
      * Human readable description of template
@@ -110,7 +110,7 @@ public interface ResourceManager extends SagaObject, Async {
      * @return the template description
      */
     public ResourceDescription getTemplate(String id) throws NotImplementedException,
-            NoSuccessException;
+            BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException;
 
     //----------------------------------------------------------------
 
@@ -121,7 +121,9 @@ public interface ResourceManager extends SagaObject, Async {
      *      the resource description
      * @return the resource handle
      */
-    public Compute acquireCompute(ComputeDescription description);
+    public Compute acquireCompute(ComputeDescription description) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
+            TimeoutException, NoSuccessException;
 
     /**
      * Close compute resource, even if it is not drained.
@@ -129,7 +131,9 @@ public interface ResourceManager extends SagaObject, Async {
      * @param id
      *      the resource identifier
      */
-    public void releaseCompute(String id);
+    public void releaseCompute(String id) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
+            DoesNotExistException, TimeoutException, NoSuccessException;
 
     /**
      * Close compute resource
@@ -139,7 +143,9 @@ public interface ResourceManager extends SagaObject, Async {
      * @param drain
      *      true if the resource must be drained, else false
      */
-    public void releaseCompute(String id, boolean drain);
+    public void releaseCompute(String id, boolean drain) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
+            DoesNotExistException, TimeoutException, NoSuccessException;
 
     //----------------------------------------------------------------
 
@@ -150,7 +156,9 @@ public interface ResourceManager extends SagaObject, Async {
      *      the resource description
      * @return the resource handle
      */
-    public Network acquireNetwork(NetworkDescription description);
+    public Network acquireNetwork(NetworkDescription description) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
+            TimeoutException, NoSuccessException;
 
     /**
      * Close network resource
@@ -158,7 +166,9 @@ public interface ResourceManager extends SagaObject, Async {
      * @param id
      *      the resource identifier
      */
-    public void releaseNetwork(String id);
+    public void releaseNetwork(String id) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
+            DoesNotExistException, TimeoutException, NoSuccessException;
 
     //----------------------------------------------------------------
 
@@ -169,7 +179,9 @@ public interface ResourceManager extends SagaObject, Async {
      *      the resource description
      * @return the resource handle
      */
-    public Storage acquireStorage(StorageDescription description);
+    public Storage acquireStorage(StorageDescription description) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
+            TimeoutException, NoSuccessException;
 
     /**
      * Close storage resource
@@ -177,7 +189,9 @@ public interface ResourceManager extends SagaObject, Async {
      * @param id
      *      the resource identifier
      */
-    public void releaseStorage(String id);
+    public void releaseStorage(String id) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
+            DoesNotExistException, TimeoutException, NoSuccessException;
 
     //----------------------------------------------------------------
 
