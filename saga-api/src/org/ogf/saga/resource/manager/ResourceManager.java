@@ -210,6 +210,34 @@ public interface ResourceManager extends SagaObject, Async {
     public Task<ResourceManager, Resource> getResource(TaskMode mode, String id)
             throws NotImplementedException;
 
+    /**
+     * Creates a task that obtains the list of available templates.
+     *
+     * @param mode
+     *      the task mode.
+     * @param type
+     *      the resource type (default = any)
+     * @return the task.
+     * @exception NotImplementedException
+     *      is thrown when the task version of this method is not implemented.
+     */
+    public Task<ResourceManager, List<String>> listTemplates(TaskMode mode, Type type)
+            throws NotImplementedException;
+
+    /**
+     * Creates a task that returns human readable description of template.
+     *
+     * @param mode
+     *      the task mode.
+     * @param id
+     *      the template identifier
+     * @return the task.
+     * @exception NotImplementedException
+     *      is thrown when the task version of this method is not implemented.
+     */
+    public Task<ResourceManager, ResourceDescription> getTemplate(TaskMode mode, String id)
+            throws NotImplementedException;
+
     //----------------------------------------------------------------
 
     /**
