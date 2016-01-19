@@ -98,6 +98,16 @@ public interface ResourceManager extends SagaObject, Async {
      * @param type
      *          the resource type (default = any)
      * @return the list of templates
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public List<String> listTemplates(Type type) throws NotImplementedException,
             TimeoutException, NoSuccessException;
@@ -108,6 +118,21 @@ public interface ResourceManager extends SagaObject, Async {
      * @param id
      *          the template identifier
      * @return the template description
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the resource manager cannot parse the template id.
+     * @exception DoesNotExistException
+     *      is thrown when the resource manager can handle the template id,
+     *      but the referenced template is not found.
      */
     public ResourceDescription getTemplate(String id) throws NotImplementedException,
             BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException;
@@ -120,6 +145,27 @@ public interface ResourceManager extends SagaObject, Async {
      * @param description
      *      the resource description
      * @return the resource handle
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the resource description contains invalid values.
      */
     public Compute acquireCompute(ComputeDescription description) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
@@ -130,6 +176,30 @@ public interface ResourceManager extends SagaObject, Async {
      *
      * @param id
      *      the resource identifier
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the resource manager cannot parse the resource id.
+     * @exception DoesNotExistException
+     *      is thrown when the resource manager can handle the resource id,
+     *      but the referenced resource is not alive.
      */
     public void releaseCompute(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
@@ -142,6 +212,30 @@ public interface ResourceManager extends SagaObject, Async {
      *      the resource identifier
      * @param drain
      *      true if the resource must be drained, else false
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the resource manager cannot parse the resource id.
+     * @exception DoesNotExistException
+     *      is thrown when the resource manager can handle the resource id,
+     *      but the referenced resource is not alive.
      */
     public void releaseCompute(String id, boolean drain) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
@@ -155,6 +249,27 @@ public interface ResourceManager extends SagaObject, Async {
      * @param description
      *      the resource description
      * @return the resource handle
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the resource description contains invalid values.
      */
     public Network acquireNetwork(NetworkDescription description) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
@@ -165,6 +280,30 @@ public interface ResourceManager extends SagaObject, Async {
      *
      * @param id
      *      the resource identifier
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the resource manager cannot parse the resource id.
+     * @exception DoesNotExistException
+     *      is thrown when the resource manager can handle the resource id,
+     *      but the referenced resource is not alive.
      */
     public void releaseNetwork(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
@@ -178,6 +317,27 @@ public interface ResourceManager extends SagaObject, Async {
      * @param description
      *      the resource description
      * @return the resource handle
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the resource description contains invalid values.
      */
     public Storage acquireStorage(StorageDescription description) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
@@ -188,6 +348,30 @@ public interface ResourceManager extends SagaObject, Async {
      *
      * @param id
      *      the resource identifier
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the resource manager cannot parse the resource id.
+     * @exception DoesNotExistException
+     *      is thrown when the resource manager can handle the resource id,
+     *      but the referenced resource is not alive.
      */
     public void releaseStorage(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,

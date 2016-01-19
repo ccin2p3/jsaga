@@ -86,6 +86,27 @@ public interface Resource<R,RD> extends ResourceTask, Async, AsyncAttributes<R> 
      *
      * @param description
      *      the new resource description
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the resource description contains invalid values.
      */
     public void reconfigure(RD description) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
@@ -93,6 +114,31 @@ public interface Resource<R,RD> extends ResourceTask, Async, AsyncAttributes<R> 
 
     /**
      * Release resource
+     *
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the resource manager cannot parse the resource id.
+     * @exception DoesNotExistException
+     *      is thrown when the resource manager can handle the resource id,
+     *      but the referenced resource is not alive.
      */
     public void release() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, DoesNotExistException,

@@ -15,6 +15,7 @@ import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 public abstract class ResourceFactory {
+
     private static ResourceFactory getFactory(String sagaFactoryName)
             throws NoSuccessException, NotImplementedException {
         return ImplementationBootstrapLoader.getManagerFactory(sagaFactoryName);
@@ -70,8 +71,7 @@ public abstract class ResourceFactory {
      *            contact string for the resource manager.
      * @return the task.
      * @exception NotImplementedException
-     *                is thrown when the task version of this method is not
-     *                implemented.
+     *      is thrown when the task version of this method is not implemented.
      */
     protected abstract Task<ResourceFactory, ResourceManager> doCreateResourceManager(
             TaskMode mode, Session session, URL rm)
