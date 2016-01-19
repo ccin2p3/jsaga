@@ -1,5 +1,6 @@
 package org.ogf.saga.resource.instance;
 
+import org.ogf.saga.error.*;
 import org.ogf.saga.resource.description.ComputeDescription;
 
 public interface Compute extends Resource<Compute, ComputeDescription> {
@@ -9,5 +10,7 @@ public interface Compute extends Resource<Compute, ComputeDescription> {
      * @param drain
      *      if true, then the resource is drained before it is released (default = false)
      */
-    public void release(boolean drain);
+    public void release(boolean drain) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, DoesNotExistException,
+            TimeoutException, NoSuccessException;
 }

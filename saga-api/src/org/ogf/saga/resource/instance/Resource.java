@@ -87,10 +87,14 @@ public interface Resource<R,RD> extends ResourceTask, Async, AsyncAttributes<R> 
      * @param description
      *      the new resource description
      */
-    public void reconfigure(RD description);
+    public void reconfigure(RD description) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
+            TimeoutException, NoSuccessException;
 
     /**
      * Release resource
      */
-    public void release();
+    public void release() throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, DoesNotExistException,
+            TimeoutException, NoSuccessException;
 }
