@@ -55,44 +55,6 @@ public interface ResourceManager extends SagaObject, Async {
             NoSuccessException;
 
     /**
-     * Return resource handle for some known resource.
-     * See drmaav2::machine_info? Add GLUE inspection as read-only attributes?
-     * link to SD or ISN?
-     *
-     * @param id
-     *      the resource identifier (can also be an old fashioned JobService URL)
-     * @return
-     *      the resource handle
-     * @exception NotImplementedException
-     *      is thrown if the implementation does not provide an
-     *      implementation of this method.
-     * @exception AuthorizationFailedException
-     *      is thrown when none of the available contexts of the
-     *      used session could be used for successful authorization.
-     *      This error indicates that the resource could not be accessed
-     *      at all, and not that an operation was not available due to
-     *      restricted permissions.
-     * @exception AuthenticationFailedException
-     *      is thrown when operation failed because none of the available
-     *      session contexts could successfully be used for authentication.
-     * @exception TimeoutException
-     *      is thrown when a remote operation did not complete successfully
-     *      because the network communication or the remote service timed
-     *      out.
-     * @exception NoSuccessException
-     *      is thrown when the operation was not successfully performed,
-     *      and none of the other exceptions apply.
-     * @exception BadParameterException
-     *      is thrown when the resource manager cannot parse the resource id.
-     * @exception DoesNotExistException
-     *      is thrown when the resource manager can handle the resource id,
-     *      but the referenced resource is not alive.
-     */
-    public Resource getResource(String id) throws NotImplementedException,
-            AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
-            DoesNotExistException, TimeoutException, NoSuccessException;
-
-    /**
      * List available templates.
      *
      * @param type
@@ -170,6 +132,42 @@ public interface ResourceManager extends SagaObject, Async {
     public Compute acquireCompute(ComputeDescription description) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
             TimeoutException, NoSuccessException;
+
+    /**
+     * Return resource handle for some known compute resource.
+     *
+     * @param id
+     *      the resource identifier (can also be an old fashioned JobService URL)
+     * @return
+     *      the resource handle
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the resource manager cannot parse the resource id.
+     * @exception DoesNotExistException
+     *      is thrown when the resource manager can handle the resource id,
+     *      but the referenced resource is not alive.
+     */
+    public Compute acquireCompute(String id) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
+            DoesNotExistException, TimeoutException, NoSuccessException;
 
     /**
      * Close compute resource, even if it is not drained.
@@ -276,6 +274,42 @@ public interface ResourceManager extends SagaObject, Async {
             TimeoutException, NoSuccessException;
 
     /**
+     * Return resource handle for some known network resource.
+     *
+     * @param id
+     *      the resource identifier
+     * @return
+     *      the resource handle
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the resource manager cannot parse the resource id.
+     * @exception DoesNotExistException
+     *      is thrown when the resource manager can handle the resource id,
+     *      but the referenced resource is not alive.
+     */
+    public Network acquireNetwork(String id) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
+            DoesNotExistException, TimeoutException, NoSuccessException;
+
+    /**
      * Close network resource
      *
      * @param id
@@ -342,6 +376,42 @@ public interface ResourceManager extends SagaObject, Async {
     public Storage acquireStorage(StorageDescription description) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
             TimeoutException, NoSuccessException;
+
+    /**
+     * Return resource handle for some known storage resource.
+     *
+     * @param id
+     *      the resource identifier
+     * @return
+     *      the resource handle
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the resource manager cannot parse the resource id.
+     * @exception DoesNotExistException
+     *      is thrown when the resource manager can handle the resource id,
+     *      but the referenced resource is not alive.
+     */
+    public Storage acquireStorage(String id) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
+            DoesNotExistException, TimeoutException, NoSuccessException;
 
     /**
      * Close storage resource
@@ -453,6 +523,20 @@ public interface ResourceManager extends SagaObject, Async {
             throws NotImplementedException;
 
     /**
+     * Creates a task that returns resource handle for some known compute resource.
+     *
+     * @param mode
+     *      the task mode.
+     * @param id
+     *      the resource identifier (can also be an old fashioned JobService URL).
+     * @return the task.
+     * @exception NotImplementedException
+     *      is thrown when the task version of this method is not implemented.
+     */
+    public Task<ResourceManager, Compute> acquireCompute(TaskMode mode, String id)
+            throws NotImplementedException;
+
+    /**
      * Creates a task that closes compute resource, even if it is not drained.
      *
      * @param mode
@@ -498,6 +582,19 @@ public interface ResourceManager extends SagaObject, Async {
             throws NotImplementedException;
 
     /**
+     * Creates a task that returns resource handle for some known network resource.
+     *
+     * @param mode
+     *      the task mode.
+     * @param id
+     *      the resource identifier
+     * @return the task.
+     * @exception NotImplementedException
+     */
+    public Task<ResourceManager, Network> acquireNetwork(TaskMode mode, String id)
+            throws NotImplementedException;
+
+    /**
      * Creates a task that closes network resource.
      *
      * @param mode
@@ -523,6 +620,19 @@ public interface ResourceManager extends SagaObject, Async {
      * @exception NotImplementedException
      */
     public Task<ResourceManager, Storage> acquireStorage(TaskMode mode, StorageDescription description)
+            throws NotImplementedException;
+
+    /**
+     * Creates a task that returns resource handle for some known storage resource.
+     *
+     * @param mode
+     *      the task mode.
+     * @param id
+     *      the resource identifier
+     * @return the task.
+     * @exception NotImplementedException
+     */
+    public Task<ResourceManager, Storage> acquireStorage(TaskMode mode, String id)
             throws NotImplementedException;
 
     /**
