@@ -7,8 +7,6 @@ import org.ogf.saga.resource.manager.ResourceManager;
 import org.ogf.saga.resource.task.ResourceTask;
 import org.ogf.saga.task.Async;
 
-import java.util.List;
-
 public interface Resource<R,RD> extends ResourceTask, Async, AsyncAttributes<R> {
 
     // Required attributes:
@@ -51,7 +49,7 @@ public interface Resource<R,RD> extends ResourceTask, Async, AsyncAttributes<R> 
     /**
      * @return the list of access URLs
      */
-    public List<String> getAccess();
+    public String[] getAccess();
 
     /**
      * Retrieves the resource description that was used to create this resource instance.
