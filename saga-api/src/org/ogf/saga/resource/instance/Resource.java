@@ -29,6 +29,11 @@ public interface Resource<R,RD> extends ResourceTask, Async, AsyncAttributes<R> 
     public static final String MANAGER_ID = "ManagerID";
 
     /**
+     * Attribute name: list of access URLs
+     */
+    public static final String ACCESS = "Access";
+
+    /**
      * Attribute name: human readable description of the resource
      */
     public static final String RESOURCE_DESCRIPTION = "Description";
