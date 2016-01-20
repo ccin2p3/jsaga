@@ -465,20 +465,6 @@ public interface ResourceManager extends SagaObject, Async {
             throws NotImplementedException;
 
     /**
-     * Creates a task that returns resource handle for some known compute resource.
-     *
-     * @param mode
-     *      the task mode.
-     * @param id
-     *      the resource identifier (can also be an old fashioned JobService URL)
-     * @return the task.
-     * @exception NotImplementedException
-     *      is thrown when the task version of this method is not implemented.
-     */
-    public Task<ResourceManager, Resource> getResource(TaskMode mode, String id)
-            throws NotImplementedException;
-
-    /**
      * Creates a task that obtains the list of available templates.
      *
      * @param mode
