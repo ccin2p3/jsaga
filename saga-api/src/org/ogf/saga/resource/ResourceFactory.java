@@ -84,6 +84,8 @@ public abstract class ResourceFactory {
      *      the resource description.
      * @exception NotImplementedException
      *      is thrown when this method is not implemented.
+     * @exception BadParameterException
+     *      is thrown when the argument type is not provided.
      * @throws NoSuccessException
      *      is thrown when the Saga factory could not be created.
      */
@@ -101,6 +103,8 @@ public abstract class ResourceFactory {
      *      the resource description.
      * @exception NotImplementedException
      *      is thrown when this method is not implemented.
+     * @exception BadParameterException
+     *      is thrown when the argument type is not provided.
      * @throws NoSuccessException
      *      is thrown when the Saga factory could not be created.
      */
