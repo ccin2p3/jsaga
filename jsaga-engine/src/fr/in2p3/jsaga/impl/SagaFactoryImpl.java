@@ -27,6 +27,7 @@ import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.monitoring.MonitoringFactory;
 import org.ogf.saga.namespace.NSFactory;
+import org.ogf.saga.resource.ResourceFactory;
 import org.ogf.saga.rpc.RPCFactory;
 import org.ogf.saga.sd.SDFactory;
 import org.ogf.saga.session.SessionFactory;
@@ -165,6 +166,10 @@ public class SagaFactoryImpl implements SagaFactory {
 
     public ISNFactory createISNFactory() throws NotImplementedException {
         throw new NotImplementedException("Not implemented by the SAGA engine");
+    }
+
+    public ResourceFactory createManagerFactory() throws NotImplementedException {
+        throw new NotImplementedException("Not implemented yet...");
     }
 
     public SessionFactory createSessionFactory() {

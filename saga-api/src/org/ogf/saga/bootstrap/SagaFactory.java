@@ -151,5 +151,5 @@ public interface SagaFactory {
      *
      * @return the resource manager factory.
      */
-    ResourceFactory createManagerFactory();
+    ResourceFactory createManagerFactory() throws NotImplementedException;
 }
