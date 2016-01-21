@@ -169,6 +169,7 @@
 
         <!-- plug-ins configuration -->
         <plugins>
+<!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -177,7 +178,7 @@
                     <reportSet>
                         <reports>
                             <report>index</report>
-                            <!--<report>dependencies</report>--><!-- java.lang.OutOfMemoryError: Java heap space -->
+                            <report>dependencies</report> java.lang.OutOfMemoryError: Java heap space
                             <report>dependency-convergence</report>
                             <report>license</report>
                             <report>summary</report>
@@ -187,6 +188,7 @@
                     </reportSet>
                 </reportSets>
             </plugin>
+-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
