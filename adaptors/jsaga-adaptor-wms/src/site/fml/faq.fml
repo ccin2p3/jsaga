@@ -69,7 +69,7 @@ Where:
             <question>When I download the output file, I get
                 <pre>Unable to get Not Before date from Proxy"</pre>
             </question>
-            <answer>This is a bug in the WMS server. See https://ggus.eu/index.php?mode=ticket_info&ticket_id=87802</answer>
+            <answer>This is a bug in the WMS server. See https://ggus.eu/index.php?mode=ticket_info&amp;ticket_id=87802</answer>
         </faq>
     </part>
 </faqs>
