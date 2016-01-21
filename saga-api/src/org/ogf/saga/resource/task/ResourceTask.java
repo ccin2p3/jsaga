@@ -69,9 +69,6 @@ public interface ResourceTask extends SagaObject, Monitorable {
      *
      * @param timeoutInSeconds
      *      maximum number of seconds to wait.
-     * @return
-     *      <code>true</code> if the task is finished within the specified
-     *      time.
      * @exception NotImplementedException
      *      is thrown if the implementation does not provide an
      *      implementation of this method.
@@ -86,7 +83,7 @@ public interface ResourceTask extends SagaObject, Monitorable {
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
-    public boolean waitFor(float timeoutInSeconds)
+    public void waitFor(float timeoutInSeconds)
             throws NotImplementedException, IncorrectStateException,
             TimeoutException, NoSuccessException;
 
@@ -97,9 +94,6 @@ public interface ResourceTask extends SagaObject, Monitorable {
      *
      * @param state
      *      the state to wait for.
-     * @return
-     *      <code>true</code> if the task is finished within the specified
-     *      time.
      * @exception NotImplementedException
      *      is thrown if the implementation does not provide an
      *      implementation of this method.
@@ -114,7 +108,7 @@ public interface ResourceTask extends SagaObject, Monitorable {
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
-    public boolean waitFor(State state)
+    public void waitFor(State state)
             throws NotImplementedException, IncorrectStateException,
             TimeoutException, NoSuccessException;
 
@@ -127,9 +121,6 @@ public interface ResourceTask extends SagaObject, Monitorable {
      *      maximum number of seconds to wait.
      * @param state
      *      the state to wait for.
-     * @return
-     *      <code>true</code> if the task is finished within the specified
-     *      time.
      * @exception NotImplementedException
      *      is thrown if the implementation does not provide an
      *      implementation of this method.
@@ -144,7 +135,7 @@ public interface ResourceTask extends SagaObject, Monitorable {
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
-    public boolean waitFor(float timeoutInSeconds, State state)
+    public void waitFor(float timeoutInSeconds, State state)
             throws NotImplementedException, IncorrectStateException,
             TimeoutException, NoSuccessException;
 }
