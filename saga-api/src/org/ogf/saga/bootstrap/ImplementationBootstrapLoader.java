@@ -424,11 +424,13 @@ public class ImplementationBootstrapLoader {
      *
      * @param factoryName classname of the Saga factory to be used, or null.
      * @return an URL factory.
+     * @throws NotImplementedException
+     *             is thrown when resource management is not implemented.
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
     public static ResourceFactory getManagerFactory(String factoryName)
-            throws NoSuccessException {
+            throws NotImplementedException, NoSuccessException {
         ImplementationBootstrapLoader l = getLoader(factoryName);
         synchronized(l) {
             if (l.resourceFactory == null) {
