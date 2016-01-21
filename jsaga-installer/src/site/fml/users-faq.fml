@@ -58,7 +58,7 @@ public class List {
                 <pre><![CDATA[        <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api</artifactId>
-            <version>1.1.1</version>
+            <version>1.1.1-rm</version>
             <scope>compile</scope>
         </dependency>]]></pre>
                 <p>Add to your project file the dependencies needed for runtime or for testing:</p>
