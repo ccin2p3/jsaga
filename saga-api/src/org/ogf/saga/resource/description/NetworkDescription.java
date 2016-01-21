@@ -1,7 +1,5 @@
 package org.ogf.saga.resource.description;
 
-import org.ogf.saga.resource.description.ResourceDescription;
-
 public interface NetworkDescription extends ResourceDescription {
     /**
      * Attribute name: number of IPs

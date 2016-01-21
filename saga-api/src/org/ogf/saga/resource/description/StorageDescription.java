@@ -1,7 +1,5 @@
 package org.ogf.saga.resource.description;
 
-import org.ogf.saga.resource.description.ResourceDescription;
-
 public interface StorageDescription extends ResourceDescription {
     /**
      * Attribute name: size in bytes /kB/MB/...

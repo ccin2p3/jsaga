@@ -9,7 +9,6 @@ import org.ogf.saga.resource.description.ResourceDescription;
 import org.ogf.saga.resource.description.StorageDescription;
 import org.ogf.saga.resource.instance.Compute;
 import org.ogf.saga.resource.instance.Network;
-import org.ogf.saga.resource.instance.Resource;
 import org.ogf.saga.resource.instance.Storage;
 import org.ogf.saga.task.Async;
 import org.ogf.saga.task.Task;

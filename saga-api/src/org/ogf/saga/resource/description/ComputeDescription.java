@@ -1,7 +1,5 @@
 package org.ogf.saga.resource.description;
 
-import org.ogf.saga.resource.description.ResourceDescription;
-
 public interface ComputeDescription extends ResourceDescription {
     /**
      * Attribute name: the machine operating system (default = Any)
