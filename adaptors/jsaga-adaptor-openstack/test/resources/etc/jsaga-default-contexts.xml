@@ -5,6 +5,7 @@
                 <attribute name="UserID" value="schwarz"/>
                 <attribute name="UserPass" value="changeit"/>
                 <attribute name="Tenant" value="ccin2p3"/>
+                <resource type="openstack"/>
             </context>
     </contexts>
     <session>
