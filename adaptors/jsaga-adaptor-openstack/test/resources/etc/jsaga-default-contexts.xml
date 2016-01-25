@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <contexts>
+            <context type="openstack">
+                <attribute name="UserID" value="schwarz"/>
+                <attribute name="UserPass" value="changeit"/>
+                <attribute name="Tenant" value="ccin2p3"/>
+            </context>
+    </contexts>
+    <session>
+	        <context type="openstack"/>
+    </session>
+</jsaga-default>
