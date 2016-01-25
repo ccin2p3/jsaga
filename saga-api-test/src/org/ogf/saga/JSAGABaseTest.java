@@ -38,6 +38,8 @@ public abstract class JSAGABaseTest extends Assert {
     protected static final String CONFIG_BASE2_URL = "base2.url";
     /** physical.protocol (optional): for testing logical protocols */
     protected static final String CONFIG_PHYSICAL_PROTOCOL = "physical.protocol";
+    /** resource management (optional): for testing RM */
+    protected static final String CONFIG_RM_URL = "rm.url";
 
     private Properties m_properties;
     private long startTime;
