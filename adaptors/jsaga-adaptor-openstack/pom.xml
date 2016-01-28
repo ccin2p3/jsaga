@@ -59,7 +59,21 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-      <build>
+  <build>
+    <plugins>
+       <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>2.5.1</version>
+              <inherited>true</inherited>
+              <configuration>
+                <source>1.7</source>
+                <target>1.7</target>
+              </configuration>
+      </plugin>
+    </plugins>
+  </build>
+<!--       <build>
         <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -78,4 +92,4 @@
             </plugin>
         </plugins>
     </build>
-</project>
+ --></project>
