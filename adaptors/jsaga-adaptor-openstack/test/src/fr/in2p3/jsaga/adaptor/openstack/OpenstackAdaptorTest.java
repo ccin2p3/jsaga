@@ -35,7 +35,7 @@ public class OpenstackAdaptorTest extends JSAGABaseTest {
                 AuthorizationFailedException, IncorrectURLException, BadParameterException, 
                 TimeoutException, NoSuccessException {
         adaptor = new OpenstackResourceAdaptor();
-        adaptor.setSecurityCredential(new OpenstackSecurityCredential("schwarz", "6505e3d8-b40a-4305-aecd-d25c614d1e72", "ccin2p3"));
+        adaptor.setSecurityCredential(new OpenstackSecurityCredential("schwarz", "changeit", "ccin2p3"));
         adaptor.connect(null, "cckeystone.in2p3.fr", 5000, "/v2.0/", null);
     }
     

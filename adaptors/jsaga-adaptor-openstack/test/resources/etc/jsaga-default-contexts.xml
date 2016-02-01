@@ -2,8 +2,7 @@
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <contexts>
             <context type="openstack">
-                <attribute name="UserID" value="schwarz"/>
-                <attribute name="UserPass" value="changeit"/>
+                <attribute name="UserPass" value="${OS_PASSWORD}"/>
                 <attribute name="Tenant" value="ccin2p3"/>
                 <resource type="openstack"/>
             </context>
