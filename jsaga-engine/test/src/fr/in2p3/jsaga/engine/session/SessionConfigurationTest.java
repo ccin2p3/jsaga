@@ -105,7 +105,8 @@ public class SessionConfigurationTest {
     			"Att",
     			ContextImpl.URL_PREFIX,
     			ContextImpl.JOB_SERVICE_ATTRIBUTES,
-    			ContextImpl.DATA_SERVICE_ATTRIBUTES};
+    			ContextImpl.DATA_SERVICE_ATTRIBUTES,
+    			ContextImpl.RESOURCE_SERVICE_ATTRIBUTES};
         SessionImpl session = (SessionImpl) createConfiguredSession(CONFIG_SCHEMES);
         
         // Check we have 1 context only
