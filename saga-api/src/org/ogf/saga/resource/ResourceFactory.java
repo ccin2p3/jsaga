@@ -18,7 +18,7 @@ public abstract class ResourceFactory {
 
     private static ResourceFactory getFactory(String sagaFactoryName)
             throws NoSuccessException, NotImplementedException {
-        return ImplementationBootstrapLoader.getManagerFactory(sagaFactoryName);
+        return ImplementationBootstrapLoader.getResourceFactory(sagaFactoryName);
     }
 
     /**

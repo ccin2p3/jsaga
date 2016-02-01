@@ -147,9 +147,9 @@ public interface SagaFactory {
     // END REMOVE FROM GFD DOC
 
     /**
-     * Creates a factory for the Saga resource package.
+     * Creates a factory for the Saga Resource Manager package.
      *
      * @return the resource manager factory.
      */
-    ResourceFactory createManagerFactory() throws NotImplementedException;
+    ResourceFactory createResourceFactory() throws NotImplementedException;
 }

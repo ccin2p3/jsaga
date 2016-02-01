@@ -420,7 +420,7 @@ public class ImplementationBootstrapLoader {
     // END REMOVE FROM GFD DOC
 
     /**
-     * Creates a manager factory, using the specified SagaFactory.
+     * Creates a resource factory, using the specified SagaFactory.
      *
      * @param factoryName classname of the Saga factory to be used, or null.
      * @return an URL factory.
@@ -429,12 +429,12 @@ public class ImplementationBootstrapLoader {
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
-    public static ResourceFactory getManagerFactory(String factoryName)
+    public static ResourceFactory getResourceFactory(String factoryName)
             throws NotImplementedException, NoSuccessException {
         ImplementationBootstrapLoader l = getLoader(factoryName);
         synchronized(l) {
             if (l.resourceFactory == null) {
-                l.resourceFactory = l.sagaFactory.createManagerFactory();
+                l.resourceFactory = l.sagaFactory.createResourceFactory();
             }
             return l.resourceFactory;
         }
