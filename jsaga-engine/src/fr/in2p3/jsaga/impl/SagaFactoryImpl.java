@@ -12,6 +12,7 @@ import fr.in2p3.jsaga.impl.job.JobFactoryImpl;
 import fr.in2p3.jsaga.impl.logicalfile.LogicalFileFactoryImpl;
 import fr.in2p3.jsaga.impl.monitoring.MonitoringFactoryImpl;
 import fr.in2p3.jsaga.impl.namespace.NSFactoryImpl;
+import fr.in2p3.jsaga.impl.resource.ResourceFactoryImpl;
 import fr.in2p3.jsaga.impl.session.SessionFactoryImpl;
 import fr.in2p3.jsaga.impl.task.TaskFactoryImpl;
 import fr.in2p3.jsaga.impl.url.URLFactoryImpl;
@@ -63,7 +64,9 @@ public class SagaFactoryImpl implements SagaFactory {
     // job
     private JobAdaptorFactory m_jobAdaptorFactory;
     private JobMonitorAdaptorFactory m_jobMonitorAdaptorFactory;
-
+    // Resource
+    private ResourceAdaptorFactory m_resourceAdaptorFactory;
+    
     public SagaFactoryImpl() throws ConfigurationException {
         // configure log4j
         URL log4jCfgURL = EngineProperties.getURL(EngineProperties.LOG4J_CONFIGURATION);
@@ -126,6 +129,7 @@ public class SagaFactoryImpl implements SagaFactory {
         m_dataAdaptorFactory = new DataAdaptorFactory(descriptors);
         m_jobAdaptorFactory = new JobAdaptorFactory(descriptors);
         m_jobMonitorAdaptorFactory = new JobMonitorAdaptorFactory();
+        m_resourceAdaptorFactory = new ResourceAdaptorFactory(descriptors);
     }
 
     public BufferFactory createBufferFactory() {
@@ -168,8 +172,8 @@ public class SagaFactoryImpl implements SagaFactory {
         throw new NotImplementedException("Not implemented by the SAGA engine");
     }
 
-    public ResourceFactory createManagerFactory() throws NotImplementedException {
-        throw new NotImplementedException("Not implemented yet...");
+    public ResourceFactory createResourceFactory() throws NotImplementedException {
+        return new ResourceFactoryImpl(m_resourceAdaptorFactory);
     }
 
     public SessionFactory createSessionFactory() {

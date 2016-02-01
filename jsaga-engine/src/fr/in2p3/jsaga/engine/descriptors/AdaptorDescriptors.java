@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.adaptor.Adaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.schema.config.*;
@@ -33,6 +34,8 @@ public class AdaptorDescriptors {
     private SecurityAdaptorDescriptor m_securityDesc;
     private DataAdaptorDescriptor m_dataDesc;
     private JobAdaptorDescriptor m_jobDesc;
+    private ResourceAdaptorDescriptor m_resourceDesc;
+    
     private Adaptors m_xml;
 
     public synchronized static AdaptorDescriptors getInstance() throws ConfigurationException {
@@ -47,6 +50,7 @@ public class AdaptorDescriptors {
             m_securityDesc = new SecurityAdaptorDescriptor(loader.getClasses(SecurityAdaptor.class));
             m_dataDesc = new DataAdaptorDescriptor(loader.getClasses(DataAdaptor.class), m_securityDesc);
             m_jobDesc = new JobAdaptorDescriptor(loader.getClasses(JobControlAdaptor.class), m_securityDesc);
+            m_resourceDesc = new ResourceAdaptorDescriptor(loader.getClasses(ResourceAdaptor.class), m_securityDesc);
         } catch(Exception e) {
             throw new ConfigurationException(e);
         }
@@ -54,6 +58,7 @@ public class AdaptorDescriptors {
         m_xml.setContext(m_securityDesc.m_xml);
         m_xml.setProtocol(m_dataDesc.m_xml);
         m_xml.setExecution(m_jobDesc.m_xml);
+        m_xml.setResource(m_resourceDesc.m_xml);
         setRootAttributes(m_xml);
     }
 
@@ -69,6 +74,9 @@ public class AdaptorDescriptors {
         return m_jobDesc;
     }
 
+    public ResourceAdaptorDescriptor getResourceDesc() {
+        return m_resourceDesc;
+    }
     public byte[] toByteArray() throws IOException, ValidationException, MarshalException {
         ByteArrayOutputStream xmlStream = new ByteArrayOutputStream();
 

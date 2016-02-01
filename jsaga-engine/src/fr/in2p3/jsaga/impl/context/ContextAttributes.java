@@ -27,6 +27,7 @@ public class ContextAttributes implements Cloneable {
     BaseUrlPatternAttribute m_baseUrlExcludes;
     JobServiceConfigAttribute m_jobServiceAttributes;
     DataServiceConfigAttribute m_dataServiceAttributes;
+    ResourceServiceConfigAttribute m_resourceServiceAttributes;
 
     /** constructor */
     ContextAttributes(ContextImpl context) {
@@ -45,6 +46,7 @@ public class ContextAttributes implements Cloneable {
                 "array of URL patterns rejected for this context"));
         m_jobServiceAttributes = (JobServiceConfigAttribute) context._addVectorAttribute(new JobServiceConfigAttribute());
         m_dataServiceAttributes = (DataServiceConfigAttribute) context._addVectorAttribute(new DataServiceConfigAttribute());
+        m_resourceServiceAttributes = (ResourceServiceConfigAttribute) context._addVectorAttribute(new ResourceServiceConfigAttribute());
     }
 
     /** clone */
@@ -56,6 +58,7 @@ public class ContextAttributes implements Cloneable {
         clone.m_baseUrlExcludes = m_baseUrlExcludes;
         clone.m_jobServiceAttributes = m_jobServiceAttributes;
         clone.m_dataServiceAttributes = m_dataServiceAttributes;
+        clone.m_resourceServiceAttributes = m_resourceServiceAttributes;
         return clone;
     }
 
@@ -71,6 +74,8 @@ public class ContextAttributes implements Cloneable {
         } else if (m_jobServiceAttributes.getKey().equals(key)) {
             throw new IncorrectStateException("Operation not allowed on vector attribute: "+key);
         } else if (m_dataServiceAttributes.getKey().equals(key)) {
+            throw new IncorrectStateException("Operation not allowed on vector attribute: "+key);
+        } else if (m_resourceServiceAttributes.getKey().equals(key)) {
             throw new IncorrectStateException("Operation not allowed on vector attribute: "+key);
         } else {
             throw new DoesNotExistException("[INTERNAL ERROR] This exception should have been catched");
@@ -90,6 +95,8 @@ public class ContextAttributes implements Cloneable {
             return m_jobServiceAttributes;
         } else if (m_dataServiceAttributes.getKey().equals(key)) {
             return m_dataServiceAttributes;
+        } else if (m_resourceServiceAttributes.getKey().equals(key)) {
+            return m_resourceServiceAttributes;
         } else {
             throw new DoesNotExistException("[INTERNAL ERROR] This exception should have been catched");
         }

@@ -4,7 +4,7 @@ import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.engine.descriptors.AdaptorDescriptors;
-import fr.in2p3.jsaga.engine.descriptors.JobAdaptorDescriptor;
+import fr.in2p3.jsaga.engine.descriptors.ResourceAdaptorDescriptor;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.url.URL;
@@ -16,10 +16,10 @@ import java.util.Map;
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************/
 public class ResourceAdaptorFactory extends ServiceAdaptorFactory {
-    private JobAdaptorDescriptor m_descriptor;
+    private ResourceAdaptorDescriptor m_descriptor;
 
     public ResourceAdaptorFactory(AdaptorDescriptors descriptors) {
-        m_descriptor = descriptors.getJobDesc();
+        m_descriptor = descriptors.getResourceDesc();
     }
 
     public ResourceAdaptor getAdaptor(URL url, ContextImpl context) throws NotImplementedException, IncorrectURLException, NoSuccessException {
@@ -40,7 +40,7 @@ public class ResourceAdaptorFactory extends ServiceAdaptorFactory {
     public Map getAttribute(URL url, ContextImpl context) throws NotImplementedException, NoSuccessException {
         String scheme = context.getSchemeFromAlias(url.getScheme());
         try {
-            return getAttributes(url, context, m_descriptor.getDefaultsMap(scheme), ContextImpl.JOB_SERVICE_ATTRIBUTES);
+            return getAttributes(url, context, m_descriptor.getDefaultsMap(scheme), ContextImpl.RESOURCE_SERVICE_ATTRIBUTES);
         } catch (BadParameterException e) {
             throw new NoSuccessException(e);
         }

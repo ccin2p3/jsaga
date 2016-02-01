@@ -65,12 +65,22 @@
         <attribute name="usage" type="string" use="optional"/><!-- from adaptor descriptor -->
     </extension></complexContent></complexType></element>
 
+    <element name="resource"><complexType><complexContent><extension base="tns:ObjectType">
+        <sequence>
+            <element name="supportedContextType" minOccurs="0" maxOccurs="unbounded" type="string"/><!-- from adaptor descriptor -->
+        </sequence>
+        <attribute name="type" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="usage" type="string" use="optional"/><!-- from adaptor descriptor -->
+    </extension></complexContent></complexType></element>
+
     <!-- root type -->
     <element name="adaptors"><complexType>
         <sequence>
             <element ref="tns:context" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="tns:protocol" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="tns:execution" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="tns:resource" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
         <attribute name="localIntermediary" type="string" use="required"/>
     </complexType></element>

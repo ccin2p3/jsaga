@@ -35,6 +35,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     public static final String BASE_URL_EXCLUDES = "BaseUrlExcludes";
     public static final String JOB_SERVICE_ATTRIBUTES = "JobServiceAttributes";
     public static final String DATA_SERVICE_ATTRIBUTES = "DataServiceAttributes";
+    public static final String RESOURCE_SERVICE_ATTRIBUTES = "ResourceServiceAttributes";
 
     private static Logger s_logger = Logger.getLogger(ContextImpl.class);
     
@@ -280,7 +281,8 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             }
             adaptorAttributes.addAll(Arrays.asList(Context.TYPE, ContextImpl.URL_PREFIX,
                     ContextImpl.BASE_URL_INCLUDES, ContextImpl.BASE_URL_EXCLUDES,
-                    ContextImpl.JOB_SERVICE_ATTRIBUTES, ContextImpl.DATA_SERVICE_ATTRIBUTES));
+                    ContextImpl.JOB_SERVICE_ATTRIBUTES, ContextImpl.DATA_SERVICE_ATTRIBUTES,
+                    ContextImpl.RESOURCE_SERVICE_ATTRIBUTES));
             Iterator i = attributes.keySet().iterator();
             while (i.hasNext()) {
                 Object attr = i.next();
@@ -346,6 +348,8 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     		return m_attributes.m_jobServiceAttributes.getServiceConfig(scheme);
     	} else if (DATA_SERVICE_ATTRIBUTES.equals(serviceType)) {
     		return m_attributes.m_dataServiceAttributes.getServiceConfig(scheme);
+    	} else if (RESOURCE_SERVICE_ATTRIBUTES.equals(serviceType)) {
+    	    return m_attributes.m_resourceServiceAttributes.getServiceConfig(scheme);
     	} else {
     		return null;
     	}
