@@ -69,10 +69,10 @@ public abstract class OpenstackAdaptorAbstract implements ClientAdaptor {
         m_os = OSFactory.builder()
                 .endpoint("https://" + host + ":" + port + basePath)
                 .withConfig(Config.newConfig()
-                        .withSSLVerificationDisabled()
-                        .withHostnameVerifier(new HostnameVerifier() {
-                public boolean verify(String hostname, SSLSession session) {return true;}
-            })
+//                        .withSSLVerificationDisabled()
+//                        .withHostnameVerifier(new HostnameVerifier() {
+//                public boolean verify(String hostname, SSLSession session) {return true;}
+//            })
                 )
                 .credentials(m_credential.getUserID(), m_credential.getUserPass())
                 .tenantName(m_credential.getAttribute(OpenstackSecurityAdaptor.PARAM_TENANT))
