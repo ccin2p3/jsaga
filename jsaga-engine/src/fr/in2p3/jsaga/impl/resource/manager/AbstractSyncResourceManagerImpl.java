@@ -64,6 +64,7 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
         return list;
     }
 
+    // TODO: filter type??? sub interface ComputeResourceAdaptor, ... ?
     public List<String> listTemplatesSync(Type type) throws NotImplementedException,
             TimeoutException, NoSuccessException {
         String[] array = m_adaptor.listTemplates();

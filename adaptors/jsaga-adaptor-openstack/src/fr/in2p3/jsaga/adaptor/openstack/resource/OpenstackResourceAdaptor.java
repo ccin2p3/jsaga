@@ -3,11 +3,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.resource.Type;
+import org.ogf.saga.resource.description.ComputeDescription;
 import org.ogf.saga.resource.description.ResourceDescription;
+import org.ogf.saga.resource.instance.Resource;
 import org.openstack4j.api.Builders;
 import org.openstack4j.model.compute.Flavor;
 import org.openstack4j.model.compute.Image;
@@ -38,17 +44,16 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     
     @Override
     public Usage getUsage() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
+    // TODO throw  NotImplementedException, AuthenticationFailedException, AuthorizationFailedException
     public String[] listResources() throws TimeoutException, NoSuccessException {
         List<? extends Server> listOfVM = m_os.compute().servers().list();
         String[] listOfResources = new String[listOfVM.size()];
@@ -65,6 +70,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         return listTemplates(null);
     }
 
+    // TODO: template (OS, RAM...) = flavor (RAM) + image (OS)...
     // TODO: define in interface?
     public String[] listTemplates(Type type) throws TimeoutException, NoSuccessException {
         if (Type.COMPUTE.equals(type) || type == null) {
@@ -72,19 +78,32 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
             String[] listOfTemplates = new String[listOfFlavors.size()];
             int count=0;
             for (Flavor i: listOfFlavors) {
-                listOfTemplates[count] = i.getId();
+                listOfTemplates[count] = i.getLinks().get(0).getHref();
                 count++;
             }
+            // TODO: add images?
             return listOfTemplates;
         }
         throw new NoSuccessException("type not supported: " + type.name());
     }
     
     @Override
-    public Properties getTemplate(String id) throws TimeoutException,
-            NoSuccessException {
-        // TODO Auto-generated method stub
-        return null;
+    public Properties getTemplate(String id) throws TimeoutException, NoSuccessException {
+        String templateId;
+        try {
+            templateId = idFromSagaId(id);
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
+        }
+        Flavor flavor = m_os.compute().flavors().get(templateId);
+        if (flavor == null) {
+            // TODO throw DoesNotExist if unknown
+            throw new NoSuccessException("This template does not exist");
+        }
+        Properties p = new Properties();
+        p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
+        p.setProperty(ComputeDescription.MEMORY, Integer.toString(flavor.getRam()));
+        return p;
     }
 
     @Override
@@ -114,8 +133,6 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     // TODO: need resourceID?
     @Override
     public void release(boolean drain) {
-        // TODO Auto-generated method stub
-        
     }
 
     // TODO: need resourceID?
@@ -137,7 +154,6 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         scb.name(desc.getProperty(DESC_NAME));
         scb.flavor(desc.getProperty(DESC_FLAVOR));
         scb.image(desc.getProperty(DESC_IMAGE));
-        
         return scb.build();
     }
 }

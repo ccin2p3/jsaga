@@ -2,6 +2,8 @@ package fr.in2p3.jsaga.adaptor.openstack;
 
 import java.net.URL;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
@@ -84,13 +86,13 @@ public abstract class OpenstackAdaptorAbstract implements ClientAdaptor {
     public void disconnect() throws NoSuccessException {
     }
 
-//    private JSONObject createAuth(String login, String password, String tenant) {
-//        Map mapCred = new HashMap();
-//        mapCred.put("username", login);
-//        mapCred.put("password", password);
-//        Map mapAuth = new HashMap();
-//        mapAuth.put("tenantName", tenant);
-//        mapAuth.put("passwordCredentials", mapCred);
-//        return new JSONObject(mapAuth);
-//    }
+    public static String idFromSagaId(String sagaId) throws BadParameterException {
+        Pattern p = Pattern.compile("(\\[.*]-\\[)(.+)(])");
+        Matcher m = p.matcher(sagaId);
+        if (m.find()) {
+            return m.group(2);
+        }
+        throw new BadParameterException();
+    }
+
 }

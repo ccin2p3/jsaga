@@ -1,6 +1,17 @@
 package org.ogf.saga.resource;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ogf.saga.JSAGABaseTest;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.IncorrectURLException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.TimeoutException;
+import org.ogf.saga.resource.manager.ResourceManager;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
@@ -21,97 +32,67 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     // configuration
     protected URL m_resourcemanager;
     protected Session m_session;
-
-    protected ResourceBaseTest(String jobprotocol) throws Exception {
+    protected ResourceManager m_rm;
+    
+    protected ResourceBaseTest(String resourceprotocol) throws Exception {
         super();
 
         // configure
-        m_resourcemanager = URLFactory.createURL(getRequiredProperty(jobprotocol, CONFIG_RM_URL));
+        m_resourcemanager = URLFactory.createURL(getRequiredProperty(resourceprotocol, CONFIG_RM_URL));
         m_session = SessionFactory.createSession(true);
         
     }
-    
-    /**
-     * Creates a new job
-     * @param desc The job description
-     * @return The new job
-     * @throws Exception
-     */
-//    protected Job createJob(JobDescription desc) throws Exception  {
-//        ResourceManager service = ResourceFactory.createResourceManager(m_session, m_resourcemanager);
-//        return job;
-//    }
-    
-    /**
-     * Creates a new job description
-     * @param executable A string with the executable path
-     * @param attributes A string array with the job attributes
-     * @return The job description
-     * @throws Exception
-     */
-//    protected JobDescription createJob(String executable, Attribute[] attributes, AttributeVector[] attributesVector) throws Exception {
-//    	// prepare
-//        JobDescription desc = JobFactory.createJobDescription();
-//        desc.setAttribute(JobDescription.EXECUTABLE, executable);
-//        desc.setAttribute(JobDescription.OUTPUT, "stdout.txt");
-//        desc.setAttribute(JobDescription.ERROR, "stderr.txt");
-//        if (m_candidateHost != null) {
-//            desc.setVectorAttribute(JobDescription.CANDIDATEHOSTS, new String[]{m_candidateHost});
-//        }
-//        if(attributes != null) {
-//        	for (int i = 0; i < attributes.length; i++) {
-//        		desc.setAttribute(attributes[i].getKey(), attributes[i].getValue());
-//			}
-//        }
-//        if(attributesVector != null) {
-//        	for (int i = 0; i < attributesVector.length; i++) {
-//        		desc.setVectorAttribute(attributesVector[i].getKey(), attributesVector[i].getValue());
-//			}
-//        }
-//        return desc;
-//    }
 
-//    /**
-//     *  Very simple job which prints the execution date
-//     * @return The job description
-//     * @throws Exception
-//     */
-//    protected JobDescription createSimpleJob() throws Exception {
-//    	return createJob(SIMPLE_JOB_BINARY, null, null);
-//    }
-//    
-//    
-//    /**
-//     * Job which write 'Test' on stdout
-//     * @param textToPrint The string to print in stdout
-//     * @return The job description
-//     * @throws Exception
-//     */
-//    protected JobDescription createWriteJob(String textToPrint) throws Exception {
-//    	AttributeVector[] attributesV = new AttributeVector[1];
-//    	attributesV[0] = new AttributeVector(JobDescription.ARGUMENTS,new String[]{textToPrint});    	
-//    	return createJob("/bin/echo", null, attributesV);
-//    }
-//    
-//    /**
-//     * Job which generate error like 'Command not found' on stderr
-//     * @return The job description
-//     * @throws Exception
-//     */
-//    protected JobDescription createErrorJob() throws Exception {
-//    	return createJob("/bin/command-error", null, null);
-//    }
-//    
-//    /**
-//     * Long job which sleeps 30 seconds
-//     * @return The job description
-//     * @throws Exception
-//     */
-//    protected JobDescription createLongJob() throws Exception {
-//    	AttributeVector[] attributesV = new AttributeVector[1];
-//    	attributesV[0] = new AttributeVector(JobDescription.ARGUMENTS, new String[]{LONG_JOB_DURATION});
-//    	return createJob(LONG_JOB_BINARY, null, attributesV);
-//    }
+    @Before
+    public void setUp() throws NotImplementedException, BadParameterException, IncorrectURLException, 
+            AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
+        m_rm = ResourceFactory.createResourceManager(m_session, m_resourcemanager);
+    }
+    
+    ////////////
+    // Templates
+    ////////////
+    @Test(expected = DoesNotExistException.class)
+    public void unknownTemplate() throws NotImplementedException, BadParameterException, 
+            IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
+            TimeoutException, NoSuccessException, DoesNotExistException {
+        m_rm.getTemplate("[" + m_resourcemanager.getString() + "]-[thisTemplateDoesNotExists]");
+    }
 
+    @Test
+    public void listComputeTemplates() throws NotImplementedException, TimeoutException, NoSuccessException  {
+        assertNotNull(m_rm.listTemplates(Type.COMPUTE));
+    }
+
+    @Test
+    public void listStorageTemplates() throws NotImplementedException, TimeoutException, NoSuccessException  {
+        assertNotNull(m_rm.listTemplates(Type.STORAGE));
+    }
+
+    @Test
+    public void listNetworkTemplates() throws NotImplementedException, TimeoutException, NoSuccessException  {
+        assertNotNull(m_rm.listTemplates(Type.NETWORK));
+    }
+
+    ////////////
+    // Resources
+    ////////////
+    @Test
+    public void listComputeResources() throws NotImplementedException, TimeoutException, 
+        NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
+        assertNotNull(m_rm.listResources(Type.COMPUTE));
+    }
+
+    @Test
+    public void listStorageResources() throws NotImplementedException, TimeoutException, 
+        NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
+        assertNotNull(m_rm.listResources(Type.STORAGE));
+    }
+
+    @Test
+    public void listNetworkResources() throws NotImplementedException, TimeoutException, 
+        NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
+        assertNotNull(m_rm.listResources(Type.NETWORK));
+    }
 
 }
