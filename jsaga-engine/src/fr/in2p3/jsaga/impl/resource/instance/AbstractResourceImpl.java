@@ -24,13 +24,14 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
     /** constructor for resource acquisition */
     public AbstractResourceImpl(Type type, Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, RD description) {
         this(type, session, manager, adaptor);
-        this.reconfigure(description);
+        // TODO adaptor.acuqire
     }
 
     /** constructor for reconnecting to resource already acquired */
     public AbstractResourceImpl(Type type, Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, String id) {
         this(type, session, manager, adaptor);
         m_attributes.m_ResourceID.setObject(id);
+        m_adaptor.check(id);
     }
 
     /** common to all constructors */
@@ -41,10 +42,13 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         m_attributes = new ResourceAttributes(this);
         m_attributes.m_Type.setObject(type);
         m_attributes.m_ManagerID.setObject(manager.getId());
-        m_attributes.m_Access.setObjects(adaptor.getAccess());
+        m_attributes.m_Access.setObjects(adaptor.getAccess(getId()));
     }
 
     // getters
+    public String getId() {
+        return m_attributes.m_ResourceID.getObject();
+    }
     public Type getType() {
         return m_attributes.m_Type.getObject();
     }
@@ -63,13 +67,13 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         m_description = description;
         if (description != null) {
             m_attributes.m_Description.setObject(description.toString());
-
-            //TODO: reconfigure the resource
+            m_adaptor.release(getId());
+            // TODO: acquire
         }
     }
 
     /** release */
     public void release() {
-        m_adaptor.release(false);
+        m_adaptor.release(getId());
     }
 }

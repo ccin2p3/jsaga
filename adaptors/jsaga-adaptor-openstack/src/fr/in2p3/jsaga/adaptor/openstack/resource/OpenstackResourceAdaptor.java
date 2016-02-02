@@ -24,6 +24,7 @@ import org.openstack4j.model.compute.builder.ServerCreateBuilder;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.openstack.OpenstackAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.resource.ComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 
 /* ***************************************************
@@ -36,7 +37,7 @@ import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
  * ***************************************************/
 
 public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
-        implements ResourceAdaptor {
+        implements ComputeResourceAdaptor {
 
     public static final String DESC_NAME = "Name";
     public static final String DESC_FLAVOR = "Flavor";
@@ -52,7 +53,6 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         return null;
     }
 
-    @Override
     // TODO throw  NotImplementedException, AuthenticationFailedException, AuthorizationFailedException
     public String[] listResources() throws TimeoutException, NoSuccessException {
         List<? extends Server> listOfVM = m_os.compute().servers().list();
@@ -106,15 +106,8 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         return p;
     }
 
-    @Override
-    public void reconfigure(Properties description) {
-        // TODO Auto-generated method stub
-        
-    }
-
     // TODO: return Resource?
     // TODO throw Exception?
-    @Override
     public void acquire(Properties description) {
         if (description.containsKey(ResourceDescription.TYPE)
                 && description.containsKey(DESC_NAME)
@@ -130,19 +123,42 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         return;
     }
 
-    // TODO: need resourceID?
     @Override
-    public void release(boolean drain) {
+    public void check(String resourceId) {
+        // TODO Auto-generated method stub
+        
     }
 
-    // TODO: need resourceID?
-    // TODO: why not acquire.getDescription.getAttribute(Access) ?
     @Override
-    public String[] getAccess() {
+    public void release(String resourceId) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public String[] getAccess(String resourceId) {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
+    @Override
+    public String[] listComputeResources() throws TimeoutException,
+            NoSuccessException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void acquireComputeResource(Properties description) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void release(String id, boolean drain) {
+        // TODO Auto-generated method stub
+        
+    }
     public Properties translateDescription(ResourceDescription rd) {
         Properties prop = new Properties();
         return prop;
@@ -156,4 +172,5 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         scb.image(desc.getProperty(DESC_IMAGE));
         return scb.build();
     }
+
 }

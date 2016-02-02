@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.resource.instance;
 
+import fr.in2p3.jsaga.adaptor.resource.ComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 import fr.in2p3.jsaga.impl.resource.manager.ResourceManagerImpl;
 import org.ogf.saga.resource.Type;
@@ -23,6 +24,6 @@ public class ComputeImpl extends AbstractResourceImpl<Compute,ComputeDescription
     }
 
     public void release(boolean drain) {
-        m_adaptor.release(drain);
+        ((ComputeResourceAdaptor)m_adaptor).release(this.getId(), drain);
     }
 }

@@ -1,6 +1,9 @@
 package fr.in2p3.jsaga.impl.resource.manager;
 
+import fr.in2p3.jsaga.adaptor.resource.ComputeResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.NetworkResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.StorageResourceAdaptor;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.resource.description.ComputeDescriptionImpl;
 import fr.in2p3.jsaga.impl.resource.description.NetworkDescriptionImpl;
@@ -55,11 +58,36 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     public List<String> listResourcesSync(Type type) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, TimeoutException,
             NoSuccessException {
-        String[] array = m_adaptor.listResources();
+        if (Type.COMPUTE.equals(type) && ! (m_adaptor instanceof ComputeResourceAdaptor)) {
+            throw new NotImplementedException("This adaptor does not handle compute resources");
+        }
+        if (Type.STORAGE.equals(type) && ! (m_adaptor instanceof StorageResourceAdaptor)) {
+            throw new NotImplementedException("This adaptor does not handle storage resources");
+        }
+        if (Type.NETWORK.equals(type) && ! (m_adaptor instanceof NetworkResourceAdaptor)) {
+            throw new NotImplementedException("This adaptor does not handle network resources");
+        }
         List<String> list = new ArrayList<String>();
-        for (int i=0; array!=null && i<array.length; i++) {
-            String sagaResourceId = "["+m_url.getString()+"]-["+array[i]+"]";
-            list.add(sagaResourceId);
+        if ((m_adaptor instanceof ComputeResourceAdaptor && type == null) || Type.COMPUTE.equals(type)) {
+            String[] array = ((ComputeResourceAdaptor)m_adaptor).listComputeResources();
+            for (int i=0; array!=null && i<array.length; i++) {
+                String sagaResourceId = "["+m_url.getString()+"]-["+array[i]+"]";
+                list.add(sagaResourceId);
+            }
+        }
+        if ((m_adaptor instanceof StorageResourceAdaptor && type == null) || Type.STORAGE.equals(type)) {
+            String[] array = ((StorageResourceAdaptor)m_adaptor).listStorageResources();
+            for (int i=0; array!=null && i<array.length; i++) {
+                String sagaResourceId = "["+m_url.getString()+"]-["+array[i]+"]";
+                list.add(sagaResourceId);
+            }
+        }
+        if ((m_adaptor instanceof NetworkResourceAdaptor && type == null) || Type.NETWORK.equals(type)) {
+            String[] array = ((NetworkResourceAdaptor)m_adaptor).listNetworkResources();
+            for (int i=0; array!=null && i<array.length; i++) {
+                String sagaResourceId = "["+m_url.getString()+"]-["+array[i]+"]";
+                list.add(sagaResourceId);
+            }
         }
         return list;
     }
@@ -111,6 +139,7 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     public void releaseComputeSync(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
+        // TODO adaptor.release(id)
         this.acquireComputeSync(id).release();
     }
     public void releaseComputeSync(String id, boolean drain) throws NotImplementedException,
