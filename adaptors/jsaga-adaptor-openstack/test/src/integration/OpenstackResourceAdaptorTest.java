@@ -29,7 +29,7 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         super("openstack");
     }
 
-    @Test @Ignore
+    @Test
     public void images() throws NotImplementedException, BadParameterException, 
             IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
             TimeoutException, NoSuccessException, DoesNotExistException, PermissionDeniedException, 
