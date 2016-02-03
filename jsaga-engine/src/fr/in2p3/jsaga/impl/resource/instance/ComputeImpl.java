@@ -3,6 +3,10 @@ package fr.in2p3.jsaga.impl.resource.instance;
 import fr.in2p3.jsaga.adaptor.resource.ComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 import fr.in2p3.jsaga.impl.resource.manager.ResourceManagerImpl;
+
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.resource.Type;
 import org.ogf.saga.resource.description.ComputeDescription;
 import org.ogf.saga.resource.instance.Compute;
@@ -18,8 +22,11 @@ public class ComputeImpl extends AbstractResourceImpl<Compute,ComputeDescription
         super(Type.COMPUTE, session, manager, adaptor, description);
     }
 
-    /** constructor for reconnecting to resource already acquired */
-    public ComputeImpl(Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, String id) {
+    /** constructor for reconnecting to resource already acquired 
+     * @throws DoesNotExistException 
+     * @throws NoSuccessException 
+     * @throws TimeoutException */
+    public ComputeImpl(Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, String id) throws DoesNotExistException, TimeoutException, NoSuccessException {
         super(Type.COMPUTE, session, manager, adaptor, id);
     }
 

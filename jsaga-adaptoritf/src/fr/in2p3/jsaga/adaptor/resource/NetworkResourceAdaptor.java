@@ -7,12 +7,16 @@ import java.util.Properties;
 
 public interface NetworkResourceAdaptor extends ResourceAdaptor {
     /**
-     * Obtains the list of resources that are currently known to the resource manager.
-     * @return a list of resource identifications.
+     * Obtains the list of network resources that are currently known to the resource manager.
+     * @return a list of network resource identifications.
      */
     public String[] listNetworkResources() throws TimeoutException, NoSuccessException;
 
     public void acquireNetworkResource(Properties description);
 
-    // TODO templates
+    /**
+     * Obtains the list of network templates that are currently known to the resource manager.
+     * @return a list of network template identifications.
+     */
+    public String[] listNetworkTemplates() throws TimeoutException, NoSuccessException;
 }

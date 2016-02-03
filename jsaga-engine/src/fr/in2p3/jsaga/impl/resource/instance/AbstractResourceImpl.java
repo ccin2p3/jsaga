@@ -3,6 +3,10 @@ package fr.in2p3.jsaga.impl.resource.instance;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 import fr.in2p3.jsaga.impl.resource.manager.ResourceManagerImpl;
 import fr.in2p3.jsaga.impl.resource.task.AbstractResourceTaskImpl;
+
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.resource.Type;
 import org.ogf.saga.resource.description.ResourceDescription;
 import org.ogf.saga.resource.instance.Resource;
@@ -27,8 +31,11 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         // TODO adaptor.acuqire
     }
 
-    /** constructor for reconnecting to resource already acquired */
-    public AbstractResourceImpl(Type type, Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, String id) {
+    /** constructor for reconnecting to resource already acquired 
+     * @throws DoesNotExistException 
+     * @throws NoSuccessException 
+     * @throws TimeoutException */
+    public AbstractResourceImpl(Type type, Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, String id) throws DoesNotExistException, TimeoutException, NoSuccessException {
         this(type, session, manager, adaptor);
         m_attributes.m_ResourceID.setObject(id);
         m_adaptor.check(id);

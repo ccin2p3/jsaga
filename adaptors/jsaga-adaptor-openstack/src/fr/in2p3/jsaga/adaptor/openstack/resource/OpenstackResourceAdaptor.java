@@ -1,4 +1,6 @@
 package fr.in2p3.jsaga.adaptor.openstack.resource;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -6,6 +8,7 @@ import java.util.Properties;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
@@ -15,11 +18,15 @@ import org.ogf.saga.resource.description.ComputeDescription;
 import org.ogf.saga.resource.description.ResourceDescription;
 import org.ogf.saga.resource.instance.Resource;
 import org.openstack4j.api.Builders;
+import org.openstack4j.api.types.ServiceType;
+import org.openstack4j.model.common.Link;
 import org.openstack4j.model.compute.Flavor;
 import org.openstack4j.model.compute.Image;
 import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.compute.ServerCreate;
 import org.openstack4j.model.compute.builder.ServerCreateBuilder;
+import org.openstack4j.model.identity.Access.Service;
+import org.openstack4j.model.identity.Endpoint;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
@@ -39,8 +46,11 @@ import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         implements ComputeResourceAdaptor {
 
+    @Deprecated
     public static final String DESC_NAME = "Name";
+    @Deprecated
     public static final String DESC_FLAVOR = "Flavor";
+    @Deprecated
     public static final String DESC_IMAGE = "Image";
     
     @Override
@@ -53,78 +63,37 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         return null;
     }
 
-    // TODO throw  NotImplementedException, AuthenticationFailedException, AuthorizationFailedException
-    public String[] listResources() throws TimeoutException, NoSuccessException {
-        List<? extends Server> listOfVM = m_os.compute().servers().list();
-        String[] listOfResources = new String[listOfVM.size()];
-        int count=0;
-        for (Server i: listOfVM) {
-            listOfResources[count] = i.getId();
-            count++;
-        }
-        return listOfResources;
-    }
-
     @Override
-    public String[] listTemplates() throws TimeoutException, NoSuccessException {
-        return listTemplates(null);
-    }
-
-    // TODO: template (OS, RAM...) = flavor (RAM) + image (OS)...
-    // TODO: define in interface?
-    public String[] listTemplates(Type type) throws TimeoutException, NoSuccessException {
-        if (Type.COMPUTE.equals(type) || type == null) {
-            List<? extends Flavor> listOfFlavors = m_os.compute().flavors().list();
-            String[] listOfTemplates = new String[listOfFlavors.size()];
-            int count=0;
-            for (Flavor i: listOfFlavors) {
-                listOfTemplates[count] = i.getLinks().get(0).getHref();
-                count++;
-            }
-            // TODO: add images?
-            return listOfTemplates;
-        }
-        throw new NoSuccessException("type not supported: " + type.name());
-    }
-    
-    @Override
-    public Properties getTemplate(String id) throws TimeoutException, NoSuccessException {
-        String templateId;
-        try {
-            templateId = idFromSagaId(id);
-        } catch (BadParameterException e) {
-            throw new NoSuccessException(e);
-        }
-        Flavor flavor = m_os.compute().flavors().get(templateId);
-        if (flavor == null) {
-            // TODO throw DoesNotExist if unknown
-            throw new NoSuccessException("This template does not exist");
-        }
+    public Properties getTemplate(String id) throws TimeoutException, NoSuccessException, 
+                    DoesNotExistException, NotImplementedException {
         Properties p = new Properties();
-        p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
-        p.setProperty(ComputeDescription.MEMORY, Integer.toString(flavor.getRam()));
+        ServiceType serviceType;
+        // What kind of template is this?
+        try {
+            serviceType = this.typeFromServiceURL(id);
+        } catch (MalformedURLException e) {
+            throw new DoesNotExistException(e);
+        }
+        if (serviceType.equals(ServiceType.COMPUTE)) {
+            p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
+            if (id.contains("/images/")) {
+                String imageId = id.replaceAll(".*/images/", "");
+                Image image = m_os.compute().images().get(imageId);
+                if (image == null) {
+                    throw new DoesNotExistException("This template does not exist");
+                }
+                p.setProperty(ComputeDescription.MACHINE_OS, image.getName());
+            } else {
+                throw new NotImplementedException();
+            }
+        } else {
+            throw new NotImplementedException();
+        }
         return p;
     }
 
-    // TODO: return Resource?
-    // TODO throw Exception?
-    public void acquire(Properties description) {
-        if (description.containsKey(ResourceDescription.TYPE)
-                && description.containsKey(DESC_NAME)
-                && description.containsKey(DESC_FLAVOR)
-                && description.containsKey(DESC_IMAGE)
-        ) {
-            ServerCreate sc = this.prepareServerCreate(description);
-            Server vm = m_os.compute().servers().boot(sc);
-            return;
-        };
-//            throw new NoSuccessException("Invalid desc");
-        System.out.println("Invalid description");
-        return;
-    }
-
     @Override
-    public void check(String resourceId) {
+    public void check(String resourceId) throws DoesNotExistException {
         // TODO Auto-generated method stub
         
     }
@@ -144,8 +113,19 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     @Override
     public String[] listComputeResources() throws TimeoutException,
             NoSuccessException {
-        // TODO Auto-generated method stub
-        return null;
+        List<? extends Server> listOfVM = m_os.compute().servers().list();
+        String[] listOfResources = new String[listOfVM.size()];
+        int count=0;
+        for (Server i: listOfVM) {
+            for (Link link: i.getLinks()) {
+                // get URL for "rel": "self"
+                if ("self".equals(link.getRel())) {
+                    listOfResources[count] = link.getHref();
+                }
+            }
+            count++;
+        }
+        return listOfResources;
     }
 
     @Override
@@ -159,10 +139,53 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         // TODO Auto-generated method stub
         
     }
-    public Properties translateDescription(ResourceDescription rd) {
-        Properties prop = new Properties();
-        return prop;
+
+    @Override
+    public String[] listComputeTemplates() throws TimeoutException,
+            NoSuccessException {
+        List<? extends Image> listOfImages = m_os.compute().images().list();
+        String[] listOfTemplates = new String[listOfImages.size()];
+        int count=0;
+        for (Image i: listOfImages) {
+            for (Link link: i.getLinks()) {
+                if ("self".equals(link.getRel())) {
+                    listOfTemplates[count] = i.getLinks().get(0).getHref();
+                }
+            }
+            count++;
+        }
+        // TODO: add flavors?
+        return listOfTemplates;
     }
+
+
+    
+    
+    // TODO throw  NotImplementedException, AuthenticationFailedException, AuthorizationFailedException
+//    public String[] listResources() throws TimeoutException, NoSuccessException {
+//    }
+
+    // TODO: return Resource?
+    // TODO throw Exception?
+    public void acquire(Properties description) {
+        if (description.containsKey(ResourceDescription.TYPE)
+                && description.containsKey(DESC_NAME)
+                && description.containsKey(DESC_FLAVOR)
+                && description.containsKey(DESC_IMAGE)
+        ) {
+            ServerCreate sc = this.prepareServerCreate(description);
+            Server vm = m_os.compute().servers().boot(sc);
+            return;
+        };
+//            throw new NoSuccessException("Invalid desc");
+        System.out.println("Invalid description");
+        return;
+    }
+
+
+    
+    
+    
     
     private ServerCreate prepareServerCreate(Properties desc) {
         ServerCreateBuilder scb = Builders.server();

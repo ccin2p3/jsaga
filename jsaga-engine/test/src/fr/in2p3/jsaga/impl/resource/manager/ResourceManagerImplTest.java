@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -28,26 +29,30 @@ public class ResourceManagerImplTest {
 
     private static Session m_session;
     private static URL m_url;
-    private static Mockery m_mockery;
+    private Mockery m_mockery;
     
     @BeforeClass
     public static void init() throws BadParameterException, NoSuccessException {
         m_session = SessionFactory.createSession(false);
         m_url = URLFactory.createURL("scheme://dummy");
-        m_mockery = new Mockery();
     }
     
+    @Before
+    public void setUp() {
+        m_mockery = new Mockery();
+    }
+
     @Test
-    public void listResources() throws TimeoutException, NoSuccessException, 
+    public void listResourcesTemplates() throws TimeoutException, NoSuccessException, 
             NotImplementedException, AuthenticationFailedException, AuthorizationFailedException {
         final ComputeResourceAdaptor adaptor;
-        final String[] resources = new String[2];
-        resources[0] = "res0";
-        resources[1] = "res1";
+        final String[] resources = {"res0","res1"};
+        final String[] templates = {"temp0","temp1"};
         
         adaptor = m_mockery.mock(ComputeResourceAdaptor.class);
         m_mockery.checking(new Expectations() {{
             allowing(adaptor).listComputeResources(); will(returnValue(resources));
+            allowing(adaptor).listComputeTemplates(); will(returnValue(templates));
         }});
         ResourceManagerImpl rm = new ResourceManagerImpl(m_session, m_url, adaptor);
         assertEquals(2, rm.listResources(Type.COMPUTE).size());
@@ -83,6 +88,14 @@ public class ResourceManagerImplTest {
         final NetworkResourceAdaptor adaptor;
         adaptor = m_mockery.mock(NetworkResourceAdaptor.class);
         new ResourceManagerImpl(m_session, m_url, adaptor).listResources(Type.COMPUTE);
+    }
+    
+    @Test(expected = NotImplementedException.class)
+    public void listTemplatesNotImplemented() throws TimeoutException, NoSuccessException, 
+            NotImplementedException, AuthenticationFailedException, AuthorizationFailedException {
+        final NetworkResourceAdaptor adaptor;
+        adaptor = m_mockery.mock(NetworkResourceAdaptor.class);
+        new ResourceManagerImpl(m_session, m_url, adaptor).listTemplates(Type.COMPUTE);
     }
     
     private abstract class ComputeAndStorageResourceAdaptor implements ComputeResourceAdaptor, StorageResourceAdaptor {};

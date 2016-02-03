@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.adaptor.openstack;
 
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -11,13 +13,16 @@ import org.apache.log4j.Logger;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.IncorrectURLException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 import org.openstack4j.api.OSClient;
+import org.openstack4j.api.types.ServiceType;
 import org.openstack4j.core.transport.Config;
 import org.openstack4j.model.identity.Token;
+import org.openstack4j.model.identity.Access.Service;
 import org.openstack4j.openstack.OSFactory;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
@@ -80,19 +85,24 @@ public abstract class OpenstackAdaptorAbstract implements ClientAdaptor {
                 .tenantName(m_credential.getAttribute(OpenstackSecurityAdaptor.PARAM_TENANT))
                 .authenticate();
         m_token = m_os.getToken();
+        m_logger.info("Connected to TENANT " + m_credential.getAttribute(OpenstackSecurityAdaptor.PARAM_TENANT));
+        m_logger.info("Token expires " + m_token.getExpires());
         m_logger.debug(m_token.toString());
     }
 
     public void disconnect() throws NoSuccessException {
     }
-
-    public static String idFromSagaId(String sagaId) throws BadParameterException {
-        Pattern p = Pattern.compile("(\\[.*]-\\[)(.+)(])");
-        Matcher m = p.matcher(sagaId);
-        if (m.find()) {
-            return m.group(2);
+    
+    protected ServiceType typeFromServiceURL(String url) throws MalformedURLException, DoesNotExistException {
+        URL templateAddress = new URL(url);
+        for (Service serv: m_os.getAccess().getServiceCatalog()) {
+            URI serviceURI = serv.getEndpoints().get(0).getPublicURL();
+            if (serviceURI.getHost().equals(templateAddress.getHost())
+                    && serviceURI.getPort() == templateAddress.getPort()) {
+                return serv.getServiceType();
+            }
         }
-        throw new BadParameterException();
+        throw new DoesNotExistException();
     }
 
 }

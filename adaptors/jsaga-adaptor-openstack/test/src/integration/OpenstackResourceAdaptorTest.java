@@ -29,23 +29,24 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         super("openstack");
     }
 
-    @Test
-    public void flavors() throws NotImplementedException, BadParameterException, 
+    @Test @Ignore
+    public void images() throws NotImplementedException, BadParameterException, 
             IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
             TimeoutException, NoSuccessException, DoesNotExistException, PermissionDeniedException, 
             IncorrectStateException {
         // List all templates
         List<String> templates = m_rm.listTemplates(Type.COMPUTE);
         assertTrue(templates.size()>0);
+        System.out.println(templates.get(0));
         // Details of a template
         ResourceDescription rd = m_rm.getTemplate(templates.get(0));
         assertTrue(rd instanceof ComputeDescription);
         ComputeDescription cd = (ComputeDescription)rd;
-        assertTrue(cd.existsAttribute(ComputeDescription.MEMORY));
-        System.out.println(cd.getAttribute(ComputeDescription.MEMORY));
+        assertTrue(cd.existsAttribute(ComputeDescription.MACHINE_OS));
+        System.out.println(cd.getAttribute(ComputeDescription.MACHINE_OS));
     }
     
-    @Test
+    @Test @Ignore
     public void servers() throws NotImplementedException, BadParameterException, 
             IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
             TimeoutException, NoSuccessException, DoesNotExistException, PermissionDeniedException, 
@@ -57,5 +58,32 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         assertNotNull(server.getDescription());
         System.out.println(server.getDescription());
     }
-    
+
+    @Override
+    @Test(expected=NotImplementedException.class)
+    public void listStorageTemplates() throws NotImplementedException, TimeoutException, NoSuccessException  {
+        assertNotNull(m_rm.listTemplates(Type.STORAGE));
+    }
+
+    @Override
+    @Test(expected=NotImplementedException.class)
+    public void listNetworkTemplates() throws NotImplementedException, TimeoutException, NoSuccessException  {
+        assertNotNull(m_rm.listTemplates(Type.NETWORK));
+    }
+
+    @Override
+    @Test(expected=NotImplementedException.class)
+    public void listStorageResources() throws NotImplementedException, TimeoutException, 
+        NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
+        assertNotNull(m_rm.listResources(Type.STORAGE));
+    }
+
+    @Override
+    @Test(expected=NotImplementedException.class)
+    public void listNetworkResources() throws NotImplementedException, TimeoutException, 
+        NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
+        assertNotNull(m_rm.listResources(Type.NETWORK));
+    }
+
+
 }

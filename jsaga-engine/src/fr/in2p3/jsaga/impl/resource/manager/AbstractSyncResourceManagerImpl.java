@@ -30,6 +30,8 @@ import org.ogf.saga.url.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -69,43 +71,52 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
         }
         List<String> list = new ArrayList<String>();
         if ((m_adaptor instanceof ComputeResourceAdaptor && type == null) || Type.COMPUTE.equals(type)) {
-            String[] array = ((ComputeResourceAdaptor)m_adaptor).listComputeResources();
-            for (int i=0; array!=null && i<array.length; i++) {
-                String sagaResourceId = "["+m_url.getString()+"]-["+array[i]+"]";
-                list.add(sagaResourceId);
-            }
+            list = addArrayOfSagaIdsToList(list, ((ComputeResourceAdaptor)m_adaptor).listComputeResources());
         }
         if ((m_adaptor instanceof StorageResourceAdaptor && type == null) || Type.STORAGE.equals(type)) {
-            String[] array = ((StorageResourceAdaptor)m_adaptor).listStorageResources();
-            for (int i=0; array!=null && i<array.length; i++) {
-                String sagaResourceId = "["+m_url.getString()+"]-["+array[i]+"]";
-                list.add(sagaResourceId);
-            }
+            list = addArrayOfSagaIdsToList(list, ((StorageResourceAdaptor)m_adaptor).listStorageResources());
         }
         if ((m_adaptor instanceof NetworkResourceAdaptor && type == null) || Type.NETWORK.equals(type)) {
-            String[] array = ((NetworkResourceAdaptor)m_adaptor).listNetworkResources();
-            for (int i=0; array!=null && i<array.length; i++) {
-                String sagaResourceId = "["+m_url.getString()+"]-["+array[i]+"]";
-                list.add(sagaResourceId);
-            }
+            list = addArrayOfSagaIdsToList(list, ((NetworkResourceAdaptor)m_adaptor).listNetworkResources());
         }
         return list;
     }
 
-    // TODO: filter type??? sub interface ComputeResourceAdaptor, ... ?
     public List<String> listTemplatesSync(Type type) throws NotImplementedException,
             TimeoutException, NoSuccessException {
-        String[] array = m_adaptor.listTemplates();
+        if (Type.COMPUTE.equals(type) && ! (m_adaptor instanceof ComputeResourceAdaptor)) {
+            throw new NotImplementedException("This adaptor does not handle compute resources");
+        }
+        if (Type.STORAGE.equals(type) && ! (m_adaptor instanceof StorageResourceAdaptor)) {
+            throw new NotImplementedException("This adaptor does not handle storage resources");
+        }
+        if (Type.NETWORK.equals(type) && ! (m_adaptor instanceof NetworkResourceAdaptor)) {
+            throw new NotImplementedException("This adaptor does not handle network resources");
+        }
         List<String> list = new ArrayList<String>();
-        for (int i=0; array!=null && i<array.length; i++) {
-            String sagaTemplateId = "["+m_url.getString()+"]-["+array[i]+"]";
-            list.add(sagaTemplateId);
+        if ((m_adaptor instanceof ComputeResourceAdaptor && type == null) || Type.COMPUTE.equals(type)) {
+            list = addArrayOfSagaIdsToList(list, ((ComputeResourceAdaptor)m_adaptor).listComputeTemplates());
+        }
+        if ((m_adaptor instanceof StorageResourceAdaptor && type == null) || Type.STORAGE.equals(type)) {
+            list = addArrayOfSagaIdsToList(list, ((StorageResourceAdaptor)m_adaptor).listStorageTemplates());
+        }
+        if ((m_adaptor instanceof NetworkResourceAdaptor && type == null) || Type.NETWORK.equals(type)) {
+            list = addArrayOfSagaIdsToList(list, ((NetworkResourceAdaptor)m_adaptor).listNetworkTemplates());
         }
         return list;
     }
+    
+    private List<String> addArrayOfSagaIdsToList(List<String> list, String[] array) {
+        for (int i=0; array!=null && i<array.length; i++) {
+            list.add("["+m_url.getString()+"]-["+array[i]+"]");
+        }
+        return list;
+    }
+
     public ResourceDescription getTemplateSync(String id) throws NotImplementedException,
             BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        Properties properties = m_adaptor.getTemplate(id);
+        // Extract internalId from sagaId
+        Properties properties = m_adaptor.getTemplate(idFromSagaId(id));
         String typeString = properties.getProperty(Resource.RESOURCE_TYPE);
         if (typeString != null) {
             Type type = Type.valueOf(typeString);
@@ -122,6 +133,16 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
         } else {
             throw new BadParameterException("Template is missing required property: "+Resource.RESOURCE_TYPE);
         }
+    }
+
+    // TODO externalize this
+    private static String idFromSagaId(String sagaId) throws BadParameterException {
+        Pattern p = Pattern.compile("(\\[.*]-\\[)(.+)(])");
+        Matcher m = p.matcher(sagaId);
+        if (m.find()) {
+            return m.group(2);
+        }
+        throw new BadParameterException();
     }
 
     //----------------------------------------------------------------

@@ -1,5 +1,7 @@
 package org.ogf.saga.resource;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.ogf.saga.JSAGABaseTest;
@@ -56,7 +58,13 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     public void unknownTemplate() throws NotImplementedException, BadParameterException, 
             IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
             TimeoutException, NoSuccessException, DoesNotExistException {
-        m_rm.getTemplate("[" + m_resourcemanager.getString() + "]-[thisTemplateDoesNotExists]");
+        List<String> templates = m_rm.listTemplates(null);
+        String templateToTest = "thisTemplateDoesNotExists";
+        if (templates.size() > 0) {
+            // Take the first template and insert "thisTemplateDoesNotExists" just before the last ']'
+            templateToTest = templates.get(0).replaceAll("]$", templateToTest + "]");
+        }
+        m_rm.getTemplate(templateToTest);
     }
 
     @Test
