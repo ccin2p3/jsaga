@@ -21,11 +21,13 @@ public interface ResourceAdaptor extends ClientAdaptor {
         DoesNotExistException, NotImplementedException;
 
     /**
-     * Check that a resource is still available
+     * Get the description of a resource
      * @param resourceId
+     * @return a list of Properties that describe the resource
      * @throws DoesNotExistException if the resource is not available anymore
+     * @throws NotImplementedException 
      */
-    public void check(String resourceId) throws TimeoutException, NoSuccessException, DoesNotExistException;
+    public Properties getDescription(String resourceId) throws TimeoutException, NoSuccessException, DoesNotExistException, NotImplementedException;
     
     public void release(String resourceId);
 

@@ -46,7 +46,7 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         System.out.println(cd.getAttribute(ComputeDescription.MACHINE_OS));
     }
     
-    @Test @Ignore
+    @Test
     public void servers() throws NotImplementedException, BadParameterException, 
             IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
             TimeoutException, NoSuccessException, DoesNotExistException, PermissionDeniedException, 
@@ -54,9 +54,31 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         List<String> resources = m_rm.listResources(Type.COMPUTE);
         assertTrue(resources.size()>0);
         // Details of a resource
-        Compute server = m_rm.acquireCompute(resources.get(0));
-        assertNotNull(server.getDescription());
-        System.out.println(server.getDescription());
+//        Compute server = m_rm.acquireCompute(resources.get(0));
+//        System.out.println(resources.get(0));
+//        ResourceDescription cd = server.getDescription();
+//        assertNotNull(cd);
+//        for (String a: cd.listAttributes()) {
+//            System.out.println(a + "=" + cd.getAttribute(a));
+//        }
+//        // RV
+//        server = m_rm.acquireCompute("[dummy]-[http://ccnova.in2p3.fr:8774/v2/0223bc1968bc4e46932c5d87012aaf14/servers/9a9313ec-c987-42c0-846d-f9e0e6ca364e]");
+//        cd = server.getDescription();
+//        assertNotNull(cd);
+//        for (String a: cd.listAttributes()) {
+//            System.out.println(a + "=" + cd.getAttribute(a));
+//        }
+//        assertNotNull(server.getDescription());
+        for (String serverId: resources) {
+            Compute server = m_rm.acquireCompute(serverId);
+            ResourceDescription rd = server.getDescription();
+            assertNotNull(rd);
+            System.out.println(serverId);
+            for (String a: rd.listAttributes()) {
+                System.out.println("  * " + a + "=" + rd.getAttribute(a));
+            }
+            
+        }
     }
 
     @Override

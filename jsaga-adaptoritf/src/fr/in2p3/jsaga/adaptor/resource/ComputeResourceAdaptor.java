@@ -13,7 +13,7 @@ public interface ComputeResourceAdaptor extends ResourceAdaptor {
     public String[] listComputeResources() throws TimeoutException, NoSuccessException;
 
     // TODO throw exc
-    public void acquireComputeResource(Properties description);
+    public String acquireComputeResource(Properties description);
     
     // TODO throw exc
     public void release(String id, boolean drain);

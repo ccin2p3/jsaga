@@ -136,7 +136,7 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     }
 
     // TODO externalize this
-    private static String idFromSagaId(String sagaId) throws BadParameterException {
+    public static String idFromSagaId(String sagaId) throws BadParameterException {
         Pattern p = Pattern.compile("(\\[.*]-\\[)(.+)(])");
         Matcher m = p.matcher(sagaId);
         if (m.find()) {
@@ -150,7 +150,15 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     public Compute acquireComputeSync(ComputeDescription description) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
             TimeoutException, NoSuccessException {
-        return new ComputeImpl(m_session, (ResourceManagerImpl) this, m_adaptor, description);
+        try {
+            return new ComputeImpl(m_session, (ResourceManagerImpl) this, m_adaptor, description);
+        } catch (PermissionDeniedException e) {
+            throw new AuthorizationFailedException(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        } catch (DoesNotExistException e) {
+            throw new BadParameterException(e);
+        }
     }
     public Compute acquireComputeSync(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
@@ -174,7 +182,15 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     public Network acquireNetworkSync(NetworkDescription description) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
             TimeoutException, NoSuccessException {
-        return new NetworkImpl(m_session, (ResourceManagerImpl) this, m_adaptor, description);
+        try {
+            return new NetworkImpl(m_session, (ResourceManagerImpl) this, m_adaptor, description);
+        } catch (PermissionDeniedException e) {
+            throw new AuthorizationFailedException(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        } catch (DoesNotExistException e) {
+            throw new BadParameterException(e);
+        }
     }
     public Network acquireNetworkSync(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
@@ -192,7 +208,15 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     public Storage acquireStorageSync(StorageDescription description) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
             TimeoutException, NoSuccessException {
-        return new StorageImpl(m_session, (ResourceManagerImpl) this, m_adaptor, description);
+        try {
+            return new StorageImpl(m_session, (ResourceManagerImpl) this, m_adaptor, description);
+        } catch (PermissionDeniedException e) {
+            throw new AuthorizationFailedException(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        } catch (DoesNotExistException e) {
+            throw new BadParameterException(e);
+        }
     }
     public Storage acquireStorageSync(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,

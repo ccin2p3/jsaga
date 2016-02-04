@@ -20,6 +20,7 @@ import org.ogf.saga.resource.instance.Resource;
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.types.ServiceType;
 import org.openstack4j.model.common.Link;
+import org.openstack4j.model.compute.Address;
 import org.openstack4j.model.compute.Flavor;
 import org.openstack4j.model.compute.Image;
 import org.openstack4j.model.compute.Server;
@@ -83,6 +84,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
                     throw new DoesNotExistException("This template does not exist");
                 }
                 p.setProperty(ComputeDescription.MACHINE_OS, image.getName());
+                // TODO: add other attributes
             } else {
                 throw new NotImplementedException();
             }
@@ -93,9 +95,49 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     }
 
     @Override
-    public void check(String resourceId) throws DoesNotExistException {
-        // TODO Auto-generated method stub
-        
+    public Properties getDescription(String resourceId) throws DoesNotExistException, NotImplementedException {
+        Properties p = new Properties();
+        ServiceType serviceType;
+        // What kind of resource is this?
+        try {
+            serviceType = this.typeFromServiceURL(resourceId);
+        } catch (MalformedURLException e) {
+            throw new DoesNotExistException(e);
+        }
+        if (serviceType.equals(ServiceType.COMPUTE)) {
+            p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
+            if (resourceId.contains("/servers/")) {
+                String serverId = resourceId.replaceAll(".*/servers/", "");
+                Server server = m_os.compute().servers().get(serverId);
+                if (server == null) {
+                    throw new DoesNotExistException("This template does not exist");
+                }
+                // concat addresses
+                String addresses = "";
+                for (List<? extends Address> addrs: server.getAddresses().getAddresses().values()) {
+                    for (Address addr: addrs) {
+                        addresses = addresses + addr.getAddr() + ",";
+                    }
+                }
+                addresses = addresses.replaceAll(",$", "");
+                p.setProperty(ComputeDescription.HOST_NAMES, addresses);
+                // get Flavor
+                Flavor flavor = server.getFlavor();
+                if (flavor != null) {
+                    p.setProperty(ComputeDescription.MEMORY, Integer.toString(flavor.getRam()));
+                    p.setProperty(ComputeDescription.SIZE, Integer.toString(flavor.getVcpus()));
+                }
+                Image image = server.getImage();
+                if (image != null) {
+                    p.setProperty(ComputeDescription.MACHINE_OS, image.getName());
+                }
+            } else {
+                throw new NotImplementedException();
+            }
+        } else {
+            throw new NotImplementedException();
+        }
+        return p;
     }
 
     @Override
@@ -129,9 +171,9 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     }
 
     @Override
-    public void acquireComputeResource(Properties description) {
+    public String acquireComputeResource(Properties description) {
         // TODO Auto-generated method stub
-        
+        return null;
     }
 
     @Override
@@ -140,7 +182,12 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         
     }
 
+    
+    
+    
+    
     @Override
+    @Deprecated
     public String[] listComputeTemplates() throws TimeoutException,
             NoSuccessException {
         List<? extends Image> listOfImages = m_os.compute().images().list();
@@ -167,6 +214,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
 
     // TODO: return Resource?
     // TODO throw Exception?
+    @Deprecated
     public void acquire(Properties description) {
         if (description.containsKey(ResourceDescription.TYPE)
                 && description.containsKey(DESC_NAME)
@@ -187,6 +235,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     
     
     
+    @Deprecated
     private ServerCreate prepareServerCreate(Properties desc) {
         ServerCreateBuilder scb = Builders.server();
 
