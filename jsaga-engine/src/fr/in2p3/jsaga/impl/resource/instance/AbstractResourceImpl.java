@@ -78,11 +78,11 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         }
         // TODO remove this cast
         m_attributes.m_ResourceID.setObject(((AbstractSyncResourceManagerImpl)m_manager).toSagaId(resourceId));
-        // TODO: reload description enable this:
+        // TODO: reload description? if yes enable this:
 //        Properties description = m_adaptor.getDescription(getInternalId());
 //        m_description = createDescription(description);
+        // and remove this line:
         this.m_description = description;
-        // or adaptor.getDescription() ???
     }
 
     /** constructor for reconnecting to resource already acquired 
@@ -138,24 +138,20 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
     protected abstract RD createDescription(Properties description);
     
     /** reconfigure 
-     * @throws BadParameterException */
-    public void reconfigure(RD description) throws BadParameterException {
+     * @throws BadParameterException 
+     * @throws NoSuccessException */
+    public void reconfigure(RD description) throws BadParameterException, NoSuccessException {
         m_description = description;
         if (description != null) {
             m_attributes.m_Description.setObject(description.toString());
             try {
                 m_adaptor.release(getInternalId());
             } catch (DoesNotExistException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new NoSuccessException(e);
             } catch (NotImplementedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (NoSuccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new NoSuccessException(e);
             }
-            // TODO: acquire
+            // TODO: acquire and change id probably...
         }
     }
 

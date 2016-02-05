@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
@@ -121,23 +123,43 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
 
     @Override
     public String acquireComputeResource(Properties description) throws NotImplementedException, NoSuccessException {
-        // Some attributes are not supported
-        if (description.containsKey(ComputeDescription.HOST_NAMES) ||
-                description.containsKey(ComputeDescription.MACHINE_ARCH) ||
-                description.containsKey(ComputeDescription.MACHINE_OS)) {
+        // hostnames is not supported
+        if (description.containsKey(ComputeDescription.HOST_NAMES)) {
+            throw new NotImplementedException();
+        }
+        // ARCH other then 'ANY' is not supported
+        if (description.containsKey(ComputeDescription.MACHINE_ARCH) &&
+                !description.getProperty(ComputeDescription.MACHINE_ARCH).equalsIgnoreCase("any")) {
+            throw new NotImplementedException();
+        }
+        // OS other then 'ANY' is not supported
+        if (description.containsKey(ComputeDescription.MACHINE_OS) &&
+                !description.getProperty(ComputeDescription.MACHINE_OS).equalsIgnoreCase("any")) {
             throw new NotImplementedException();
         }
         // Some attributes are mandatory
         if (!description.containsKey(ComputeDescription.TEMPLATE)) {
             throw new NoSuccessException("Mandatory: " + ComputeDescription.TEMPLATE);
         }
+        // Check that template name is in the JSAGA form
+        // [URL]-[nova/images/.*]
+        Pattern p = Pattern.compile("(\\[.*]-\\[)(.+)(])");
+        Matcher m = p.matcher(description.getProperty(ComputeDescription.TEMPLATE));
+        if (!m.find()) {
+            throw new NoSuccessException("Malformed imageId: " + description.getProperty(ComputeDescription.TEMPLATE));
+        }
         // Build server create
         ServerCreateBuilder scb = Builders.server();
+        // check image
+        try {
+            scb.image(this.getImageByName(m.group(2)));
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
+        }
         String serverName = "jsaga-" + m_credential.getUserID() + "-" + UUID.randomUUID();
         scb.name(serverName);
         // TODO discover flavor
         scb.flavor("2");
-        scb.image(description.getProperty(ComputeDescription.TEMPLATE));
         ServerCreate sc = scb.build();
         Server vm = m_os.compute().servers().boot(sc);
         // Cannot use vm.getName() because it is empty
@@ -177,17 +199,10 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         if (id.startsWith(ServiceType.COMPUTE.getServiceName())) {
             p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
             if (id.contains("/images/")) {
-                String imageId = id.replaceAll(".*/images/", "");
-                // TODO filter
-                for (Image i: m_os.compute().images().list()) {
-                    if (imageId.equals(i.getName())) {
-                        // FIXME: OS not available
-                        p.setProperty(ComputeDescription.MACHINE_OS, i.getName());
-                        // TODO: add other attributes
-                        return p;
-                    }
-                }
-                throw new DoesNotExistException("This template does not exist");
+                Image i = this.getImageByName(id);
+                p.setProperty(ComputeDescription.MACHINE_OS, i.getName());
+                // TODO: add other attributes
+                return p;
             } else {
                 throw new NotImplementedException();
             }
@@ -232,6 +247,20 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         throw new DoesNotExistException("This resource does not exist: " + serverId);
     }
 
+    private Image getImageByName(String internalId) throws DoesNotExistException {
+        String imageId = internalId.replaceAll(".*/images/", "");
+        for (Image i: m_os.compute().images().list()) {
+            if (i.getName().equals(imageId)) {
+                return i;
+            }
+        }
+        throw new DoesNotExistException("This template does not exist: " + imageId);
+    }
+
+//    private Flavor getFlavorFromProperties(Properties prop) {
+//        
+//    }
+    
     @Deprecated
     private String getHRef(List<? extends Link> links) throws NoSuccessException {
         for (Link link: links) {
