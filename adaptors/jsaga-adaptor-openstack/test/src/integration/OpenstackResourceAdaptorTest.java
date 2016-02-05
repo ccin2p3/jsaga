@@ -43,10 +43,11 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
     
     @Test
     public void launchAndDeleteVM() throws Exception {
-        ComputeDescription cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
-        String image = "[openstack://cckeystone.in2p3.fr:5000/v2.0/]-[nova/images/official-centosCC-7x-x86_64]";
-        cd.setAttribute(ComputeDescription.TEMPLATE, image);
-        Compute server = m_rm.acquireCompute(cd);
+        ResourceDescription cd = (ResourceDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
+        // TODO: build a array with image AND flavor
+        String templates = "[openstack://cckeystone.in2p3.fr:5000/v2.0/]-[nova/images/official-centosCC-7x-x86_64]";
+        cd.setAttribute(ResourceDescription.TEMPLATE, templates);
+        Compute server = m_rm.acquireCompute((ComputeDescription) cd);
         ResourceDescription rd = server.getDescription();
         assertNotNull(rd);
         System.out.println(server.getId());

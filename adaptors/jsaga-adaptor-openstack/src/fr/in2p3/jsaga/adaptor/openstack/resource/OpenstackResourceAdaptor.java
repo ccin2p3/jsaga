@@ -143,6 +143,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         }
         // Check that template name is in the JSAGA form
         // [URL]-[nova/images/.*]
+        // TODO this is a list! => image and/or flavor
         Pattern p = Pattern.compile("(\\[.*]-\\[)(.+)(])");
         Matcher m = p.matcher(description.getProperty(ComputeDescription.TEMPLATE));
         if (!m.find()) {
