@@ -78,11 +78,14 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         }
         // TODO remove this cast
         m_attributes.m_ResourceID.setObject(((AbstractSyncResourceManagerImpl)m_manager).toSagaId(resourceId));
-        // TODO: reload description? if yes enable this:
-//        Properties description = m_adaptor.getDescription(getInternalId());
-//        m_description = createDescription(description);
-        // and remove this line:
-        this.m_description = description;
+        // reload description
+        Properties prop;
+        try {
+            prop = m_adaptor.getDescription(getInternalId());
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
+        }
+        m_description = createDescription(prop);
     }
 
     /** constructor for reconnecting to resource already acquired 
