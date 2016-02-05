@@ -9,9 +9,17 @@ import java.util.Properties;
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************/
 public class ComputeDescriptionImpl extends AbstractResourceDescriptionImpl implements ComputeDescription {
+    
+    public final static String DEFAULT_SIZE = "1";
+    
     /** constructor for ResourceFactory.createDescription() */
     public ComputeDescriptionImpl() {
         super();
+        try {
+            this.setAttribute(ComputeDescription.SIZE, DEFAULT_SIZE);
+        } catch (Exception e) {
+            // TODO log error
+        }
     }
 
     /** constructor for ResourceManager.getTemplate() */

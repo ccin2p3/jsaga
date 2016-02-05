@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
@@ -47,13 +48,6 @@ import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         implements ComputeResourceAdaptor {
 
-    @Deprecated
-    public static final String DESC_NAME = "Name";
-    @Deprecated
-    public static final String DESC_FLAVOR = "Flavor";
-    @Deprecated
-    public static final String DESC_IMAGE = "Image";
-    
     @Override
     public Usage getUsage() {
         return null;
@@ -61,39 +55,13 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
 
     @Override
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
+        // TODO: default MEM, NBCPU...
         return null;
     }
 
-    @Override
-    public Properties getTemplate(String id) throws TimeoutException, NoSuccessException, 
-                    DoesNotExistException, NotImplementedException {
-        Properties p = new Properties();
-        ServiceType serviceType;
-        // What kind of template is this?
-        try {
-            serviceType = this.typeFromServiceURL(id);
-        } catch (MalformedURLException e) {
-            throw new DoesNotExistException(e);
-        }
-        if (serviceType.equals(ServiceType.COMPUTE)) {
-            p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
-            if (id.contains("/images/")) {
-                String imageId = id.replaceAll(".*/images/", "");
-                Image image = m_os.compute().images().get(imageId);
-                if (image == null) {
-                    throw new DoesNotExistException("This template does not exist");
-                }
-                p.setProperty(ComputeDescription.MACHINE_OS, image.getName());
-                // TODO: add other attributes
-            } else {
-                throw new NotImplementedException();
-            }
-        } else {
-            throw new NotImplementedException();
-        }
-        return p;
-    }
-
+    //////////////////////
+    // Servers (Resources)
+    //////////////////////
     @Override
     public Properties getDescription(String resourceId) throws DoesNotExistException, NotImplementedException {
         Properties p = new Properties();
@@ -141,12 +109,6 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     }
 
     @Override
-    public void release(String resourceId) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
     public String[] getAccess(String resourceId) {
         // TODO Auto-generated method stub
         return null;
@@ -171,9 +133,26 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     }
 
     @Override
-    public String acquireComputeResource(Properties description) {
-        // TODO Auto-generated method stub
-        return null;
+    public String acquireComputeResource(Properties description) throws NotImplementedException, NoSuccessException {
+        // Some attributes are not supported
+        if (description.containsKey(ComputeDescription.HOST_NAMES) ||
+                description.containsKey(ComputeDescription.MACHINE_ARCH) ||
+                description.containsKey(ComputeDescription.MACHINE_OS)) {
+            throw new NotImplementedException();
+        }
+        // Some attributes are mandatory
+        if (!description.containsKey(ComputeDescription.TEMPLATE)) {
+            throw new NoSuccessException("Mandatory: " + ComputeDescription.TEMPLATE);
+        }
+        // Build server create
+        ServerCreateBuilder scb = Builders.server();
+        scb.name("jsaga-" + m_credential.getUserID() + UUID.randomUUID());
+        // TODO discover flavor
+        scb.flavor("2");
+        scb.image(description.getProperty(ComputeDescription.TEMPLATE));
+        ServerCreate sc = scb.build();
+        Server vm = m_os.compute().servers().boot(sc);
+        return vm.getId();
     }
 
     @Override
@@ -182,12 +161,46 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         
     }
 
-    
-    
-    
-    
     @Override
-    @Deprecated
+    public void release(String resourceId) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /////////////////////
+    // Images (Templates)
+    /////////////////////
+    @Override
+    public Properties getTemplate(String id) throws TimeoutException, NoSuccessException, 
+                    DoesNotExistException, NotImplementedException {
+        Properties p = new Properties();
+        ServiceType serviceType;
+        // What kind of template is this?
+        try {
+            serviceType = this.typeFromServiceURL(id);
+        } catch (MalformedURLException e) {
+            throw new DoesNotExistException(e);
+        }
+        if (serviceType.equals(ServiceType.COMPUTE)) {
+            p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
+            if (id.contains("/images/")) {
+                String imageId = id.replaceAll(".*/images/", "");
+                Image image = m_os.compute().images().get(imageId);
+                if (image == null) {
+                    throw new DoesNotExistException("This template does not exist");
+                }
+                p.setProperty(ComputeDescription.MACHINE_OS, image.getName());
+                // TODO: add other attributes
+            } else {
+                throw new NotImplementedException();
+            }
+        } else {
+            throw new NotImplementedException();
+        }
+        return p;
+    }
+
+    @Override
     public String[] listComputeTemplates() throws TimeoutException,
             NoSuccessException {
         List<? extends Image> listOfImages = m_os.compute().images().list();
@@ -203,46 +216,6 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         }
         // TODO: add flavors?
         return listOfTemplates;
-    }
-
-
-    
-    
-    // TODO throw  NotImplementedException, AuthenticationFailedException, AuthorizationFailedException
-//    public String[] listResources() throws TimeoutException, NoSuccessException {
-//    }
-
-    // TODO: return Resource?
-    // TODO throw Exception?
-    @Deprecated
-    public void acquire(Properties description) {
-        if (description.containsKey(ResourceDescription.TYPE)
-                && description.containsKey(DESC_NAME)
-                && description.containsKey(DESC_FLAVOR)
-                && description.containsKey(DESC_IMAGE)
-        ) {
-            ServerCreate sc = this.prepareServerCreate(description);
-            Server vm = m_os.compute().servers().boot(sc);
-            return;
-        };
-//            throw new NoSuccessException("Invalid desc");
-        System.out.println("Invalid description");
-        return;
-    }
-
-
-    
-    
-    
-    
-    @Deprecated
-    private ServerCreate prepareServerCreate(Properties desc) {
-        ServerCreateBuilder scb = Builders.server();
-
-        scb.name(desc.getProperty(DESC_NAME));
-        scb.flavor(desc.getProperty(DESC_FLAVOR));
-        scb.image(desc.getProperty(DESC_IMAGE));
-        return scb.build();
     }
 
 }

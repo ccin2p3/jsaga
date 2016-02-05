@@ -1,6 +1,8 @@
 package fr.in2p3.jsaga.adaptor.resource;
 
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 
 import java.util.Properties;
@@ -12,8 +14,7 @@ public interface ComputeResourceAdaptor extends ResourceAdaptor {
      */
     public String[] listComputeResources() throws TimeoutException, NoSuccessException;
 
-    // TODO throw exc
-    public String acquireComputeResource(Properties description);
+    public String acquireComputeResource(Properties description) throws NotImplementedException, NoSuccessException;
     
     // TODO throw exc
     public void release(String id, boolean drain);

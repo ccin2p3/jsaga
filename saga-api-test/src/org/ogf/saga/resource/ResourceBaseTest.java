@@ -9,10 +9,14 @@ import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.IncorrectURLException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
+import org.ogf.saga.resource.description.ResourceDescription;
+import org.ogf.saga.resource.instance.Compute;
 import org.ogf.saga.resource.manager.ResourceManager;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -103,4 +107,25 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         assertNotNull(m_rm.listResources(Type.NETWORK));
     }
 
+    @Test
+    public void listServers() throws Exception, 
+            IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
+            TimeoutException, NoSuccessException, DoesNotExistException, PermissionDeniedException, 
+            IncorrectStateException {
+        List<String> resources = m_rm.listResources(Type.COMPUTE);
+        assertTrue(resources.size()>0);
+        for (String serverId: resources) {
+            Compute server = m_rm.acquireCompute(serverId);
+            ResourceDescription rd = server.getDescription();
+            assertNotNull(rd);
+            System.out.println(serverId);
+            this.dumpDescription(rd);
+        }
+    }
+    
+    protected void dumpDescription(ResourceDescription rd) throws Exception {
+        for (String a: rd.listAttributes()) {
+            System.out.println("  * " + a + "=" + rd.getAttribute(a));
+        }
+    }
 }

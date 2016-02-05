@@ -48,7 +48,10 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
      * @throws AuthorizationFailedException 
      * @throws AuthenticationFailedException 
      * @throws NotImplementedException */
-    public AbstractResourceImpl(Type type, Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, RD description) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException, IncorrectStateException, DoesNotExistException {
+    public AbstractResourceImpl(Type type, Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, RD description) 
+            throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, 
+                    PermissionDeniedException, TimeoutException, NoSuccessException, IncorrectStateException, 
+                    DoesNotExistException {
         this(type, session, manager, adaptor);
         m_attributes.m_Description.setObject(description.toString());
         if (Type.COMPUTE.equals(type) && ! (m_adaptor instanceof ComputeResourceAdaptor)) {
