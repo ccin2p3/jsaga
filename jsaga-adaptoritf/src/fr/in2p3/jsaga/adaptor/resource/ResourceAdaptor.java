@@ -29,7 +29,7 @@ public interface ResourceAdaptor extends ClientAdaptor {
      */
     public Properties getDescription(String resourceId) throws TimeoutException, NoSuccessException, DoesNotExistException, NotImplementedException;
     
-    public void release(String resourceId);
+    public void release(String resourceId) throws DoesNotExistException, NotImplementedException;
 
     public String[] getAccess(String resourceId);
 }

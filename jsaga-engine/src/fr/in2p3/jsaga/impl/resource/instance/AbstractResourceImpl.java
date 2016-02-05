@@ -78,8 +78,11 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         } else {
             throw new NotImplementedException("Unkown type of resource adaptor");
         }
-        m_attributes.m_ResourceID.setObject(resourceId);
-        // TODO: store initial description or effective description?
+        // TODO remove this cast
+        m_attributes.m_ResourceID.setObject(((AbstractSyncResourceManagerImpl)m_manager).toSagaId(resourceId));
+        // TODO: reload description enable this:
+//        Properties description = m_adaptor.getDescription(getInternalId());
+//        m_description = createDescription(description);
         this.m_description = description;
         // or adaptor.getDescription() ???
     }
@@ -142,7 +145,15 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         m_description = description;
         if (description != null) {
             m_attributes.m_Description.setObject(description.toString());
-            m_adaptor.release(getInternalId());
+            try {
+                m_adaptor.release(getInternalId());
+            } catch (DoesNotExistException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (NotImplementedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             // TODO: acquire
         }
     }
@@ -152,6 +163,10 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
     public void release() throws NoSuccessException {
         try {
             m_adaptor.release(getInternalId());
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
+        } catch (NotImplementedException e) {
+            throw new NoSuccessException(e);
         } catch (BadParameterException e) {
             throw new NoSuccessException(e);
         }

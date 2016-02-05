@@ -135,16 +135,6 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
         }
     }
 
-    // TODO externalize this
-    public static String idFromSagaId(String sagaId) throws BadParameterException {
-        Pattern p = Pattern.compile("(\\[.*]-\\[)(.+)(])");
-        Matcher m = p.matcher(sagaId);
-        if (m.find()) {
-            return m.group(2);
-        }
-        throw new BadParameterException();
-    }
-
     //----------------------------------------------------------------
 
     public Compute acquireComputeSync(ComputeDescription description) throws NotImplementedException,
@@ -238,5 +228,22 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     /** This method is specific to JSAGA implementation */
     public void stopListening() {
         //TODO
+    }
+
+    // ---------------------------------------------------------------
+    // Internal methods
+    
+    // TODO externalize this
+    public static String idFromSagaId(String sagaId) throws BadParameterException {
+        Pattern p = Pattern.compile("(\\[.*]-\\[)(.+)(])");
+        Matcher m = p.matcher(sagaId);
+        if (m.find()) {
+            return m.group(2);
+        }
+        throw new BadParameterException();
+    }
+
+    public String toSagaId(String id) {
+        return "[" + m_url.getString() + "]-[" + id + "]";
     }
 }

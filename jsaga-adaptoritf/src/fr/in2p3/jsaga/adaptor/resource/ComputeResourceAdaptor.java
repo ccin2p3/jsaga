@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.resource;
 
-import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
@@ -16,8 +16,7 @@ public interface ComputeResourceAdaptor extends ResourceAdaptor {
 
     public String acquireComputeResource(Properties description) throws NotImplementedException, NoSuccessException;
     
-    // TODO throw exc
-    public void release(String id, boolean drain);
+    public void release(String id, boolean drain) throws DoesNotExistException, NotImplementedException;
 
     /**
      * Obtains the list of compute templates that are currently known to the resource manager.

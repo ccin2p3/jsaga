@@ -20,6 +20,7 @@ import org.ogf.saga.resource.description.ResourceDescription;
 import org.ogf.saga.resource.instance.Resource;
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.types.ServiceType;
+import org.openstack4j.model.ModelEntity;
 import org.openstack4j.model.common.Link;
 import org.openstack4j.model.compute.Address;
 import org.openstack4j.model.compute.Flavor;
@@ -120,13 +121,8 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         List<? extends Server> listOfVM = m_os.compute().servers().list();
         String[] listOfResources = new String[listOfVM.size()];
         int count=0;
-        for (Server i: listOfVM) {
-            for (Link link: i.getLinks()) {
-                // get URL for "rel": "self"
-                if ("self".equals(link.getRel())) {
-                    listOfResources[count] = link.getHref();
-                }
-            }
+        for (Server s: listOfVM) {
+            listOfResources[count] = this.getHRef(s.getLinks());
             count++;
         }
         return listOfResources;
@@ -146,25 +142,39 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         }
         // Build server create
         ServerCreateBuilder scb = Builders.server();
-        scb.name("jsaga-" + m_credential.getUserID() + UUID.randomUUID());
+        scb.name("jsaga-" + m_credential.getUserID() + "-" + UUID.randomUUID());
         // TODO discover flavor
         scb.flavor("2");
         scb.image(description.getProperty(ComputeDescription.TEMPLATE));
         ServerCreate sc = scb.build();
         Server vm = m_os.compute().servers().boot(sc);
-        return vm.getId();
+        return this.getHRef(vm.getLinks());
     }
 
     @Override
-    public void release(String id, boolean drain) {
-        // TODO Auto-generated method stub
-        
+    public void release(String resourceId, boolean drain) throws DoesNotExistException, NotImplementedException {
+        ServiceType serviceType;
+        // What kind of resource is this?
+        try {
+            serviceType = this.typeFromServiceURL(resourceId);
+        } catch (MalformedURLException e) {
+            throw new DoesNotExistException(e);
+        }
+        if (serviceType.equals(ServiceType.COMPUTE)) {
+            if (resourceId.contains("/servers/")) {
+                String serverId = resourceId.replaceAll(".*/servers/", "");
+                m_os.compute().servers().delete(serverId);
+            } else {
+                throw new NotImplementedException();
+            }
+        } else {
+            throw new NotImplementedException();
+        }
     }
 
     @Override
-    public void release(String resourceId) {
-        // TODO Auto-generated method stub
-        
+    public void release(String resourceId) throws DoesNotExistException, NotImplementedException {
+        this.release(resourceId, false);
     }
 
     /////////////////////
@@ -207,15 +217,19 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         String[] listOfTemplates = new String[listOfImages.size()];
         int count=0;
         for (Image i: listOfImages) {
-            for (Link link: i.getLinks()) {
-                if ("self".equals(link.getRel())) {
-                    listOfTemplates[count] = i.getLinks().get(0).getHref();
-                }
-            }
+            listOfTemplates[count] = this.getHRef(i.getLinks());
             count++;
         }
         // TODO: add flavors?
         return listOfTemplates;
     }
 
+    private String getHRef(List<? extends Link> links) throws NoSuccessException {
+        for (Link link: links) {
+            if ("self".equals(link.getRel())) {
+                return link.getHref();
+            }
+        }
+        throw new NoSuccessException("Cound not find HRef");
+    }
 }

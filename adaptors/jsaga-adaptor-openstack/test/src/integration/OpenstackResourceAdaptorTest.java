@@ -44,7 +44,7 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
     }
     
     @Test
-    public void launchVM() throws Exception {
+    public void launchAndDeleteVM() throws Exception {
         ComputeDescription cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
         cd.setAttribute(ComputeDescription.TEMPLATE, "7754358e-3f71-4225-bd71-0dae35f5b833"); // official-centosCC-7x-x86_64
         Compute server = m_rm.acquireCompute(cd);
@@ -52,6 +52,9 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         assertNotNull(rd);
         System.out.println(server.getId());
         this.dumpDescription(rd);
+        // Wait 2s
+        Thread.sleep(2000);
+        m_rm.releaseCompute(server.getId());
     }
 
     @Override
