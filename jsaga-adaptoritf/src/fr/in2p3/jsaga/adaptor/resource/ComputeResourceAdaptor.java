@@ -16,7 +16,7 @@ public interface ComputeResourceAdaptor extends ResourceAdaptor {
 
     public String acquireComputeResource(Properties description) throws NotImplementedException, NoSuccessException;
     
-    public void release(String id, boolean drain) throws DoesNotExistException, NotImplementedException;
+    public void release(String id, boolean drain) throws DoesNotExistException, NotImplementedException, NoSuccessException;
 
     /**
      * Obtains the list of compute templates that are currently known to the resource manager.

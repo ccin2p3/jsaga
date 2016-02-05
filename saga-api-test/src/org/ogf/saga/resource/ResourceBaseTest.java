@@ -108,18 +108,22 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     }
 
     @Test
-    public void listServers() throws Exception, 
+    public void list10Servers() throws Exception, 
             IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
             TimeoutException, NoSuccessException, DoesNotExistException, PermissionDeniedException, 
             IncorrectStateException {
         List<String> resources = m_rm.listResources(Type.COMPUTE);
         assertTrue(resources.size()>0);
+        int count = 1;
         for (String serverId: resources) {
             Compute server = m_rm.acquireCompute(serverId);
             ResourceDescription rd = server.getDescription();
             assertNotNull(rd);
             System.out.println(serverId);
             this.dumpDescription(rd);
+            if (count++ == 10) {
+                return;
+            }
         }
     }
     

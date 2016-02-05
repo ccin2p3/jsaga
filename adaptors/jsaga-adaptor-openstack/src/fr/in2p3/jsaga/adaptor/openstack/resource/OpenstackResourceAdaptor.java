@@ -1,14 +1,10 @@
 package fr.in2p3.jsaga.adaptor.openstack.resource;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
-import org.ogf.saga.error.AuthenticationFailedException;
-import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.IncorrectStateException;
@@ -17,26 +13,21 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.resource.Type;
 import org.ogf.saga.resource.description.ComputeDescription;
-import org.ogf.saga.resource.description.ResourceDescription;
 import org.ogf.saga.resource.instance.Resource;
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.types.ServiceType;
-import org.openstack4j.model.ModelEntity;
 import org.openstack4j.model.common.Link;
+import org.openstack4j.model.compute.ActionResponse;
 import org.openstack4j.model.compute.Address;
 import org.openstack4j.model.compute.Flavor;
 import org.openstack4j.model.compute.Image;
 import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.compute.ServerCreate;
 import org.openstack4j.model.compute.builder.ServerCreateBuilder;
-import org.openstack4j.model.identity.Access.Service;
-import org.openstack4j.model.identity.Endpoint;
-
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.openstack.OpenstackAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.resource.ComputeResourceAdaptor;
-import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -68,13 +59,6 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     public Properties getDescription(String resourceId) 
             throws DoesNotExistException, NotImplementedException, BadParameterException {
         Properties p = new Properties();
-//        ServiceType serviceType;
-//        // What kind of resource is this?
-//        try {
-//            serviceType = this.typeFromServiceURL(resourceId);
-//        } catch (MalformedURLException e) {
-//            throw new DoesNotExistException(e);
-//        }
         if (resourceId.startsWith(ServiceType.COMPUTE.getServiceName())) {
             p = this.getComputeDescription(resourceId);
         } else {
@@ -88,23 +72,8 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         Properties p = new Properties();
         p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
         if (resourceId.contains("/servers/")) {
-            String serverId = resourceId.replaceAll(".*/servers/", "");
-//            Server server = m_os.compute().servers().get(serverId);
-//            if (server == null) {
-//                throw new DoesNotExistException("This resource does not exist: " + serverId);
-//            }
             // search by name
-            Server server = null;
-            Map<String,String> param = new HashMap<String,String>();
-            param.put("name", serverId);
-            for (Server s: m_os.compute().servers().list(param)) {
-                if (s.getName().equals(serverId)) {
-                    server = s;
-                }
-            }
-            if (server == null) {
-                throw new DoesNotExistException("This resource does not exist: " + serverId);
-            }
+            Server server = this.getServerByName(resourceId);
             // concat addresses
             String addresses = "";
             for (List<? extends Address> addrs: server.getAddresses().getAddresses().values()) {
@@ -144,7 +113,6 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         String[] listOfResources = new String[listOfVM.size()];
         int count=0;
         for (Server s: listOfVM) {
-//            listOfResources[count] = this.getHRef(s.getLinks());
             listOfResources[count] = this.internalIdOf(s);
             count++;
         }
@@ -172,35 +140,30 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         scb.image(description.getProperty(ComputeDescription.TEMPLATE));
         ServerCreate sc = scb.build();
         Server vm = m_os.compute().servers().boot(sc);
-//        return this.getHRef(vm.getLinks());
         // Cannot use vm.getName() because it is empty
-//        return this.internalIdOf(vm);
         return internalIdOfServerName(serverName);
     }
 
     @Override
-    public void release(String resourceId, boolean drain) throws DoesNotExistException, NotImplementedException {
-//        ServiceType serviceType;
-        // What kind of resource is this?
-//        try {
-//            serviceType = this.typeFromServiceURL(resourceId);
-//        } catch (MalformedURLException e) {
-//            throw new DoesNotExistException(e);
-//        }
+    public void release(String resourceId, boolean drain) 
+            throws DoesNotExistException, NotImplementedException, NoSuccessException {
         if (resourceId.startsWith(ServiceType.COMPUTE.getServiceName())) {
             if (resourceId.contains("/servers/")) {
-                String serverId = resourceId.replaceAll(".*/servers/", "");
-                m_os.compute().servers().delete(serverId);
+                Server server = this.getServerByName(resourceId);
+                ActionResponse ar = m_os.compute().servers().delete(server.getId());
+                if (!ar.isSuccess()) {
+                    throw new NoSuccessException(ar.getFault());
+                }
             } else {
                 throw new NotImplementedException();
             }
         } else {
-            throw new NotImplementedException();
+            throw new NoSuccessException();
         }
     }
 
     @Override
-    public void release(String resourceId) throws DoesNotExistException, NotImplementedException {
+    public void release(String resourceId) throws DoesNotExistException, NotImplementedException, NoSuccessException {
         this.release(resourceId, false);
     }
 
@@ -211,13 +174,6 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     public Properties getTemplate(String id) throws TimeoutException, NoSuccessException, 
                     DoesNotExistException, NotImplementedException {
         Properties p = new Properties();
-//        ServiceType serviceType;
-        // What kind of template is this?
-//        try {
-//            serviceType = this.typeFromServiceURL(id);
-//        } catch (MalformedURLException e) {
-//            throw new DoesNotExistException(e);
-//        }
         if (id.startsWith(ServiceType.COMPUTE.getServiceName())) {
             p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
             if (id.contains("/images/")) {
@@ -231,10 +187,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
                         return p;
                     }
                 }
-//                Image image = m_os.compute().images().get(imageId);
-//                if (image == null) {
-                    throw new DoesNotExistException("This template does not exist");
-//                }
+                throw new DoesNotExistException("This template does not exist");
             } else {
                 throw new NotImplementedException();
             }
@@ -250,7 +203,6 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         String[] listOfTemplates = new String[listOfImages.size()];
         int count=0;
         for (Image i: listOfImages) {
-//            listOfTemplates[count] = this.getHRef(i.getLinks());
             listOfTemplates[count] = this.internalIdOf(i);
             count++;
         }
@@ -258,15 +210,6 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         return listOfTemplates;
     }
 
-//    private String getHRef(List<? extends Link> links) throws NoSuccessException {
-//        for (Link link: links) {
-//            if ("self".equals(link.getRel())) {
-//                return link.getHref();
-//            }
-//        }
-//        throw new NoSuccessException("Cound not find HRef");
-//    }
-//    
     private String internalIdOf(Image i) {
         return ServiceType.COMPUTE.getServiceName() + "/images/" + i.getName();
     }
@@ -275,5 +218,27 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     }
     private String internalIdOfServerName(String name) {
         return ServiceType.COMPUTE.getServiceName() + "/servers/" + name;
+    }
+    
+    private Server getServerByName(String internalId) throws DoesNotExistException {
+        String serverId = internalId.replaceAll(".*/servers/", "");
+        Map<String,String> param = new HashMap<String,String>();
+        param.put("name", serverId);
+        for (Server s: m_os.compute().servers().list(param)) {
+            if (s.getName().equals(serverId)) {
+                return s;
+            }
+        }
+        throw new DoesNotExistException("This resource does not exist: " + serverId);
+    }
+
+    @Deprecated
+    private String getHRef(List<? extends Link> links) throws NoSuccessException {
+        for (Link link: links) {
+            if ("self".equals(link.getRel())) {
+                return link.getHref();
+            }
+        }
+        throw new NoSuccessException("Cound not find HRef");
     }
 }

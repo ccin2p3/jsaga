@@ -1,13 +1,11 @@
 package fr.in2p3.jsaga.impl.resource.instance;
 
-import java.util.Map.Entry;
 import java.util.Properties;
 
 import fr.in2p3.jsaga.adaptor.resource.ComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.NetworkResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.StorageResourceAdaptor;
-import fr.in2p3.jsaga.impl.resource.description.ComputeDescriptionImpl;
 import fr.in2p3.jsaga.impl.resource.manager.AbstractSyncResourceManagerImpl;
 import fr.in2p3.jsaga.impl.resource.manager.ResourceManagerImpl;
 import fr.in2p3.jsaga.impl.resource.task.AbstractResourceTaskImpl;
@@ -151,6 +149,9 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (NotImplementedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (NoSuccessException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }

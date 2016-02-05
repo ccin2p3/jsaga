@@ -49,7 +49,7 @@ public class ComputeImpl extends AbstractResourceImpl<Compute,ComputeDescription
         super(Type.COMPUTE, session, manager, adaptor, id);
     }
 
-    public void release(boolean drain) throws DoesNotExistException, NotImplementedException {
+    public void release(boolean drain) throws DoesNotExistException, NotImplementedException, NoSuccessException {
         ((ComputeResourceAdaptor)m_adaptor).release(this.getId(), drain);
     }
 
