@@ -93,6 +93,7 @@ public abstract class OpenstackAdaptorAbstract implements ClientAdaptor {
     public void disconnect() throws NoSuccessException {
     }
     
+    @Deprecated
     protected ServiceType typeFromServiceURL(String url) throws MalformedURLException, DoesNotExistException {
         URL templateAddress = new URL(url);
         for (Service serv: m_os.getAccess().getServiceCatalog()) {

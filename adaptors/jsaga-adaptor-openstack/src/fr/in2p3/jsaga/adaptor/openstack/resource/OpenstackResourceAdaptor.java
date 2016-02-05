@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.openstack.resource;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -64,51 +65,72 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     // Servers (Resources)
     //////////////////////
     @Override
-    public Properties getDescription(String resourceId) throws DoesNotExistException, NotImplementedException {
+    public Properties getDescription(String resourceId) 
+            throws DoesNotExistException, NotImplementedException, BadParameterException {
         Properties p = new Properties();
-        ServiceType serviceType;
-        // What kind of resource is this?
-        try {
-            serviceType = this.typeFromServiceURL(resourceId);
-        } catch (MalformedURLException e) {
-            throw new DoesNotExistException(e);
-        }
-        if (serviceType.equals(ServiceType.COMPUTE)) {
-            p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
-            if (resourceId.contains("/servers/")) {
-                String serverId = resourceId.replaceAll(".*/servers/", "");
-                Server server = m_os.compute().servers().get(serverId);
-                if (server == null) {
-                    throw new DoesNotExistException("This template does not exist");
-                }
-                // concat addresses
-                String addresses = "";
-                for (List<? extends Address> addrs: server.getAddresses().getAddresses().values()) {
-                    for (Address addr: addrs) {
-                        addresses = addresses + addr.getAddr() + ",";
-                    }
-                }
-                addresses = addresses.replaceAll(",$", "");
-                p.setProperty(ComputeDescription.HOST_NAMES, addresses);
-                // get Flavor
-                Flavor flavor = server.getFlavor();
-                if (flavor != null) {
-                    p.setProperty(ComputeDescription.MEMORY, Integer.toString(flavor.getRam()));
-                    p.setProperty(ComputeDescription.SIZE, Integer.toString(flavor.getVcpus()));
-                }
-                Image image = server.getImage();
-                if (image != null) {
-                    p.setProperty(ComputeDescription.MACHINE_OS, image.getName());
-                }
-            } else {
-                throw new NotImplementedException();
-            }
+//        ServiceType serviceType;
+//        // What kind of resource is this?
+//        try {
+//            serviceType = this.typeFromServiceURL(resourceId);
+//        } catch (MalformedURLException e) {
+//            throw new DoesNotExistException(e);
+//        }
+        if (resourceId.startsWith(ServiceType.COMPUTE.getServiceName())) {
+            p = this.getComputeDescription(resourceId);
         } else {
             throw new NotImplementedException();
         }
         return p;
     }
 
+    private Properties getComputeDescription(String resourceId) 
+            throws DoesNotExistException, NotImplementedException, BadParameterException {
+        Properties p = new Properties();
+        p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
+        if (resourceId.contains("/servers/")) {
+            String serverId = resourceId.replaceAll(".*/servers/", "");
+//            Server server = m_os.compute().servers().get(serverId);
+//            if (server == null) {
+//                throw new DoesNotExistException("This resource does not exist: " + serverId);
+//            }
+            // search by name
+            Server server = null;
+            Map<String,String> param = new HashMap<String,String>();
+            param.put("name", serverId);
+            for (Server s: m_os.compute().servers().list(param)) {
+                if (s.getName().equals(serverId)) {
+                    server = s;
+                }
+            }
+            if (server == null) {
+                throw new DoesNotExistException("This resource does not exist: " + serverId);
+            }
+            // concat addresses
+            String addresses = "";
+            for (List<? extends Address> addrs: server.getAddresses().getAddresses().values()) {
+                for (Address addr: addrs) {
+                    addresses = addresses + addr.getAddr() + ",";
+                }
+            }
+            addresses = addresses.replaceAll(",$", "");
+            p.setProperty(ComputeDescription.HOST_NAMES, addresses);
+            // get Flavor
+            Flavor flavor = server.getFlavor();
+            if (flavor != null) {
+                p.setProperty(ComputeDescription.MEMORY, Integer.toString(flavor.getRam()));
+                p.setProperty(ComputeDescription.SIZE, Integer.toString(flavor.getVcpus()));
+            }
+            // FIXME: this is not OS!
+            Image image = server.getImage();
+            if (image != null) {
+                p.setProperty(ComputeDescription.MACHINE_OS, image.getName());
+            }
+        } else {
+            throw new NotImplementedException();
+        }
+        return p;
+    }
+    
     @Override
     public String[] getAccess(String resourceId) {
         // TODO Auto-generated method stub
@@ -122,7 +144,8 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         String[] listOfResources = new String[listOfVM.size()];
         int count=0;
         for (Server s: listOfVM) {
-            listOfResources[count] = this.getHRef(s.getLinks());
+//            listOfResources[count] = this.getHRef(s.getLinks());
+            listOfResources[count] = this.internalIdOf(s);
             count++;
         }
         return listOfResources;
@@ -142,25 +165,29 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         }
         // Build server create
         ServerCreateBuilder scb = Builders.server();
-        scb.name("jsaga-" + m_credential.getUserID() + "-" + UUID.randomUUID());
+        String serverName = "jsaga-" + m_credential.getUserID() + "-" + UUID.randomUUID();
+        scb.name(serverName);
         // TODO discover flavor
         scb.flavor("2");
         scb.image(description.getProperty(ComputeDescription.TEMPLATE));
         ServerCreate sc = scb.build();
         Server vm = m_os.compute().servers().boot(sc);
-        return this.getHRef(vm.getLinks());
+//        return this.getHRef(vm.getLinks());
+        // Cannot use vm.getName() because it is empty
+//        return this.internalIdOf(vm);
+        return internalIdOfServerName(serverName);
     }
 
     @Override
     public void release(String resourceId, boolean drain) throws DoesNotExistException, NotImplementedException {
-        ServiceType serviceType;
+//        ServiceType serviceType;
         // What kind of resource is this?
-        try {
-            serviceType = this.typeFromServiceURL(resourceId);
-        } catch (MalformedURLException e) {
-            throw new DoesNotExistException(e);
-        }
-        if (serviceType.equals(ServiceType.COMPUTE)) {
+//        try {
+//            serviceType = this.typeFromServiceURL(resourceId);
+//        } catch (MalformedURLException e) {
+//            throw new DoesNotExistException(e);
+//        }
+        if (resourceId.startsWith(ServiceType.COMPUTE.getServiceName())) {
             if (resourceId.contains("/servers/")) {
                 String serverId = resourceId.replaceAll(".*/servers/", "");
                 m_os.compute().servers().delete(serverId);
@@ -184,30 +211,36 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     public Properties getTemplate(String id) throws TimeoutException, NoSuccessException, 
                     DoesNotExistException, NotImplementedException {
         Properties p = new Properties();
-        ServiceType serviceType;
+//        ServiceType serviceType;
         // What kind of template is this?
-        try {
-            serviceType = this.typeFromServiceURL(id);
-        } catch (MalformedURLException e) {
-            throw new DoesNotExistException(e);
-        }
-        if (serviceType.equals(ServiceType.COMPUTE)) {
+//        try {
+//            serviceType = this.typeFromServiceURL(id);
+//        } catch (MalformedURLException e) {
+//            throw new DoesNotExistException(e);
+//        }
+        if (id.startsWith(ServiceType.COMPUTE.getServiceName())) {
             p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
             if (id.contains("/images/")) {
                 String imageId = id.replaceAll(".*/images/", "");
-                Image image = m_os.compute().images().get(imageId);
-                if (image == null) {
-                    throw new DoesNotExistException("This template does not exist");
+                // TODO filter
+                for (Image i: m_os.compute().images().list()) {
+                    if (imageId.equals(i.getName())) {
+                        // FIXME: OS not available
+                        p.setProperty(ComputeDescription.MACHINE_OS, i.getName());
+                        // TODO: add other attributes
+                        return p;
+                    }
                 }
-                p.setProperty(ComputeDescription.MACHINE_OS, image.getName());
-                // TODO: add other attributes
+//                Image image = m_os.compute().images().get(imageId);
+//                if (image == null) {
+                    throw new DoesNotExistException("This template does not exist");
+//                }
             } else {
                 throw new NotImplementedException();
             }
         } else {
             throw new NotImplementedException();
         }
-        return p;
     }
 
     @Override
@@ -217,19 +250,30 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         String[] listOfTemplates = new String[listOfImages.size()];
         int count=0;
         for (Image i: listOfImages) {
-            listOfTemplates[count] = this.getHRef(i.getLinks());
+//            listOfTemplates[count] = this.getHRef(i.getLinks());
+            listOfTemplates[count] = this.internalIdOf(i);
             count++;
         }
         // TODO: add flavors?
         return listOfTemplates;
     }
 
-    private String getHRef(List<? extends Link> links) throws NoSuccessException {
-        for (Link link: links) {
-            if ("self".equals(link.getRel())) {
-                return link.getHref();
-            }
-        }
-        throw new NoSuccessException("Cound not find HRef");
+//    private String getHRef(List<? extends Link> links) throws NoSuccessException {
+//        for (Link link: links) {
+//            if ("self".equals(link.getRel())) {
+//                return link.getHref();
+//            }
+//        }
+//        throw new NoSuccessException("Cound not find HRef");
+//    }
+//    
+    private String internalIdOf(Image i) {
+        return ServiceType.COMPUTE.getServiceName() + "/images/" + i.getName();
+    }
+    private String internalIdOf(Server s) {
+        return this.internalIdOfServerName(s.getName());
+    }
+    private String internalIdOfServerName(String name) {
+        return ServiceType.COMPUTE.getServiceName() + "/servers/" + name;
     }
 }

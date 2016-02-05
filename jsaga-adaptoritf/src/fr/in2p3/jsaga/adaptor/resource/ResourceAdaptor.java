@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.adaptor.resource;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
@@ -26,8 +27,9 @@ public interface ResourceAdaptor extends ClientAdaptor {
      * @return a list of Properties that describe the resource
      * @throws DoesNotExistException if the resource is not available anymore
      * @throws NotImplementedException 
+     * @throws BadParameterException 
      */
-    public Properties getDescription(String resourceId) throws TimeoutException, NoSuccessException, DoesNotExistException, NotImplementedException;
+    public Properties getDescription(String resourceId) throws TimeoutException, NoSuccessException, DoesNotExistException, NotImplementedException, BadParameterException;
     
     public void release(String resourceId) throws DoesNotExistException, NotImplementedException;
 
