@@ -30,7 +30,7 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
     }
 
     @Test
-    public void images() throws Exception {
+    public void imagesAndFlavors() throws Exception {
         // List all templates
         List<String> templates = m_rm.listTemplates(Type.COMPUTE);
         assertTrue(templates.size()>0);
@@ -44,9 +44,11 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
     @Test
     public void launchAndDeleteVM() throws Exception {
         ResourceDescription cd = (ResourceDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
-        // TODO: build a array with image AND flavor
-        String templates = "[openstack://cckeystone.in2p3.fr:5000/v2.0/]-[nova/images/official-centosCC-7x-x86_64]";
-        cd.setAttribute(ResourceDescription.TEMPLATE, templates);
+        String[] templates = new String[]{
+                "[DUMMY_URL]-[nova/images/official-centosCC-7x-x86_64]",
+                "[DUMMY_URL]-[nova/flavors/m1.small]"
+        };
+        cd.setVectorAttribute(ResourceDescription.TEMPLATE, templates);
         Compute server = m_rm.acquireCompute((ComputeDescription) cd);
         ResourceDescription rd = server.getDescription();
         assertNotNull(rd);

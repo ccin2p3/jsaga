@@ -77,14 +77,15 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
             // search by name
             Server server = this.getServerByName(resourceId);
             // concat addresses
-            String addresses = "";
-            for (List<? extends Address> addrs: server.getAddresses().getAddresses().values()) {
-                for (Address addr: addrs) {
-                    addresses = addresses + addr.getAddr() + ",";
-                }
-            }
-            addresses = addresses.replaceAll(",$", "");
-            p.setProperty(ComputeDescription.HOST_NAMES, addresses);
+            // TODO: remove this comment. addresses got into access[]...
+//            String addresses = "";
+//            for (List<? extends Address> addrs: server.getAddresses().getAddresses().values()) {
+//                for (Address addr: addrs) {
+//                    addresses = addresses + addr.getAddr() + ",";
+//                }
+//            }
+//            addresses = addresses.replaceAll(",$", "");
+//            p.setProperty(ComputeDescription.HOST_NAMES, addresses);
             // get Flavor
             Flavor flavor = server.getFlavor();
             if (flavor != null) {
@@ -141,26 +142,32 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         if (!description.containsKey(ComputeDescription.TEMPLATE)) {
             throw new NoSuccessException("Mandatory: " + ComputeDescription.TEMPLATE);
         }
-        // Check that template name is in the JSAGA form
-        // [URL]-[nova/images/.*]
-        // TODO this is a list! => image and/or flavor
-        Pattern p = Pattern.compile("(\\[.*]-\\[)(.+)(])");
-        Matcher m = p.matcher(description.getProperty(ComputeDescription.TEMPLATE));
-        if (!m.find()) {
-            throw new NoSuccessException("Malformed imageId: " + description.getProperty(ComputeDescription.TEMPLATE));
-        }
+        // TODO discover flavor if MEMORY, SIZE...
         // Build server create
         ServerCreateBuilder scb = Builders.server();
-        // check image
-        try {
-            scb.image(this.getImageByName(m.group(2)));
-        } catch (DoesNotExistException e) {
-            throw new NoSuccessException(e);
+        
+        // TEMPLATE can be an IMAGE, FLAVOR
+        Pattern p = Pattern.compile("(\\[.*]-\\[)(.+)(])");
+        for (String template: (String[])description.get(ComputeDescription.TEMPLATE)) {
+            // Check that template name is in the JSAGA form
+            // [URL]-[nova/images/.*]
+            Matcher m = p.matcher(template);
+            if (!m.find()) {
+                throw new NoSuccessException("Malformed templateId: " + template);
+            }
+            // check image
+            try {
+                scb.image(this.getImageByName(m.group(2)));
+            } catch (DoesNotExistException e) {
+                try {
+                    scb.flavor(this.getFlavorByName(m.group(2)));
+                } catch (DoesNotExistException e1) {
+                    throw new NoSuccessException(e1);
+                }
+            }
         }
         String serverName = "jsaga-" + m_credential.getUserID() + "-" + UUID.randomUUID();
         scb.name(serverName);
-        // TODO discover flavor
-        scb.flavor("2");
         ServerCreate sc = scb.build();
         Server vm = m_os.compute().servers().boot(sc);
         // Cannot use vm.getName() because it is empty
@@ -216,18 +223,25 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     public String[] listComputeTemplates() throws TimeoutException,
             NoSuccessException {
         List<? extends Image> listOfImages = m_os.compute().images().list();
-        String[] listOfTemplates = new String[listOfImages.size()];
+        List<? extends Flavor> listOfFlavors = m_os.compute().flavors().list();
+        String[] listOfTemplates = new String[listOfImages.size()+listOfFlavors.size()];
         int count=0;
         for (Image i: listOfImages) {
             listOfTemplates[count] = this.internalIdOf(i);
             count++;
         }
-        // TODO: add flavors?
+        for (Flavor f: listOfFlavors) {
+            listOfTemplates[count] = this.internalIdOf(f);
+            count++;
+        }
         return listOfTemplates;
     }
 
     private String internalIdOf(Image i) {
         return ServiceType.COMPUTE.getServiceName() + "/images/" + i.getName();
+    }
+    private String internalIdOf(Flavor f) {
+        return ServiceType.COMPUTE.getServiceName() + "/flavors/" + f.getName();
     }
     private String internalIdOf(Server s) {
         return this.internalIdOfServerName(s.getName());
@@ -258,10 +272,16 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         throw new DoesNotExistException("This template does not exist: " + imageId);
     }
 
-//    private Flavor getFlavorFromProperties(Properties prop) {
-//        
-//    }
-    
+    private Flavor getFlavorByName(String internalId) throws DoesNotExistException {
+        String flavorId = internalId.replaceAll(".*/flavors/", "");
+        for (Flavor f: m_os.compute().flavors().list()) {
+            if (f.getName().equals(flavorId)) {
+                return f;
+            }
+        }
+        throw new DoesNotExistException("This template does not exist: " + flavorId);
+    }
+
     @Deprecated
     private String getHRef(List<? extends Link> links) throws NoSuccessException {
         for (Link link: links) {

@@ -2,7 +2,10 @@ package fr.in2p3.jsaga.impl.resource.description;
 
 import org.apache.log4j.Logger;
 import org.ogf.saga.resource.description.ComputeDescription;
+import org.ogf.saga.resource.description.ResourceDescription;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Properties;
 
 /* ***************************************************
@@ -40,4 +43,23 @@ public class ComputeDescriptionImpl extends AbstractResourceDescriptionImpl impl
     public ComputeDescriptionImpl(Properties properties) {
         super(properties);
     }
+    
+    @Override
+    protected Collection<String> getScalarAttributes() {
+        Collection<String> c = super.getScalarAttributes();
+        c.add(ComputeDescription.MACHINE_ARCH);
+        c.add(ComputeDescription.MACHINE_OS);
+        c.add(ComputeDescription.ACCESS);
+        c.add(ComputeDescription.SIZE);
+        c.add(ComputeDescription.MEMORY);
+        return c;
+    }
+
+    @Override
+    protected Collection<String> getVectorAttributes() {
+        Collection<String> c = super.getVectorAttributes();
+        c.add(ComputeDescription.HOST_NAMES);
+        return c;
+    }
+    
 }

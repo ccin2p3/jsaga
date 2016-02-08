@@ -57,6 +57,8 @@ public class AbstractResourceDescriptionImpl extends AbstractAttributesImpl impl
     /** constructor for ResourceManager.getTemplate() */
     public AbstractResourceDescriptionImpl(Properties properties) {
         super(null, true);      //isExtensible=true
+        m_scalarAttributes = this.getScalarAttributes();
+        m_vectorAttributes = this.getVectorAttributes();
         for (Entry<Object, Object> entrySet: properties.entrySet()) {
             try {
                 if (entrySet.getValue() instanceof String) {

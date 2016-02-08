@@ -63,7 +63,11 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         }
         Properties properties = new Properties();
         for (String attr: description.listAttributes()) {
-            properties.setProperty(attr, description.getAttribute(attr));
+            try { // scalar attribute
+                properties.setProperty(attr, description.getAttribute(attr));
+            } catch (IncorrectStateException ise) {
+                properties.put(attr, description.getVectorAttribute(attr));
+            }
         }
         String resourceId;
         if (m_adaptor instanceof ComputeResourceAdaptor) {
