@@ -82,11 +82,13 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
             throw new NotImplementedException("Unkown type of resource adaptor");
         }
         // TODO remove this cast
-        m_attributes.m_ResourceID.setObject(((AbstractSyncResourceManagerImpl)m_manager).toSagaId(resourceId));
+        m_attributes.m_ResourceID.setObject(SAGAId.idToSagaId(
+                ((AbstractSyncResourceManagerImpl)m_manager).getURL(), 
+                resourceId));
         // reload description
         Properties prop;
         try {
-            prop = m_adaptor.getDescription(getInternalId());
+            prop = m_adaptor.getDescription(SAGAId.idFromSagaId(getId()));
         } catch (BadParameterException e) {
             throw new NoSuccessException(e);
         }
@@ -105,7 +107,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         this(type, session, manager, adaptor);
         m_attributes.m_ResourceID.setObject(id);
         // Get description of the resource
-        Properties description = m_adaptor.getDescription(getInternalId());
+        Properties description = m_adaptor.getDescription(SAGAId.idFromSagaId(getId()));
         if (!type.name().equals(description.getProperty(Resource.RESOURCE_TYPE))) {
             throw new NotImplementedException();
         }
@@ -126,9 +128,6 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
     // getters
     public String getId() {
         return m_attributes.m_ResourceID.getObject();
-    }
-    public String getInternalId() throws BadParameterException {
-        return SAGAId.idFromSagaId(getId());
     }
     public Type getType() {
         return m_attributes.m_Type.getObject();
@@ -153,7 +152,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         if (description != null) {
             m_attributes.m_Description.setObject(description.toString());
             try {
-                m_adaptor.release(getInternalId());
+                m_adaptor.release(SAGAId.idFromSagaId(getId()));
             } catch (DoesNotExistException e) {
                 throw new NoSuccessException(e);
             } catch (NotImplementedException e) {
@@ -167,7 +166,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
      * @throws NoSuccessException */
     public void release() throws NoSuccessException {
         try {
-            m_adaptor.release(getInternalId());
+            m_adaptor.release(SAGAId.idFromSagaId(getId()));
         } catch (DoesNotExistException e) {
             throw new NoSuccessException(e);
         } catch (NotImplementedException e) {

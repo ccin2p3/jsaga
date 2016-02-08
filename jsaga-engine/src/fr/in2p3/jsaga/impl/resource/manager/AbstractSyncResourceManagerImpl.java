@@ -46,6 +46,10 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
         m_adaptor = adaptor;
     }
 
+    public URL getURL() {
+        return this.m_url;
+    }
+    
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
         AbstractSyncResourceManagerImpl clone = (AbstractSyncResourceManagerImpl) super.clone();
@@ -228,10 +232,4 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
         //TODO
     }
 
-    // ---------------------------------------------------------------
-    // Internal methods
-    
-    public String toSagaId(String id) {
-        return "[" + m_url.getString() + "]-[" + id + "]";
-    }
 }

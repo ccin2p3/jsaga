@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.url.URL;
 
 public class SAGAId {
 
@@ -24,4 +25,7 @@ public class SAGAId {
         throw new BadParameterException();
     }
 
+    public static String idToSagaId(URL url, String nativeId) {
+        return "[" + url.getString() + "]-[" + nativeId + "]";
+    }
 }
