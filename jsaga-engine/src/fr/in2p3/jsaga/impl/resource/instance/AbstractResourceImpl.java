@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.resource.ComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.NetworkResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.StorageResourceAdaptor;
+import fr.in2p3.jsaga.helpers.SAGAId;
 import fr.in2p3.jsaga.impl.resource.manager.AbstractSyncResourceManagerImpl;
 import fr.in2p3.jsaga.impl.resource.manager.ResourceManagerImpl;
 import fr.in2p3.jsaga.impl.resource.task.AbstractResourceTaskImpl;
@@ -127,7 +128,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         return m_attributes.m_ResourceID.getObject();
     }
     public String getInternalId() throws BadParameterException {
-        return AbstractSyncResourceManagerImpl.idFromSagaId(getId());
+        return SAGAId.idFromSagaId(getId());
     }
     public Type getType() {
         return m_attributes.m_Type.getObject();

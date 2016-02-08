@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.adaptor.resource.ComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.NetworkResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.StorageResourceAdaptor;
+import fr.in2p3.jsaga.helpers.SAGAId;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.resource.description.ComputeDescriptionImpl;
 import fr.in2p3.jsaga.impl.resource.description.NetworkDescriptionImpl;
@@ -30,8 +31,6 @@ import org.ogf.saga.url.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -116,7 +115,7 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     public ResourceDescription getTemplateSync(String id) throws NotImplementedException,
             BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         // Extract internalId from sagaId
-        Properties properties = m_adaptor.getTemplate(idFromSagaId(id));
+        Properties properties = m_adaptor.getTemplate(SAGAId.idFromSagaId(id));
         String typeString = properties.getProperty(Resource.RESOURCE_TYPE);
         if (typeString != null) {
             Type type = Type.valueOf(typeString);
@@ -158,12 +157,12 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     public void releaseComputeSync(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
-        m_adaptor.release(idFromSagaId(id));
+        m_adaptor.release(SAGAId.idFromSagaId(id));
     }
     public void releaseComputeSync(String id, boolean drain) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
-        ((ComputeResourceAdaptor)m_adaptor).release(idFromSagaId(id), drain);
+        ((ComputeResourceAdaptor)m_adaptor).release(SAGAId.idFromSagaId(id), drain);
     }
 
     //----------------------------------------------------------------
@@ -189,7 +188,7 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     public void releaseNetworkSync(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
-        m_adaptor.release(idFromSagaId(id));
+        m_adaptor.release(SAGAId.idFromSagaId(id));
     }
 
     //----------------------------------------------------------------
@@ -215,7 +214,7 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     public void releaseStorageSync(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
-        m_adaptor.release(idFromSagaId(id));
+        m_adaptor.release(SAGAId.idFromSagaId(id));
     }
 
     //----------------------------------------------------------------
@@ -232,16 +231,6 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     // ---------------------------------------------------------------
     // Internal methods
     
-    // TODO externalize this
-    public static String idFromSagaId(String sagaId) throws BadParameterException {
-        Pattern p = Pattern.compile("(\\[.*]-\\[)(.+)(])");
-        Matcher m = p.matcher(sagaId);
-        if (m.find()) {
-            return m.group(2);
-        }
-        throw new BadParameterException();
-    }
-
     public String toSagaId(String id) {
         return "[" + m_url.getString() + "]-[" + id + "]";
     }
