@@ -34,8 +34,9 @@ public class StorageImpl extends AbstractResourceImpl<Storage,StorageDescription
      * @throws PermissionDeniedException 
      * @throws AuthorizationFailedException 
      * @throws AuthenticationFailedException 
-     * @throws NotImplementedException */
-    public StorageImpl(Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, StorageDescription description) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException, IncorrectStateException, DoesNotExistException {
+     * @throws NotImplementedException 
+     * @throws BadParameterException */
+    public StorageImpl(Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, StorageDescription description) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException, IncorrectStateException, DoesNotExistException, BadParameterException {
         super(Type.STORAGE, session, manager, adaptor, description);
     }
 

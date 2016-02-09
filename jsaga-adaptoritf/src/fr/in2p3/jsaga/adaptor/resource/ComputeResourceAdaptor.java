@@ -14,8 +14,23 @@ public interface ComputeResourceAdaptor extends ResourceAdaptor {
      */
     public String[] listComputeResources() throws TimeoutException, NoSuccessException;
 
+    /**
+     * Obtains a compute resource from a description
+     * @param description
+     * @return the native resource ID
+     * @throws NotImplementedException
+     * @throws NoSuccessException
+     */
     public String acquireComputeResource(Properties description) throws NotImplementedException, NoSuccessException;
     
+    /**
+     * release a compute resource identified by ID after draining if requested
+     * @param id
+     * @param drain
+     * @throws DoesNotExistException
+     * @throws NotImplementedException
+     * @throws NoSuccessException
+     */
     public void release(String id, boolean drain) throws DoesNotExistException, NotImplementedException, NoSuccessException;
 
     /**

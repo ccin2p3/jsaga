@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.resource;
 
 import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 
 import java.util.Properties;
@@ -12,7 +13,14 @@ public interface NetworkResourceAdaptor extends ResourceAdaptor {
      */
     public String[] listNetworkResources() throws TimeoutException, NoSuccessException;
 
-    public void acquireNetworkResource(Properties description);
+    /**
+     * Obtains a network resource from a description
+     * @param description
+     * @return the native resource ID
+     * @throws NotImplementedException
+     * @throws NoSuccessException
+     */
+    public String acquireNetworkResource(Properties description);
 
     /**
      * Obtains the list of network templates that are currently known to the resource manager.

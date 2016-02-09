@@ -34,8 +34,9 @@ public class ComputeImpl extends AbstractResourceImpl<Compute,ComputeDescription
      * @throws PermissionDeniedException 
      * @throws AuthorizationFailedException 
      * @throws AuthenticationFailedException 
-     * @throws NotImplementedException */
-    public ComputeImpl(Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, ComputeDescription description) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException, IncorrectStateException, DoesNotExistException {
+     * @throws NotImplementedException 
+     * @throws BadParameterException */
+    public ComputeImpl(Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, ComputeDescription description) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException, IncorrectStateException, DoesNotExistException, BadParameterException {
         super(Type.COMPUTE, session, manager, adaptor, description);
     }
 

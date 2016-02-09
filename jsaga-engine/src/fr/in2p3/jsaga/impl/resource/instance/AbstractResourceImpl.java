@@ -46,22 +46,14 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
      * @throws PermissionDeniedException 
      * @throws AuthorizationFailedException 
      * @throws AuthenticationFailedException 
-     * @throws NotImplementedException */
+     * @throws NotImplementedException 
+     * @throws BadParameterException */
     public AbstractResourceImpl(Type type, Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, RD description) 
             throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, 
                     PermissionDeniedException, TimeoutException, NoSuccessException, IncorrectStateException, 
-                    DoesNotExistException {
+                    DoesNotExistException, BadParameterException {
         this(type, session, manager, adaptor);
         m_attributes.m_Description.setObject(description.toString());
-        if (Type.COMPUTE.equals(type) && ! (m_adaptor instanceof ComputeResourceAdaptor)) {
-            throw new NotImplementedException("This adaptor does not handle compute resources");
-        }
-        if (Type.STORAGE.equals(type) && ! (m_adaptor instanceof StorageResourceAdaptor)) {
-            throw new NotImplementedException("This adaptor does not handle storage resources");
-        }
-        if (Type.NETWORK.equals(type) && ! (m_adaptor instanceof NetworkResourceAdaptor)) {
-            throw new NotImplementedException("This adaptor does not handle network resources");
-        }
         Properties properties = new Properties();
         for (String attr: description.listAttributes()) {
             try { // scalar attribute
@@ -73,11 +65,10 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         String resourceId;
         if (m_adaptor instanceof ComputeResourceAdaptor) {
             resourceId = ((ComputeResourceAdaptor)m_adaptor).acquireComputeResource(properties);
-        // TODO uncommend this
-//        } else if (m_adaptor instanceof StorageResourceAdaptor) {
-//            resourceId = ((StorageResourceAdaptor)m_adaptor).acquireStorageResource(properties);
-//        } else if (m_adaptor instanceof NetworkResourceAdaptor) {
-//            resourceId = ((NetworkResourceAdaptor)m_adaptor).acquireNetworkResource(properties);
+        } else if (m_adaptor instanceof StorageResourceAdaptor) {
+            resourceId = ((StorageResourceAdaptor)m_adaptor).acquireStorageResource(properties);
+        } else if (m_adaptor instanceof NetworkResourceAdaptor) {
+            resourceId = ((NetworkResourceAdaptor)m_adaptor).acquireNetworkResource(properties);
         } else {
             throw new NotImplementedException("Unkown type of resource adaptor");
         }
@@ -86,13 +77,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
                 ((AbstractSyncResourceManagerImpl)m_manager).getURL(), 
                 resourceId));
         // reload description
-        Properties prop;
-        try {
-            prop = m_adaptor.getDescription(SAGAId.idFromSagaId(getId()));
-        } catch (BadParameterException e) {
-            throw new NoSuccessException(e);
-        }
-        m_description = createDescription(prop);
+        this.loadDescription(type);
     }
 
     /** constructor for reconnecting to resource already acquired 
@@ -106,17 +91,23 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
                     NotImplementedException, BadParameterException {
         this(type, session, manager, adaptor);
         m_attributes.m_ResourceID.setObject(id);
-        // Get description of the resource
-        Properties description = m_adaptor.getDescription(SAGAId.idFromSagaId(getId()));
-        if (!type.name().equals(description.getProperty(Resource.RESOURCE_TYPE))) {
-            throw new NotImplementedException();
-        }
-        m_description = createDescription(description);
+        // load description of the resource
+        this.loadDescription(type);
     }
 
-    /** common to all constructors */
-    private AbstractResourceImpl(Type type, Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor) {
+    /** common to all constructors 
+     * @throws NotImplementedException */
+    private AbstractResourceImpl(Type type, Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor) throws NotImplementedException {
         super(session, manager);
+        if (Type.COMPUTE.equals(type) && ! (adaptor instanceof ComputeResourceAdaptor)) {
+            throw new NotImplementedException("This adaptor does not handle compute resources");
+        }
+        if (Type.STORAGE.equals(type) && ! (adaptor instanceof StorageResourceAdaptor)) {
+            throw new NotImplementedException("This adaptor does not handle storage resources");
+        }
+        if (Type.NETWORK.equals(type) && ! (adaptor instanceof NetworkResourceAdaptor)) {
+            throw new NotImplementedException("This adaptor does not handle network resources");
+        }
         m_manager = manager;
         m_adaptor = adaptor;
         m_attributes = new ResourceAttributes(this);
@@ -125,6 +116,15 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         m_attributes.m_Access.setObjects(adaptor.getAccess(getId()));
     }
 
+    private void loadDescription(Type type) throws TimeoutException, NoSuccessException, 
+                DoesNotExistException, NotImplementedException, BadParameterException {
+        Properties description = m_adaptor.getDescription(SAGAId.idFromSagaId(getId()));
+        if (!type.name().equals(description.getProperty(Resource.RESOURCE_TYPE))) {
+            throw new NotImplementedException();
+        }
+        m_description = createDescription(description);
+    }
+    
     // getters
     public String getId() {
         return m_attributes.m_ResourceID.getObject();
@@ -151,14 +151,8 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         m_description = description;
         if (description != null) {
             m_attributes.m_Description.setObject(description.toString());
-            try {
-                m_adaptor.release(SAGAId.idFromSagaId(getId()));
-            } catch (DoesNotExistException e) {
-                throw new NoSuccessException(e);
-            } catch (NotImplementedException e) {
-                throw new NoSuccessException(e);
-            }
-            // TODO: acquire and change id probably...
+            this.release();
+            // TODO: acquire and change id probably... or keep the same name
         }
     }
 

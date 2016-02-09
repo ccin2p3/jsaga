@@ -34,8 +34,9 @@ public class NetworkImpl extends AbstractResourceImpl<Network,NetworkDescription
      * @throws PermissionDeniedException 
      * @throws AuthorizationFailedException 
      * @throws AuthenticationFailedException 
-     * @throws NotImplementedException */
-    public NetworkImpl(Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, NetworkDescription description) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException, IncorrectStateException, DoesNotExistException {
+     * @throws NotImplementedException 
+     * @throws BadParameterException */
+    public NetworkImpl(Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor, NetworkDescription description) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException, IncorrectStateException, DoesNotExistException, BadParameterException {
         super(Type.NETWORK, session, manager, adaptor, description);
     }
 
