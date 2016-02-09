@@ -111,7 +111,7 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     
     private List<String> addArrayOfSagaIdsToList(List<String> list, String[] array) {
         for (int i=0; array!=null && i<array.length; i++) {
-            list.add("["+m_url.getString()+"]-["+array[i]+"]");
+            list.add(SAGAId.idToSagaId(m_url, array[i]));
         }
         return list;
     }
