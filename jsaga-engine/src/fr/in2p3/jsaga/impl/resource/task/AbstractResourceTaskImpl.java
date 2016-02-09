@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.impl.resource.task;
 
+import java.util.Date;
+
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.monitoring.Callback;
@@ -10,6 +12,9 @@ import org.ogf.saga.resource.task.ResourceTask;
 import org.ogf.saga.resource.task.State;
 import org.ogf.saga.session.Session;
 
+import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
+import fr.in2p3.jsaga.helpers.SAGAId;
+
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
@@ -18,13 +23,16 @@ public class AbstractResourceTaskImpl<R extends Resource>
         extends AbstractMonitorableWithAsyncAttributes<R>
         implements ResourceTask, StateListener
 {
+    protected ResourceAdaptor m_adaptor;
     private StateListener m_listener;
     private ResourceMetrics m_metrics;
     private State m_state;
+    private Date m_stateLastUpdate;
 
     /** common to all constructors */
-    public AbstractResourceTaskImpl(Session session, StateListener listener) {
+    public AbstractResourceTaskImpl(Session session, StateListener listener, ResourceAdaptor adaptor) {
         super(session);
+        m_adaptor = adaptor;
         m_listener = listener;
         m_metrics = new ResourceMetrics(this);
     }
@@ -34,9 +42,16 @@ public class AbstractResourceTaskImpl<R extends Resource>
         if (m_state != null) {
             return m_state;
         } else {
-            return null;    //TODO: query the current state
+            try {
+                return m_adaptor.getState(SAGAId.idFromSagaId(getId()));
+            } catch (DoesNotExistException e) {
+                throw new NoSuccessException(e);
+            } catch (BadParameterException e) {
+                throw new NoSuccessException(e);
+            }
         }
     }
+    
     public String getStateDetail() {
         return null;        //TODO: query the current state
     }
@@ -78,7 +93,7 @@ public class AbstractResourceTaskImpl<R extends Resource>
                 } catch (InterruptedException e) {
                     throw new NoSuccessException(e);
                 }
-                current = this.getState();
+                current = this.m_state;
             } while ((current.getValue() & mask) == 0);
 
             // stop listening
@@ -107,5 +122,6 @@ public class AbstractResourceTaskImpl<R extends Resource>
     public void setState(State state) {
         // save the notified state
         m_state = state;
+        m_stateLastUpdate = new Date();
     }
 }

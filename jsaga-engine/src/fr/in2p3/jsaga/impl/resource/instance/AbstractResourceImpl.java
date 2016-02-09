@@ -33,7 +33,6 @@ import org.ogf.saga.session.Session;
 public abstract class AbstractResourceImpl<R extends Resource, RD extends ResourceDescription>
         extends AbstractResourceTaskImpl<R> implements Resource<R,RD>
 {
-    protected ResourceAdaptor m_adaptor;
     private RD m_description;
     private ResourceManager m_manager;
     private ResourceAttributes m_attributes;
@@ -100,7 +99,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
     /** common to all constructors 
      * @throws NotImplementedException */
     private AbstractResourceImpl(Type type, Session session, ResourceManagerImpl manager, ResourceAdaptor adaptor) throws NotImplementedException {
-        super(session, manager);
+        super(session, manager, adaptor);
         if (Type.COMPUTE.equals(type) && ! (adaptor instanceof ComputeResourceAdaptor)) {
             throw new NotImplementedException("This adaptor does not handle compute resources");
         }
@@ -111,7 +110,6 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
             throw new NotImplementedException("This adaptor does not handle network resources");
         }
         m_manager = manager;
-        m_adaptor = adaptor;
         m_attributes = new ResourceAttributes(this);
         m_attributes.m_Type.setObject(type);
         m_attributes.m_ManagerID.setObject(manager.getId());

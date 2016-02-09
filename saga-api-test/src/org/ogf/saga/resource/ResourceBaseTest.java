@@ -117,10 +117,13 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         int count = 1;
         for (String serverId: resources) {
             Compute server = m_rm.acquireCompute(serverId);
+            // display description
             ResourceDescription rd = server.getDescription();
             assertNotNull(rd);
             System.out.println(serverId);
             this.dumpDescription(rd);
+            // display status
+            System.out.println("  * status=" + server.getState().name());
             // display accesses
             for (String access: server.getAccess()) {
                 System.out.println("  => " + access);

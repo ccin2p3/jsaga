@@ -17,6 +17,7 @@ import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.resource.Type;
 import org.ogf.saga.resource.description.ComputeDescription;
 import org.ogf.saga.resource.instance.Resource;
+import org.ogf.saga.resource.task.State;
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.types.ServiceType;
 import org.openstack4j.model.common.Link;
@@ -25,6 +26,7 @@ import org.openstack4j.model.compute.Address;
 import org.openstack4j.model.compute.Flavor;
 import org.openstack4j.model.compute.Image;
 import org.openstack4j.model.compute.Server;
+import org.openstack4j.model.compute.Server.Status;
 import org.openstack4j.model.compute.ServerCreate;
 import org.openstack4j.model.compute.builder.ServerCreateBuilder;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
@@ -116,6 +118,30 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
                 }
             }
             return accesses.toArray(new String[accesses.size()]);
+        } else {
+            throw new NotImplementedException();
+        }
+    }
+
+    @Override
+    public State getState(String resourceId) throws DoesNotExistException, NotImplementedException {
+        if (resourceId.contains("/servers/")) {
+            // search by name
+            Server server = this.getServerByName(resourceId);
+            Status status = server.getStatus();
+            if (status.equals(Status.ACTIVE)) {
+                return State.ACTIVE;
+            } else if (status.equals(Status.UNKNOWN) || status.equals(Status.UNRECOGNIZED)) {
+                return State.UNKNOWN;
+            } else if (status.equals(Status.DELETED) || status.equals(Status.SHUTOFF) || status.equals(Status.STOPPED)) {
+                return State.CLOSED;
+            } else if (status.equals(Status.ERROR)) {
+                return State.FAILED;
+            } else { 
+                // BUILD | REBUILD | SUSPENDED | PAUSED | RESIZE | VERIFY_RESIZE | REVERT_RESIZE |
+                // PASSWORD | REBOOT | HARD_REBOOT | MIGRATING
+                return State.PENDING;
+            }
         } else {
             throw new NotImplementedException();
         }
@@ -304,4 +330,5 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         }
         throw new NoSuccessException("Cound not find HRef");
     }
+
 }
