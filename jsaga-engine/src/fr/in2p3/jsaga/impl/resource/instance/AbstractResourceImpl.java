@@ -76,6 +76,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         m_attributes.m_ResourceID.setObject(SAGAId.idToSagaId(
                 ((AbstractSyncResourceManagerImpl)m_manager).getURL(), 
                 resourceId));
+        m_attributes.m_Access.setObjects(adaptor.getAccess(SAGAId.idFromSagaId(getId())));
         // reload description
         this.loadDescription(type);
     }
@@ -91,6 +92,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
                     NotImplementedException, BadParameterException {
         this(type, session, manager, adaptor);
         m_attributes.m_ResourceID.setObject(id);
+        m_attributes.m_Access.setObjects(adaptor.getAccess(SAGAId.idFromSagaId(getId())));
         // load description of the resource
         this.loadDescription(type);
     }
@@ -113,7 +115,6 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         m_attributes = new ResourceAttributes(this);
         m_attributes.m_Type.setObject(type);
         m_attributes.m_ManagerID.setObject(manager.getId());
-        m_attributes.m_Access.setObjects(adaptor.getAccess(getId()));
     }
 
     private void loadDescription(Type type) throws TimeoutException, NoSuccessException, 

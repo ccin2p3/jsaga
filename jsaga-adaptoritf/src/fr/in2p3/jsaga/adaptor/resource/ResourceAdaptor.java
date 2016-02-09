@@ -31,7 +31,21 @@ public interface ResourceAdaptor extends ClientAdaptor {
      */
     public Properties getDescription(String resourceId) throws TimeoutException, NoSuccessException, DoesNotExistException, NotImplementedException, BadParameterException;
     
+    /**
+     * release a resource identified by ID
+     * @param resourceId
+     * @throws DoesNotExistException
+     * @throws NotImplementedException
+     * @throws NoSuccessException
+     */
     public void release(String resourceId) throws DoesNotExistException, NotImplementedException, NoSuccessException;
 
-    public String[] getAccess(String resourceId);
+    /**
+     * get the list of access points for the resource identified by ID
+     * @param resourceId
+     * @return
+     * @throws NotImplementedException
+     * @throws DoesNotExistException 
+     */
+    public String[] getAccess(String resourceId) throws NotImplementedException, DoesNotExistException;
 }

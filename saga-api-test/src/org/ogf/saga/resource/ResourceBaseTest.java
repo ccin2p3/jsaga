@@ -121,6 +121,10 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
             assertNotNull(rd);
             System.out.println(serverId);
             this.dumpDescription(rd);
+            // display accesses
+            for (String access: server.getAccess()) {
+                System.out.println("  => " + access);
+            }
             if (count++ == 10) {
                 return;
             }

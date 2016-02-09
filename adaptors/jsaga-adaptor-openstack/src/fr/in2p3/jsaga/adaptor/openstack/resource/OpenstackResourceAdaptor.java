@@ -1,4 +1,5 @@
 package fr.in2p3.jsaga.adaptor.openstack.resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,9 +105,20 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     }
     
     @Override
-    public String[] getAccess(String resourceId) {
-        // TODO Auto-generated method stub
-        return null;
+    public String[] getAccess(String resourceId) throws NotImplementedException, DoesNotExistException {
+        List<String> accesses = new ArrayList<String>();
+        if (resourceId.contains("/servers/")) {
+            // search by name
+            Server server = this.getServerByName(resourceId);
+            for (List<? extends Address> addrs: server.getAddresses().getAddresses().values()) {
+                for (Address addr: addrs) {
+                    accesses.add(addr.getAddr());
+                }
+            }
+            return accesses.toArray(new String[accesses.size()]);
+        } else {
+            throw new NotImplementedException();
+        }
     }
 
     @Override
@@ -177,6 +189,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     @Override
     public void release(String resourceId, boolean drain) 
             throws DoesNotExistException, NotImplementedException, NoSuccessException {
+        // TODO throw NotImpl if drain=true
         if (resourceId.startsWith(ServiceType.COMPUTE.getServiceName())) {
             if (resourceId.contains("/servers/")) {
                 Server server = this.getServerByName(resourceId);
