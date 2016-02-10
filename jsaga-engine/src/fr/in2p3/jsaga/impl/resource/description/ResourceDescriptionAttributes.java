@@ -39,14 +39,12 @@ public class ResourceDescriptionAttributes implements Cloneable {
                 null));
         m_dynamic = resourceDescription._addAttribute(new ScalarAttributeImpl<Boolean>(
                 ResourceDescription.DYNAMIC,
-                // TODO
                 "???",
                 MetricMode.ReadWrite,
                 MetricType.Bool,
                 null));
         m_placement = resourceDescription._addAttribute(new ScalarAttributeImpl<String>(
                 ResourceDescription.PLACEMENT,
-                // TODO
                 "???",
                 MetricMode.ReadWrite,
                 MetricType.String,
