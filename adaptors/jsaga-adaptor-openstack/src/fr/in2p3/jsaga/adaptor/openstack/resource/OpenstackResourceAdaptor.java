@@ -159,7 +159,6 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         if (!description.containsKey(ComputeDescription.TEMPLATE)) {
             throw new NoSuccessException("Mandatory: " + ComputeDescription.TEMPLATE);
         }
-        // TODO discover flavor if MEMORY, SIZE...
         // Build server create
         ServerCreateBuilder scb = Builders.server();
         
@@ -183,6 +182,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
                 }
             }
         }
+        // TODO discover flavor if MEMORY, SIZE...
         String serverName = "jsaga-" + m_credential.getUserID() + "-" + UUID.randomUUID();
         scb.name(serverName);
         ServerCreate sc = scb.build();
@@ -195,7 +195,10 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     @Override
     public void release(String resourceId, boolean drain) 
             throws DoesNotExistException, NotImplementedException, NoSuccessException {
-        // TODO throw NotImpl if drain=true
+        if (drain) {
+            // TODO drain
+            throw new NotImplementedException();
+        }
         if (resourceId.startsWith(ServiceType.COMPUTE.getServiceName())) {
             if (resourceId.contains("/servers/")) {
                 Server server = this.getServerByName(resourceId);
