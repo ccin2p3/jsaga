@@ -27,7 +27,6 @@ public class AbstractResourceTaskImpl<R extends Resource>
     private StateListener m_listener;
     private ResourceMetrics m_metrics;
     private State m_state = State.NEW;
-    private String m_stateDetail;
     private long m_stateLastUpdate = 0;
 
     // TODO: make this a parameter
@@ -52,7 +51,7 @@ public class AbstractResourceTaskImpl<R extends Resource>
             return m_state;
         } else {
             try {
-                return m_adaptor.getState(SAGAId.idFromSagaId(getId()));
+                return m_adaptor.getResourceStatus(SAGAId.idFromSagaId(getId())).getSagaState();
             } catch (DoesNotExistException e) {
                 throw new NoSuccessException(e);
             } catch (BadParameterException e) {
@@ -79,7 +78,7 @@ public class AbstractResourceTaskImpl<R extends Resource>
                     try {
                         String value = metric.getAttribute(Metric.VALUE);
                         State current = State.valueOf(value);
-                        resource.setState(current);
+                        resource.setState(current, null);
                     }
                     catch (NotImplementedException e) {throw e;}
                     catch (AuthorizationFailedException e) {throw e;}
@@ -143,9 +142,10 @@ public class AbstractResourceTaskImpl<R extends Resource>
     }
     
     @Override
-    public void setState(State state) {
+    public void setState(State state, String stateDetail) {
         // save the notified state
         m_state = state;
+        m_metrics.m_StateDetail.setValue(stateDetail);
         m_stateLastUpdate = System.currentTimeMillis();
     }
 

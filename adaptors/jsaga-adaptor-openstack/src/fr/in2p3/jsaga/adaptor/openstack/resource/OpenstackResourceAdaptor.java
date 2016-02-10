@@ -17,11 +17,9 @@ import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.resource.Type;
 import org.ogf.saga.resource.description.ComputeDescription;
 import org.ogf.saga.resource.instance.Resource;
-import org.ogf.saga.resource.task.State;
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.api.types.ServiceType;
-import org.openstack4j.core.transport.Config;
 import org.openstack4j.model.common.Link;
 import org.openstack4j.model.compute.ActionResponse;
 import org.openstack4j.model.compute.Address;
@@ -36,8 +34,8 @@ import org.openstack4j.openstack.OSFactory;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.openstack.OpenstackAdaptorAbstract;
-import fr.in2p3.jsaga.adaptor.openstack.security.OpenstackSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ComputeResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.ResourceStatus;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -119,32 +117,10 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     }
 
     @Override
-    public State getState(String resourceId) throws DoesNotExistException, NotImplementedException {
+    public ResourceStatus getResourceStatus(String resourceId) throws DoesNotExistException, NotImplementedException {
         if (resourceId.contains("/servers/")) {
             Status status = this.getServerByName(resourceId).getStatus();
-            if (status.equals(Status.ACTIVE)) {
-                return State.ACTIVE;
-            } else if (status.equals(Status.UNKNOWN) || status.equals(Status.UNRECOGNIZED)) {
-                return State.UNKNOWN;
-            } else if (status.equals(Status.DELETED) || status.equals(Status.SHUTOFF) || status.equals(Status.STOPPED)) {
-                return State.CLOSED;
-            } else if (status.equals(Status.ERROR)) {
-                return State.FAILED;
-            } else { 
-                // BUILD | REBUILD | SUSPENDED | PAUSED | RESIZE | VERIFY_RESIZE | REVERT_RESIZE |
-                // PASSWORD | REBOOT | HARD_REBOOT | MIGRATING
-                return State.PENDING;
-            }
-        } else {
-            throw new NotImplementedException();
-        }
-    }
-
-    @Deprecated
-    public String getStateDetail(String resourceId)
-            throws DoesNotExistException, NotImplementedException {
-        if (resourceId.contains("/servers/")) {
-            return this.getServerByName(resourceId).getStatus().name();
+            return new OpenstackResourceStatus(status);
         } else {
             throw new NotImplementedException();
         }

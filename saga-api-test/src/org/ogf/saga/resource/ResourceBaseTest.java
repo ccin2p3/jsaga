@@ -15,9 +15,11 @@ import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
+import org.ogf.saga.monitoring.Metric;
 import org.ogf.saga.resource.description.ResourceDescription;
 import org.ogf.saga.resource.instance.Compute;
 import org.ogf.saga.resource.manager.ResourceManager;
+import org.ogf.saga.resource.task.ResourceTask;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
@@ -136,7 +138,8 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         System.out.println(server.getId());
         this.dumpDescription(rd);
         // display status
-        System.out.println("  * status=" + server.getState().name());
+        System.out.println("  * status=" + server.getState().name() + " // " 
+                + server.getMetric(ResourceTask.RESOURCE_STATEDETAIL).getAttribute(Metric.VALUE));
         // display accesses
         for (String access: server.getAccess()) {
             System.out.println("  => " + access);
