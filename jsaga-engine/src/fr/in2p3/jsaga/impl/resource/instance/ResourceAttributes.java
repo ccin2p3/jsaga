@@ -13,7 +13,7 @@ import org.ogf.saga.resource.instance.Resource;
  * ***************************************************/
 public class ResourceAttributes implements Cloneable {
     ScalarAttributeImpl<Type> m_Type;
-    ScalarAttributeImpl<String> m_ResourceID;
+    public ScalarAttributeImpl<String> m_ResourceID;
     ScalarAttributeImpl<String> m_ManagerID;
     VectorAttributeImpl<String> m_Access;
     ScalarAttributeImpl<String> m_Description;

@@ -10,6 +10,6 @@ import org.ogf.saga.error.TimeoutException;
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************/
 public interface StateListener {
-    public void startListening() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException;
-    public void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException;
+    public void startListening(String nativeResourceId, ResourceMonitorCallback callback) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException;
+    public void stopListening(String nativeResourceId) throws NotImplementedException, TimeoutException, NoSuccessException;
 }

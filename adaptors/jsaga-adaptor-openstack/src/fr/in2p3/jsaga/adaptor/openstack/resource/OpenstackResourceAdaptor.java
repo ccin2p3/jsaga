@@ -19,7 +19,9 @@ import org.ogf.saga.resource.description.ComputeDescription;
 import org.ogf.saga.resource.instance.Resource;
 import org.ogf.saga.resource.task.State;
 import org.openstack4j.api.Builders;
+import org.openstack4j.api.OSClient;
 import org.openstack4j.api.types.ServiceType;
+import org.openstack4j.core.transport.Config;
 import org.openstack4j.model.common.Link;
 import org.openstack4j.model.compute.ActionResponse;
 import org.openstack4j.model.compute.Address;
@@ -29,9 +31,12 @@ import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.compute.Server.Status;
 import org.openstack4j.model.compute.ServerCreate;
 import org.openstack4j.model.compute.builder.ServerCreateBuilder;
+import org.openstack4j.openstack.OSFactory;
+
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.openstack.OpenstackAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.openstack.security.OpenstackSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ComputeResourceAdaptor;
 
 /* ***************************************************
@@ -79,16 +84,6 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         if (resourceId.contains("/servers/")) {
             // search by name
             Server server = this.getServerByName(resourceId);
-            // concat addresses
-            // TODO: remove this comment. addresses got into access[]...
-//            String addresses = "";
-//            for (List<? extends Address> addrs: server.getAddresses().getAddresses().values()) {
-//                for (Address addr: addrs) {
-//                    addresses = addresses + addr.getAddr() + ",";
-//                }
-//            }
-//            addresses = addresses.replaceAll(",$", "");
-//            p.setProperty(ComputeDescription.HOST_NAMES, addresses);
             // get Flavor
             Flavor flavor = server.getFlavor();
             if (flavor != null) {
@@ -126,9 +121,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     @Override
     public State getState(String resourceId) throws DoesNotExistException, NotImplementedException {
         if (resourceId.contains("/servers/")) {
-            // search by name
-            Server server = this.getServerByName(resourceId);
-            Status status = server.getStatus();
+            Status status = this.getServerByName(resourceId).getStatus();
             if (status.equals(Status.ACTIVE)) {
                 return State.ACTIVE;
             } else if (status.equals(Status.UNKNOWN) || status.equals(Status.UNRECOGNIZED)) {
@@ -142,6 +135,16 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
                 // PASSWORD | REBOOT | HARD_REBOOT | MIGRATING
                 return State.PENDING;
             }
+        } else {
+            throw new NotImplementedException();
+        }
+    }
+
+    @Deprecated
+    public String getStateDetail(String resourceId)
+            throws DoesNotExistException, NotImplementedException {
+        if (resourceId.contains("/servers/")) {
+            return this.getServerByName(resourceId).getStatus().name();
         } else {
             throw new NotImplementedException();
         }
@@ -208,6 +211,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         scb.name(serverName);
         ServerCreate sc = scb.build();
         Server vm = m_os.compute().servers().boot(sc);
+//        Server vm = m_os.compute().servers().bootAndWaitActive(sc, 60000);
         // Cannot use vm.getName() because it is empty
         return internalIdOfServerName(serverName);
     }
@@ -293,7 +297,12 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         String serverId = internalId.replaceAll(".*/servers/", "");
         Map<String,String> param = new HashMap<String,String>();
         param.put("name", serverId);
-        for (Server s: m_os.compute().servers().list(param)) {
+        OSClient os = OSFactory.builder()
+                .endpoint(m_os.getEndpoint())
+                .token(m_token.getId())
+                .tenantName(m_tenant)
+                .authenticate();
+        for (Server s: os.compute().servers().list(param)) {
             if (s.getName().equals(serverId)) {
                 return s;
             }

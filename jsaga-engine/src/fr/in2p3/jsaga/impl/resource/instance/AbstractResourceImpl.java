@@ -35,7 +35,6 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
 {
     private RD m_description;
     private ResourceManager m_manager;
-    private ResourceAttributes m_attributes;
 
     /** constructor for resource acquisition 
      * @throws DoesNotExistException 
@@ -125,18 +124,19 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
     }
     
     // getters
-    public String getId() {
-        return m_attributes.m_ResourceID.getObject();
-    }
+    @Override
     public Type getType() {
         return m_attributes.m_Type.getObject();
     }
+    @Override
     public ResourceManager getManager() {
         return m_manager;
     }
+    @Override
     public String[] getAccess() {
         return m_attributes.m_Access.getObjects();
     }
+    @Override
     public RD getDescription() {
         return m_description;
     }

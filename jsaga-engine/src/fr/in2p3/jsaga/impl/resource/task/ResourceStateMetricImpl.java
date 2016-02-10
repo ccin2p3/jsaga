@@ -11,7 +11,7 @@ import org.ogf.saga.monitoring.Callback;
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************/
 public class ResourceStateMetricImpl<E> extends MetricImpl<E> {
-    private StateListener m_listener;
+    private AbstractResourceTaskImpl m_listener;
 
     /** constructor */
     public ResourceStateMetricImpl(AbstractResourceTaskImpl resource, String name, String desc, MetricMode mode, String unit, MetricType type, E initialValue) {

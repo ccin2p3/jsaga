@@ -21,6 +21,7 @@ import org.ogf.saga.resource.description.ComputeDescription;
 import org.ogf.saga.resource.description.ResourceDescription;
 import org.ogf.saga.resource.instance.Compute;
 import org.ogf.saga.resource.manager.ResourceManager;
+import org.ogf.saga.resource.task.State;
 
 
 public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
@@ -50,12 +51,11 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         };
         cd.setVectorAttribute(ResourceDescription.TEMPLATE, templates);
         Compute server = m_rm.acquireCompute((ComputeDescription) cd);
+        server.waitFor(120);
         ResourceDescription rd = server.getDescription();
         assertNotNull(rd);
         System.out.println(server.getId());
         this.dumpDescription(rd);
-        // Wait 2s
-        Thread.sleep(2000);
         m_rm.releaseCompute(server.getId());
     }
 

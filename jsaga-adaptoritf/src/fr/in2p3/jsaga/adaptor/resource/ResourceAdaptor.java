@@ -51,4 +51,5 @@ public interface ResourceAdaptor extends ClientAdaptor {
     public String[] getAccess(String resourceId) throws NotImplementedException, DoesNotExistException;
     
     public State getState(String resourceId) throws DoesNotExistException, NotImplementedException;
+
 }

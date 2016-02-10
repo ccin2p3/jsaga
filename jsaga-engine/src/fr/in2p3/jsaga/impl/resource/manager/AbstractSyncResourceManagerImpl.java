@@ -12,6 +12,9 @@ import fr.in2p3.jsaga.impl.resource.description.StorageDescriptionImpl;
 import fr.in2p3.jsaga.impl.resource.instance.ComputeImpl;
 import fr.in2p3.jsaga.impl.resource.instance.NetworkImpl;
 import fr.in2p3.jsaga.impl.resource.instance.StorageImpl;
+import fr.in2p3.jsaga.impl.resource.task.AbstractResourceTaskImpl;
+import fr.in2p3.jsaga.impl.resource.task.IndividualResourceStatusPoller;
+import fr.in2p3.jsaga.impl.resource.task.ResourceMonitorCallback;
 import fr.in2p3.jsaga.impl.resource.task.StateListener;
 import fr.in2p3.jsaga.sync.resource.SyncResourceManager;
 import org.ogf.saga.SagaObject;
@@ -39,11 +42,13 @@ import java.util.Properties;
 public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObjectImpl implements SyncResourceManager, StateListener {
     protected URL m_url;
     protected ResourceAdaptor m_adaptor;
-
+    private IndividualResourceStatusPoller m_poller;
+    
     public AbstractSyncResourceManagerImpl(Session session, URL rm, ResourceAdaptor adaptor) {
         super(session);
         m_url = rm;
         m_adaptor = adaptor;
+        m_poller = new IndividualResourceStatusPoller(m_adaptor);
     }
 
     public URL getURL() {
@@ -224,12 +229,15 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     //----------------------------------------------------------------
 
     /** This method is specific to JSAGA implementation */
-    public void startListening() {
-        //TODO
+    @Override
+    public void startListening(String nativeResourceId, ResourceMonitorCallback callback) {
+        m_poller.subscribeResource(nativeResourceId, callback);
     }
+    
+    @Override
     /** This method is specific to JSAGA implementation */
-    public void stopListening() {
-        //TODO
+    public void stopListening(String nativeResourceId) {
+        m_poller.unsubscribeResource(nativeResourceId);
     }
 
 }

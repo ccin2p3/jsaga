@@ -14,6 +14,7 @@ import org.ogf.saga.session.Session;
 
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 import fr.in2p3.jsaga.helpers.SAGAId;
+import fr.in2p3.jsaga.impl.resource.instance.ResourceAttributes;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -21,12 +22,14 @@ import fr.in2p3.jsaga.helpers.SAGAId;
  * ***************************************************/
 public class AbstractResourceTaskImpl<R extends Resource>
         extends AbstractMonitorableWithAsyncAttributes<R>
-        implements ResourceTask, StateListener
+        implements ResourceTask, ResourceMonitorCallback
 {
     protected ResourceAdaptor m_adaptor;
+    protected ResourceAttributes m_attributes;
     private StateListener m_listener;
     private ResourceMetrics m_metrics;
-    private State m_state;
+    private State m_state = State.NEW;
+    private String m_stateDetail;
     private Date m_stateLastUpdate;
 
     /** common to all constructors */
@@ -35,6 +38,11 @@ public class AbstractResourceTaskImpl<R extends Resource>
         m_adaptor = adaptor;
         m_listener = listener;
         m_metrics = new ResourceMetrics(this);
+    }
+
+    @Override
+    public String getId() {
+        return m_attributes.m_ResourceID.getObject();
     }
 
     public State getState() throws NotImplementedException, TimeoutException, NoSuccessException {
@@ -52,15 +60,11 @@ public class AbstractResourceTaskImpl<R extends Resource>
         }
     }
     
-    public String getStateDetail() {
-        return null;        //TODO: query the current state
-    }
-
     public void waitFor() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        this.waitFor(WAIT_FOREVER, State.FINAL);
+        this.waitFor(WAIT_FOREVER, State.ACTIVE);
     }
     public void waitFor(float timeoutInSeconds) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        this.waitFor(timeoutInSeconds, State.FINAL);
+        this.waitFor(timeoutInSeconds, State.ACTIVE);
     }
     public void waitFor(State state) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         this.waitFor(WAIT_FOREVER, state);
@@ -85,6 +89,12 @@ public class AbstractResourceTaskImpl<R extends Resource>
             });
 
             // wait for specified state
+            long endTime;
+            if (timeoutInSeconds == WAIT_FOREVER) {
+                endTime = -1;
+            } else {
+                endTime = System.currentTimeMillis() + (long) (timeoutInSeconds*1000f);
+            }
             int mask = state.getValue();
             State current;
             do {
@@ -94,6 +104,10 @@ public class AbstractResourceTaskImpl<R extends Resource>
                     throw new NoSuccessException(e);
                 }
                 current = this.m_state;
+                System.out.println("current state:" + current);
+                if (System.currentTimeMillis()>=endTime) {
+                    throw new TimeoutException();
+                }
             } while ((current.getValue() & mask) == 0);
 
             // stop listening
@@ -113,15 +127,26 @@ public class AbstractResourceTaskImpl<R extends Resource>
 
     public void startListening() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         // forward to manager
-        m_listener.startListening();
+        try {
+            m_listener.startListening(SAGAId.idFromSagaId(getId()), this);
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
+        }
     }
     public void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException {
         // forward to manager
-        m_listener.stopListening();
+        try {
+            m_listener.stopListening(SAGAId.idFromSagaId(getId()));
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
+        }
     }
+    
+    @Override
     public void setState(State state) {
         // save the notified state
         m_state = state;
         m_stateLastUpdate = new Date();
     }
+
 }

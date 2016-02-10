@@ -48,7 +48,8 @@ public abstract class OpenstackAdaptorAbstract implements ClientAdaptor {
 //    protected String m_tokenId;
     protected Token m_token;
     protected OSClient m_os;
-
+    protected String m_tenant;
+    
     @Override
     public String getType() {
         return "openstack";
@@ -73,6 +74,7 @@ public abstract class OpenstackAdaptorAbstract implements ClientAdaptor {
             NoSuccessException {
         // remote host closed connection during handshake
         m_logger.debug("Connecting to " + host);
+        m_tenant = m_credential.getAttribute(OpenstackSecurityAdaptor.PARAM_TENANT);
         m_os = OSFactory.builder()
                 .endpoint("https://" + host + ":" + port + basePath)
                 .withConfig(Config.newConfig()
@@ -82,7 +84,7 @@ public abstract class OpenstackAdaptorAbstract implements ClientAdaptor {
 //            })
                 )
                 .credentials(m_credential.getUserID(), m_credential.getUserPass())
-                .tenantName(m_credential.getAttribute(OpenstackSecurityAdaptor.PARAM_TENANT))
+                .tenantName(m_tenant)
                 .authenticate();
         m_token = m_os.getToken();
         m_logger.info("Connected to TENANT " + m_credential.getAttribute(OpenstackSecurityAdaptor.PARAM_TENANT));
