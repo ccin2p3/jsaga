@@ -52,10 +52,8 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         cd.setVectorAttribute(ResourceDescription.TEMPLATE, templates);
         Compute server = m_rm.acquireCompute((ComputeDescription) cd);
         server.waitFor(120);
-        ResourceDescription rd = server.getDescription();
-        assertNotNull(rd);
-        System.out.println(server.getId());
-        this.dumpDescription(rd);
+        assertEquals(State.ACTIVE, server.getState());
+        this.dumpCompute(server);
         m_rm.releaseCompute(server.getId());
     }
 
