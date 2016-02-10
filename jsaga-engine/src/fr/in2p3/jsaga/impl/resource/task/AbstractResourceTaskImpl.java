@@ -1,7 +1,5 @@
 package fr.in2p3.jsaga.impl.resource.task;
 
-import java.util.Date;
-
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.monitoring.Callback;
@@ -30,8 +28,11 @@ public class AbstractResourceTaskImpl<R extends Resource>
     private ResourceMetrics m_metrics;
     private State m_state = State.NEW;
     private String m_stateDetail;
-    private Date m_stateLastUpdate;
+    private long m_stateLastUpdate = 0;
 
+    // TODO: make this a parameter
+    private long m_stateLifetimeMillis = 30000;
+    
     /** common to all constructors */
     public AbstractResourceTaskImpl(Session session, StateListener listener, ResourceAdaptor adaptor) {
         super(session);
@@ -46,8 +47,8 @@ public class AbstractResourceTaskImpl<R extends Resource>
     }
 
     public State getState() throws NotImplementedException, TimeoutException, NoSuccessException {
-        //TODO: m_state=null when the notified state has expired...
-        if (m_state != null) {
+        if (m_state != null && m_stateLastUpdate != 0 
+                && (System.currentTimeMillis() < m_stateLastUpdate + m_stateLifetimeMillis)) {
             return m_state;
         } else {
             try {
@@ -104,7 +105,6 @@ public class AbstractResourceTaskImpl<R extends Resource>
                     throw new NoSuccessException(e);
                 }
                 current = this.m_state;
-                System.out.println("current state:" + current);
                 if (System.currentTimeMillis()>=endTime) {
                     throw new TimeoutException();
                 }
@@ -146,7 +146,7 @@ public class AbstractResourceTaskImpl<R extends Resource>
     public void setState(State state) {
         // save the notified state
         m_state = state;
-        m_stateLastUpdate = new Date();
+        m_stateLastUpdate = System.currentTimeMillis();
     }
 
 }
