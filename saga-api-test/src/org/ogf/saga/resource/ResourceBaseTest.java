@@ -29,7 +29,7 @@ import org.ogf.saga.url.URLFactory;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   AbstractJobTest
+* File:   ResourceBaseTest
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr
 * Date:   25 JAN 2016
 * ***************************************************
