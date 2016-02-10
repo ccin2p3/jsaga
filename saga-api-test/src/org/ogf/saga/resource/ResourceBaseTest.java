@@ -16,6 +16,7 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.monitoring.Metric;
+import org.ogf.saga.resource.description.ComputeDescription;
 import org.ogf.saga.resource.description.ResourceDescription;
 import org.ogf.saga.resource.instance.Compute;
 import org.ogf.saga.resource.manager.ResourceManager;
@@ -125,6 +126,10 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
             }
         }
     }
+    
+    ////////
+    // Utils
+    ////////
     
     protected void dumpDescription(ResourceDescription rd) throws Exception {
         for (String a: rd.listAttributes()) {

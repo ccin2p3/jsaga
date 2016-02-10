@@ -46,6 +46,7 @@ public class AbstractResourceTaskImpl<R extends Resource>
     }
 
     public State getState() throws NotImplementedException, TimeoutException, NoSuccessException {
+        // either take status from cache or ask the adaptor
         if (m_state != null && m_stateLastUpdate != 0 
                 && (System.currentTimeMillis() < m_stateLastUpdate + m_stateLifetimeMillis)) {
             return m_state;
@@ -61,10 +62,10 @@ public class AbstractResourceTaskImpl<R extends Resource>
     }
     
     public void waitFor() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        this.waitFor(WAIT_FOREVER, State.ACTIVE);
+        this.waitFor(WAIT_FOREVER, State.FINAL);
     }
     public void waitFor(float timeoutInSeconds) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        this.waitFor(timeoutInSeconds, State.ACTIVE);
+        this.waitFor(timeoutInSeconds, State.FINAL);
     }
     public void waitFor(State state) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         this.waitFor(WAIT_FOREVER, state);
