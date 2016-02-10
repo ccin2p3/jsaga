@@ -44,15 +44,40 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
     
     @Test
     public void launchAndDeleteVM() throws Exception {
-        ResourceDescription cd = (ResourceDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
+        ComputeDescription cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
         String[] templates = new String[]{
                 "[DUMMY_URL]-[nova/images/official-centosCC-7x-x86_64]",
                 "[DUMMY_URL]-[nova/flavors/m1.small]"
         };
         cd.setVectorAttribute(ResourceDescription.TEMPLATE, templates);
-        Compute server = m_rm.acquireCompute((ComputeDescription) cd);
-        server.waitFor(120);
+        Compute server = m_rm.acquireCompute(cd);
+        server.waitFor(120, State.ACTIVE);
         assertEquals(State.ACTIVE, server.getState());
+        this.dumpCompute(server);
+        m_rm.releaseCompute(server.getId());
+    }
+
+    @Test
+    public void launchAndReconfigureDeleteVM() throws Exception {
+        ComputeDescription cd;
+        String[] templates;
+        cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
+        templates = new String[]{
+                "[DUMMY_URL]-[nova/images/official-centosCC-7x-x86_64]",
+                "[DUMMY_URL]-[nova/flavors/m1.small]"
+        };
+        cd.setVectorAttribute(ResourceDescription.TEMPLATE, templates);
+        Compute server = m_rm.acquireCompute(cd);
+        server.waitFor(120, State.ACTIVE);
+        this.dumpCompute(server);
+        // reconfigure to official-ubuntu-14.04-x86_64 
+        templates = new String[]{
+                "[DUMMY_URL]-[nova/images/official-ubuntu-14.04-x86_64]",
+                "[DUMMY_URL]-[nova/flavors/m1.small]"
+        };
+        cd.setVectorAttribute(ResourceDescription.TEMPLATE, templates);
+        server.reconfigure(cd);
+        server.waitFor(120);
         this.dumpCompute(server);
         m_rm.releaseCompute(server.getId());
     }

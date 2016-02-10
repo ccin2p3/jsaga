@@ -10,22 +10,6 @@ public class OpenstackResourceStatus extends ResourceStatus {
     public OpenstackResourceStatus(Status nativeStatus) {
         super(null, nativeStatus, nativeStatus.name());
     }
-//    public OpenstackResourceStatus(State state, Object stateCode,
-//            String stateString, int returnCode) {
-//        super(state, stateCode, stateString, returnCode);
-//    }
-
-//    public OpenstackResourceStatus(State state, Object stateCode,
-//            String stateString, String cause) {
-//        super(state, stateCode, stateString, cause);
-//        // TODO Auto-generated constructor stub
-//    }
-//
-//    public OpenstackResourceStatus(State state, Object stateCode,
-//            String stateString) {
-//        super(state, stateCode, stateString);
-//        // TODO Auto-generated constructor stub
-//    }
 
     @Override
     protected String getModel() {
