@@ -51,12 +51,13 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
 
     @Override
     public Usage getUsage() {
+        // TODO: keypairname as param
         return null;
     }
 
     @Override
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-        // TODO: default MEM, NBCPU...
+        // TODO: keypairname as param
         return null;
     }
 
@@ -232,6 +233,11 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
                 Image i = this.getImageByName(id);
                 p.setProperty(ComputeDescription.MACHINE_OS, i.getName());
                 // TODO: add other attributes
+                return p;
+            } else if (id.contains("/flavors")) {
+                Flavor f = this.getFlavorByName(id);
+                p.setProperty(ComputeDescription.MEMORY, Integer.toString(f.getRam()));
+                p.setProperty(ComputeDescription.SIZE, Integer.toString(f.getVcpus()));
                 return p;
             } else {
                 throw new NotImplementedException();

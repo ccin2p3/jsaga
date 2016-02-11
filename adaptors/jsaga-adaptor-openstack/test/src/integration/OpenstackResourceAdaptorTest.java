@@ -82,6 +82,8 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         m_rm.releaseCompute(server.getId());
     }
 
+    // TODO test launch + submit job
+    
     @Override
     @Test(expected=NotImplementedException.class)
     public void listStorageTemplates() throws NotImplementedException, TimeoutException, NoSuccessException  {
