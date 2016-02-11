@@ -8,9 +8,14 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+import org.ogf.saga.context.Context;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.IncorrectURLException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
@@ -32,9 +37,11 @@ import org.openstack4j.model.compute.builder.ServerCreateBuilder;
 import org.openstack4j.openstack.OSFactory;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.openstack.OpenstackAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.resource.ComputeResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.ResourceSecurityContextProvider;
 import fr.in2p3.jsaga.adaptor.resource.ResourceStatus;
 
 /* ***************************************************
@@ -47,17 +54,32 @@ import fr.in2p3.jsaga.adaptor.resource.ResourceStatus;
  * ***************************************************/
 
 public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
-        implements ComputeResourceAdaptor {
+        implements ComputeResourceAdaptor, ResourceSecurityContextProvider {
 
+    protected Logger m_logger = Logger.getLogger(OpenstackResourceAdaptor.class);
+
+    public static String PARAM_KEYPAIRNAME = "KeypairName";
+    private String m_keypairName = null;
+    
+    @Override
+    public void connect(String userInfo, String host, int port,
+            String basePath, Map attributes) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            IncorrectURLException, BadParameterException, TimeoutException,
+            NoSuccessException {
+        super.connect(userInfo, host, port, basePath, attributes);
+        if (attributes.containsKey(PARAM_KEYPAIRNAME)) {
+            m_keypairName = (String) attributes.get(PARAM_KEYPAIRNAME);
+        }
+    }
+    
     @Override
     public Usage getUsage() {
-        // TODO: keypairname as param
-        return null;
+        return new U(PARAM_KEYPAIRNAME);
     }
 
     @Override
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-        // TODO: keypairname as param
         return null;
     }
 
@@ -102,13 +124,16 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     
     @Override
     public String[] getAccess(String resourceId) throws NotImplementedException, DoesNotExistException {
+        m_logger.info("getAccess");
         List<String> accesses = new ArrayList<String>();
         if (resourceId.contains("/servers/")) {
             // search by name
             Server server = this.getServerByName(resourceId);
+            m_logger.debug("vmstate:" + server.getVmState());
             for (List<? extends Address> addrs: server.getAddresses().getAddresses().values()) {
                 for (Address addr: addrs) {
-                    accesses.add(addr.getAddr());
+                    m_logger.debug("ssh://" + addr.getAddr());
+                    accesses.add("ssh://" + addr.getAddr());
                 }
             }
             return accesses.toArray(new String[accesses.size()]);
@@ -184,12 +209,16 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
             }
         }
         // TODO discover flavor if MEMORY, SIZE...
+        if (m_keypairName != null) {
+            scb.keypairName(m_keypairName);
+        }
         String serverName = "jsaga-" + m_credential.getUserID() + "-" + UUID.randomUUID();
         scb.name(serverName);
         ServerCreate sc = scb.build();
         Server vm = m_os.compute().servers().boot(sc);
 //        Server vm = m_os.compute().servers().bootAndWaitActive(sc, 60000);
         // Cannot use vm.getName() because it is empty
+        m_logger.debug("PASS:" + vm.getAdminPass());
         return internalIdOfServerName(serverName);
     }
 
@@ -265,6 +294,29 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         return listOfTemplates;
     }
 
+    //////////////
+    // Security context to access new VMs
+    //////////////
+    @Override
+    public Properties getSecurityProperties(String resourceId) throws NotImplementedException, DoesNotExistException {
+        if (resourceId.contains("/servers/")) {
+            Server server = this.getServerByName(resourceId);
+            if (server.getKeyName() != null) {
+                return null;
+            }
+            Properties p = new Properties();
+            p.setProperty(Context.TYPE, "UserPass");
+            p.setProperty(Context.USERID, "root");
+            p.setProperty(Context.USERPASS, server.getAdminPass());
+            return p;
+        } else {
+            throw new NotImplementedException();
+        }
+    }
+
+    ///////////////
+    // Private 
+    ///////////////
     private String internalIdOf(Image i) {
         return ServiceType.COMPUTE.getServiceName() + "/images/" + i.getName();
     }

@@ -72,7 +72,6 @@ public abstract class OpenstackAdaptorAbstract implements ClientAdaptor {
             AuthenticationFailedException, AuthorizationFailedException,
             IncorrectURLException, BadParameterException, TimeoutException,
             NoSuccessException {
-        // remote host closed connection during handshake
         m_logger.debug("Connecting to " + host);
         m_tenant = m_credential.getAttribute(OpenstackSecurityAdaptor.PARAM_TENANT);
         m_os = OSFactory.builder()
