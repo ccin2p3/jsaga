@@ -7,8 +7,10 @@ import fr.in2p3.jsaga.adaptor.resource.ResourceStatus;
 
 public class OpenstackResourceStatus extends ResourceStatus {
 
-    public OpenstackResourceStatus(Status nativeStatus) {
+    private String m_vmState;
+    public OpenstackResourceStatus(Status nativeStatus, String vmState) {
         super(null, nativeStatus, nativeStatus.name());
+        m_vmState = vmState;
     }
 
     @Override
@@ -20,7 +22,13 @@ public class OpenstackResourceStatus extends ResourceStatus {
     public State getSagaState() {
         Status status = (Status)m_nativeStateCode;
         if (status.equals(Status.ACTIVE)) {
-            return State.ACTIVE;
+            // vmState can be "building" when status is "ACTIVE"...
+            // vmState should be "active" for SAGA state to become "ACTIVE
+            if ("active".equals(m_vmState)) {
+                return State.ACTIVE;
+            } else {
+                return State.PENDING;
+            }
         } else if (status.equals(Status.UNKNOWN) || status.equals(Status.UNRECOGNIZED)) {
             return State.UNKNOWN;
         } else if (status.equals(Status.DELETED) || status.equals(Status.SHUTOFF) || status.equals(Status.STOPPED)) {

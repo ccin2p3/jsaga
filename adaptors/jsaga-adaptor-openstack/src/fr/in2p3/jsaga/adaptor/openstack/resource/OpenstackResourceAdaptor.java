@@ -145,8 +145,8 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     @Override
     public ResourceStatus getResourceStatus(String resourceId) throws DoesNotExistException, NotImplementedException {
         if (resourceId.contains("/servers/")) {
-            Status status = this.getServerByName(resourceId).getStatus();
-            return new OpenstackResourceStatus(status);
+            Server server = this.getServerByName(resourceId);
+            return new OpenstackResourceStatus(server.getStatus(), server.getVmState());
         } else {
             throw new NotImplementedException();
         }
