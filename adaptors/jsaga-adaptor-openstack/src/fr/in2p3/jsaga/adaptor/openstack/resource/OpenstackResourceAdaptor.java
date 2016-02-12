@@ -40,9 +40,9 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.openstack.OpenstackAdaptorAbstract;
-import fr.in2p3.jsaga.adaptor.resource.ComputeResourceAdaptor;
-import fr.in2p3.jsaga.adaptor.resource.ResourceSecurityContextProvider;
 import fr.in2p3.jsaga.adaptor.resource.ResourceStatus;
+import fr.in2p3.jsaga.adaptor.resource.SecuredResource;
+import fr.in2p3.jsaga.adaptor.resource.compute.SecuredComputeResourceAdaptor;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -54,7 +54,7 @@ import fr.in2p3.jsaga.adaptor.resource.ResourceStatus;
  * ***************************************************/
 
 public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
-        implements ComputeResourceAdaptor, ResourceSecurityContextProvider {
+        implements SecuredComputeResourceAdaptor {
 
     protected Logger m_logger = Logger.getLogger(OpenstackResourceAdaptor.class);
 
@@ -166,7 +166,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     }
 
     @Override
-    public String acquireComputeResource(Properties description) throws NotImplementedException, NoSuccessException {
+    public SecuredResource acquireComputeResource(Properties description) throws NotImplementedException, NoSuccessException {
         // hostnames is not supported
         if (description.containsKey(ComputeDescription.HOST_NAMES)) {
             throw new NotImplementedException();
@@ -218,8 +218,16 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         Server vm = m_os.compute().servers().boot(sc);
 //        Server vm = m_os.compute().servers().bootAndWaitActive(sc, 60000);
         // Cannot use vm.getName() because it is empty
-        m_logger.debug("PASS:" + vm.getAdminPass());
-        return internalIdOfServerName(serverName);
+//        m_logger.debug("PASS:" + vm.getAdminPass());
+        SecuredResource sr;
+        if (vm.getAdminPass() != null) {
+            sr = new SecuredResource(internalIdOfServerName(serverName), "UserPass");
+            sr.setProperty(Context.USERID, "root");
+            sr.setProperty(Context.USERPASS, vm.getAdminPass());
+        } else {
+            sr = new SecuredResource(internalIdOfServerName(serverName), null);
+        }
+        return sr;
     }
 
     @Override
@@ -297,7 +305,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     //////////////
     // Security context to access new VMs
     //////////////
-    @Override
+    @Deprecated
     public Properties getSecurityProperties(String resourceId) throws NotImplementedException, DoesNotExistException {
         if (resourceId.contains("/servers/")) {
             Server server = this.getServerByName(resourceId);

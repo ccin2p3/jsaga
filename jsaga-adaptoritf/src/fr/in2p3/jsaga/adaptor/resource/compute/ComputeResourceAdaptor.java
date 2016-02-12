@@ -1,9 +1,11 @@
-package fr.in2p3.jsaga.adaptor.resource;
+package fr.in2p3.jsaga.adaptor.resource.compute;
 
 import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
+
+import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 
 import java.util.Properties;
 
@@ -14,15 +16,6 @@ public interface ComputeResourceAdaptor extends ResourceAdaptor {
      */
     public String[] listComputeResources() throws TimeoutException, NoSuccessException;
 
-    /**
-     * Obtains a compute resource from a description
-     * @param description
-     * @return the native resource ID
-     * @throws NotImplementedException
-     * @throws NoSuccessException
-     */
-    public String acquireComputeResource(Properties description) throws NotImplementedException, NoSuccessException;
-    
     /**
      * release a compute resource identified by ID after draining if requested
      * @param id

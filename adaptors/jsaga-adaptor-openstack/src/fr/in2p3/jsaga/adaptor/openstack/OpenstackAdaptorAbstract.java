@@ -4,11 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
 import org.apache.log4j.Logger;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
@@ -20,7 +15,6 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.api.types.ServiceType;
-import org.openstack4j.core.transport.Config;
 import org.openstack4j.model.identity.Token;
 import org.openstack4j.model.identity.Access.Service;
 import org.openstack4j.openstack.OSFactory;
@@ -45,7 +39,6 @@ public abstract class OpenstackAdaptorAbstract implements ClientAdaptor {
 
     protected OpenstackSecurityCredential m_credential;
     protected URL m_url;
-//    protected String m_tokenId;
     protected Token m_token;
     protected OSClient m_os;
     protected String m_tenant;
@@ -76,12 +69,6 @@ public abstract class OpenstackAdaptorAbstract implements ClientAdaptor {
         m_tenant = m_credential.getAttribute(OpenstackSecurityAdaptor.PARAM_TENANT);
         m_os = OSFactory.builder()
                 .endpoint("https://" + host + ":" + port + basePath)
-                .withConfig(Config.newConfig()
-//                        .withSSLVerificationDisabled()
-//                        .withHostnameVerifier(new HostnameVerifier() {
-//                public boolean verify(String hostname, SSLSession session) {return true;}
-//            })
-                )
                 .credentials(m_credential.getUserID(), m_credential.getUserPass())
                 .tenantName(m_tenant)
                 .authenticate();

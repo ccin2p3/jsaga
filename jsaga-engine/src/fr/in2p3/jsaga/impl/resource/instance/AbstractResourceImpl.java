@@ -1,16 +1,22 @@
 package fr.in2p3.jsaga.impl.resource.instance;
 
+import java.util.Map.Entry;
 import java.util.Properties;
 
-import fr.in2p3.jsaga.adaptor.resource.ComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.NetworkResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.SecuredResource;
 import fr.in2p3.jsaga.adaptor.resource.StorageResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.compute.ComputeResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.compute.SecuredComputeResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.compute.UnsecuredComputeResourceAdaptor;
 import fr.in2p3.jsaga.helpers.SAGAId;
 import fr.in2p3.jsaga.impl.resource.manager.AbstractSyncResourceManagerImpl;
 import fr.in2p3.jsaga.impl.resource.manager.ResourceManagerImpl;
 import fr.in2p3.jsaga.impl.resource.task.AbstractResourceTaskImpl;
 
+import org.ogf.saga.context.Context;
+import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
@@ -130,6 +136,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
                 m_attributes.m_Access.setObjects(m_adaptor.getAccess(SAGAId.idFromSagaId(getId())));
                 // reload description
                 this.loadDescription();
+                // TODO if adaptor can provide SecurityProperties, build a context and add it to the session
             } catch (Exception e) {
                 throw new NoSuccessException(e);
             }
@@ -154,10 +161,15 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
     //////////////////
     // Private methods
     //////////////////
+    /*
+     * Acquire a resource from a description.
+     * Returns the ID of the acquired resource.
+     */
     private String acquireResource(RD description) 
             throws NotImplementedException, NoSuccessException, AuthenticationFailedException, 
             AuthorizationFailedException, PermissionDeniedException, TimeoutException, 
             DoesNotExistException, IncorrectStateException {
+        // translate the description into a Properties for the adaptor
         Properties properties = new Properties();
         for (String attr: description.listAttributes()) {
             try { // scalar attribute
@@ -167,29 +179,48 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
             }
         }
         if (m_adaptor instanceof ComputeResourceAdaptor) {
-            return ((ComputeResourceAdaptor)m_adaptor).acquireComputeResource(properties);
+            if (m_adaptor instanceof SecuredComputeResourceAdaptor) {
+                // this adaptor sends back a resourceID along with properties necessary to build a security context
+                SecuredResource sr = ((SecuredComputeResourceAdaptor)m_adaptor).acquireComputeResource(properties);
+                // build and add the context into the session
+                this.loadContext(sr);
+                // returns the ID only
+                return sr.getId();
+            } else if (m_adaptor instanceof UnsecuredComputeResourceAdaptor) {
+                return ((UnsecuredComputeResourceAdaptor)m_adaptor).acquireComputeResource(properties);
+            }
         } else if (m_adaptor instanceof StorageResourceAdaptor) {
             return ((StorageResourceAdaptor)m_adaptor).acquireStorageResource(properties);
         } else if (m_adaptor instanceof NetworkResourceAdaptor) {
             return ((NetworkResourceAdaptor)m_adaptor).acquireNetworkResource(properties);
-        } else {
-            throw new NotImplementedException("Unkown type of resource adaptor");
         }
+        throw new NotImplementedException("Unkown type of resource adaptor");
     }
 
+    /*
+     * Asks the adaptor to send back the resource identified by ID.
+     */
     private void loadDescription() throws TimeoutException, NoSuccessException, 
                 DoesNotExistException, NotImplementedException, BadParameterException {
+        // adaptor sends back a properties with resource description
         Properties description = m_adaptor.getDescription(SAGAId.idFromSagaId(getId()));
         if (!getType().name().equals(description.getProperty(Resource.RESOURCE_TYPE))) {
             throw new NotImplementedException(getType().name() + " <> " + description.getProperty(Resource.RESOURCE_TYPE));
         }
+        // the subclass instantiates the appropriate Resource object
         m_description = createDescription(description);
     }
     
+    /*
+     * checks that the type of resource matches with the adaptor instance
+     */
     private void checkDescription() throws BadParameterException {
         this.checkDescription(getType());
     }
     
+    /*
+     * checks that the type in parameter matches with the adaptor instance
+     */
     private void checkDescription(Type type) throws BadParameterException {
         if (Type.COMPUTE.equals(type) && ! (m_adaptor instanceof ComputeResourceAdaptor)) {
             throw new BadParameterException("This adaptor does not handle compute resources");
@@ -202,4 +233,29 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         }
         
     }
+    
+    /*
+     * create a security context from properties and add it to the session
+     */
+    private void loadContext(SecuredResource securityProperties) throws NoSuccessException, IncorrectStateException, TimeoutException, NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException {
+        if (securityProperties == null || securityProperties.getId() == null ||
+                securityProperties.getContextType() == null) {
+            return;
+        }
+        try {
+        Context context = ContextFactory.createContext(JSAGA_FACTORY, securityProperties.getContextType());
+        for (Entry<Object, Object> entry: securityProperties.entrySet()) {
+            if (entry.getValue() instanceof String) {
+                context.setAttribute((String)entry.getKey(), (String)entry.getValue());
+            } else if (entry.getValue() instanceof String[]) {
+                context.setVectorAttribute((String)entry.getKey(), (String[])entry.getValue());
+            }
+        }
+        m_session.addContext(context);
+        } catch (BadParameterException bpe) {
+            throw new NoSuccessException(bpe);
+        }
+    }
+
+
 }

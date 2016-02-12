@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.impl.resource.instance;
 
 import java.util.Properties;
 
-import fr.in2p3.jsaga.adaptor.resource.ComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.compute.ComputeResourceAdaptor;
 import fr.in2p3.jsaga.impl.resource.description.ComputeDescriptionImpl;
 import fr.in2p3.jsaga.impl.resource.manager.ResourceManagerImpl;
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
@@ -54,9 +55,14 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         server.waitFor(120, State.ACTIVE);
         assertEquals(State.ACTIVE, server.getState());
         this.dumpCompute(server);
+        // test if we have a new UserPass context in the session
+        for (Context c: m_session.listContexts()) {
+            System.out.println(c.getAttribute(Context.TYPE));
+            System.out.println(c.toString());
+        }
         m_rm.releaseCompute(server.getId());
     }
-
+    
     @Test
     public void launchAndReconfigureDeleteVM() throws Exception {
         ComputeDescription cd;

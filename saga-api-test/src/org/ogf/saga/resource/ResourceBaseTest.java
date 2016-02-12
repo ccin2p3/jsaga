@@ -146,6 +146,7 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         System.out.println("  * status=" + server.getState().name() + " // " 
                 + server.getMetric(ResourceTask.RESOURCE_STATEDETAIL).getAttribute(Metric.VALUE));
         // display accesses
+        Thread.sleep(20000);
         for (String access: server.getAccess()) {
             System.out.println("  => " + access);
         }
