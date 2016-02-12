@@ -12,6 +12,9 @@
 			<job type="unicore">
             	<attribute name="ServiceName" value="JobManagement"/>
 			</job>
+            <resource type="unicore">
+                <attribute name="ServiceName" value="ResourceManagement"/>
+            </resource>
 			
         </context>
     </session>

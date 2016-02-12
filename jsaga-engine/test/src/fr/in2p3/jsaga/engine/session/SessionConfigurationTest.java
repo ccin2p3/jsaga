@@ -123,7 +123,7 @@ public class SessionConfigurationTest {
             if (key.equals(ContextImpl.BASE_URL_EXCLUDES)) {
                 Assert.assertArrayEquals(new String[]{}, context.getVectorAttribute(key));
             } else if (key.equals(ContextImpl.BASE_URL_INCLUDES)) {
-                Assert.assertArrayEquals(new String[]{"unicore://*","unicore://*"}, context.getVectorAttribute(key));
+                Assert.assertArrayEquals(new String[]{"unicore://*","unicore://*","unicore://*"}, context.getVectorAttribute(key));
             } else if (key.equals(ContextImpl.TYPE)) {
                 Assert.assertEquals("VOMS",context.getAttribute(key));
             } else if (key.equals("Att")) {
@@ -134,6 +134,8 @@ public class SessionConfigurationTest {
                 Assert.assertArrayEquals(new String[]{"unicore.MaxJobsQueued=100","unicore.ServiceName=JobManagement"}, context.getVectorAttribute(key));
             } else if (key.equals(ContextImpl.DATA_SERVICE_ATTRIBUTES)) {
                 Assert.assertArrayEquals(new String[]{"unicore.ServiceName=StorageManagement"}, context.getVectorAttribute(key));
+            } else if (key.equals(ContextImpl.RESOURCE_SERVICE_ATTRIBUTES)) {
+                Assert.assertArrayEquals(new String[]{"unicore.ServiceName=ResourceManagement"}, context.getVectorAttribute(key));
             }
         }
     }

@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.engine.session;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.context.attrs.DataServiceConfigAttribute;
 import fr.in2p3.jsaga.impl.context.attrs.JobServiceConfigAttribute;
+import fr.in2p3.jsaga.impl.context.attrs.ResourceServiceConfigAttribute;
 import fr.in2p3.jsaga.impl.context.attrs.ServiceConfigAttribute;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,6 +35,11 @@ public class ServiceConfigAttributeTest {
 		test_set(ContextImpl.DATA_SERVICE_ATTRIBUTES);
 	}
 	
+    @Test
+    public void test_set_resource() throws Exception {
+        test_set(ContextImpl.RESOURCE_SERVICE_ATTRIBUTES);
+    }
+    
     private void test_set(String serviceType) throws Exception {
         ServiceConfigAttribute vector = getVector(serviceType);
         vector.setValues(new String[]{"srb.Resource=foo", "srb.Zone=bar", "srm.Protocols=gsiftp,gsidcap", "Ping=true"});
@@ -56,6 +62,11 @@ public class ServiceConfigAttributeTest {
 		test_unset(ContextImpl.DATA_SERVICE_ATTRIBUTES);
 	}
 	
+    @Test
+    public void test_unset_resource() throws Exception {
+        test_unset(ContextImpl.RESOURCE_SERVICE_ATTRIBUTES);
+    }
+    
     private void test_unset(String serviceType) throws Exception {
         ServiceConfigAttribute vector = getVector(serviceType);
         vector.setValues(new String[]{"srm.Protocols=", "*.Ping="});
@@ -74,6 +85,11 @@ public class ServiceConfigAttributeTest {
 		test_error(ContextImpl.DATA_SERVICE_ATTRIBUTES);
 	}
 	
+    @Test
+    public void test_error_resource() throws Exception {
+        test_error(ContextImpl.RESOURCE_SERVICE_ATTRIBUTES);
+    }
+    
     private void test_error(String serviceType) throws Exception {
         ServiceConfigAttribute vector = getVector(serviceType);
         try {
@@ -98,6 +114,8 @@ public class ServiceConfigAttributeTest {
         	return new JobServiceConfigAttribute();
         } else if (ContextImpl.DATA_SERVICE_ATTRIBUTES.equals(serviceType)) {
         	return new DataServiceConfigAttribute();
+        } else if (ContextImpl.RESOURCE_SERVICE_ATTRIBUTES.equals(serviceType)) {
+            return new ResourceServiceConfigAttribute();
         }
         throw new Exception("unknown service type: " + serviceType);
     }

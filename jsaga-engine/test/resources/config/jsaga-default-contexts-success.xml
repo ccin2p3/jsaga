@@ -19,6 +19,9 @@
             <data type="srb">
                 <attribute name="Zone" value="titi"/>
             </data>
+            <resource type="openstack">
+                <attribute name="Tenant" value="titi"/>
+            </resource>
             <include domain="de"/>
             <include host="localhost" port="8080"/>
         </context>

@@ -13,6 +13,7 @@
     <xsl:variable name="BaseUrlExcludes">BaseUrlExcludes</xsl:variable>
     <xsl:variable name="JobServiceAttributes">JobServiceAttributes</xsl:variable>
     <xsl:variable name="DataServiceAttributes">DataServiceAttributes</xsl:variable>
+    <xsl:variable name="ResourceServiceAttributes">ResourceServiceAttributes</xsl:variable>
 
     <xsl:template match="/cfg:jsaga-default">
         <jsaga-default>
@@ -38,7 +39,7 @@
         <context>
             <xsl:copy-of select="@type"/>
             <!-- config context -->
-            <xsl:copy-of select="cfg:attribute[@name!=$UrlPrefix and @name!=$BaseUrlIncludes and @name!=$BaseUrlExcludes and @name!=$JobServiceAttributes and @name!=$DataServiceAttributes]"/>
+            <xsl:copy-of select="cfg:attribute[@name!=$UrlPrefix and @name!=$BaseUrlIncludes and @name!=$BaseUrlExcludes and @name!=$JobServiceAttributes and @name!=$DataServiceAttributes and @name!=$ResourceServiceAttributes]"/>
 
             <!-- prefix -->
             <xsl:if test="parent::cfg:session">
@@ -60,10 +61,10 @@
             </xsl:if>
 
             <!-- includes -->
-            <xsl:if test="cfg:attribute[@name=$BaseUrlIncludes] or cfg:include or cfg:data or cfg:job">
+            <xsl:if test="cfg:attribute[@name=$BaseUrlIncludes] or cfg:include or cfg:data or cfg:job or cfg:resource">
                 <attribute name="{$BaseUrlIncludes}">
                     <xsl:copy-of select="cfg:attribute[@name=$BaseUrlIncludes]/cfg:item"/>
-                    <xsl:for-each select="cfg:data | cfg:job">
+                    <xsl:for-each select="cfg:data | cfg:job | cfg:resource">
                         <xsl:variable name="service" select="."/>
                         <xsl:for-each select="child::cfg:include | following-sibling::cfg:include">
                             <item>
@@ -83,7 +84,7 @@
             <xsl:if test="cfg:attribute[@name=$BaseUrlExcludes] or descendant::cfg:exclude">
                 <attribute name="{$BaseUrlExcludes}">
                     <xsl:copy-of select="cfg:attribute[@name=$BaseUrlExcludes]/cfg:item"/>
-                    <xsl:for-each select="cfg:data | cfg:job">
+                    <xsl:for-each select="cfg:data | cfg:job | cfg:resource">
                         <xsl:variable name="service" select="."/>
                         <xsl:for-each select="child::cfg:exclude | following-sibling::cfg:exclude">
                             <item>
@@ -173,6 +174,45 @@
                 </attribute>
             </xsl:if>
 
+            <!-- Resource service -->
+            <xsl:if test="cfg:attribute[@name=$ResourceServiceAttributes] or cfg:resource">
+                <attribute name="{$ResourceServiceAttributes}">
+                    <xsl:copy-of select="cfg:attribute[@name=$ResourceServiceAttributes]/cfg:item"/>
+                    <xsl:for-each select="cfg:resource">
+                        <xsl:variable name="service" select="."/>
+                        <xsl:for-each select="cfg:attribute">
+                            <item>
+                                <xsl:value-of select="$service/@type"/>
+                                <xsl:text>.</xsl:text>
+                                <xsl:value-of select="@name"/>
+                                <xsl:text>=</xsl:text>
+                                <xsl:choose>
+                                    <xsl:when test="@value">
+                                        <xsl:value-of select="@value"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:for-each select="cfg:item">
+                                            <xsl:if test="position()>1">,</xsl:if>
+                                            <xsl:value-of select="text()"/>
+                                        </xsl:for-each>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </item>
+                        </xsl:for-each>
+                        <xsl:for-each select="$AdaptorsDescriptor/*/adapt:resource[@type=$service/@type]
+                                              /adapt:attribute[not(@name=$service/cfg:attribute/@name)]">
+                            <item>
+                                <xsl:value-of select="$service/@type"/>
+                                <xsl:text>.</xsl:text>
+                                <xsl:value-of select="@name"/>
+                                <xsl:text>=</xsl:text>
+                                <xsl:value-of select="@value"/>
+                            </item>
+                        </xsl:for-each>
+                    </xsl:for-each>
+                </attribute>
+            </xsl:if>
+
         </context>
     </xsl:template>
 
@@ -210,7 +250,7 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="cfg:data[not(cfg:alias)] | cfg:job[not(cfg:alias)]">
+    <xsl:template match="cfg:data[not(cfg:alias)] | cfg:job[not(cfg:alias)] | cfg:resource[not(cfg:alias)] ">
         <xsl:value-of select="@type"/>
     </xsl:template>
 

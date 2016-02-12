@@ -105,6 +105,11 @@
             </xsl:call-template>
             <xsl:call-template name="MERGE">
                 <xsl:with-param name="ref" select="$ref"/>
+                <xsl:with-param name="tag">resource</xsl:with-param>
+                <xsl:with-param name="attr">type</xsl:with-param>
+            </xsl:call-template>
+            <xsl:call-template name="MERGE">
+                <xsl:with-param name="ref" select="$ref"/>
                 <xsl:with-param name="tag">data</xsl:with-param>
                 <xsl:with-param name="attr">type</xsl:with-param>
             </xsl:call-template>
@@ -125,7 +130,7 @@
             </xsl:call-template>
         </xsl:element>
     </xsl:template>
-    <xsl:template match="cfg:data | cfg:job">
+    <xsl:template match="cfg:data | cfg:job | cfg:resource">
         <xsl:param name="ref"/>
         <xsl:element name="{name()}">
             <xsl:call-template name="MERGE">
