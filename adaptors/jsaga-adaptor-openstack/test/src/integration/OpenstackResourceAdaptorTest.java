@@ -2,6 +2,8 @@ package integration;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.ogf.saga.context.Context;
@@ -15,6 +17,10 @@ import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
+import org.ogf.saga.job.Job;
+import org.ogf.saga.job.JobDescription;
+import org.ogf.saga.job.JobFactory;
+import org.ogf.saga.job.JobService;
 import org.ogf.saga.resource.ResourceBaseTest;
 import org.ogf.saga.resource.ResourceFactory;
 import org.ogf.saga.resource.Type;
@@ -23,9 +29,13 @@ import org.ogf.saga.resource.description.ResourceDescription;
 import org.ogf.saga.resource.instance.Compute;
 import org.ogf.saga.resource.manager.ResourceManager;
 import org.ogf.saga.resource.task.State;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 
 public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
+
+    private Logger m_logger = Logger.getLogger(this.getClass());
 
     public OpenstackResourceAdaptorTest() throws Exception {
         super("openstack");
@@ -57,8 +67,9 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         this.dumpCompute(server);
         // test if we have a new UserPass context in the session
         for (Context c: m_session.listContexts()) {
-            System.out.println(c.getAttribute(Context.TYPE));
-            System.out.println(c.toString());
+            if ("UserPass".equals(c.getAttribute(Context.TYPE))) {
+                m_logger.info(c);
+            }
         }
         m_rm.releaseCompute(server.getId());
     }
@@ -88,7 +99,51 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         m_rm.releaseCompute(server.getId());
     }
 
-    // TODO test launch + submit job
+    @Test
+    public void launchAndSubmitJobAndDeleteVM() throws Exception {
+        ComputeDescription cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
+        String[] templates = new String[]{
+                "[DUMMY_URL]-[nova/images/official-centosCC-7x-x86_64]",
+                "[DUMMY_URL]-[nova/flavors/m1.small]"
+        };
+        cd.setVectorAttribute(ResourceDescription.TEMPLATE, templates);
+        Compute server = m_rm.acquireCompute(cd);
+        server.waitFor(120, State.ACTIVE);
+        assertEquals(State.ACTIVE, server.getState());
+        this.dumpCompute(server);
+        // test if we have a new UserPass context in the session
+        for (Context c: m_session.listContexts()) {
+            if ("UserPass".equals(c.getAttribute(Context.TYPE))) {
+                m_logger.info("UserPass context" + c);
+            }
+        }
+        // Wait 10s for the SSHD server to be started
+//        Thread.sleep(30000);
+        try {
+            URL jobservice = URLFactory.createURL(server.getAccess()[0]);
+//            URL jobservice = URLFactory.createURL("ssh://172.17.0.37");
+            JobService service = JobFactory.createJobService(m_session, jobservice);
+            JobDescription desc = JobFactory.createJobDescription();
+            desc.setAttribute(JobDescription.EXECUTABLE, "/bin/date");
+            desc.setAttribute(JobDescription.OUTPUT, "stdout.txt");
+            desc.setAttribute(JobDescription.ERROR, "stderr.txt");
+            Job job = service.createJob(desc);
+            job.run();
+            m_logger.info(job.getAttribute(Job.JOBID));   // for detecting hang in run()
+    
+            // wait for the END
+            job.waitFor();
+            m_logger.info("Job finished.");               // for detecting hang in waitFor()
+    
+            // check job status
+            Assert.assertEquals(
+                    org.ogf.saga.task.State.DONE,
+                    job.getState());
+        } catch (Exception e) {
+            m_logger.error("Could not run job", e);
+        }
+//        m_rm.releaseCompute(server.getId());
+    }
     
     @Override
     @Test(expected=NotImplementedException.class)

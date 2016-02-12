@@ -59,6 +59,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     protected Logger m_logger = Logger.getLogger(OpenstackResourceAdaptor.class);
 
     public static String PARAM_KEYPAIRNAME = "KeypairName";
+    // TODO  public static String PARAM_PRIVATEKEY = "PrivateKey";
     private String m_keypairName = null;
     
     @Override
@@ -132,7 +133,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
             m_logger.debug("vmstate:" + server.getVmState());
             for (List<? extends Address> addrs: server.getAddresses().getAddresses().values()) {
                 for (Address addr: addrs) {
-                    m_logger.debug("ssh://" + addr.getAddr());
+                    m_logger.debug(addr.getAddr());
                     accesses.add("ssh://" + addr.getAddr());
                 }
             }
@@ -215,13 +216,15 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         String serverName = "jsaga-" + m_credential.getUserID() + "-" + UUID.randomUUID();
         scb.name(serverName);
         ServerCreate sc = scb.build();
-        Server vm = m_os.compute().servers().boot(sc);
-//        Server vm = m_os.compute().servers().bootAndWaitActive(sc, 60000);
+//        Server vm = m_os.compute().servers().boot(sc);
+        Server vm = m_os.compute().servers().bootAndWaitActive(sc, 60000);
         // Cannot use vm.getName() because it is empty
 //        m_logger.debug("PASS:" + vm.getAdminPass());
         SecuredResource sr;
-        if (vm.getAdminPass() != null) {
+        // getAdminPass is never null... even if keypair was provided
+        if (m_keypairName == null) {
             sr = new SecuredResource(internalIdOfServerName(serverName), "UserPass");
+            // TODO make root user customizable
             sr.setProperty(Context.USERID, "root");
             sr.setProperty(Context.USERPASS, vm.getAdminPass());
         } else {

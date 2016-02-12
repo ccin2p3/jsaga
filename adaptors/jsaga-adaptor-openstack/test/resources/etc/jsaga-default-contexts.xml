@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
-    <contexts>
-            <context type="openstack">
-                <attribute name="UserPass" value="${OS_PASSWORD}"/>
-                <attribute name="Tenant" value="ccin2p3"/>
-                <resource type="openstack"/>
-            </context>
-    </contexts>
     <session>
-	        <context type="openstack"/>
+        <context type="openstack" id="cloud">
+            <attribute name="UserPass" value="${OS_PASSWORD}"/>
+            <attribute name="Tenant" value="ccin2p3"/>
+            <resource type="openstack"/>
+            <include host="cckeystone"/>
+        </context>
+        <context type="SSH" id="vm">
+            <attribute name="UserID" value="root"/>
+            <attribute name="UserPrivateKey" value="${user.home}/.novacreds/cloudkey"/>
+            <job type="ssh">
+                <attribute name="KnownHosts" value=""/>
+            </job>
+            <exclude host="cckeystone"/>
+        </context>
     </session>
 </jsaga-default>
