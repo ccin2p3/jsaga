@@ -63,8 +63,6 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         m_attributes.m_ResourceID.setObject(SAGAId.idToSagaId(
                 ((AbstractSyncResourceManagerImpl)m_manager).getURL(), 
                 resourceId));
-        // set access
-        m_attributes.m_Access.setObjects(adaptor.getAccess(SAGAId.idFromSagaId(getId())));
         // reload description
         this.loadDescription();
     }
@@ -81,8 +79,6 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         this(type, session, manager, adaptor);
         // simply set the ID
         m_attributes.m_ResourceID.setObject(id);
-        // set access
-        m_attributes.m_Access.setObjects(adaptor.getAccess(SAGAId.idFromSagaId(getId())));
         // load description of the resource
         this.loadDescription();
     }
@@ -108,10 +104,29 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
     public ResourceManager getManager() {
         return m_manager;
     }
+    
+    /**
+     * Get accesses. Accesses are not required when resource is built because they might be
+     * unavailable before resource is fully ACTIVE.
+     */
     @Override
-    public String[] getAccess() {
+    public String[] getAccess() throws NotImplementedException, AuthenticationFailedException, 
+                    AuthorizationFailedException, TimeoutException, NoSuccessException {
+        try {
+            if (m_attributes.m_Access.getValues().length == 0) {
+                // set access
+                m_attributes.m_Access.setObjects(m_adaptor.getAccess(SAGAId.idFromSagaId(getId())));
+            }
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
+        }
         return m_attributes.m_Access.getObjects();
     }
+    
     @Override
     public RD getDescription() {
         return m_description;
