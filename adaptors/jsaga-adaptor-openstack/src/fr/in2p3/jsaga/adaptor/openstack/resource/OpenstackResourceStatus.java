@@ -1,16 +1,28 @@
 package fr.in2p3.jsaga.adaptor.openstack.resource;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.List;
+
+import org.apache.commons.net.telnet.TelnetClient;
+import org.apache.log4j.Logger;
 import org.ogf.saga.resource.task.State;
+import org.openstack4j.model.compute.Address;
+import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.compute.Server.Status;
 
 import fr.in2p3.jsaga.adaptor.resource.ResourceStatus;
 
 public class OpenstackResourceStatus extends ResourceStatus {
 
-    private String m_vmState;
-    public OpenstackResourceStatus(Status nativeStatus, String vmState) {
-        super(null, nativeStatus, nativeStatus.name());
-        m_vmState = vmState;
+    private Server m_server;
+    protected Logger m_logger = Logger.getLogger(OpenstackResourceStatus.class);
+    
+    public OpenstackResourceStatus(Server server) {
+        super(null, server.getStatus(), server.getStatus().name());
+        m_server = server;
     }
 
     @Override
@@ -22,13 +34,35 @@ public class OpenstackResourceStatus extends ResourceStatus {
     public State getSagaState() {
         Status status = (Status)m_nativeStateCode;
         if (status.equals(Status.ACTIVE)) {
-            // vmState can be "building" when status is "ACTIVE"...
-            // vmState should be "active" for SAGA state to become "ACTIVE
-            if ("active".equals(m_vmState)) {
-                return State.ACTIVE;
-            } else {
-                return State.PENDING;
+            // telnet the SSH server
+            for (List<? extends Address> addrs: m_server.getAddresses().getAddresses().values()) {
+                for (Address addr: addrs) {
+                    TelnetClient tc = new TelnetClient();
+                    tc.setConnectTimeout(1000); // millis
+                    try {
+                        m_logger.debug("telnet " + addr.getAddr());
+                        // port 22 configurable?
+                        tc.connect(InetAddress.getByName(addr.getAddr()), 22);
+                        // vmState can be "building" when status is "ACTIVE"...
+                        // vmState should be "active" for SAGA state to become "ACTIVE
+                        m_logger.debug("vmState=" + m_server.getVmState());
+                        if ("active".equals(m_server.getVmState())) {
+                            return State.ACTIVE;
+                        } else {
+                            return State.PENDING;
+                        }
+                    } catch (Exception e) {
+                        m_logger.debug("SSHD not ready: " + e.getMessage());
+                        return State.PENDING;
+                    } finally {
+                        try {
+                            tc.disconnect();
+                        } catch (IOException e) {
+                        }
+                    }
+                }
             }
+            return State.PENDING;
         } else if (status.equals(Status.UNKNOWN) || status.equals(Status.UNRECOGNIZED)) {
             return State.UNKNOWN;
         } else if (status.equals(Status.DELETED) || status.equals(Status.SHUTOFF) || status.equals(Status.STOPPED)) {

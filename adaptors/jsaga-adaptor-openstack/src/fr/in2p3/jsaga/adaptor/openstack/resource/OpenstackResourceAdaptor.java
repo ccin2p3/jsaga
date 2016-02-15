@@ -159,7 +159,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     public ResourceStatus getResourceStatus(String resourceId) throws DoesNotExistException, NotImplementedException {
         if (resourceId.contains("/servers/")) {
             Server server = this.getServerByName(resourceId);
-            return new OpenstackResourceStatus(server.getStatus(), server.getVmState());
+            return new OpenstackResourceStatus(server);
         } else {
             throw new NotImplementedException();
         }
@@ -241,14 +241,16 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
             // SSH property
             sr.setProperty("UserPrivateKey", m_privateKey);
             sr.put(ContextImpl.JOB_SERVICE_ATTRIBUTES, new String[]{"ssh.KnownHosts="});
-            sr.put(ContextImpl.BASE_URL_INCLUDES, new String[]{"ssh://"});
+            // not specific enough: Pattern 'ssh://*' conflicts with...
+//            sr.put(ContextImpl.BASE_URL_INCLUDES, new String[]{"ssh://"});
+            
         } else {
             m_logger.debug("Building a UserPass context...");
             sr = new SecuredResource(internalIdOfServerName(serverName), "UserPass");
             // TODO make root user customizable
             sr.setProperty(Context.USERID, "root");
             sr.setProperty(Context.USERPASS, vm.getAdminPass());
-            sr.put(ContextImpl.BASE_URL_INCLUDES, new String[]{"ssh://"});
+//            sr.put(ContextImpl.BASE_URL_INCLUDES, new String[]{"ssh://"});
         }
         return sr;
     }
