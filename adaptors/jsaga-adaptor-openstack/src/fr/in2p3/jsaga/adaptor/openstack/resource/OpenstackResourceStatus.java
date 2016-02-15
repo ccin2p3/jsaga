@@ -32,6 +32,9 @@ public class OpenstackResourceStatus extends ResourceStatus {
     public State getSagaState() {
         Status status = (Status)m_nativeStateCode;
         if (status.equals(Status.ACTIVE)) {
+            if (!"active".equals(m_server.getVmState())) {
+                return State.PENDING;
+            }
             // telnet the SSH server
             for (List<? extends Address> addrs: m_server.getAddresses().getAddresses().values()) {
                 for (Address addr: addrs) {
@@ -43,15 +46,9 @@ public class OpenstackResourceStatus extends ResourceStatus {
                         tc.connect(InetAddress.getByName(addr.getAddr()), 22);
                         // vmState can be "building" when status is "ACTIVE"...
                         // vmState should be "active" for SAGA state to become "ACTIVE
-                        m_logger.debug("vmState=" + m_server.getVmState());
-                        if ("active".equals(m_server.getVmState())) {
-                            return State.ACTIVE;
-                        } else {
-                            return State.PENDING;
-                        }
+                        return State.ACTIVE;
                     } catch (Exception e) {
                         m_logger.debug("SSHD not ready: " + e.getMessage());
-                        return State.PENDING;
                     } finally {
                         try {
                             tc.disconnect();
