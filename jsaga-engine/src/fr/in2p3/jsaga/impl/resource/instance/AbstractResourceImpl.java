@@ -11,6 +11,7 @@ import fr.in2p3.jsaga.adaptor.resource.compute.ComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.SecuredComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.UnsecuredComputeResourceAdaptor;
 import fr.in2p3.jsaga.helpers.SAGAId;
+import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.resource.manager.AbstractSyncResourceManagerImpl;
 import fr.in2p3.jsaga.impl.resource.manager.ResourceManagerImpl;
 import fr.in2p3.jsaga.impl.resource.task.AbstractResourceTaskImpl;
@@ -41,7 +42,8 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
 {
     private RD m_description;
     private ResourceManager m_manager;
-
+    private SecuredResource m_securedResourceContext = null;
+    
     /** constructor for resource acquisition 
      * @throws DoesNotExistException 
      * @throws IncorrectStateException 
@@ -114,8 +116,33 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
                     AuthorizationFailedException, TimeoutException, NoSuccessException {
         try {
             if (m_attributes.m_Access.getValues().length == 0) {
+                String[] accesses = m_adaptor.getAccess(SAGAId.idFromSagaId(getId()));
                 // set access
-                m_attributes.m_Access.setObjects(m_adaptor.getAccess(SAGAId.idFromSagaId(getId())));
+                m_attributes.m_Access.setObjects(accesses);
+                // now that we have access we can build the context and add it if not already added
+                if (m_securedResourceContext != null && m_securedResourceContext.getId() != null &&
+                        m_securedResourceContext.getContextType() != null) {
+                    try {
+                        // Add the access to BaseUrlIncludes: this make the context unique
+                        m_securedResourceContext.put(ContextImpl.BASE_URL_INCLUDES, m_attributes.m_Access.getObjects());
+                        // Build the new context
+                        Context context = ContextFactory.createContext(JSAGA_FACTORY, 
+                                m_securedResourceContext.getContextType());
+                        for (Entry<Object, Object> entry: m_securedResourceContext.entrySet()) {
+                            if (entry.getValue() instanceof String) {
+                                context.setAttribute((String)entry.getKey(), (String)entry.getValue());
+                            } else if (entry.getValue() instanceof String[]) {
+                                context.setVectorAttribute((String)entry.getKey(), (String[])entry.getValue());
+                            }
+                        }
+                        // add it to the session
+                        m_session.addContext(context);
+                    } catch (BadParameterException bpe) {
+                        throw new NoSuccessException(bpe);
+                    } catch (PermissionDeniedException e) {
+                        throw new AuthorizationFailedException(e);
+                    }
+                }
             }
         } catch (IncorrectStateException e) {
             throw new NoSuccessException(e);
@@ -151,7 +178,6 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
                 m_attributes.m_Access.setObjects(m_adaptor.getAccess(SAGAId.idFromSagaId(getId())));
                 // reload description
                 this.loadDescription();
-                // TODO if adaptor can provide SecurityProperties, build a context and add it to the session
             } catch (Exception e) {
                 throw new NoSuccessException(e);
             }
@@ -196,11 +222,11 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         if (m_adaptor instanceof ComputeResourceAdaptor) {
             if (m_adaptor instanceof SecuredComputeResourceAdaptor) {
                 // this adaptor sends back a resourceID along with properties necessary to build a security context
-                SecuredResource sr = ((SecuredComputeResourceAdaptor)m_adaptor).acquireComputeResource(properties);
-                // build and add the context into the session
-                this.loadContext(sr);
+                // the security context will be build at getAccess stage as the IP address of the resource may not
+                // be available yet
+                m_securedResourceContext = ((SecuredComputeResourceAdaptor)m_adaptor).acquireComputeResource(properties);
                 // returns the ID only
-                return sr.getId();
+                return m_securedResourceContext.getId();
             } else if (m_adaptor instanceof UnsecuredComputeResourceAdaptor) {
                 return ((UnsecuredComputeResourceAdaptor)m_adaptor).acquireComputeResource(properties);
             }
@@ -258,15 +284,16 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
             return;
         }
         try {
-        Context context = ContextFactory.createContext(JSAGA_FACTORY, securityProperties.getContextType());
-        for (Entry<Object, Object> entry: securityProperties.entrySet()) {
-            if (entry.getValue() instanceof String) {
-                context.setAttribute((String)entry.getKey(), (String)entry.getValue());
-            } else if (entry.getValue() instanceof String[]) {
-                context.setVectorAttribute((String)entry.getKey(), (String[])entry.getValue());
+            Context context = ContextFactory.createContext(JSAGA_FACTORY, securityProperties.getContextType());
+            for (Entry<Object, Object> entry: securityProperties.entrySet()) {
+                if (entry.getValue() instanceof String) {
+                    context.setAttribute((String)entry.getKey(), (String)entry.getValue());
+                } else if (entry.getValue() instanceof String[]) {
+                    context.setVectorAttribute((String)entry.getKey(), (String[])entry.getValue());
+                }
             }
-        }
-        m_session.addContext(context);
+            m_securedResourceContext.put(ContextImpl.BASE_URL_INCLUDES, new String[]{"ssh://"});
+            m_session.addContext(context);
         } catch (BadParameterException bpe) {
             throw new NoSuccessException(bpe);
         }
