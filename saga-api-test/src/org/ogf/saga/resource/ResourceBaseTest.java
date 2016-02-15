@@ -164,6 +164,29 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     }
     
     @Test
+    public void launchAndDelete2VMs() throws Exception {
+        ComputeDescription cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
+        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templateListForAcquire);
+        Compute server1 = m_rm.acquireCompute(cd);
+        server1.waitFor(120, State.ACTIVE);
+        assertEquals(State.ACTIVE, server1.getState());
+        this.dumpCompute(server1);
+        // test if we have a new UserPass context in the session
+        for (Context c: m_session.listContexts()) {
+            if (!"openstack".equals(c.getAttribute(Context.TYPE))) {
+                m_logger.info(c);
+            }
+        }
+        Compute server2 = m_rm.acquireCompute(cd);
+        server2.waitFor(120, State.ACTIVE);
+        assertEquals(State.ACTIVE, server2.getState());
+        this.dumpCompute(server2);
+        // release both VMs
+        m_rm.releaseCompute(server1.getId());
+        m_rm.releaseCompute(server2.getId());
+    }
+    
+    @Test
     public void launchAndReconfigureDeleteVM() throws Exception {
         ComputeDescription cd;
         cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
