@@ -2,8 +2,6 @@ package fr.in2p3.jsaga.adaptor.openstack.resource;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.List;
 
 import org.apache.commons.net.telnet.TelnetClient;
@@ -41,7 +39,7 @@ public class OpenstackResourceStatus extends ResourceStatus {
                     tc.setConnectTimeout(1000); // millis
                     try {
                         m_logger.debug("telnet " + addr.getAddr());
-                        // port 22 configurable?
+                        // TODO port 22 configurable?
                         tc.connect(InetAddress.getByName(addr.getAddr()), 22);
                         // vmState can be "building" when status is "ACTIVE"...
                         // vmState should be "active" for SAGA state to become "ACTIVE
