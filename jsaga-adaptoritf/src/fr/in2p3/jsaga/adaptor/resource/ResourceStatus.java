@@ -17,39 +17,27 @@ import org.ogf.saga.resource.task.State;
  *
  */
 public abstract class ResourceStatus {
-//    private String m_nativeResourceId;
-//    protected State m_sagaState;
     protected Object m_nativeStateCode;
     protected String m_nativeStateString;
     protected SagaException m_nativeCause;
 
-    // TODO remove param state
-    public ResourceStatus(State state, Object stateCode, String stateString, int returnCode) {
-        this(state, stateCode, stateString);
+    public ResourceStatus(Object stateCode, String stateString, int returnCode) {
+        this(stateCode, stateString);
         if (returnCode != 0) {
             m_nativeCause = new NoSuccessException(stateString);
         }
     }
-    public ResourceStatus(State state, Object stateCode, String stateString, String cause) {
-        this(state, stateCode, stateString);
+    public ResourceStatus(Object stateCode, String stateString, String cause) {
+        this(stateCode, stateString);
         if (cause != null) {
             m_nativeCause = new NoSuccessException(cause);
         }
     }
-    public ResourceStatus(State state, Object stateCode, String stateString) {
-//        m_nativeResourceId = resourceId;
-//        m_sagaState = state;
+    public ResourceStatus(Object stateCode, String stateString) {
         m_nativeStateCode = stateCode;
         m_nativeStateString = stateString;
         m_nativeCause = null;
     }
-
-    /**
-     * @return the identifier of the resource in the cloud
-     */
-//    public String getNativeResourceId() {
-//        return m_nativeResourceId;
-//    }
 
     public abstract State getSagaState();
     /**

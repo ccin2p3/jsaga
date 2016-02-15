@@ -19,7 +19,7 @@ public class OpenstackResourceStatus extends ResourceStatus {
     protected Logger m_logger = Logger.getLogger(OpenstackResourceStatus.class);
     
     public OpenstackResourceStatus(Server server) {
-        super(null, server.getStatus(), server.getStatus().name());
+        super(server.getStatus(), server.getStatus().name());
         m_server = server;
     }
 
