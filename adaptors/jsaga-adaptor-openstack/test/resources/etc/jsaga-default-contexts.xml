@@ -4,16 +4,19 @@
         <context type="openstack" id="cloud">
             <attribute name="UserPass" value="${OS_PASSWORD}"/>
             <attribute name="Tenant" value="ccin2p3"/>
-            <resource type="openstack"/>
+            <resource type="openstack">
+                <attribute name="KeypairName" value="couldkey"/>
+                <attribute name="PrivateKey" value="${user.home}/.novacreds/cloudkey"/>
+            </resource>
             <include host="cckeystone"/>
         </context>
-        <context type="SSH" id="vm">
+        <!-- <context type="SSH" id="vm">
             <attribute name="UserID" value="root"/>
             <attribute name="UserPrivateKey" value="${user.home}/.novacreds/cloudkey"/>
             <job type="ssh">
                 <attribute name="KnownHosts" value=""/>
             </job>
             <exclude host="cckeystone"/>
-        </context>
+        </context> -->
     </session>
 </jsaga-default>

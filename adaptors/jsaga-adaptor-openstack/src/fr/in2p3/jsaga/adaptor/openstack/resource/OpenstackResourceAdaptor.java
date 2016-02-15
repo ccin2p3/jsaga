@@ -38,11 +38,15 @@ import org.openstack4j.openstack.OSFactory;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.U;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.UFile;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.openstack.OpenstackAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.resource.ResourceStatus;
 import fr.in2p3.jsaga.adaptor.resource.SecuredResource;
 import fr.in2p3.jsaga.adaptor.resource.compute.SecuredComputeResourceAdaptor;
+import fr.in2p3.jsaga.impl.context.ContextImpl;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -59,8 +63,10 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     protected Logger m_logger = Logger.getLogger(OpenstackResourceAdaptor.class);
 
     public static String PARAM_KEYPAIRNAME = "KeypairName";
-    // TODO  public static String PARAM_PRIVATEKEY = "PrivateKey";
+    public static String PARAM_PRIVATEKEY = "PrivateKey";
+    
     private String m_keypairName = null;
+    private String m_privateKey = null;
     
     @Override
     public void connect(String userInfo, String host, int port,
@@ -72,11 +78,17 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         if (attributes.containsKey(PARAM_KEYPAIRNAME)) {
             m_keypairName = (String) attributes.get(PARAM_KEYPAIRNAME);
         }
+        if (attributes.containsKey(PARAM_PRIVATEKEY)) {
+            m_privateKey = (String) attributes.get(PARAM_PRIVATEKEY);
+        }
     }
     
     @Override
     public Usage getUsage() {
-        return new U(PARAM_KEYPAIRNAME);
+        return new UAnd.Builder()
+        .and(new UFile(PARAM_PRIVATEKEY))
+        .and(new U(PARAM_KEYPAIRNAME))
+        .build();
     }
 
     @Override
@@ -209,26 +221,34 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
                 }
             }
         }
+        Boolean connectWithKey = (m_keypairName != null && m_privateKey != null);
         // TODO discover flavor if MEMORY, SIZE...
-        if (m_keypairName != null) {
+        if (connectWithKey) {
             scb.keypairName(m_keypairName);
         }
         String serverName = "jsaga-" + m_credential.getUserID() + "-" + UUID.randomUUID();
         scb.name(serverName);
         ServerCreate sc = scb.build();
-//        Server vm = m_os.compute().servers().boot(sc);
-        Server vm = m_os.compute().servers().bootAndWaitActive(sc, 60000);
+        Server vm = m_os.compute().servers().boot(sc);
+//        Server vm = m_os.compute().servers().bootAndWaitActive(sc, 60000);
         // Cannot use vm.getName() because it is empty
-//        m_logger.debug("PASS:" + vm.getAdminPass());
         SecuredResource sr;
         // getAdminPass is never null... even if keypair was provided
-        if (m_keypairName == null) {
+        if (connectWithKey) {
+            m_logger.debug("Building a SSH context...");
+            sr = new SecuredResource(internalIdOfServerName(serverName), "SSH");
+            sr.setProperty(Context.USERID, "root");
+            // SSH property
+            sr.setProperty("UserPrivateKey", m_privateKey);
+            sr.put(ContextImpl.JOB_SERVICE_ATTRIBUTES, new String[]{"ssh.KnownHosts="});
+            sr.put(ContextImpl.BASE_URL_INCLUDES, new String[]{"ssh://"});
+        } else {
+            m_logger.debug("Building a UserPass context...");
             sr = new SecuredResource(internalIdOfServerName(serverName), "UserPass");
             // TODO make root user customizable
             sr.setProperty(Context.USERID, "root");
             sr.setProperty(Context.USERPASS, vm.getAdminPass());
-        } else {
-            sr = new SecuredResource(internalIdOfServerName(serverName), null);
+            sr.put(ContextImpl.BASE_URL_INCLUDES, new String[]{"ssh://"});
         }
         return sr;
     }

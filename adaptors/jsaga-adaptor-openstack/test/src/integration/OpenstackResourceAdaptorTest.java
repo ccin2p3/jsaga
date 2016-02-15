@@ -67,7 +67,7 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         this.dumpCompute(server);
         // test if we have a new UserPass context in the session
         for (Context c: m_session.listContexts()) {
-            if ("UserPass".equals(c.getAttribute(Context.TYPE))) {
+            if (!"openstack".equals(c.getAttribute(Context.TYPE))) {
                 m_logger.info(c);
             }
         }
@@ -118,10 +118,9 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
             }
         }
         // Wait 10s for the SSHD server to be started
-//        Thread.sleep(30000);
+        Thread.sleep(30000);
         try {
             URL jobservice = URLFactory.createURL(server.getAccess()[0]);
-//            URL jobservice = URLFactory.createURL("ssh://172.17.0.37");
             JobService service = JobFactory.createJobService(m_session, jobservice);
             JobDescription desc = JobFactory.createJobDescription();
             desc.setAttribute(JobDescription.EXECUTABLE, "/bin/date");
@@ -142,7 +141,7 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         } catch (Exception e) {
             m_logger.error("Could not run job", e);
         }
-//        m_rm.releaseCompute(server.getId());
+        m_rm.releaseCompute(server.getId());
     }
     
     @Override
