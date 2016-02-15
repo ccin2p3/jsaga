@@ -16,12 +16,12 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
 
     private Logger m_logger = Logger.getLogger(this.getClass());
     private final static String[] m_templatesForAcquire = new String[]{
-            "[DUMMY_URL]-[nova/images/official-centosCC-7x-x86_64]",
-            "[DUMMY_URL]-[nova/flavors/m1.small]"
+        "[DUMMY_URL]-[nova/images/official-centosCC-7x-x86_64]",
+        "[DUMMY_URL]-[nova/flavors/m1.small]"
     };
     private final static String[] m_templatesForReconfigure = new String[]{
-        "[DUMMY_URL]-[nova/images/official-ubuntu-14.04-x86_64]",
-        "[DUMMY_URL]-[nova/flavors/m1.small]"
+        "[DUMMY_URL]-[nova/images/official-centosCC-7x-x86_64]",
+        "[DUMMY_URL]-[nova/flavors/m1.medium]"
     };
 
     public OpenstackResourceAdaptorTest() throws Exception {
@@ -54,9 +54,4 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         assertNotNull(m_rm.listResources(Type.NETWORK));
     }
 
-    @Override
-    @Ignore("SSHD is not available on second boot")
-    @Test
-    public void launchAndReconfigureDeleteVM() throws Exception {
-    }
 }
