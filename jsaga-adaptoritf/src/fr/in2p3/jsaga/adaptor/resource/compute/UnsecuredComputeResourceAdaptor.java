@@ -5,6 +5,7 @@ import java.util.Properties;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 
+// TODO javadoc
 public interface UnsecuredComputeResourceAdaptor extends ComputeResourceAdaptor {
 
     /**

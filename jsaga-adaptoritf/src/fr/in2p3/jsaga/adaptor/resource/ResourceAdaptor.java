@@ -49,6 +49,7 @@ public interface ResourceAdaptor extends ClientAdaptor {
      */
     public String[] getAccess(String resourceId) throws NotImplementedException, DoesNotExistException;
     
+    // TODO javadoc
     public ResourceStatus getResourceStatus(String resourceId) throws DoesNotExistException, NotImplementedException;
 
 }

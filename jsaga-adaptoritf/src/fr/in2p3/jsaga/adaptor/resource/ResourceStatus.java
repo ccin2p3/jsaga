@@ -14,7 +14,7 @@ import org.ogf.saga.resource.task.State;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * TODO javadoc
  */
 public abstract class ResourceStatus {
     protected Object m_nativeStateCode;

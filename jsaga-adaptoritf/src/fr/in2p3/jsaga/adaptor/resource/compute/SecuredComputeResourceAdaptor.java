@@ -7,6 +7,7 @@ import org.ogf.saga.error.NotImplementedException;
 
 import fr.in2p3.jsaga.adaptor.resource.SecuredResource;
 
+// TODO JAVADOC
 public interface SecuredComputeResourceAdaptor extends ComputeResourceAdaptor {
 
     public SecuredResource acquireComputeResource(Properties description) throws NotImplementedException, NoSuccessException;

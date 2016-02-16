@@ -5,7 +5,7 @@ import java.util.Properties;
 public class SecuredResource extends Properties {
 
     /**
-     * 
+     * TODO JAVADOC
      */
     private static final long serialVersionUID = 1L;
     private String m_id;
