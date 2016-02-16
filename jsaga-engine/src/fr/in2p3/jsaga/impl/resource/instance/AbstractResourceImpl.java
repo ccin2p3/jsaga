@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.resource.instance;
 
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -10,12 +11,15 @@ import fr.in2p3.jsaga.adaptor.resource.StorageResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.ComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.SecuredComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.UnsecuredComputeResourceAdaptor;
+import fr.in2p3.jsaga.engine.session.BaseUrlPattern;
+import fr.in2p3.jsaga.generated.parser.BaseUrlParser;
 import fr.in2p3.jsaga.helpers.SAGAId;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.resource.manager.AbstractSyncResourceManagerImpl;
 import fr.in2p3.jsaga.impl.resource.manager.ResourceManagerImpl;
 import fr.in2p3.jsaga.impl.resource.task.AbstractResourceTaskImpl;
 
+import org.apache.log4j.Logger;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.AuthenticationFailedException;
@@ -40,6 +44,8 @@ import org.ogf.saga.session.Session;
 public abstract class AbstractResourceImpl<R extends Resource, RD extends ResourceDescription>
         extends AbstractResourceTaskImpl<R> implements Resource<R,RD>
 {
+    protected Logger m_logger = Logger.getLogger(AbstractResourceImpl.class);
+    
     private RD m_description;
     private ResourceManager m_manager;
     private SecuredResource m_securedResourceContext = null;
@@ -195,6 +201,21 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
             throw new NoSuccessException(e);
         } catch (BadParameterException e) {
             throw new NoSuccessException(e);
+        }
+        // Try to remove security context from session
+        for (Context c: m_session.listContexts()) {
+            try {
+                if (c.existsAttribute(ContextImpl.BASE_URL_INCLUDES)) {
+                    String[] urls = c.getVectorAttribute(ContextImpl.BASE_URL_INCLUDES);
+                    if (Arrays.equals(urls, m_attributes.m_Access.getObjects())) {
+                        m_logger.debug("Removing context: " + c.getId());
+                        m_session.removeContext(c);
+                        return;
+                    }
+                }
+            } catch (Exception e) {
+                m_logger.warn("could not remove context", e);
+            }
         }
     }
 
