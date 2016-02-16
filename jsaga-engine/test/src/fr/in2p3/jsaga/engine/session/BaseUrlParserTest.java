@@ -24,7 +24,8 @@ public class BaseUrlParserTest {
         final String[] SUCCESS = {
                 "gridftp->gsiftp://cc*.*in2p3.fr/*/dteam",
                 "gridftp->gsiftp://cc*.*in2p3.fr[:2811]/*/dteam",
-                "gridftp->gsiftp://*:1234"
+                "gridftp->gsiftp://*:1234",
+                "gridftp->gsiftp://172.17.0.23"
         };
         for (String url : SUCCESS) {
             String result = new BaseUrlPattern(BaseUrlParser.parse(url)).toString();

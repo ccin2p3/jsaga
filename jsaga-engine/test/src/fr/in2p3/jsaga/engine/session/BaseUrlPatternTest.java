@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 public class BaseUrlPatternTest {
     private static final BaseUrlItem SCHEME = new SchemeItem("gsiftp", "gridftp");
     private static final BaseUrlItem HOST = new HostItem("cc", null, "*");
+    private static final BaseUrlItem IPV4 = new IPv4Item("127.17.0.23");
     private static final BaseUrlItem DOMAIN = new DomainItem("in2p3.fr", "*");
     private static final BaseUrlItem PORT_DEFAULT = new PortItem("2811", PortItem.OPTIONAL);
     private static final BaseUrlItem PORT = new PortItem("1234", PortItem.REQUIRED);
@@ -31,7 +32,8 @@ public class BaseUrlPatternTest {
     private static final BaseUrlPattern URL3 = new BaseUrlPattern(SCHEME, new HostItem(), new DomainItem(), PORT);
     private static final BaseUrlPattern URL4 = new BaseUrlPattern(SCHEME, HOST);
     private static final BaseUrlPattern URL5 = new BaseUrlPattern(SCHEME);
-
+    private static final BaseUrlPattern URL6 = new BaseUrlPattern(SCHEME, IPV4, PORT_DEFAULT, new DirItem(), DIR);
+    
     @Test
     public void test_toString() {
         Assert.assertEquals("gridftp->gsiftp://cc*.*in2p3.fr/*/dteam", URL1.toString());
@@ -39,6 +41,7 @@ public class BaseUrlPatternTest {
         Assert.assertEquals("gridftp->gsiftp://*:1234", URL3.toString());
         Assert.assertEquals("gridftp->gsiftp://cc*", URL4.toString());
         Assert.assertEquals("gridftp->gsiftp", URL5.toString());
+        Assert.assertEquals("gridftp->gsiftp://127.17.0.23[:2811]/*/dteam", URL6.toString());
     }
 
     @Test
@@ -48,6 +51,7 @@ public class BaseUrlPatternTest {
         System.out.println(URL3.toRegExp().toString());
         System.out.println(URL4.toRegExp().toString());
         System.out.println(URL5.toRegExp().toString());
+        System.out.println(URL6.toRegExp().toString());
     }
 
     @Test
@@ -69,6 +73,10 @@ public class BaseUrlPatternTest {
 
         Assert.assertTrue(URL5.matches("gridftp://cclcgvmli07.in2p3.fr/pnfs/dteam"));
         Assert.assertFalse(URL5.matches("ridftp://cclcgvmli07.in2p3.fr/pnfs/dteam"));
+
+        Assert.assertTrue(URL6.matches("gridftp://127.17.0.23:2811:2811/pnfs/dteam"));
+        Assert.assertTrue(URL6.matches("gridftp://127.17.0.23:2811/pnfs/dteam"));
+        Assert.assertTrue(URL6.matches("gridftp://127.17.0.23:2811:1111/pnfs/dteam"));
     }
 
     @Test
@@ -87,5 +95,8 @@ public class BaseUrlPatternTest {
                 new BaseUrlPattern(SCHEME, HOST, DOMAIN, new PortItem(), new DirItem(), new DirItem("eam", "*", null))));
         Assert.assertFalse(url.conflictsWith(
                 new BaseUrlPattern(SCHEME, HOST, DOMAIN, new PortItem(), new DirItem(), new DirItem("tea", "*", null))));
+        
+        Assert.assertFalse(URL5.conflictsWith(
+                new BaseUrlPattern(SCHEME, new IPv4Item("172.17.0.24"), PORT_DEFAULT, new DirItem(), DIR)));
     }
 }

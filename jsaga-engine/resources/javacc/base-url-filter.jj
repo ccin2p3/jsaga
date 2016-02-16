@@ -34,7 +34,7 @@ TOKEN: {
 }
 
 BaseUrlItem[] parse(): {
-    Token scheme,alias=null,host,port;   StringBuffer domain,dir;
+    Token scheme,alias=null,host,port;   StringBuffer domain,dir,ipv4;
     Token preHost=null,postHost=null,preDomain=null,preDir=null,postDir=null;
     List<BaseUrlItem> result = new ArrayList<BaseUrlItem>();
     result.add(null);
@@ -48,21 +48,24 @@ BaseUrlItem[] parse(): {
                                                            alias!=null ? alias.toString() : null)); }
     (   <SEP_SCHEME>
         (
-            (   (   (preHost=<STAR>)?
-                    host=<NAME>
-                    (postHost=<STAR>)?           { result.set(1, new HostItem(host.toString(), preHost, postHost)); }
-                )
-            |   preHost=<STAR>
-            |   host=<NUMBER><SEP_DOMAIN><NUMBER><SEP_DOMAIN><NUMBER><SEP_DOMAIN><NUMBER>
-                                                 { result.set(1, new HostItem(host.toString(), null, null)); }
-            )
-            (   <SEP_DOMAIN>
-                (   (   (preDomain=<STAR>)?
-                        domain=parseDomain()     { result.set(2, new DomainItem(domain.toString(), preDomain)); }
+            (
+                (   
+                    (   (preHost=<STAR>)?
+                        host=<NAME>
+                        (postHost=<STAR>)?           { result.set(1, new HostItem(host.toString(), preHost, postHost)); }
                     )
-                |   preDomain=<STAR>
+                    |   preHost=<STAR>
                 )
-            )?
+                (   <SEP_DOMAIN>
+                    (   (   (preDomain=<STAR>)?
+                            domain=parseDomain()     { result.set(2, new DomainItem(domain.toString(), preDomain)); }
+                        )
+                    |   preDomain=<STAR>
+                    )
+                )?
+                |   ipv4=parseIPv4()
+                                                     { result.set(1, new IPv4Item(ipv4.toString())); }
+            )
             (   <SEP_PORT> port=<NUMBER>         { result.set(3, new PortItem(port.toString(), PortItem.REQUIRED)); }
             |   "[" <SEP_PORT> port=<NUMBER> "]" { result.set(3, new PortItem(port.toString(), PortItem.OPTIONAL)); }
             )?
@@ -97,5 +100,12 @@ StringBuffer parseDir(): {StringBuffer buffer=new StringBuffer(); Token token;}
     (   token=<NAME>                        { buffer.append(token.toString()); }
     |   token=<NUMBER>                      { buffer.append(token.toString()); }
     |   token=<["_", ".", ",", "+"]>        { buffer.append(token.toString()); }
+    )+                                      { return buffer; }
+}
+
+StringBuffer parseIPv4(): {StringBuffer buffer=new StringBuffer(); Token token;}
+{
+    (   token=<NUMBER>                      { buffer.append(token.toString()); }
+    |   token=<SEP_DOMAIN>                  { buffer.append(token.toString()); }
     )+                                      { return buffer; }
 }
