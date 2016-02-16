@@ -10,6 +10,14 @@ import org.ogf.saga.error.TimeoutException;
 
 import java.util.Properties;
 
+/**
+ * An interface for describing an adaptor able to create/release/list resources. Please consider using sub-interfaces
+ * {@link ComputeResourceAdaptor} for compute resources, {@link StorageResourceAdaptor} for storage resources and/or
+ * {@link NetworkResourceAdaptor} for network resources.
+ * 
+ * @author schwarz
+ *
+ */
 public interface ResourceAdaptor extends ClientAdaptor {
 
     /**
@@ -43,13 +51,19 @@ public interface ResourceAdaptor extends ClientAdaptor {
     /**
      * get the list of access points for the resource identified by ID
      * @param resourceId
-     * @return
-     * @throws NotImplementedException
-     * @throws DoesNotExistException 
+     * @return the list of access points for the resource
+     * @throws DoesNotExistException if the resource does not exist
+     * @throws NotImplementedException if the operation is not implemented
      */
     public String[] getAccess(String resourceId) throws NotImplementedException, DoesNotExistException;
     
-    // TODO javadoc
+    /**
+     * get the status of the resource
+     * @param resourceId the identifier of the resource
+     * @return the status of the resource
+     * @throws DoesNotExistException if the resource does not exist
+     * @throws NotImplementedException if the operation is not implemented
+     */
     public ResourceStatus getResourceStatus(String resourceId) throws DoesNotExistException, NotImplementedException;
 
 }
