@@ -74,9 +74,9 @@ public class BaseUrlPatternTest {
         Assert.assertTrue(URL5.matches("gridftp://cclcgvmli07.in2p3.fr/pnfs/dteam"));
         Assert.assertFalse(URL5.matches("ridftp://cclcgvmli07.in2p3.fr/pnfs/dteam"));
 
-        Assert.assertTrue(URL6.matches("gridftp://127.17.0.23:2811:2811/pnfs/dteam"));
         Assert.assertTrue(URL6.matches("gridftp://127.17.0.23:2811/pnfs/dteam"));
-        Assert.assertTrue(URL6.matches("gridftp://127.17.0.23:2811:1111/pnfs/dteam"));
+        Assert.assertTrue(URL6.matches("gridftp://127.17.0.23/pnfs/dteam"));
+        Assert.assertFalse(URL6.matches("gridftp://127.17.0.23:1111/pnfs/dteam"));
     }
 
     @Test
@@ -96,7 +96,7 @@ public class BaseUrlPatternTest {
         Assert.assertFalse(url.conflictsWith(
                 new BaseUrlPattern(SCHEME, HOST, DOMAIN, new PortItem(), new DirItem(), new DirItem("tea", "*", null))));
         
-        Assert.assertFalse(URL5.conflictsWith(
+        Assert.assertFalse(URL6.conflictsWith(
                 new BaseUrlPattern(SCHEME, new IPv4Item("172.17.0.24"), PORT_DEFAULT, new DirItem(), DIR)));
     }
 }
