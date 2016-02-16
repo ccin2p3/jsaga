@@ -18,7 +18,8 @@ public interface SecuredComputeResourceAdaptor extends ComputeResourceAdaptor {
 
     /**
      * Obtains a compute resource from a description
-     * @param description
+     * 
+     * @param description a list of Properties amongst SAGA @{link ComputeDescription}
      * @return a {@link SecuredResource} that contains the ID of the resource along with the security context
      * necessary to access the resource.
      * @throws NotImplementedException if the operation is not implemented

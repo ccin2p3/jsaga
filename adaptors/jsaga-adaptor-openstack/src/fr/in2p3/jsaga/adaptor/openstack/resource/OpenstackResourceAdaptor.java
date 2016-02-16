@@ -31,7 +31,6 @@ import org.openstack4j.model.compute.Address;
 import org.openstack4j.model.compute.Flavor;
 import org.openstack4j.model.compute.Image;
 import org.openstack4j.model.compute.Server;
-import org.openstack4j.model.compute.Server.Status;
 import org.openstack4j.model.compute.ServerCreate;
 import org.openstack4j.model.compute.builder.ServerCreateBuilder;
 import org.openstack4j.openstack.OSFactory;
@@ -40,7 +39,6 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UFile;
-import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.openstack.OpenstackAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.resource.ResourceStatus;
@@ -231,26 +229,21 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         ServerCreate sc = scb.build();
         Server vm = m_os.compute().servers().boot(sc);
 //        Server vm = m_os.compute().servers().bootAndWaitActive(sc, 60000);
-        // Cannot use vm.getName() because it is empty
         SecuredResource sr;
         // getAdminPass is never null... even if keypair was provided
         if (connectWithKey) {
             m_logger.debug("Building a SSH context...");
             sr = new SecuredResource(internalIdOfServerName(serverName), "SSH");
-            sr.setProperty(Context.USERID, "root");
+            sr.setProperty(Context.USERID, description.getProperty("AdminUser"));
             // SSH property
             sr.setProperty("UserPrivateKey", m_privateKey);
             sr.put(ContextImpl.JOB_SERVICE_ATTRIBUTES, new String[]{"ssh.KnownHosts="});
-            // not specific enough: Pattern 'ssh://*' conflicts with...
-//            sr.put(ContextImpl.BASE_URL_INCLUDES, new String[]{"ssh://"});
             
         } else {
             m_logger.debug("Building a UserPass context...");
             sr = new SecuredResource(internalIdOfServerName(serverName), "UserPass");
-            // TODO make root user customizable
-            sr.setProperty(Context.USERID, "root");
+            sr.setProperty(Context.USERID, description.getProperty("AdminUser"));
             sr.setProperty(Context.USERPASS, vm.getAdminPass());
-//            sr.put(ContextImpl.BASE_URL_INCLUDES, new String[]{"ssh://"});
         }
         return sr;
     }

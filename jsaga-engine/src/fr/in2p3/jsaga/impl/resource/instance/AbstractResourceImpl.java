@@ -11,8 +11,6 @@ import fr.in2p3.jsaga.adaptor.resource.StorageResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.ComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.SecuredComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.UnsecuredComputeResourceAdaptor;
-import fr.in2p3.jsaga.engine.session.BaseUrlPattern;
-import fr.in2p3.jsaga.generated.parser.BaseUrlParser;
 import fr.in2p3.jsaga.helpers.SAGAId;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.resource.manager.AbstractSyncResourceManagerImpl;
