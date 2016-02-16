@@ -14,32 +14,45 @@ import org.ogf.saga.resource.task.State;
 * ***************************************************
 * Description:                                      */
 /**
- * TODO javadoc
+ * A class that represents the status of a resource.
  */
 public abstract class ResourceStatus {
     protected Object m_nativeStateCode;
     protected String m_nativeStateString;
     protected SagaException m_nativeCause;
 
-    public ResourceStatus(Object stateCode, String stateString, int returnCode) {
-        this(stateCode, stateString);
-        if (returnCode != 0) {
-            m_nativeCause = new NoSuccessException(stateString);
-        }
-    }
+    /**
+     * Build a status composed of a native state code, a native state description and a error description
+     * 
+     * @param stateCode
+     * @param stateString
+     * @param cause
+     */
     public ResourceStatus(Object stateCode, String stateString, String cause) {
         this(stateCode, stateString);
         if (cause != null) {
             m_nativeCause = new NoSuccessException(cause);
         }
     }
+    
+    /**
+     * Build a status composed of a native state code, a native state description
+     * 
+     * @param stateCode
+     * @param stateString
+     */
     public ResourceStatus(Object stateCode, String stateString) {
         m_nativeStateCode = stateCode;
         m_nativeStateString = stateString;
         m_nativeCause = null;
     }
 
+    /**
+     * Translate the native state into a SAGA state
+     * @return the SAGA {@link State}
+     */
     public abstract State getSagaState();
+
     /**
      * @return the backend state of the resource
      */
@@ -55,6 +68,8 @@ public abstract class ResourceStatus {
     }
 
     /**
+     * The backend model is a string that identifies the type of backend.
+     * 
      * @return the backend name
      */
     protected abstract String getModel();
