@@ -49,7 +49,10 @@ public interface ResourceAdaptor extends ClientAdaptor {
     public void release(String resourceId) throws DoesNotExistException, NotImplementedException, NoSuccessException;
 
     /**
-     * get the list of access points for the resource identified by ID
+     * get the list of access points for the resource identified by ID. If the resource was acquired along with security
+     * properties see {@link SecuredComputeResourceAdaptor} in the same session, a context is built with these
+     * properties and added to the current session, so that the user can immediately connect to the resource.
+     * 
      * @param resourceId
      * @return the list of access points for the resource
      * @throws DoesNotExistException if the resource does not exist
