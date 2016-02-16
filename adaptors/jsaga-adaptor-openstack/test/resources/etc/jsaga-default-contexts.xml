@@ -10,12 +10,21 @@
             </resource>
             <include host="cckeystone"/>
         </context>
-        <!-- <context type="SSH">
+<!--         <context type="SSH">
             <attribute name="UserID" value="root"/>
             <attribute name="UserPrivateKey" value="${user.home}/.novacreds/cloudkey"/>
             <job type="ssh">
                 <attribute name="KnownHosts" value=""/>
+                <include host="172.17.0.133"/>
             </job>
-        </context> -->
-    </session>
+        </context>
+        <context type="SSH">
+            <attribute name="UserID" value="root"/>
+            <attribute name="UserPrivateKey" value="${user.home}/.novacreds/cloudkey"/>
+            <job type="ssh">
+                <attribute name="KnownHosts" value=""/>
+                <include host="172.17.0.137"/>
+            </job>
+        </context>
+ -->    </session>
 </jsaga-default>
