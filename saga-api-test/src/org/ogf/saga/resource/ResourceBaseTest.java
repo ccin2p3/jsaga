@@ -47,21 +47,32 @@ import org.ogf.saga.url.URLFactory;
 public abstract class ResourceBaseTest extends JSAGABaseTest {
 	
     private Logger m_logger = Logger.getLogger(this.getClass());
+
     // configuration
+    protected String SUBMIT_DELAY           = "submitDelay";
+    protected String ACQUIRE_TEMPLATE       = "acquireTemplate";
+    protected String RECONFIGURE_TEMPLATE   = "reconfigureTemplate";
+
+    // defaults
+    private static final String DEFAULT_SUBMIT_DELAY = "0";
+    
     protected URL m_resourcemanager;
     protected Session m_session;
     protected ResourceManager m_rm;
-    protected String[] m_templateListForAcquire;
-    protected String[] m_templateListForReconfigure;
+
+    protected List<String> m_templatesForAcquire;
+    protected List<String> m_templatesForReconfigure;
+    protected int m_delayBeforeSubmittingJobInMs;
     
-    protected ResourceBaseTest(String resourceprotocol, String[] templatesForAcquire, String[] templatesForReconfig) throws Exception {
+    protected ResourceBaseTest(String resourceprotocol) throws Exception {
         super();
 
         // configure
         m_resourcemanager = URLFactory.createURL(getRequiredProperty(resourceprotocol, CONFIG_RM_URL));
         m_session = SessionFactory.createSession(true);
-        m_templateListForAcquire = templatesForAcquire;
-        m_templateListForReconfigure = templatesForReconfig;
+        m_delayBeforeSubmittingJobInMs = Integer.parseInt(super.getOptionalProperty(resourceprotocol, SUBMIT_DELAY, DEFAULT_SUBMIT_DELAY));
+        m_templatesForAcquire = super.getProperties(resourceprotocol, ACQUIRE_TEMPLATE);
+        m_templatesForReconfigure = super.getProperties(resourceprotocol, RECONFIGURE_TEMPLATE);
     }
 
     @Before
@@ -73,13 +84,21 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     ////////////
     // Templates
     ////////////
+    @Test
+    public void getTemplate() throws NotImplementedException, BadParameterException, 
+            IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
+            TimeoutException, NoSuccessException, DoesNotExistException {
+        // Take the first template and insert "thisTemplateDoesNotExists" just before the last ']'
+        m_rm.getTemplate(m_templatesForAcquire.get(0));
+    }
+
     @Test(expected = DoesNotExistException.class)
     public void unknownTemplate() throws NotImplementedException, BadParameterException, 
             IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
             TimeoutException, NoSuccessException, DoesNotExistException {
         String templateToTest = "thisTemplateDoesNotExists";
         // Take the first template and insert "thisTemplateDoesNotExists" just before the last ']'
-        templateToTest = m_templateListForAcquire[0].replaceAll("]$", templateToTest + "]");
+        templateToTest = m_templatesForAcquire.get(0).replaceAll("]$", templateToTest + "]");
         m_rm.getTemplate(templateToTest);
     }
 
@@ -149,16 +168,16 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     @Test
     public void launchAndDeleteVM() throws Exception {
         ComputeDescription cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
-        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templateListForAcquire);
+        String[] templates = new String[m_templatesForAcquire.size()];
+        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templatesForAcquire.toArray(templates));
         Compute server = m_rm.acquireCompute(cd);
         server.waitFor(120, State.ACTIVE);
         assertEquals(State.ACTIVE, server.getState());
         this.dumpCompute(server);
         // test if we have a new UserPass context in the session
         for (Context c: m_session.listContexts()) {
-            if (!"openstack".equals(c.getAttribute(Context.TYPE))) {
-                m_logger.info(c);
-            }
+            m_logger.info("** Context :" + c.getAttribute(Context.TYPE));
+            m_logger.debug(c.toString());
         }
         m_rm.releaseCompute(server.getId());
     }
@@ -166,16 +185,16 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     @Test
     public void launchAndDelete2VMs() throws Exception {
         ComputeDescription cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
-        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templateListForAcquire);
+        String[] templates = new String[m_templatesForAcquire.size()];
+        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templatesForAcquire.toArray(templates));
         Compute server1 = m_rm.acquireCompute(cd);
         server1.waitFor(120, State.ACTIVE);
         assertEquals(State.ACTIVE, server1.getState());
         this.dumpCompute(server1);
         // test if we have a new UserPass context in the session
         for (Context c: m_session.listContexts()) {
-            if (!"openstack".equals(c.getAttribute(Context.TYPE))) {
-                m_logger.info(c);
-            }
+            m_logger.info("** Context :" + c.getAttribute(Context.TYPE));
+            m_logger.debug(c.toString());
         }
         Compute server2 = m_rm.acquireCompute(cd);
         server2.waitFor(120, State.ACTIVE);
@@ -190,11 +209,13 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     public void launchAndReconfigureDeleteVM() throws Exception {
         ComputeDescription cd;
         cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
-        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templateListForAcquire);
+        String[] templates = new String[m_templatesForAcquire.size()];
+        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templatesForAcquire.toArray(templates));
         Compute server = m_rm.acquireCompute(cd);
         server.waitFor(120, State.ACTIVE);
         this.dumpCompute(server);
-        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templateListForReconfigure);
+        templates = new String[m_templatesForReconfigure.size()];
+        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templatesForReconfigure.toArray(templates));
         server.reconfigure(cd);
         server.waitFor(240, State.ACTIVE);
         this.dumpCompute(server);
@@ -204,17 +225,21 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     @Test
     public void launchAndSubmitJobAndDeleteVM() throws Exception {
         ComputeDescription cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
-        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templateListForAcquire);
+        String[] templates = new String[m_templatesForAcquire.size()];
+        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templatesForAcquire.toArray(templates));
         Compute server = m_rm.acquireCompute(cd);
         server.waitFor(120, State.ACTIVE);
         assertEquals(State.ACTIVE, server.getState());
         this.dumpCompute(server);
         // test if we have a new UserPass context in the session
         for (Context c: m_session.listContexts()) {
-            if ("UserPass".equals(c.getAttribute(Context.TYPE))) {
-                m_logger.info("UserPass context" + c);
-            }
+            m_logger.info("** Context :" + c.getAttribute(Context.TYPE));
+            m_logger.debug(c.toString());
         }
+        if (m_delayBeforeSubmittingJobInMs > 0) {
+            Thread.sleep(m_delayBeforeSubmittingJobInMs*1000);
+        }
+        org.ogf.saga.task.State jobState = null;
         try {
             URL jobservice = URLFactory.createURL(server.getAccess()[0]);
             JobService service = JobFactory.createJobService(m_session, jobservice);
@@ -231,13 +256,17 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
             m_logger.info("Job finished.");               // for detecting hang in waitFor()
     
             // check job status
-            Assert.assertEquals(
-                    org.ogf.saga.task.State.DONE,
-                    job.getState());
+            jobState = job.getState();
         } catch (Exception e) {
             m_logger.error("Could not run job", e);
+            fail(e.getMessage());
+        } finally {
+            m_rm.releaseCompute(server.getId());
         }
-        m_rm.releaseCompute(server.getId());
+        // check job status
+        Assert.assertEquals(
+                org.ogf.saga.task.State.DONE,
+                jobState);
     }
     
     

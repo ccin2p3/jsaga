@@ -2,10 +2,7 @@ package org.ogf.saga;
 
 //import junit.framework.TestCase;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
@@ -134,6 +131,18 @@ public abstract class JSAGABaseTest extends Assert {
         }
     }
 
+    protected List<String> getProperties(String protocol, String prefix) throws Exception {
+        List<String> list = new ArrayList<String>();
+        int count=1;
+        String param = getRequiredProperty(protocol, prefix + "." + Integer.toString(count));
+        while (param != null) {
+            list.add(param);
+            count++;
+            param = getOptionalProperty(protocol, prefix + "." + Integer.toString(count));
+        }
+        return list;
+    }
+    
     protected static URL createURL(URL base, String name) throws NotImplementedException, NoSuccessException, BadParameterException {
         String basePath = base.getPath();
         String path = (basePath.endsWith("/") ? basePath+name : basePath+"/"+name);

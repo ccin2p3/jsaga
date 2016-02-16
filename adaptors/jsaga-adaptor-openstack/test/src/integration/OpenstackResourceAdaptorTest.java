@@ -1,7 +1,6 @@
 package integration;
 
 import org.apache.log4j.Logger;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
@@ -15,17 +14,9 @@ import org.ogf.saga.resource.Type;
 public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
 
     private Logger m_logger = Logger.getLogger(this.getClass());
-    private final static String[] m_templatesForAcquire = new String[]{
-        "[DUMMY_URL]-[nova/images/official-centosCC-7x-x86_64]",
-        "[DUMMY_URL]-[nova/flavors/m1.small]"
-    };
-    private final static String[] m_templatesForReconfigure = new String[]{
-        "[DUMMY_URL]-[nova/images/official-centosCC-7x-x86_64]",
-        "[DUMMY_URL]-[nova/flavors/m1.medium]"
-    };
 
     public OpenstackResourceAdaptorTest() throws Exception {
-        super("openstack", m_templatesForAcquire, m_templatesForReconfigure);
+        super("openstack");
     }
 
     @Override
