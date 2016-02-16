@@ -62,7 +62,7 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
 
     protected List<String> m_templatesForAcquire;
     protected List<String> m_templatesForReconfigure;
-    protected int m_delayBeforeSubmittingJobInMs;
+    protected int m_delayBeforeSubmittingJobInSeconds;
     
     protected ResourceBaseTest(String resourceprotocol) throws Exception {
         super();
@@ -70,7 +70,7 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         // configure
         m_resourcemanager = URLFactory.createURL(getRequiredProperty(resourceprotocol, CONFIG_RM_URL));
         m_session = SessionFactory.createSession(true);
-        m_delayBeforeSubmittingJobInMs = Integer.parseInt(super.getOptionalProperty(resourceprotocol, SUBMIT_DELAY, DEFAULT_SUBMIT_DELAY));
+        m_delayBeforeSubmittingJobInSeconds = Integer.parseInt(super.getOptionalProperty(resourceprotocol, SUBMIT_DELAY, DEFAULT_SUBMIT_DELAY));
         m_templatesForAcquire = super.getProperties(resourceprotocol, ACQUIRE_TEMPLATE);
         m_templatesForReconfigure = super.getProperties(resourceprotocol, RECONFIGURE_TEMPLATE);
     }
@@ -236,8 +236,8 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
             m_logger.info("** Context :" + c.getAttribute(Context.TYPE));
             m_logger.debug(c.toString());
         }
-        if (m_delayBeforeSubmittingJobInMs > 0) {
-            Thread.sleep(m_delayBeforeSubmittingJobInMs*1000);
+        if (m_delayBeforeSubmittingJobInSeconds > 0) {
+            Thread.sleep(m_delayBeforeSubmittingJobInSeconds*1000);
         }
         org.ogf.saga.task.State jobState = null;
         try {
