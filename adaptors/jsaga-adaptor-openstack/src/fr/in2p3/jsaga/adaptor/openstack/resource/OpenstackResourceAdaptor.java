@@ -44,7 +44,6 @@ import fr.in2p3.jsaga.adaptor.openstack.OpenstackAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.resource.ResourceStatus;
 import fr.in2p3.jsaga.adaptor.resource.SecuredResource;
 import fr.in2p3.jsaga.adaptor.resource.compute.SecuredComputeResourceAdaptor;
-import fr.in2p3.jsaga.impl.context.ContextImpl;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -135,15 +134,14 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     
     @Override
     public String[] getAccess(String resourceId) throws NotImplementedException, DoesNotExistException {
-        m_logger.info("getAccess");
         List<String> accesses = new ArrayList<String>();
         if (resourceId.contains("/servers/")) {
             // search by name
             Server server = this.getServerByName(resourceId);
-            m_logger.debug("vmstate:" + server.getVmState());
             for (List<? extends Address> addrs: server.getAddresses().getAddresses().values()) {
                 for (Address addr: addrs) {
                     m_logger.debug(addr.getAddr());
+                    // TODO: param accessProtocol?
                     accesses.add("ssh://" + addr.getAddr());
                 }
             }
@@ -237,7 +235,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
             sr.setProperty(Context.USERID, description.getProperty("AdminUser"));
             // SSH property
             sr.setProperty("UserPrivateKey", m_privateKey);
-            sr.put(ContextImpl.JOB_SERVICE_ATTRIBUTES, new String[]{"ssh.KnownHosts="});
+            sr.put("JobServiceAttributes", new String[]{"ssh.KnownHosts="});
             
         } else {
             m_logger.debug("Building a UserPass context...");
@@ -320,26 +318,6 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         return listOfTemplates;
     }
 
-    //////////////
-    // Security context to access new VMs
-    //////////////
-    @Deprecated
-    public Properties getSecurityProperties(String resourceId) throws NotImplementedException, DoesNotExistException {
-        if (resourceId.contains("/servers/")) {
-            Server server = this.getServerByName(resourceId);
-            if (server.getKeyName() != null) {
-                return null;
-            }
-            Properties p = new Properties();
-            p.setProperty(Context.TYPE, "UserPass");
-            p.setProperty(Context.USERID, "root");
-            p.setProperty(Context.USERPASS, server.getAdminPass());
-            return p;
-        } else {
-            throw new NotImplementedException();
-        }
-    }
-
     ///////////////
     // Private 
     ///////////////
@@ -360,6 +338,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         String serverId = internalId.replaceAll(".*/servers/", "");
         Map<String,String> param = new HashMap<String,String>();
         param.put("name", serverId);
+        // this must be able to run outside the main thread: need a OSClient
         OSClient os = OSFactory.builder()
                 .endpoint(m_os.getEndpoint())
                 .token(m_token.getId())
