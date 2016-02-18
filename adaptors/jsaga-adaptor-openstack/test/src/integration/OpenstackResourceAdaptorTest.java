@@ -20,11 +20,6 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         super("openstack");
     }
 
-    @Test
-    public void createAndDeleteStorageArea() throws Exception {
-        super.createAndDeleteStorageArea();
-    }
-    
     @Override
     @Ignore
     @Test

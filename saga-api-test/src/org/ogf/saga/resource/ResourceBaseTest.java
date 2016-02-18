@@ -137,7 +137,7 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         int count = 1;
         for (String serverId: resources) {
             Compute server = m_rm.acquireCompute(serverId);
-            this.dumpCompute(server);
+            this.dumpResource(server);
             if (count++ == 10) {
                 return;
             }
@@ -176,7 +176,7 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         Compute server = m_rm.acquireCompute(cd);
         server.waitFor(120, State.ACTIVE);
         assertEquals(State.ACTIVE, server.getState());
-        this.dumpCompute(server);
+        this.dumpResource(server);
         // test if we have a new UserPass context in the session
         for (Context c: m_session.listContexts()) {
             m_logger.info("** Context :" + c.getAttribute(Context.TYPE));
@@ -193,7 +193,7 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         Compute server1 = m_rm.acquireCompute(cd);
         server1.waitFor(120, State.ACTIVE);
         assertEquals(State.ACTIVE, server1.getState());
-        this.dumpCompute(server1);
+        this.dumpResource(server1);
         // test if we have a new UserPass context in the session
         for (Context c: m_session.listContexts()) {
             m_logger.info("** Context :" + c.getAttribute(Context.TYPE));
@@ -202,7 +202,7 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         Compute server2 = m_rm.acquireCompute(cd);
         server2.waitFor(120, State.ACTIVE);
         assertEquals(State.ACTIVE, server2.getState());
-        this.dumpCompute(server2);
+        this.dumpResource(server2);
         // release both VMs
         m_rm.releaseCompute(server1.getId());
         m_rm.releaseCompute(server2.getId());
@@ -216,12 +216,12 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templatesForAcquire.toArray(templates));
         Compute server = m_rm.acquireCompute(cd);
         server.waitFor(120, State.ACTIVE);
-        this.dumpCompute(server);
+        this.dumpResource(server);
         templates = new String[m_templatesForReconfigure.size()];
         cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templatesForReconfigure.toArray(templates));
         server.reconfigure(cd);
         server.waitFor(240, State.ACTIVE);
-        this.dumpCompute(server);
+        this.dumpResource(server);
         m_rm.releaseCompute(server.getId());
     }
 
@@ -233,7 +233,7 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         Compute server = m_rm.acquireCompute(cd);
         server.waitFor(120, State.ACTIVE);
         assertEquals(State.ACTIVE, server.getState());
-        this.dumpCompute(server);
+        this.dumpResource(server);
         // test if we have a new UserPass context in the session
         for (Context c: m_session.listContexts()) {
             m_logger.info("** Context :" + c.getAttribute(Context.TYPE));

@@ -24,6 +24,7 @@ import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.openstack.OpenstackAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.openstack.resource.OpenstackResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.openstack.util.SwiftURL;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 
 public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements DataReaderAdaptor {
@@ -53,9 +54,11 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Da
             AuthenticationFailedException, AuthorizationFailedException,
             IncorrectURLException, BadParameterException, TimeoutException,
             NoSuccessException {
-        super.connect(userInfo, host, port, basePath, attributes);
+        super.connect(userInfo, host, port, 
+                SwiftURL.getNovaPath(basePath), 
+                attributes);
         // remove ".*/object-store/containers/"
-        m_container = basePath.replaceAll("^.*" + ServiceType.OBJECT_STORAGE.getServiceName() + "/containers/", "");
+        m_container = SwiftURL.getContainer(basePath);
         m_logger.debug("Connected to container " + m_container);
     }
     
@@ -63,10 +66,19 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Da
     public boolean exists(String absolutePath, String additionalArgs)
             throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
-        ObjectListOptions options = ObjectListOptions.create()
-            .path(absolutePath);
-        List<? extends SwiftObject> objs = m_os.objectStorage().objects().list(m_container, options);
-        // TODO Auto-generated method stub
+        String containerPath = SwiftURL.getPath(absolutePath);
+        m_logger.debug("exists " + containerPath);
+        // In case of file use get()
+        if (!containerPath.endsWith("/")) {
+            return m_os.objectStorage().objects().get(m_container, containerPath) != null;
+        }
+        // Otherwise list objects
+        List<? extends SwiftObject> objs = m_os.objectStorage().objects().list(m_container);
+        for (SwiftObject so: objs) {
+            if (so.getName().equals(containerPath)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -74,6 +86,7 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Da
     public FileAttributes getAttributes(String absolutePath,
             String additionalArgs) throws PermissionDeniedException,
             DoesNotExistException, TimeoutException, NoSuccessException {
+        String containerPath = SwiftURL.getPath(absolutePath);
         // TODO Auto-generated method stub
         return null;
     }
@@ -83,8 +96,12 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Da
             String additionalArgs) throws PermissionDeniedException,
             BadParameterException, DoesNotExistException, TimeoutException,
             NoSuccessException {
+        String containerPath = SwiftURL.getPath(absolutePath);
         // TODO Auto-generated method stub
         return null;
     }
 
+    /*
+     * removes  ".../object-store/containers/"
+     */
 }
