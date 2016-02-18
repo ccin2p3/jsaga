@@ -1,6 +1,7 @@
 package integration;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
@@ -19,10 +20,15 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         super("openstack");
     }
 
+    @Test
+    public void createAndDeleteStorageArea() throws Exception {
+        super.createAndDeleteStorageArea();
+    }
+    
     @Override
-    @Test(expected=NotImplementedException.class)
+    @Ignore
+    @Test
     public void listStorageTemplates() throws NotImplementedException, TimeoutException, NoSuccessException  {
-        assertNotNull(m_rm.listTemplates(Type.STORAGE));
     }
 
     @Override
@@ -32,10 +38,9 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
     }
 
     @Override
-    @Test(expected=NotImplementedException.class)
-    public void listStorageResources() throws NotImplementedException, TimeoutException, 
+    public void listStorageResources() throws Exception, 
         NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
-        assertNotNull(m_rm.listResources(Type.STORAGE));
+        super.listStorageResources();
     }
 
     @Override

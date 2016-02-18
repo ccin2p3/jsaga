@@ -38,7 +38,7 @@ public abstract class OpenstackAdaptorAbstract implements ClientAdaptor {
     protected Logger m_logger = Logger.getLogger(this.getClass());
 
     protected OpenstackSecurityCredential m_credential;
-    protected URL m_url;
+//    protected URL m_url;
     protected Token m_token;
     protected OSClient m_os;
     protected String m_tenant;

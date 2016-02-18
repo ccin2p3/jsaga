@@ -13,12 +13,12 @@ import org.openstack4j.model.compute.Server.Status;
 
 import fr.in2p3.jsaga.adaptor.resource.ResourceStatus;
 
-public class OpenstackResourceStatus extends ResourceStatus {
+public class OpenstackServerStatus extends ResourceStatus {
 
     private Server m_server;
-    protected Logger m_logger = Logger.getLogger(OpenstackResourceStatus.class);
+    protected Logger m_logger = Logger.getLogger(OpenstackServerStatus.class);
     
-    public OpenstackResourceStatus(Server server) {
+    public OpenstackServerStatus(Server server) {
         super(server.getStatus(), server.getStatus().name());
         m_server = server;
     }

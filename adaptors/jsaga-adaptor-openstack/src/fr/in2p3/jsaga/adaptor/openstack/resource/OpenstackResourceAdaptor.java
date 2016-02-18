@@ -21,6 +21,7 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.resource.Type;
 import org.ogf.saga.resource.description.ComputeDescription;
+import org.ogf.saga.resource.description.StorageDescription;
 import org.ogf.saga.resource.instance.Resource;
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.OSClient;
@@ -33,6 +34,9 @@ import org.openstack4j.model.compute.Image;
 import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.compute.ServerCreate;
 import org.openstack4j.model.compute.builder.ServerCreateBuilder;
+import org.openstack4j.model.storage.object.SwiftContainer;
+import org.openstack4j.model.storage.object.options.ContainerListOptions;
+import org.openstack4j.model.storage.object.options.CreateUpdateContainerOptions;
 import org.openstack4j.openstack.OSFactory;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
@@ -44,6 +48,7 @@ import fr.in2p3.jsaga.adaptor.openstack.OpenstackAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.resource.ResourceStatus;
 import fr.in2p3.jsaga.adaptor.resource.SecuredResource;
 import fr.in2p3.jsaga.adaptor.resource.compute.SecuredComputeResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.storage.UnsecuredStorageResourceAdaptor;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -55,7 +60,7 @@ import fr.in2p3.jsaga.adaptor.resource.compute.SecuredComputeResourceAdaptor;
  * ***************************************************/
 
 public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
-        implements SecuredComputeResourceAdaptor {
+        implements SecuredComputeResourceAdaptor, UnsecuredStorageResourceAdaptor {
 
     protected Logger m_logger = Logger.getLogger(OpenstackResourceAdaptor.class);
 
@@ -100,38 +105,36 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     public Properties getDescription(String resourceId) 
             throws DoesNotExistException, NotImplementedException, BadParameterException {
         Properties p = new Properties();
+        m_logger.debug("Getting description of " + resourceId);
         if (resourceId.startsWith(ServiceType.COMPUTE.getServiceName())) {
-            p = this.getComputeDescription(resourceId);
-        } else {
-            throw new NotImplementedException();
+            p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
+            if (resourceId.contains("/servers/")) {
+                // search by name
+                Server server = this.getServerByName(resourceId);
+                // get Flavor
+                Flavor flavor = server.getFlavor();
+                if (flavor != null) {
+                    p.setProperty(ComputeDescription.MEMORY, Integer.toString(flavor.getRam()));
+                    p.setProperty(ComputeDescription.SIZE, Integer.toString(flavor.getVcpus()));
+                }
+                // FIXME: this is not OS!
+                Image image = server.getImage();
+                if (image != null) {
+                    p.setProperty(ComputeDescription.MACHINE_OS, image.getName());
+                }
+            }
+            return p;
+        } else if (resourceId.startsWith(ServiceType.OBJECT_STORAGE.getServiceName())){
+            p.setProperty(Resource.RESOURCE_TYPE, Type.STORAGE.name());
+            if (resourceId.contains("/containers/")) {
+                SwiftContainer sc = this.getContainerByName(resourceId);
+                p.setProperty(StorageDescription.SIZE, Long.toString(sc.getTotalSize()));
+            }
+            return p;
         }
-        return p;
+        throw new NotImplementedException();
     }
 
-    private Properties getComputeDescription(String resourceId) 
-            throws DoesNotExistException, NotImplementedException, BadParameterException {
-        Properties p = new Properties();
-        p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
-        if (resourceId.contains("/servers/")) {
-            // search by name
-            Server server = this.getServerByName(resourceId);
-            // get Flavor
-            Flavor flavor = server.getFlavor();
-            if (flavor != null) {
-                p.setProperty(ComputeDescription.MEMORY, Integer.toString(flavor.getRam()));
-                p.setProperty(ComputeDescription.SIZE, Integer.toString(flavor.getVcpus()));
-            }
-            // FIXME: this is not OS!
-            Image image = server.getImage();
-            if (image != null) {
-                p.setProperty(ComputeDescription.MACHINE_OS, image.getName());
-            }
-        } else {
-            throw new NotImplementedException();
-        }
-        return p;
-    }
-    
     @Override
     public String[] getAccess(String resourceId) throws NotImplementedException, DoesNotExistException {
         List<String> accesses = new ArrayList<String>();
@@ -146,6 +149,10 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
                 }
             }
             return accesses.toArray(new String[accesses.size()]);
+        } else if (resourceId.contains("/containers/")) {
+            // access = swift://keystone:5000/v2/object-store/containers/NAME
+            accesses.add(m_os.getEndpoint().replaceAll("^.*://", "swift://") + resourceId);
+            return accesses.toArray(new String[accesses.size()]);
         } else {
             throw new NotImplementedException();
         }
@@ -155,7 +162,10 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     public ResourceStatus getResourceStatus(String resourceId) throws DoesNotExistException, NotImplementedException {
         if (resourceId.contains("/servers/")) {
             Server server = this.getServerByName(resourceId);
-            return new OpenstackResourceStatus(server);
+            return new OpenstackServerStatus(server);
+        } else if (resourceId.contains("/containers/")) {
+            SwiftContainer sc = this.getContainerByName(resourceId);
+            return new OpenstackSwiftContainerStatus(sc);
         } else {
             throw new NotImplementedException();
         }
@@ -222,7 +232,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         if (connectWithKey) {
             scb.keypairName(m_keypairName);
         }
-        String serverName = "jsaga-" + m_credential.getUserID() + "-" + UUID.randomUUID();
+        String serverName = "jsaga-server-" + m_credential.getUserID() + "-" + UUID.randomUUID();
         scb.name(serverName);
         ServerCreate sc = scb.build();
         Server vm = m_os.compute().servers().boot(sc);
@@ -249,6 +259,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     @Override
     public void release(String resourceId, boolean drain) 
             throws DoesNotExistException, NotImplementedException, NoSuccessException {
+        m_logger.debug("Releasing " + resourceId);
         if (drain) {
             // TODO drain
             throw new NotImplementedException();
@@ -260,12 +271,19 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
                 if (!ar.isSuccess()) {
                     throw new NoSuccessException(ar.getFault());
                 }
-            } else {
-                throw new NotImplementedException();
+                return;
             }
-        } else {
-            throw new NoSuccessException();
+        } else if (resourceId.startsWith(ServiceType.OBJECT_STORAGE.getServiceName())) {
+            if (resourceId.contains("/containers/")) {
+                SwiftContainer sc = this.getContainerByName(resourceId);
+                ActionResponse ar = m_os.objectStorage().containers().delete(sc.getName());
+                if (!ar.isSuccess()) {
+                    throw new NoSuccessException(ar.getFault());
+                }
+                return;
+            }
         }
+        throw new NotImplementedException();
     }
 
     @Override
@@ -318,6 +336,39 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         return listOfTemplates;
     }
 
+    //////////////////
+    // Storage
+    //////////////////
+    @Override
+    public String[] listStorageResources() throws TimeoutException,
+            NoSuccessException {
+        List<? extends SwiftContainer> listOfContainers = m_os.objectStorage().containers().list();
+        String[] listOfResources = new String[listOfContainers.size()];
+        int count=0;
+        for (SwiftContainer s: listOfContainers) {
+            listOfResources[count] = this.internalIdOf(s);
+            count++;
+        }
+        return listOfResources;
+    }
+
+    @Override
+    public String[] listStorageTemplates() throws TimeoutException,
+            NoSuccessException {
+        return new String[]{};
+    }
+
+    @Override
+    public String acquireStorageResource(Properties description)
+            throws NotImplementedException, NoSuccessException {
+        String containerName;
+        containerName = description.getProperty(StorageDescription.ACCESS,
+                "jsaga-container-" + m_credential.getUserID() + "-" + UUID.randomUUID());
+        m_os.objectStorage().containers().create(containerName);
+        return internalIdOfContainerName(containerName);
+    }
+
+
     ///////////////
     // Private 
     ///////////////
@@ -330,8 +381,14 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     private String internalIdOf(Server s) {
         return this.internalIdOfServerName(s.getName());
     }
+    private String internalIdOf(SwiftContainer sc) {
+        return this.internalIdOfContainerName(sc.getName());
+    }
     private String internalIdOfServerName(String name) {
         return ServiceType.COMPUTE.getServiceName() + "/servers/" + name;
+    }
+    private String internalIdOfContainerName(String name) {
+        return ServiceType.OBJECT_STORAGE.getServiceName() + "/containers/" + name;
     }
     
     private Server getServerByName(String internalId) throws DoesNotExistException {
@@ -370,6 +427,23 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
             }
         }
         throw new DoesNotExistException("This template does not exist: " + flavorId);
+    }
+
+    private SwiftContainer getContainerByName(String internalId) throws DoesNotExistException {
+        String containerId = internalId.replaceAll(".*/containers/", "");
+        // this must be able to run outside the main thread: need a OSClient
+        OSClient os = OSFactory.builder()
+                .endpoint(m_os.getEndpoint())
+                .token(m_token.getId())
+                .tenantName(m_tenant)
+                .authenticate();
+        ContainerListOptions clo = ContainerListOptions.create();
+        for (SwiftContainer sc: os.objectStorage().containers().list(clo)) {
+            if (sc.getName().equals(containerId)) {
+                return sc;
+            }
+        }
+        throw new DoesNotExistException("This resource does not exist: " + containerId);
     }
 
     @Deprecated

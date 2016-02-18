@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.resource;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.storage.StorageResourceAdaptor;
 
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
@@ -50,7 +51,7 @@ public interface ResourceAdaptor extends ClientAdaptor {
 
     /**
      * get the list of access points for the resource identified by ID. If the resource was acquired along with security
-     * properties see {@link SecuredComputeResourceAdaptor} in the same session, a context is built with these
+     * properties see {@link SecuredStorageResourceAdaptor} in the same session, a context is built with these
      * properties and added to the current session, so that the user can immediately connect to the resource.
      * 
      * @param resourceId

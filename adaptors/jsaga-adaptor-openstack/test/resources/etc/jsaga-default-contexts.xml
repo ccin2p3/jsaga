@@ -4,6 +4,8 @@
         <context type="openstack" id="cloud">
             <attribute name="UserPass" value="${OS_PASSWORD}"/>
             <attribute name="Tenant" value="ccin2p3"/>
+            <data type="swift">
+            </data>
             <resource type="openstack">
                 <attribute name="KeypairName" value="couldkey"/>
                 <attribute name="PrivateKey" value="${user.home}/.novacreds/cloudkey"/>

@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.impl.resource.manager;
 
 import fr.in2p3.jsaga.adaptor.resource.NetworkResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
-import fr.in2p3.jsaga.adaptor.resource.StorageResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.ComputeResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.storage.StorageResourceAdaptor;
 import fr.in2p3.jsaga.helpers.SAGAId;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.resource.description.ComputeDescriptionImpl;

@@ -7,10 +7,12 @@ import java.util.Properties;
 import fr.in2p3.jsaga.adaptor.resource.NetworkResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.SecuredResource;
-import fr.in2p3.jsaga.adaptor.resource.StorageResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.ComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.SecuredComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.UnsecuredComputeResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.storage.SecuredStorageResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.storage.StorageResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.storage.UnsecuredStorageResourceAdaptor;
 import fr.in2p3.jsaga.helpers.SAGAId;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.resource.manager.AbstractSyncResourceManagerImpl;
@@ -30,7 +32,10 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.resource.Type;
+import org.ogf.saga.resource.description.ComputeDescription;
+import org.ogf.saga.resource.description.NetworkDescription;
 import org.ogf.saga.resource.description.ResourceDescription;
+import org.ogf.saga.resource.description.StorageDescription;
 import org.ogf.saga.resource.instance.Resource;
 import org.ogf.saga.resource.manager.ResourceManager;
 import org.ogf.saga.session.Session;
@@ -238,7 +243,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
                 properties.put(attr, description.getVectorAttribute(attr));
             }
         }
-        if (m_adaptor instanceof ComputeResourceAdaptor) {
+        if (description instanceof ComputeDescription) {
             if (m_adaptor instanceof SecuredComputeResourceAdaptor) {
                 // this adaptor sends back a resourceID along with properties necessary to build a security context
                 // the security context will be build at getAccess stage as the IP address of the resource may not
@@ -249,9 +254,14 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
             } else if (m_adaptor instanceof UnsecuredComputeResourceAdaptor) {
                 return ((UnsecuredComputeResourceAdaptor)m_adaptor).acquireComputeResource(properties);
             }
-        } else if (m_adaptor instanceof StorageResourceAdaptor) {
-            return ((StorageResourceAdaptor)m_adaptor).acquireStorageResource(properties);
-        } else if (m_adaptor instanceof NetworkResourceAdaptor) {
+        } else if (description instanceof StorageDescription) {
+            if (m_adaptor instanceof SecuredStorageResourceAdaptor) {
+                m_securedResourceContext = ((SecuredStorageResourceAdaptor)m_adaptor).acquireStorageResource(properties);
+                return m_securedResourceContext.getId();
+            } else if (m_adaptor instanceof UnsecuredStorageResourceAdaptor) {
+                return ((UnsecuredStorageResourceAdaptor)m_adaptor).acquireStorageResource(properties);
+            }
+        } else if (description instanceof NetworkDescription) {
             return ((NetworkResourceAdaptor)m_adaptor).acquireNetworkResource(properties);
         }
         throw new NotImplementedException("Unkown type of resource adaptor");
@@ -297,26 +307,26 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
     /*
      * create a security context from properties and add it to the session
      */
-    private void loadContext(SecuredResource securityProperties) throws NoSuccessException, IncorrectStateException, TimeoutException, NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException {
-        if (securityProperties == null || securityProperties.getId() == null ||
-                securityProperties.getContextType() == null) {
-            return;
-        }
-        try {
-            Context context = ContextFactory.createContext(JSAGA_FACTORY, securityProperties.getContextType());
-            for (Entry<Object, Object> entry: securityProperties.entrySet()) {
-                if (entry.getValue() instanceof String) {
-                    context.setAttribute((String)entry.getKey(), (String)entry.getValue());
-                } else if (entry.getValue() instanceof String[]) {
-                    context.setVectorAttribute((String)entry.getKey(), (String[])entry.getValue());
-                }
-            }
-            m_securedResourceContext.put(ContextImpl.BASE_URL_INCLUDES, new String[]{"ssh://"});
-            m_session.addContext(context);
-        } catch (BadParameterException bpe) {
-            throw new NoSuccessException(bpe);
-        }
-    }
+//    private void loadContext(SecuredResource securityProperties) throws NoSuccessException, IncorrectStateException, TimeoutException, NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException {
+//        if (securityProperties == null || securityProperties.getId() == null ||
+//                securityProperties.getContextType() == null) {
+//            return;
+//        }
+//        try {
+//            Context context = ContextFactory.createContext(JSAGA_FACTORY, securityProperties.getContextType());
+//            for (Entry<Object, Object> entry: securityProperties.entrySet()) {
+//                if (entry.getValue() instanceof String) {
+//                    context.setAttribute((String)entry.getKey(), (String)entry.getValue());
+//                } else if (entry.getValue() instanceof String[]) {
+//                    context.setVectorAttribute((String)entry.getKey(), (String[])entry.getValue());
+//                }
+//            }
+//            m_securedResourceContext.put(ContextImpl.BASE_URL_INCLUDES, new String[]{"ssh://"});
+//            m_session.addContext(context);
+//        } catch (BadParameterException bpe) {
+//            throw new NoSuccessException(bpe);
+//        }
+//    }
 
 
 }

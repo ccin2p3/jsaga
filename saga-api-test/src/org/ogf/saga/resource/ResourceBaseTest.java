@@ -25,7 +25,10 @@ import org.ogf.saga.job.JobService;
 import org.ogf.saga.monitoring.Metric;
 import org.ogf.saga.resource.description.ComputeDescription;
 import org.ogf.saga.resource.description.ResourceDescription;
+import org.ogf.saga.resource.description.StorageDescription;
 import org.ogf.saga.resource.instance.Compute;
+import org.ogf.saga.resource.instance.Resource;
+import org.ogf.saga.resource.instance.Storage;
 import org.ogf.saga.resource.manager.ResourceManager;
 import org.ogf.saga.resource.task.ResourceTask;
 import org.ogf.saga.resource.task.State;
@@ -88,7 +91,6 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     public void getTemplate() throws NotImplementedException, BadParameterException, 
             IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
             TimeoutException, NoSuccessException, DoesNotExistException {
-        // Take the first template and insert "thisTemplateDoesNotExists" just before the last ']'
         m_rm.getTemplate(m_templatesForAcquire.get(0));
     }
 
@@ -128,28 +130,8 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     // Resources
     ////////////
     @Test
-    public void listComputeResources() throws NotImplementedException, TimeoutException, 
+    public void listComputeResources() throws Exception, 
         NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
-        assertNotNull(m_rm.listResources(Type.COMPUTE));
-    }
-
-    @Test
-    public void listStorageResources() throws NotImplementedException, TimeoutException, 
-        NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
-        assertNotNull(m_rm.listResources(Type.STORAGE));
-    }
-
-    @Test
-    public void listNetworkResources() throws NotImplementedException, TimeoutException, 
-        NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
-        assertNotNull(m_rm.listResources(Type.NETWORK));
-    }
-
-    @Test
-    public void list10Servers() throws Exception, 
-            IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
-            TimeoutException, NoSuccessException, DoesNotExistException, PermissionDeniedException, 
-            IncorrectStateException {
         List<String> resources = m_rm.listResources(Type.COMPUTE);
         assertTrue(resources.size()>0);
         int count = 1;
@@ -161,7 +143,28 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
             }
         }
     }
-    
+
+    @Test
+    public void listStorageResources() throws Exception, 
+        NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
+        List<String> resources = m_rm.listResources(Type.STORAGE);
+        assertTrue(resources.size()>0);
+        int count = 1;
+        for (String resourceId: resources) {
+            Storage storage = m_rm.acquireStorage(resourceId);
+            this.dumpResource(storage);
+            if (count++ == 10) {
+                return;
+            }
+        }
+    }
+
+    @Test
+    public void listNetworkResources() throws NotImplementedException, TimeoutException, 
+        NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
+        assertNotNull(m_rm.listResources(Type.NETWORK));
+    }
+
     //////////
     // Acquire
     //////////
@@ -269,6 +272,17 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
                 jobState);
     }
     
+    //////////////////
+    // acquire storage
+    //////////////////
+    @Test
+    public void createAndDeleteStorageArea() throws Exception {
+        StorageDescription sd = (StorageDescription) ResourceFactory.createResourceDescription(Type.STORAGE);
+        Storage storage = m_rm.acquireStorage(sd);
+        storage.waitFor(120, State.ACTIVE);
+        this.dumpResource(storage);
+        storage.release();
+    }
     
     ////////
     // Utils
@@ -280,6 +294,7 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         }
     }
     
+    @Deprecated
     protected void dumpCompute(Compute server) throws Exception {
         ResourceDescription rd = server.getDescription();
         assertNotNull(rd);
@@ -289,6 +304,19 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         System.out.println("  * status=" + server.getState().name() + " // " 
                 + server.getMetric(ResourceTask.RESOURCE_STATEDETAIL).getAttribute(Metric.VALUE));
         for (String access: server.getAccess()) {
+            System.out.println("  => " + access);
+        }
+    }
+    
+    protected void dumpResource(Resource resource) throws Exception {
+        ResourceDescription rd = (ResourceDescription) resource.getDescription();
+        assertNotNull(rd);
+        System.out.println(resource.getId());
+        this.dumpDescription(rd);
+        // display status
+        System.out.println("  * status=" + resource.getState().name() + " // " 
+                + resource.getMetric(ResourceTask.RESOURCE_STATEDETAIL).getAttribute(Metric.VALUE));
+        for (String access: resource.getAccess()) {
             System.out.println("  => " + access);
         }
     }
