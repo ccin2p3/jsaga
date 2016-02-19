@@ -35,6 +35,7 @@ import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.compute.ServerCreate;
 import org.openstack4j.model.compute.builder.ServerCreateBuilder;
 import org.openstack4j.model.storage.object.SwiftContainer;
+import org.openstack4j.model.storage.object.SwiftObject;
 import org.openstack4j.model.storage.object.options.ContainerListOptions;
 import org.openstack4j.model.storage.object.options.CreateUpdateContainerOptions;
 import org.openstack4j.openstack.OSFactory;
@@ -276,9 +277,17 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         } else if (resourceId.startsWith(ServiceType.OBJECT_STORAGE.getServiceName())) {
             if (resourceId.contains("/containers/")) {
                 SwiftContainer sc = this.getContainerByName(resourceId);
+                for (SwiftObject so: m_os.objectStorage().objects().list(sc.getName())) {
+                    ActionResponse ar = m_os.objectStorage().objects().delete(sc.getName(), so.getName());
+                    if (!ar.isSuccess()) {
+                        m_logger.warn("Could not delete object:" + ar.getCode() + ":" + ar.toString());
+                    } else {
+                        m_logger.debug("deleted object " + so.getName());
+                    }
+                }
                 ActionResponse ar = m_os.objectStorage().containers().delete(sc.getName());
                 if (!ar.isSuccess()) {
-                    throw new NoSuccessException(ar.getFault());
+                    throw new NoSuccessException(ar.getCode() + ":" + ar.getFault());
                 }
                 return;
             }

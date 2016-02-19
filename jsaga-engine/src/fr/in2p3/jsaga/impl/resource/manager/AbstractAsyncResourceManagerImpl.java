@@ -70,7 +70,7 @@ public abstract class AbstractAsyncResourceManagerImpl extends AbstractSyncResou
     }
     public Task<ResourceManager, Void> releaseCompute(TaskMode mode, final String id) throws NotImplementedException {
         return new AbstractThreadedTask<ResourceManager, Void>(mode) {
-            public Void invoke() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+            public Void invoke() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
                 AbstractAsyncResourceManagerImpl.super.releaseComputeSync(id);
                 return null;
             }
@@ -78,7 +78,7 @@ public abstract class AbstractAsyncResourceManagerImpl extends AbstractSyncResou
     }
     public Task<ResourceManager, Void> releaseCompute(TaskMode mode, final String id, final boolean drain) throws NotImplementedException {
         return new AbstractThreadedTask<ResourceManager, Void>(mode) {
-            public Void invoke() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+            public Void invoke() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
                 AbstractAsyncResourceManagerImpl.super.releaseComputeSync(id, drain);
                 return null;
             }
@@ -103,7 +103,7 @@ public abstract class AbstractAsyncResourceManagerImpl extends AbstractSyncResou
     }
     public Task<ResourceManager, Void> releaseNetwork(TaskMode mode, final String id) throws NotImplementedException {
         return new AbstractThreadedTask<ResourceManager, Void>(mode) {
-            public Void invoke() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+            public Void invoke() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
                 AbstractAsyncResourceManagerImpl.super.releaseNetworkSync(id);
                 return null;
             }
@@ -128,7 +128,7 @@ public abstract class AbstractAsyncResourceManagerImpl extends AbstractSyncResou
     }
     public Task<ResourceManager, Void> releaseStorage(TaskMode mode, final String id) throws NotImplementedException {
         return new AbstractThreadedTask<ResourceManager, Void>(mode) {
-            public Void invoke() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+            public Void invoke() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
                 AbstractAsyncResourceManagerImpl.super.releaseStorageSync(id);
                 return null;
             }

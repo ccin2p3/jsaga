@@ -120,7 +120,7 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
             catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
-    public void releaseCompute(String id) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public void releaseCompute(String id) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
         float timeout = this.getTimeout("releaseCompute");
         if (timeout == WAIT_FOREVER) {
             super.releaseComputeSync(id);
@@ -135,7 +135,7 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
             catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
-    public void releaseCompute(String id, boolean drain) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public void releaseCompute(String id, boolean drain) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
         float timeout = this.getTimeout("releaseCompute");
         if (timeout == WAIT_FOREVER) {
             super.releaseComputeSync(id, drain);
@@ -184,7 +184,7 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
             catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
-    public void releaseNetwork(String id) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public void releaseNetwork(String id) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
         float timeout = this.getTimeout("releaseNetwork");
         if (timeout == WAIT_FOREVER) {
             super.releaseNetworkSync(id);
@@ -233,7 +233,7 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
             catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
-    public void releaseStorage(String id) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public void releaseStorage(String id) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
         float timeout = this.getTimeout("releaseStorage");
         if (timeout == WAIT_FOREVER) {
             super.releaseStorageSync(id);

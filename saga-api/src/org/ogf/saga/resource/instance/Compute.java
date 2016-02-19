@@ -9,8 +9,9 @@ public interface Compute extends Resource<Compute, ComputeDescription> {
      *
      * @param drain
      *      if true, then the resource is drained before it is released (default = false)
+     * @throws IncorrectStateException 
      */
     public void release(boolean drain) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, DoesNotExistException,
-            TimeoutException, NoSuccessException;
+            TimeoutException, NoSuccessException, IncorrectStateException;
 }

@@ -33,8 +33,7 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
     }
 
     @Override
-    public void listStorageResources() throws Exception, 
-        NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
+    public void listStorageResources() throws Exception {
         super.listStorageResources();
     }
 
@@ -44,5 +43,10 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
         NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
         assertNotNull(m_rm.listResources(Type.NETWORK));
     }
-
+    
+    @Override
+    @Test
+    public void createAndDeleteStorageArea() throws Exception {
+        super.createAndDeleteStorageArea();
+    }
 }

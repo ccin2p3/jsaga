@@ -5,6 +5,7 @@ import fr.in2p3.jsaga.adaptor.resource.storage.StorageResourceAdaptor;
 
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
@@ -47,7 +48,7 @@ public interface ResourceAdaptor extends ClientAdaptor {
      * @throws NotImplementedException
      * @throws NoSuccessException
      */
-    public void release(String resourceId) throws DoesNotExistException, NotImplementedException, NoSuccessException;
+    public void release(String resourceId) throws DoesNotExistException, IncorrectStateException, NotImplementedException, NoSuccessException;
 
     /**
      * get the list of access points for the resource identified by ID. If the resource was acquired along with security

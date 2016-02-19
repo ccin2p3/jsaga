@@ -23,6 +23,9 @@ import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.job.JobService;
 import org.ogf.saga.monitoring.Metric;
+import org.ogf.saga.namespace.Flags;
+import org.ogf.saga.namespace.NSDirectory;
+import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.resource.description.ComputeDescription;
 import org.ogf.saga.resource.description.ResourceDescription;
 import org.ogf.saga.resource.description.StorageDescription;
@@ -281,6 +284,10 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         Storage storage = m_rm.acquireStorage(sd);
         storage.waitFor(120, State.ACTIVE);
         this.dumpResource(storage);
+        URL baseUrl = URLFactory.createURL(storage.getAccess()[0]);
+        URL m_dirUrl = createURL(baseUrl, "dir/");
+        NSDirectory m_dir = NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.CREATE.or(Flags.EXCL));
+        m_dir.close();
         storage.release();
     }
     

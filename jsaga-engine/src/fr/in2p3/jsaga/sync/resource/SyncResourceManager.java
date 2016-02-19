@@ -34,10 +34,10 @@ public interface SyncResourceManager {
             DoesNotExistException, TimeoutException, NoSuccessException;
     public void releaseComputeSync(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
-            DoesNotExistException, TimeoutException, NoSuccessException;
+            DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException;
     public void releaseComputeSync(String id, boolean drain) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
-            DoesNotExistException, TimeoutException, NoSuccessException;
+            DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException;
 
     public Network acquireNetworkSync(NetworkDescription description) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
@@ -47,7 +47,7 @@ public interface SyncResourceManager {
             DoesNotExistException, TimeoutException, NoSuccessException;
     public void releaseNetworkSync(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
-            DoesNotExistException, TimeoutException, NoSuccessException;
+            DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException;
 
     public Storage acquireStorageSync(StorageDescription description) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
@@ -57,5 +57,5 @@ public interface SyncResourceManager {
             DoesNotExistException, TimeoutException, NoSuccessException;
     public void releaseStorageSync(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
-            DoesNotExistException, TimeoutException, NoSuccessException;
+            DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException;
 }

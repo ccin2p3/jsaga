@@ -165,12 +165,12 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     }
     public void releaseComputeSync(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
-            DoesNotExistException, TimeoutException, NoSuccessException {
+            DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
         m_adaptor.release(SAGAId.idFromSagaId(id));
     }
     public void releaseComputeSync(String id, boolean drain) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
-            DoesNotExistException, TimeoutException, NoSuccessException {
+            DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
         ((ComputeResourceAdaptor)m_adaptor).release(SAGAId.idFromSagaId(id), drain);
     }
 
@@ -196,7 +196,7 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     }
     public void releaseNetworkSync(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
-            DoesNotExistException, TimeoutException, NoSuccessException {
+            DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
         m_adaptor.release(SAGAId.idFromSagaId(id));
     }
 
@@ -222,7 +222,7 @@ public abstract class AbstractSyncResourceManagerImpl extends AbstractSagaObject
     }
     public void releaseStorageSync(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
-            DoesNotExistException, TimeoutException, NoSuccessException {
+            DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
         m_adaptor.release(SAGAId.idFromSagaId(id));
     }
 

@@ -177,8 +177,8 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         m_description = description;
         if (description != null) {
             m_attributes.m_Description.setObject(description.toString());
-            this.release();
             try {
+                this.release();
                 // check that adaptor supports type
                 String resourceId = this.acquireResource(description);
                 m_attributes.m_ResourceID.setObject(SAGAId.idToSagaId(
@@ -194,8 +194,9 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
     }
 
     /** release 
-     * @throws NoSuccessException */
-    public void release() throws NoSuccessException {
+     * @throws NoSuccessException 
+     * @throws IncorrectStateException */
+    public void release() throws NoSuccessException, IncorrectStateException {
         try {
             m_adaptor.release(SAGAId.idFromSagaId(getId()));
         } catch (DoesNotExistException e) {

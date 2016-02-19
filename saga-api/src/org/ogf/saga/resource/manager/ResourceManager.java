@@ -197,10 +197,11 @@ public interface ResourceManager extends SagaObject, Async {
      * @exception DoesNotExistException
      *      is thrown when the resource manager can handle the resource id,
      *      but the referenced resource is not alive.
+     * @throws IncorrectStateException 
      */
     public void releaseCompute(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
-            DoesNotExistException, TimeoutException, NoSuccessException;
+            DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException;
 
     /**
      * Close compute resource
@@ -233,10 +234,11 @@ public interface ResourceManager extends SagaObject, Async {
      * @exception DoesNotExistException
      *      is thrown when the resource manager can handle the resource id,
      *      but the referenced resource is not alive.
+     * @throws IncorrectStateException 
      */
     public void releaseCompute(String id, boolean drain) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
-            DoesNotExistException, TimeoutException, NoSuccessException;
+            DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException;
 
     //----------------------------------------------------------------
 
@@ -337,10 +339,11 @@ public interface ResourceManager extends SagaObject, Async {
      * @exception DoesNotExistException
      *      is thrown when the resource manager can handle the resource id,
      *      but the referenced resource is not alive.
+     * @throws IncorrectStateException 
      */
     public void releaseNetwork(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
-            DoesNotExistException, TimeoutException, NoSuccessException;
+            DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException;
 
     //----------------------------------------------------------------
 
@@ -441,10 +444,11 @@ public interface ResourceManager extends SagaObject, Async {
      * @exception DoesNotExistException
      *      is thrown when the resource manager can handle the resource id,
      *      but the referenced resource is not alive.
+     * @throws IncorrectStateException 
      */
     public void releaseStorage(String id) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
-            DoesNotExistException, TimeoutException, NoSuccessException;
+            DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException;
 
     //----------------------------------------------------------------
 

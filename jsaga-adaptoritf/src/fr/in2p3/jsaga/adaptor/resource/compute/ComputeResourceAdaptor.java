@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.resource.compute;
 
 import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
@@ -34,7 +35,7 @@ public interface ComputeResourceAdaptor extends ResourceAdaptor {
      * @throws NotImplementedException if the operation is not implemented
      * @throws NoSuccessException in case of error
      */
-    public void release(String id, boolean drain) throws DoesNotExistException, NotImplementedException, NoSuccessException;
+    public void release(String id, boolean drain) throws DoesNotExistException, IncorrectStateException, NotImplementedException, NoSuccessException;
 
     /**
      * Obtains the list of compute templates that are currently known to the resource manager.

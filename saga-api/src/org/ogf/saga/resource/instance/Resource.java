@@ -173,10 +173,12 @@ public interface Resource<R,RD> extends ResourceTask, Async, AsyncAttributes<R> 
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
+     * @exception IncorrectStateException
+     *      is thrown when the resource is in such a state that it cannot be released
      * @exception DoesNotExistException
      *      is thrown when the resource is not alive.
      */
     public void release() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, DoesNotExistException,
-            TimeoutException, NoSuccessException;
+            TimeoutException, IncorrectStateException, NoSuccessException;
 }
