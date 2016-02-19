@@ -92,12 +92,12 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Da
             NoSuccessException {
         String objectPath = SwiftURL.getPath(absolutePath);
         List<SwiftObjectAttributes> attrs = new ArrayList<SwiftObjectAttributes>();
-        List<? extends SwiftObject> objs = m_os.objectStorage().objects().list(m_container);
-        for (SwiftObject obj: m_os.objectStorage().objects().list(m_container)) {
-            SwiftObjectAttributes soa = new SwiftObjectAttributes(obj);
-            // getDirectory must equal objectPath
-            if (soa.getDirectoryName() != null && objectPath.equals(soa.getDirectoryName() + "/")) {
-                attrs.add(soa);
+        ObjectListOptions options = ObjectListOptions.create()
+                .path(objectPath);
+        for (SwiftObject obj: m_os.objectStorage().objects().list(m_container, options)) {
+            // do not add directory itself
+            if (!obj.getName().equals(objectPath)) {
+                attrs.add(new SwiftObjectAttributes(obj));
             }
         }
         FileAttributes[] attrArray = new FileAttributes[attrs.size()];

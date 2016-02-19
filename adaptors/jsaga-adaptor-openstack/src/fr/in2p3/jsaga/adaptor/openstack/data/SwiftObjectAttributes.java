@@ -18,11 +18,6 @@ public class SwiftObjectAttributes extends FileAttributes {
     public String getName() {
         // m_object.getName returns full path, must extract directory
         // getDirectoryName() does not work
-//        if (getType() == FileAttributes.TYPE_FILE) {
-//            return m_object.getName().replace(m_object.getDirectoryName(), "");
-//        } else {
-//            return m_object.getName();
-//        }
         return SwiftURL.getFileName(m_object.getName());
     }
 
