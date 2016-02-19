@@ -25,6 +25,7 @@ import org.openstack4j.model.compute.ActionResponse;
 import org.openstack4j.model.storage.block.options.DownloadOptions;
 import org.openstack4j.model.storage.object.SwiftObject;
 import org.openstack4j.model.storage.object.options.ObjectListOptions;
+import org.openstack4j.model.storage.object.options.ObjectLocation;
 import org.openstack4j.model.storage.object.options.ObjectPutOptions;
 import org.openstack4j.openstack.OSFactory;
 
@@ -37,10 +38,10 @@ import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
 import fr.in2p3.jsaga.adaptor.openstack.OpenstackAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.openstack.util.SwiftURL;
 
-public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements FileReaderStreamFactory, FileWriterPutter {
+public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract 
+        implements FileReaderStreamFactory, FileWriterPutter {
 
     protected Logger m_logger = Logger.getLogger(OpenstackDataAdaptor.class);
-    private String m_container;
     
     @Override
     public String getType() {
@@ -67,19 +68,16 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Fi
         super.connect(userInfo, host, port, 
                 SwiftURL.getNovaPath(basePath), 
                 attributes);
-        // remove ".*/object-store/containers/"
-        m_container = SwiftURL.getContainer(basePath);
-        m_logger.debug("Connected to container " + m_container);
     }
     
     @Override
     public boolean exists(String absolutePath, String additionalArgs)
             throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
-        String containerPath = SwiftURL.getPath(absolutePath);
-        m_logger.debug("exists " + containerPath);
+        ObjectLocation objectLocation = SwiftURL.getObjectLocation(absolutePath);
+        m_logger.debug("exists " + objectLocation.getURI());
         try {
-            this.getSwiftObject(containerPath);
+            this.getSwiftObject(objectLocation);
             return true;
         } catch (DoesNotExistException e) {
             return false;
@@ -90,8 +88,8 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Fi
     public FileAttributes getAttributes(String absolutePath,
             String additionalArgs) throws PermissionDeniedException,
             DoesNotExistException, TimeoutException, NoSuccessException {
-        String containerPath = SwiftURL.getPath(absolutePath);
-        return new SwiftObjectAttributes(this.getSwiftObject(containerPath));
+        ObjectLocation objectLocation = SwiftURL.getObjectLocation(absolutePath);
+        return new SwiftObjectAttributes(this.getSwiftObject(objectLocation));
     }
 
     @Override
@@ -99,13 +97,13 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Fi
             String additionalArgs) throws PermissionDeniedException,
             BadParameterException, DoesNotExistException, TimeoutException,
             NoSuccessException {
-        String objectPath = SwiftURL.getPath(absolutePath);
+        ObjectLocation objectLocation = SwiftURL.getObjectLocation(absolutePath);
         List<SwiftObjectAttributes> attrs = new ArrayList<SwiftObjectAttributes>();
         ObjectListOptions options = ObjectListOptions.create()
-                .path(objectPath);
-        for (SwiftObject obj: m_os.objectStorage().objects().list(m_container, options)) {
+                .path(objectLocation.getObjectName());
+        for (SwiftObject obj: m_os.objectStorage().objects().list(objectLocation.getContainerName(), options)) {
             // do not add directory itself
-            if (!obj.getName().equals(objectPath)) {
+            if (!obj.getName().equals(objectLocation.getObjectName())) {
                 attrs.add(new SwiftObjectAttributes(obj));
             }
         }
@@ -117,13 +115,16 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Fi
     public InputStream getInputStream(String absolutePath, String additionalArgs)
             throws PermissionDeniedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
-        String objectPath = SwiftURL.getPath(absolutePath);
+        ObjectLocation objectLocation = SwiftURL.getObjectLocation(absolutePath);
         DownloadOptions options = DownloadOptions.create();
-        DLPayload file = m_os.objectStorage().objects().download(m_container, objectPath, options);
+        DLPayload file = m_os.objectStorage().objects().download(
+                objectLocation.getContainerName(), 
+                objectLocation.getObjectName(), 
+                options);
         file.getInputStream();
         HttpResponse response = file.getHttpResponse();
         if (response.getStatus() == 404) {
-            throw new DoesNotExistException(objectPath);
+            throw new DoesNotExistException(objectLocation.getURI());
         }
         return file.getInputStream();
     }
@@ -135,16 +136,17 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Fi
             BadParameterException, AlreadyExistsException, ParentDoesNotExist,
             TimeoutException, NoSuccessException {
         // createPath() needs "/" at the end
-        String pseudoDirPath = SwiftURL.getPath(parentAbsolutePath) + directoryName + "/";
+//        String pseudoDirPath = SwiftURL.getPath(parentAbsolutePath) + directoryName + "/";
+        ObjectLocation objectLocation = SwiftURL.getObjectLocation(parentAbsolutePath + directoryName + "/");
         try {
-            this.getSwiftObject(pseudoDirPath);
-            throw new AlreadyExistsException(pseudoDirPath);
+            this.getSwiftObject(objectLocation);
+            throw new AlreadyExistsException(objectLocation.getURI());
         } catch (DoesNotExistException e) {
             // ignore
         }
         // createPath() does not return error if alreadyexistsn must test before
-        m_logger.debug("mkdir: " + pseudoDirPath); 
-        m_os.objectStorage().containers().createPath(m_container, pseudoDirPath);
+        m_logger.debug("mkdir: " + objectLocation.getURI()); 
+        m_os.objectStorage().containers().createPath(objectLocation.getContainerName(), objectLocation.getObjectName());
     }
 
     @Override
@@ -153,7 +155,7 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Fi
             BadParameterException, DoesNotExistException, TimeoutException,
             NoSuccessException {
         // pseudo dir has a "/" at the end
-        this.removeSwiftObject(SwiftURL.getPath(parentAbsolutePath) + directoryName + "/");
+        this.removeSwiftObject(SwiftURL.getObjectLocation(parentAbsolutePath + directoryName + "/"));
     }
 
     @Override
@@ -161,17 +163,17 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Fi
             String additionalArgs) throws PermissionDeniedException,
             BadParameterException, DoesNotExistException, TimeoutException,
             NoSuccessException {
-        this.removeSwiftObject(SwiftURL.getPath(parentAbsolutePath) + fileName);
+        this.removeSwiftObject(SwiftURL.getObjectLocation(parentAbsolutePath + fileName));
     }
 
-    private void removeSwiftObject(String objectPath) throws PermissionDeniedException,
+    private void removeSwiftObject(ObjectLocation objectLocation) throws PermissionDeniedException,
             BadParameterException, DoesNotExistException, TimeoutException,
             NoSuccessException {
-        m_logger.debug("deleting object: " + objectPath); 
-        ActionResponse ar = m_os.objectStorage().objects().delete(m_container, objectPath);
+        m_logger.debug("deleting object: " + objectLocation.getURI()); 
+        ActionResponse ar = m_os.objectStorage().objects().delete(objectLocation.getContainerName(), objectLocation.getObjectName());
         if (!ar.isSuccess()) {
             if (ar.getCode() == 404) {
-                throw new DoesNotExistException(objectPath);
+                throw new DoesNotExistException(objectLocation.getURI());
             }
             throw new NoSuccessException(ar.getCode() + ":" + ar.getFault());
         }
@@ -187,9 +189,9 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Fi
         if (append) {
             throw new NoSuccessException("Append mode is not supported");
         }
-        String objectPath = SwiftURL.getPath(absolutePath);
+        ObjectLocation objectLocation = SwiftURL.getObjectLocation(absolutePath);
         // directory
-        ObjectPutOptions options = ObjectPutOptions.create().path(SwiftURL.getDirectoryName(objectPath));
+        ObjectPutOptions options = ObjectPutOptions.create().path(SwiftURL.getDirectoryName(objectLocation.getObjectName()));
         // upload
         // needs a client because put is done on a separate thread
         OSClient os = OSFactory.builder()
@@ -197,8 +199,9 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Fi
                 .token(m_token.getId())
                 .tenantName(m_tenant)
                 .authenticate();
-        os.objectStorage().objects().put(m_container, 
-                SwiftURL.getFileName(objectPath), 
+        os.objectStorage().objects().put(
+                objectLocation.getContainerName(), 
+                SwiftURL.getFileName(objectLocation.getObjectName()), 
                 Payloads.create(stream), 
                 options);
     }
@@ -211,29 +214,27 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Fi
     ////////////
     // Private 
     ////////////
-    private SwiftObject getSwiftObject(String containerPath) throws DoesNotExistException {
+    private SwiftObject getSwiftObject(ObjectLocation objLocation) throws DoesNotExistException {
         SwiftObject so;
-        if (!containerPath.endsWith("/")) {
+//        if (!containerPath.endsWith("/")) {
             // catch a NumberFormatException in case of pseudo directory
             try {
-                so = m_os.objectStorage().objects().get(m_container, containerPath);
+                so = m_os.objectStorage().objects().get(objLocation);
                 if (so != null) {
                     return so;
                 } else {
-                    throw new DoesNotExistException(containerPath);
+                    throw new DoesNotExistException(objLocation.getURI());
                 }
             } catch (NumberFormatException nfe) {
                 // ignore
             }
-        }
+//        }
         // Otherwise list objects
-        List<? extends SwiftObject> objs = m_os.objectStorage().objects().list(m_container);
-        for (SwiftObject obj: m_os.objectStorage().objects().list(m_container)) {
-            if (obj.getName().equals(containerPath)) {
+        for (SwiftObject obj: m_os.objectStorage().objects().list(objLocation.getContainerName())) {
+            if (obj.getName().equals(objLocation.getObjectName())) {
                 return obj;
             }
         }
-        throw new DoesNotExistException(containerPath);
+        throw new DoesNotExistException(objLocation.getURI());
     }
-
 }

@@ -31,8 +31,7 @@ import org.ogf.saga.namespace.EntryTest;
 	,OpenstackDataTestSuite.OpenstackDirectoryMakeTest.class 
 	,OpenstackDataTestSuite.OpenstackFileReadTest.class
 	,OpenstackDataTestSuite.OpenstackFileWriteTest.class 
-//	,OpenstackDataTestSuite.OpenstackDataMovementTest.class 
-//	,OpenstackDataTestSuite.OpenstackEmulatorDataMovementTest.class
+	,OpenstackDataTestSuite.OpenstackDataMovementTest.class 
 	})
 public class OpenstackDataTestSuite {
 	
@@ -75,9 +74,6 @@ public class OpenstackDataTestSuite {
     }
     public static class OpenstackDataMovementTest extends DataMovementTest {
         public OpenstackDataMovementTest() throws Exception {super(TYPE, TYPE);}
-    }
-    public static class OpenstackEmulatorDataMovementTest extends DataMovementTest {
-        public OpenstackEmulatorDataMovementTest() throws Exception {super(TYPE, "test");}
     }
     public static class OpenstackDataCleanUp extends DataCleanUp {
         public OpenstackDataCleanUp() throws Exception {super(TYPE);}

@@ -1,10 +1,17 @@
 package fr.in2p3.jsaga.adaptor.openstack.util;
 
 import org.openstack4j.api.types.ServiceType;
+import org.openstack4j.model.storage.object.options.ObjectLocation;
 
 
 public final class SwiftURL {
     
+    public static ObjectLocation getObjectLocation(String swiftPath) {
+        return ObjectLocation.create(
+                SwiftURL.getContainer(swiftPath),
+                SwiftURL.getPath(swiftPath)
+        );
+    }
     /*
      * "v2.0/object-store/containers/myContainer" => "v2.0/"
      */
