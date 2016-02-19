@@ -18,10 +18,11 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 import org.openstack4j.api.OSClient;
-import org.openstack4j.api.types.ServiceType;
-import org.openstack4j.model.common.Payload;
+import org.openstack4j.core.transport.HttpResponse;
+import org.openstack4j.model.common.DLPayload;
 import org.openstack4j.model.common.Payloads;
 import org.openstack4j.model.compute.ActionResponse;
+import org.openstack4j.model.storage.block.options.DownloadOptions;
 import org.openstack4j.model.storage.object.SwiftObject;
 import org.openstack4j.model.storage.object.options.ObjectListOptions;
 import org.openstack4j.model.storage.object.options.ObjectPutOptions;
@@ -30,16 +31,13 @@ import org.openstack4j.openstack.OSFactory;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
-import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
+import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
 import fr.in2p3.jsaga.adaptor.openstack.OpenstackAdaptorAbstract;
-import fr.in2p3.jsaga.adaptor.openstack.resource.OpenstackResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.openstack.util.SwiftURL;
-import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 
-public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements DataReaderAdaptor, FileWriterPutter {
+public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements FileReaderStreamFactory, FileWriterPutter {
 
     protected Logger m_logger = Logger.getLogger(OpenstackDataAdaptor.class);
     private String m_container;
@@ -116,12 +114,35 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Da
     }
 
     @Override
+    public InputStream getInputStream(String absolutePath, String additionalArgs)
+            throws PermissionDeniedException, BadParameterException,
+            DoesNotExistException, TimeoutException, NoSuccessException {
+        String objectPath = SwiftURL.getPath(absolutePath);
+        DownloadOptions options = DownloadOptions.create();
+        DLPayload file = m_os.objectStorage().objects().download(m_container, objectPath, options);
+        file.getInputStream();
+        HttpResponse response = file.getHttpResponse();
+        if (response.getStatus() == 404) {
+            throw new DoesNotExistException(objectPath);
+        }
+        return file.getInputStream();
+    }
+
+
+    @Override
     public void makeDir(String parentAbsolutePath, String directoryName,
             String additionalArgs) throws PermissionDeniedException,
             BadParameterException, AlreadyExistsException, ParentDoesNotExist,
             TimeoutException, NoSuccessException {
-        // openstack API createPath() needs "/" at the end
+        // createPath() needs "/" at the end
         String pseudoDirPath = SwiftURL.getPath(parentAbsolutePath) + directoryName + "/";
+        try {
+            this.getSwiftObject(pseudoDirPath);
+            throw new AlreadyExistsException(pseudoDirPath);
+        } catch (DoesNotExistException e) {
+            // ignore
+        }
+        // createPath() does not return error if alreadyexistsn must test before
         m_logger.debug("mkdir: " + pseudoDirPath); 
         m_os.objectStorage().containers().createPath(m_container, pseudoDirPath);
     }
@@ -161,12 +182,16 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Da
     public void putFromStream(String absolutePath, boolean append,
             String additionalArgs, InputStream stream)
             throws PermissionDeniedException, BadParameterException,
-            AlreadyExistsException, ParentDoesNotExist, TimeoutException,
-            NoSuccessException {
+                AlreadyExistsException, ParentDoesNotExist, TimeoutException,
+                NoSuccessException {
+        if (append) {
+            throw new NoSuccessException("Append mode is not supported");
+        }
         String objectPath = SwiftURL.getPath(absolutePath);
         // directory
         ObjectPutOptions options = ObjectPutOptions.create().path(SwiftURL.getDirectoryName(objectPath));
         // upload
+        // needs a client because put is done on a separate thread
         OSClient os = OSFactory.builder()
                 .endpoint(m_os.getEndpoint())
                 .token(m_token.getId())
