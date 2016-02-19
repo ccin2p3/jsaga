@@ -15,5 +15,13 @@ public class SwiftUrlTest {
         assertEquals("myContainer/dir/subdir", SwiftURL.getContainerAndPath(m_swiftPath));
         assertEquals("myContainer", SwiftURL.getContainer(m_swiftPath));
         assertEquals("dir/subdir", SwiftURL.getPath(m_swiftPath));
+        assertEquals("file", SwiftURL.getFileName("dir/subdir/file"));
+        assertEquals("subdir", SwiftURL.getFileName("dir/subdir/"));
+        assertEquals("dir", SwiftURL.getFileName("dir/"));
+        assertEquals("file", SwiftURL.getFileName("file"));
+        assertEquals("dir/subdir", SwiftURL.getDirectoryName("dir/subdir/file"));
+        assertEquals("dir", SwiftURL.getDirectoryName("dir/subdir/"));
+        assertNull(SwiftURL.getDirectoryName("dir/"));
+        assertNull(SwiftURL.getDirectoryName("file"));
     }
 }

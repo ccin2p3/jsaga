@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.openstack.data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -68,18 +69,12 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Da
             NoSuccessException {
         String containerPath = SwiftURL.getPath(absolutePath);
         m_logger.debug("exists " + containerPath);
-        // In case of file use get()
-        if (!containerPath.endsWith("/")) {
-            return m_os.objectStorage().objects().get(m_container, containerPath) != null;
+        try {
+            this.getSwiftObject(containerPath);
+            return true;
+        } catch (DoesNotExistException e) {
+            return false;
         }
-        // Otherwise list objects
-        List<? extends SwiftObject> objs = m_os.objectStorage().objects().list(m_container);
-        for (SwiftObject so: objs) {
-            if (so.getName().equals(containerPath)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
@@ -87,8 +82,7 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Da
             String additionalArgs) throws PermissionDeniedException,
             DoesNotExistException, TimeoutException, NoSuccessException {
         String containerPath = SwiftURL.getPath(absolutePath);
-        // TODO Auto-generated method stub
-        return null;
+        return new SwiftObjectAttributes(this.getSwiftObject(containerPath));
     }
 
     @Override
@@ -96,12 +90,40 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract implements Da
             String additionalArgs) throws PermissionDeniedException,
             BadParameterException, DoesNotExistException, TimeoutException,
             NoSuccessException {
-        String containerPath = SwiftURL.getPath(absolutePath);
-        // TODO Auto-generated method stub
-        return null;
+        String objectPath = SwiftURL.getPath(absolutePath);
+        List<SwiftObjectAttributes> attrs = new ArrayList<SwiftObjectAttributes>();
+        List<? extends SwiftObject> objs = m_os.objectStorage().objects().list(m_container);
+        for (SwiftObject obj: m_os.objectStorage().objects().list(m_container)) {
+            SwiftObjectAttributes soa = new SwiftObjectAttributes(obj);
+            // getDirectory must equal objectPath
+            if (soa.getDirectoryName() != null && objectPath.equals(soa.getDirectoryName() + "/")) {
+                attrs.add(soa);
+            }
+        }
+        FileAttributes[] attrArray = new FileAttributes[attrs.size()];
+        return attrs.toArray(attrArray);
     }
 
-    /*
-     * removes  ".../object-store/containers/"
-     */
+    ////////////
+    // Private 
+    ////////////
+    private SwiftObject getSwiftObject(String containerPath) throws DoesNotExistException {
+        SwiftObject so;
+        if (!containerPath.endsWith("/")) {
+            so = m_os.objectStorage().objects().get(m_container, containerPath);
+            if (so != null) {
+                return so;
+            } else {
+                throw new DoesNotExistException(containerPath);
+            }
+        }
+        // Otherwise list objects
+        List<? extends SwiftObject> objs = m_os.objectStorage().objects().list(m_container);
+        for (SwiftObject obj: m_os.objectStorage().objects().list(m_container)) {
+            if (obj.getName().equals(containerPath)) {
+                return obj;
+            }
+        }
+        throw new DoesNotExistException(containerPath);
+    }
 }
