@@ -134,7 +134,6 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
             return p;
         } else if (resourceId.startsWith(ServiceType.NETWORK.getServiceName())) {
             p.setProperty(Resource.RESOURCE_TYPE, Type.NETWORK.name());
-            p.setProperty(NetworkDescription.SIZE, "1");
             return p;
         }
         throw new NotImplementedException();
