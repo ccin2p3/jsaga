@@ -21,8 +21,7 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
     }
 
     @Override
-    @Ignore
-    @Test
+    @Test @Ignore
     public void listStorageTemplates() throws NotImplementedException, TimeoutException, NoSuccessException  {
     }
 
@@ -33,20 +32,10 @@ public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
     }
 
     @Override
-    public void listStorageResources() throws Exception {
-        super.listStorageResources();
-    }
-
-    @Override
     @Test(expected=NotImplementedException.class)
     public void listNetworkResources() throws NotImplementedException, TimeoutException, 
         NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
         assertNotNull(m_rm.listResources(Type.NETWORK));
     }
     
-    @Override
-    @Test
-    public void createAndDeleteStorageArea() throws Exception {
-        super.createAndDeleteStorageArea();
-    }
 }

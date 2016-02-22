@@ -279,7 +279,7 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     // acquire storage
     //////////////////
     @Test
-    public void createAndDeleteStorageArea() throws Exception {
+    public void createAndMkdirAndDeleteStorageArea() throws Exception {
         StorageDescription sd = (StorageDescription) ResourceFactory.createResourceDescription(Type.STORAGE);
         Storage storage = m_rm.acquireStorage(sd);
         storage.waitFor(120, State.ACTIVE);
@@ -298,20 +298,6 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     protected void dumpDescription(ResourceDescription rd) throws Exception {
         for (String a: rd.listAttributes()) {
             System.out.println("  * " + a + "=" + rd.getAttribute(a));
-        }
-    }
-    
-    @Deprecated
-    protected void dumpCompute(Compute server) throws Exception {
-        ResourceDescription rd = server.getDescription();
-        assertNotNull(rd);
-        System.out.println(server.getId());
-        this.dumpDescription(rd);
-        // display status
-        System.out.println("  * status=" + server.getState().name() + " // " 
-                + server.getMetric(ResourceTask.RESOURCE_STATEDETAIL).getAttribute(Metric.VALUE));
-        for (String access: server.getAccess()) {
-            System.out.println("  => " + access);
         }
     }
     

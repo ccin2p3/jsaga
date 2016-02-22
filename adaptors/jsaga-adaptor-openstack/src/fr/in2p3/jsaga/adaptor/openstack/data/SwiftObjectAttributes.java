@@ -23,9 +23,9 @@ public class SwiftObjectAttributes extends FileAttributes {
 
     @Override
     public int getType() {
-        // isDirectory() does not work!
-//        if (m_object.isDirectory()) {
-        if (m_object.getName().endsWith("/")) {
+//        if (m_object.getMimeType().equals("application/directory")) {
+//        if (m_object.getName().endsWith("/")) {
+        if (m_object.isDirectory()) {
             return FileAttributes.TYPE_DIRECTORY;
         } else {
             return FileAttributes.TYPE_FILE;
@@ -39,31 +39,26 @@ public class SwiftObjectAttributes extends FileAttributes {
 
     @Override
     public PermissionBytes getUserPermission() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public PermissionBytes getGroupPermission() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public PermissionBytes getAnyPermission() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String getOwner() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String getGroup() {
-        // TODO Auto-generated method stub
         return null;
     }
 

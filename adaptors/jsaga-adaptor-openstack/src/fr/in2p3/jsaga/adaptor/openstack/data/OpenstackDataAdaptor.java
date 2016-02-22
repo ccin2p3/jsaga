@@ -50,13 +50,11 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract
 
     @Override
     public Usage getUsage() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -144,7 +142,7 @@ public class OpenstackDataAdaptor extends OpenstackAdaptorAbstract
         } catch (DoesNotExistException e) {
             // ignore
         }
-        // createPath() does not return error if alreadyexistsn must test before
+        // createPath() does not return error if already exists, must test before
         m_logger.debug("mkdir: " + objectLocation.getURI()); 
         m_os.objectStorage().containers().createPath(objectLocation.getContainerName(), objectLocation.getObjectName());
     }

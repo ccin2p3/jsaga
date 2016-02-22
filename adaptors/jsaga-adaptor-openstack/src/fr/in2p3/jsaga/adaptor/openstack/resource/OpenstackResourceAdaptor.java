@@ -37,7 +37,6 @@ import org.openstack4j.model.compute.builder.ServerCreateBuilder;
 import org.openstack4j.model.storage.object.SwiftContainer;
 import org.openstack4j.model.storage.object.SwiftObject;
 import org.openstack4j.model.storage.object.options.ContainerListOptions;
-import org.openstack4j.model.storage.object.options.CreateUpdateContainerOptions;
 import org.openstack4j.openstack.OSFactory;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
@@ -370,6 +369,9 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     @Override
     public String acquireStorageResource(Properties description)
             throws NotImplementedException, NoSuccessException {
+        for (Object prop: description.keySet()) {
+            m_logger.warn("Attribute " + prop.toString() + " is not supported, value is ignored");
+        }
         String containerName;
         containerName = description.getProperty(StorageDescription.ACCESS,
                 "jsaga-container-" + m_credential.getUserID() + "-" + UUID.randomUUID());

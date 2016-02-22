@@ -7,11 +7,8 @@ import fr.in2p3.jsaga.adaptor.resource.ResourceStatus;
 
 public class OpenstackSwiftContainerStatus extends ResourceStatus {
 
-    private SwiftContainer m_container;
-    
     public OpenstackSwiftContainerStatus(SwiftContainer sc) {
         super(null, null);
-        // TODO Auto-generated constructor stub
     }
 
     @Override
