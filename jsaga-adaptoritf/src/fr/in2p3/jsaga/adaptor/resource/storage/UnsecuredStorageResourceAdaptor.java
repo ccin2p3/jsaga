@@ -6,7 +6,7 @@ import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 
 /**
- * You can implement this interface if your adaptor does provide compute resources that are available without
+ * You can implement this interface if your adaptor does provide storage resources that are available without
  * any additional security contexts. In other case, please consider using {@link SecuredStorageResourceAdaptor} instead.
  * 
  * @author schwarz

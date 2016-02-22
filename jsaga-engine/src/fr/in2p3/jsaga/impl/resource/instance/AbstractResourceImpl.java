@@ -4,12 +4,14 @@ import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import fr.in2p3.jsaga.adaptor.resource.NetworkResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.SecuredResource;
 import fr.in2p3.jsaga.adaptor.resource.compute.ComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.SecuredComputeResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.UnsecuredComputeResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.network.NetworkResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.network.SecuredNetworkResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.network.UnsecuredNetworkResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.storage.SecuredStorageResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.storage.StorageResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.storage.UnsecuredStorageResourceAdaptor;
@@ -263,7 +265,12 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
                 return ((UnsecuredStorageResourceAdaptor)m_adaptor).acquireStorageResource(properties);
             }
         } else if (description instanceof NetworkDescription) {
-            return ((NetworkResourceAdaptor)m_adaptor).acquireNetworkResource(properties);
+            if (m_adaptor instanceof SecuredNetworkResourceAdaptor) {
+                m_securedResourceContext = ((SecuredNetworkResourceAdaptor)m_adaptor).acquireNetworkResource(properties);
+                return m_securedResourceContext.getId();
+            } else if (m_adaptor instanceof UnsecuredNetworkResourceAdaptor) {
+                return ((UnsecuredNetworkResourceAdaptor)m_adaptor).acquireNetworkResource(properties);
+            }
         }
         throw new NotImplementedException("Unkown type of resource adaptor");
     }
@@ -305,29 +312,4 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
         
     }
     
-    /*
-     * create a security context from properties and add it to the session
-     */
-//    private void loadContext(SecuredResource securityProperties) throws NoSuccessException, IncorrectStateException, TimeoutException, NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException {
-//        if (securityProperties == null || securityProperties.getId() == null ||
-//                securityProperties.getContextType() == null) {
-//            return;
-//        }
-//        try {
-//            Context context = ContextFactory.createContext(JSAGA_FACTORY, securityProperties.getContextType());
-//            for (Entry<Object, Object> entry: securityProperties.entrySet()) {
-//                if (entry.getValue() instanceof String) {
-//                    context.setAttribute((String)entry.getKey(), (String)entry.getValue());
-//                } else if (entry.getValue() instanceof String[]) {
-//                    context.setVectorAttribute((String)entry.getKey(), (String[])entry.getValue());
-//                }
-//            }
-//            m_securedResourceContext.put(ContextImpl.BASE_URL_INCLUDES, new String[]{"ssh://"});
-//            m_session.addContext(context);
-//        } catch (BadParameterException bpe) {
-//            throw new NoSuccessException(bpe);
-//        }
-//    }
-
-
 }

@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.resource.storage;
+package fr.in2p3.jsaga.adaptor.resource.network;
 
 import java.util.Properties;
 
@@ -8,16 +8,16 @@ import org.ogf.saga.error.NotImplementedException;
 import fr.in2p3.jsaga.adaptor.resource.SecuredResource;
 
 /**
- * You must use this interface if your adaptor provides storage resources that need additional security context
- * (eg. a VM that needs a SSH context). Otherwise, use the simpler interface {@link UnsecuredStorageResourceAdaptor}.
+ * You must use this interface if your adaptor provides network resources that need additional security context
+ * (eg. a VM that needs a SSH context). Otherwise, use the simpler interface {@link UnsecuredNetworkResourceAdaptor}.
  * 
  * @author schwarz
  *
  */
-public interface SecuredStorageResourceAdaptor extends StorageResourceAdaptor {
+public interface SecuredNetworkResourceAdaptor extends NetworkResourceAdaptor {
 
     /**
-     * Obtains a storage resource from a description
+     * Obtains a network resource from a description
      * 
      * @param description a list of Properties amongst SAGA @{link ComputeDescription}
      * @return a {@link SecuredResource} that contains the ID of the resource along with the security context
@@ -25,6 +25,6 @@ public interface SecuredStorageResourceAdaptor extends StorageResourceAdaptor {
      * @throws NotImplementedException if the operation is not implemented
      * @throws NoSuccessException in case of error
      */
-    public SecuredResource acquireStorageResource(Properties description) throws NotImplementedException, NoSuccessException;
+    public SecuredResource acquireNetworkResource(Properties description) throws NotImplementedException, NoSuccessException;
 
 }

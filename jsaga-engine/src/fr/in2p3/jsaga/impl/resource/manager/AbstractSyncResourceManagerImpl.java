@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.resource.manager;
 
-import fr.in2p3.jsaga.adaptor.resource.NetworkResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.ResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.compute.ComputeResourceAdaptor;
+import fr.in2p3.jsaga.adaptor.resource.network.NetworkResourceAdaptor;
 import fr.in2p3.jsaga.adaptor.resource.storage.StorageResourceAdaptor;
 import fr.in2p3.jsaga.helpers.SAGAId;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
@@ -12,7 +12,6 @@ import fr.in2p3.jsaga.impl.resource.description.StorageDescriptionImpl;
 import fr.in2p3.jsaga.impl.resource.instance.ComputeImpl;
 import fr.in2p3.jsaga.impl.resource.instance.NetworkImpl;
 import fr.in2p3.jsaga.impl.resource.instance.StorageImpl;
-import fr.in2p3.jsaga.impl.resource.task.AbstractResourceTaskImpl;
 import fr.in2p3.jsaga.impl.resource.task.IndividualResourceStatusPoller;
 import fr.in2p3.jsaga.impl.resource.task.ResourceMonitorCallback;
 import fr.in2p3.jsaga.impl.resource.task.StateListener;
