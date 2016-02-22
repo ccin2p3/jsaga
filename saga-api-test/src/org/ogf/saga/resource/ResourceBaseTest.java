@@ -27,9 +27,11 @@ import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSDirectory;
 import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.resource.description.ComputeDescription;
+import org.ogf.saga.resource.description.NetworkDescription;
 import org.ogf.saga.resource.description.ResourceDescription;
 import org.ogf.saga.resource.description.StorageDescription;
 import org.ogf.saga.resource.instance.Compute;
+import org.ogf.saga.resource.instance.Network;
 import org.ogf.saga.resource.instance.Resource;
 import org.ogf.saga.resource.instance.Storage;
 import org.ogf.saga.resource.manager.ResourceManager;
@@ -130,44 +132,46 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     }
 
     ////////////
-    // Resources
+    // List resources
     ////////////
     @Test
     public void listComputeResources() throws Exception, 
         NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
-        List<String> resources = m_rm.listResources(Type.COMPUTE);
-        assertTrue(resources.size()>0);
-        int count = 1;
-        for (String serverId: resources) {
-            Compute server = m_rm.acquireCompute(serverId);
-            this.dumpResource(server);
-            if (count++ == 10) {
-                return;
-            }
-        }
+        this.listResources(Type.COMPUTE);
     }
 
     @Test
     public void listStorageResources() throws Exception, 
         NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
-        List<String> resources = m_rm.listResources(Type.STORAGE);
-        assertTrue(resources.size()>0);
+        this.listResources(Type.STORAGE);
+    }
+
+    @Test
+    public void listNetworkResources() throws Exception  {
+        this.listResources(Type.NETWORK);
+    }
+
+    private void listResources(Type type) throws Exception {
+        List<String> resources = m_rm.listResources(type);
         int count = 1;
         for (String resourceId: resources) {
-            Storage storage = m_rm.acquireStorage(resourceId);
-            this.dumpResource(storage);
+            Resource resource;
+            if (Type.NETWORK.equals(type)) {
+                resource = m_rm.acquireNetwork(resourceId);
+            } else if (Type.STORAGE.equals(type)) {
+                resource = m_rm.acquireStorage(resourceId);
+            } else if (Type.COMPUTE.equals(type)) {
+                resource = m_rm.acquireCompute(resourceId);
+            } else {
+                throw new Exception("Type not supported: " + type.name());
+            }
+            this.dumpResource(resource);
             if (count++ == 10) {
                 return;
             }
         }
+        
     }
-
-    @Test
-    public void listNetworkResources() throws NotImplementedException, TimeoutException, 
-        NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
-        assertNotNull(m_rm.listResources(Type.NETWORK));
-    }
-
     //////////
     // Acquire
     //////////
@@ -289,6 +293,18 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         NSDirectory m_dir = NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.CREATE.or(Flags.EXCL));
         m_dir.close();
         storage.release();
+    }
+    
+    //////////////////
+    // Network
+    //////////////////
+    @Test
+    public void createAndDeleteNetwork() throws Exception {
+        NetworkDescription nd = (NetworkDescription) ResourceFactory.createResourceDescription(Type.NETWORK);
+        Network net = m_rm.acquireNetwork(nd);
+        net.waitFor(120, State.ACTIVE);
+        this.dumpResource(net);
+        net.release();
     }
     
     ////////

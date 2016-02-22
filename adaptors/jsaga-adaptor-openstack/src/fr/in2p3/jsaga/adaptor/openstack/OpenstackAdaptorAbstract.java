@@ -74,6 +74,10 @@ public abstract class OpenstackAdaptorAbstract implements ClientAdaptor {
                 .authenticate();
         m_token = m_os.getToken();
         m_logger.info("Connected to TENANT " + m_credential.getAttribute(OpenstackSecurityAdaptor.PARAM_TENANT));
+        m_logger.info("Supported services:");
+        for (ServiceType s: m_os.getSupportedServices()) {
+            m_logger.info("* " + s.name() + "(" + s.getServiceName() + ":" + s.getTypeV3() + ")");
+        }
         m_logger.info("Token expires " + m_token.getExpires());
         m_logger.debug(m_token.toString());
     }
