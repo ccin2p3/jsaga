@@ -1,24 +1,29 @@
 package integration;
 
-import org.apache.log4j.Logger;
-import org.ogf.saga.resource.ResourceBaseTest;
-import org.ogf.saga.resource.Type;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+import org.ogf.saga.resource.ComputeTest;
+import org.ogf.saga.resource.NetworkTest;
+import org.ogf.saga.resource.StorageTest;
 
+@RunWith(Suite.class)
+@SuiteClasses({
+    OpenstackResourceAdaptorTest.OpenstackServerTest.class
+    ,OpenstackResourceAdaptorTest.OpenstackSwiftContainerTest.class
+    ,OpenstackResourceAdaptorTest.OpenstackNeuroneTest.class
+})
 
-public class OpenstackResourceAdaptorTest extends ResourceBaseTest {
-
-    private Logger m_logger = Logger.getLogger(this.getClass());
-
-    public OpenstackResourceAdaptorTest() throws Exception {
-        super("openstack");
+public class OpenstackResourceAdaptorTest {
+    public static class OpenstackServerTest extends ComputeTest {
+        public OpenstackServerTest() throws Exception { super("openstack");}
     }
-
-    @Override
-    protected Object[] typeToBeTested() {
-        return new Object[][] {
-                {Type.COMPUTE},
-                {Type.STORAGE}
-        };
+    
+    public static class OpenstackSwiftContainerTest extends StorageTest {
+        public OpenstackSwiftContainerTest() throws Exception { super("openstack");}
     }
-
+    
+    public static class OpenstackNeuroneTest extends NetworkTest {
+        public OpenstackNeuroneTest() throws Exception { super("openstack");}
+    }
 }

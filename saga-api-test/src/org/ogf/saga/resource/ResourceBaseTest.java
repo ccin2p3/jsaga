@@ -58,31 +58,16 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
 	
     private Logger m_logger = Logger.getLogger(this.getClass());
 
-    // configuration
-    protected String SUBMIT_DELAY           = "submitDelay";
-    protected String ACQUIRE_TEMPLATE       = "acquireTemplate";
-    protected String RECONFIGURE_TEMPLATE   = "reconfigureTemplate";
-
-    // defaults
-    private static final String DEFAULT_SUBMIT_DELAY = "0";
-    
     protected URL m_resourcemanager;
     protected Session m_session;
     protected ResourceManager m_rm;
 
-    protected List<String> m_templatesForAcquire;
-    protected List<String> m_templatesForReconfigure;
-    protected int m_delayBeforeSubmittingJobInSeconds;
-    
     protected ResourceBaseTest(String resourceprotocol) throws Exception {
         super();
 
         // configure
         m_resourcemanager = URLFactory.createURL(getRequiredProperty(resourceprotocol, CONFIG_RM_URL));
         m_session = SessionFactory.createSession(true);
-        m_delayBeforeSubmittingJobInSeconds = Integer.parseInt(super.getOptionalProperty(resourceprotocol, SUBMIT_DELAY, DEFAULT_SUBMIT_DELAY));
-        m_templatesForAcquire = super.getProperties(resourceprotocol, ACQUIRE_TEMPLATE);
-        m_templatesForReconfigure = super.getProperties(resourceprotocol, RECONFIGURE_TEMPLATE);
     }
 
     protected Object[] typeToBeTested() {
@@ -99,26 +84,6 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         m_rm = ResourceFactory.createResourceManager(m_session, m_resourcemanager);
     }
     
-    ////////////
-    // Templates
-    ////////////
-    @Test
-    public void getTemplate() throws NotImplementedException, BadParameterException, 
-            IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
-            TimeoutException, NoSuccessException, DoesNotExistException {
-        m_rm.getTemplate(m_templatesForAcquire.get(0));
-    }
-
-    @Test(expected = DoesNotExistException.class)
-    public void unknownTemplate() throws NotImplementedException, BadParameterException, 
-            IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
-            TimeoutException, NoSuccessException, DoesNotExistException {
-        String templateToTest = "thisTemplateDoesNotExists";
-        // Take the first template and insert "thisTemplateDoesNotExists" just before the last ']'
-        templateToTest = m_templatesForAcquire.get(0).replaceAll("]$", templateToTest + "]");
-        m_rm.getTemplate(templateToTest);
-    }
-
 
     private Object[] parametersForListTemplates() {
         return typeToBeTested();
@@ -176,141 +141,6 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         }
         
     }
-    //////////
-    // Acquire
-    //////////
-    @Test
-    public void launchAndDeleteVM() throws Exception {
-        ComputeDescription cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
-        String[] templates = new String[m_templatesForAcquire.size()];
-        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templatesForAcquire.toArray(templates));
-        Compute server = m_rm.acquireCompute(cd);
-        server.waitFor(120, State.ACTIVE);
-        assertEquals(State.ACTIVE, server.getState());
-        this.dumpResource(server);
-        // test if we have a new UserPass context in the session
-        for (Context c: m_session.listContexts()) {
-            m_logger.info("** Context :" + c.getAttribute(Context.TYPE));
-            m_logger.debug(c.toString());
-        }
-        m_rm.releaseCompute(server.getId());
-    }
-    
-    @Test
-    public void launchAndDelete2VMs() throws Exception {
-        ComputeDescription cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
-        String[] templates = new String[m_templatesForAcquire.size()];
-        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templatesForAcquire.toArray(templates));
-        Compute server1 = m_rm.acquireCompute(cd);
-        server1.waitFor(120, State.ACTIVE);
-        assertEquals(State.ACTIVE, server1.getState());
-        this.dumpResource(server1);
-        // test if we have a new UserPass context in the session
-        for (Context c: m_session.listContexts()) {
-            m_logger.info("** Context :" + c.getAttribute(Context.TYPE));
-            m_logger.debug(c.toString());
-        }
-        Compute server2 = m_rm.acquireCompute(cd);
-        server2.waitFor(120, State.ACTIVE);
-        assertEquals(State.ACTIVE, server2.getState());
-        this.dumpResource(server2);
-        // release both VMs
-        m_rm.releaseCompute(server1.getId());
-        m_rm.releaseCompute(server2.getId());
-    }
-    
-    @Test
-    public void launchAndReconfigureDeleteVM() throws Exception {
-        ComputeDescription cd;
-        cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
-        String[] templates = new String[m_templatesForAcquire.size()];
-        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templatesForAcquire.toArray(templates));
-        Compute server = m_rm.acquireCompute(cd);
-        server.waitFor(120, State.ACTIVE);
-        this.dumpResource(server);
-        templates = new String[m_templatesForReconfigure.size()];
-        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templatesForReconfigure.toArray(templates));
-        server.reconfigure(cd);
-        server.waitFor(240, State.ACTIVE);
-        this.dumpResource(server);
-        m_rm.releaseCompute(server.getId());
-    }
-
-    @Test
-    public void launchAndSubmitJobAndDeleteVM() throws Exception {
-        ComputeDescription cd = (ComputeDescription) ResourceFactory.createResourceDescription(Type.COMPUTE);
-        String[] templates = new String[m_templatesForAcquire.size()];
-        cd.setVectorAttribute(ResourceDescription.TEMPLATE, m_templatesForAcquire.toArray(templates));
-        Compute server = m_rm.acquireCompute(cd);
-        server.waitFor(120, State.ACTIVE);
-        assertEquals(State.ACTIVE, server.getState());
-        this.dumpResource(server);
-        // test if we have a new UserPass context in the session
-        for (Context c: m_session.listContexts()) {
-            m_logger.info("** Context :" + c.getAttribute(Context.TYPE));
-            m_logger.debug(c.toString());
-        }
-        if (m_delayBeforeSubmittingJobInSeconds > 0) {
-            Thread.sleep(m_delayBeforeSubmittingJobInSeconds*1000);
-        }
-        org.ogf.saga.task.State jobState = null;
-        try {
-            URL jobservice = URLFactory.createURL(server.getAccess()[0]);
-            JobService service = JobFactory.createJobService(m_session, jobservice);
-            JobDescription desc = JobFactory.createJobDescription();
-            desc.setAttribute(JobDescription.EXECUTABLE, "/bin/date");
-            desc.setAttribute(JobDescription.OUTPUT, "stdout.txt");
-            desc.setAttribute(JobDescription.ERROR, "stderr.txt");
-            Job job = service.createJob(desc);
-            job.run();
-            m_logger.info(job.getAttribute(Job.JOBID));   // for detecting hang in run()
-    
-            // wait for the END
-            job.waitFor();
-            m_logger.info("Job finished.");               // for detecting hang in waitFor()
-    
-            // check job status
-            jobState = job.getState();
-        } catch (Exception e) {
-            m_logger.error("Could not run job", e);
-            fail(e.getMessage());
-        } finally {
-            m_rm.releaseCompute(server.getId());
-        }
-        // check job status
-        Assert.assertEquals(
-                org.ogf.saga.task.State.DONE,
-                jobState);
-    }
-    
-    //////////////////
-    // acquire storage
-    //////////////////
-    @Test
-    public void createAndMkdirAndDeleteStorageArea() throws Exception {
-        StorageDescription sd = (StorageDescription) ResourceFactory.createResourceDescription(Type.STORAGE);
-        Storage storage = m_rm.acquireStorage(sd);
-        storage.waitFor(120, State.ACTIVE);
-        this.dumpResource(storage);
-        URL baseUrl = URLFactory.createURL(storage.getAccess()[0]);
-        URL m_dirUrl = createURL(baseUrl, "dir/");
-        NSDirectory m_dir = NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.CREATE.or(Flags.EXCL));
-        m_dir.close();
-        storage.release();
-    }
-    
-    //////////////////
-    // Network
-    //////////////////
-    @Test
-    public void createAndDeleteNetwork() throws Exception {
-        NetworkDescription nd = (NetworkDescription) ResourceFactory.createResourceDescription(Type.NETWORK);
-        Network net = m_rm.acquireNetwork(nd);
-        net.waitFor(120, State.ACTIVE);
-        this.dumpResource(net);
-        net.release();
-    }
-    
     ////////
     // Utils
     ////////
