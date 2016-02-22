@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.impl.resource.description;
 
 import org.ogf.saga.resource.description.NetworkDescription;
 
+import java.util.Collection;
 import java.util.Properties;
 
 /* ***************************************************
@@ -17,5 +18,13 @@ public class NetworkDescriptionImpl extends AbstractResourceDescriptionImpl impl
     /** constructor for ResourceManager.getTemplate() */
     public NetworkDescriptionImpl(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected Collection<String> getScalarAttributes() {
+        Collection<String> c = super.getScalarAttributes();
+        c.add(NetworkDescription.ACCESS);
+        c.add(NetworkDescription.SIZE);
+        return c;
     }
 }
