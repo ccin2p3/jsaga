@@ -16,8 +16,7 @@
         <title>Security</title>
         <faq id="which">
             <question>Which security context should I use with this adaptor ?</question>
-            <answer>Use a context of type "X509", giving your p12 certificate and your password. Your DN should be registered in the Dirac
-            remote system and you should upload your proxy to the Dirac portal.</answer>
+            <answer>Use a context of type "openstack", giving your tenant, your username and your password.</answer>
         </faq>
     </part>
     <part id="execution">
@@ -25,13 +24,10 @@
         <faq id="url">
             <question>What is the URL syntax understood by this adaptor ?</question>
             <answer>The URL must be:
-                <pre><![CDATA[dirac://<HOSTNAME>:<PORT>/[?[Group=<GROUP>][&Setup=<SETUP>][&Sites=<LIST_OF_SITES>]]
+                <pre><![CDATA[openstack://<HOSTNAME>:<PORT>/v2.0/
 Where:
-    <HOSTNAME> is the name of the host running the Dirac REST service,
-    <PORT> is the port of the Dirac REST service,
-    <GROUP> is the Dirac group your DN is allowed in (this parameter is optional if your DN is allowed in only 1 group),
-    <SETUP> is the Dirac setup your DN is allowed in (this parameter is optional if your DN is allowed in only 1 setup),
-    <LIST_OF_SITES> is a comma-delimited list of Dirac sites you want your job to be sent to.
+    <HOSTNAME> is the name of the host running the Openstack identity service,
+    <PORT> is the port of the Openstack identity service.
 ]]></pre>
             </answer>
         </faq>
