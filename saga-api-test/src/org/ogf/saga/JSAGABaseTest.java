@@ -131,10 +131,10 @@ public abstract class JSAGABaseTest extends Assert {
         }
     }
 
-    protected List<String> getProperties(String protocol, String prefix) throws Exception {
+    protected List<String> getOptionalProperties(String protocol, String prefix) throws Exception {
         List<String> list = new ArrayList<String>();
         int count=1;
-        String param = getRequiredProperty(protocol, prefix + "." + Integer.toString(count));
+        String param = getOptionalProperty(protocol, prefix + "." + Integer.toString(count));
         while (param != null) {
             list.add(param);
             count++;

@@ -2,13 +2,11 @@ package org.ogf.saga.resource;
 
 import java.util.List;
 
-import junitparams.Parameters;
-
 import org.apache.log4j.Logger;
-import org.junit.Assert;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.junit.Assume.assumeTrue;
 import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.AuthenticationFailedException;
@@ -19,22 +17,12 @@ import org.ogf.saga.error.IncorrectURLException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
-import org.ogf.saga.job.Job;
-import org.ogf.saga.job.JobDescription;
-import org.ogf.saga.job.JobFactory;
-import org.ogf.saga.job.JobService;
 import org.ogf.saga.monitoring.Metric;
-import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.NSDirectory;
-import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.resource.description.ComputeDescription;
 import org.ogf.saga.resource.description.NetworkDescription;
 import org.ogf.saga.resource.description.ResourceDescription;
 import org.ogf.saga.resource.description.StorageDescription;
-import org.ogf.saga.resource.instance.Compute;
-import org.ogf.saga.resource.instance.Network;
 import org.ogf.saga.resource.instance.Resource;
-import org.ogf.saga.resource.instance.Storage;
 import org.ogf.saga.resource.manager.ResourceManager;
 import org.ogf.saga.resource.task.ResourceTask;
 import org.ogf.saga.resource.task.State;
@@ -53,86 +41,127 @@ import org.ogf.saga.url.URLFactory;
 * ***************************************************
 * Description:                                      */
 
-@RunWith(junitparams.JUnitParamsRunner.class)
+//@RunWith(junitparams.JUnitParamsRunner.class)
 public abstract class ResourceBaseTest extends JSAGABaseTest {
 	
     private Logger m_logger = Logger.getLogger(this.getClass());
+    // defaults
+    private static final String DEFAULT_DELAY_BEFORE_USE = "0";
+    
 
+
+    // configuration
+    protected String DELAY_BEFORE_USE       = "delayBeforeUse";
+    protected String ACQUIRE_TEMPLATE       = "acquireTemplate";
+    protected String RECONFIGURE_TEMPLATE   = "reconfigureTemplate";
+
+    protected List<String> m_templatesForAcquire;
+    protected List<String> m_templatesForReconfigure;
+    protected int m_delayBeforeUseInSeconds;
+    
     protected URL m_resourcemanager;
     protected Session m_session;
     protected ResourceManager m_rm;
+    protected Type m_type;
+    
+    protected Resource m_currentResource;
 
-    protected ResourceBaseTest(String resourceprotocol) throws Exception {
+    protected ResourceBaseTest(String resourceprotocol, Type type) throws Exception {
         super();
-
         // configure
         m_resourcemanager = URLFactory.createURL(getRequiredProperty(resourceprotocol, CONFIG_RM_URL));
         m_session = SessionFactory.createSession(true);
-    }
-
-    protected Object[] typeToBeTested() {
-        return new Object[][] {
-                {Type.COMPUTE},
-                {Type.STORAGE},
-                {Type.NETWORK}
-        };
+        m_type = type;
+        String prefix = resourceprotocol + "." + m_type.name();
+        m_delayBeforeUseInSeconds = Integer.parseInt(
+                super.getOptionalProperty(prefix, DELAY_BEFORE_USE, DEFAULT_DELAY_BEFORE_USE));
+        m_templatesForAcquire = super.getOptionalProperties(prefix, ACQUIRE_TEMPLATE);
+        m_templatesForReconfigure = super.getOptionalProperties(prefix, RECONFIGURE_TEMPLATE);
     }
 
     @Before
-    public void setUp() throws NotImplementedException, BadParameterException, IncorrectURLException, 
-            AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
+    public void setUp() throws Exception {
         m_rm = ResourceFactory.createResourceManager(m_session, m_resourcemanager);
+        m_currentResource = null;
     }
     
 
-    private Object[] parametersForListTemplates() {
-        return typeToBeTested();
+    @After 
+    public void cleanUp() throws Exception {
+        if (this.m_currentResource != null) {
+            try {
+                this.m_currentResource.release();
+            } catch (Exception e) {
+                // ignore
+            }
+        }
     }
-
+    protected abstract Resource acquire(ResourceDescription rd) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException;
+    
+    //////////////
+    // templates
+    //////////////
     @Test
-    @Parameters()
-    public void listTemplates(Type type) throws Exception {
-        List<String> templates = m_rm.listTemplates(type);
+    public void listTemplates() throws Exception {
+        List<String> templates = m_rm.listTemplates(m_type);
         assertNotNull(templates);
         if (templates.size()>0) {
             System.out.println(templates.get(0));
             // Details of a template
             ResourceDescription rd = m_rm.getTemplate(templates.get(0));
-            if (Type.COMPUTE.equals(type)) {
+            if (Type.COMPUTE.equals(m_type)) {
                 assertTrue(rd instanceof ComputeDescription);
-            } else if (Type.STORAGE.equals(type)) {
+            } else if (Type.STORAGE.equals(m_type)) {
                 assertTrue(rd instanceof StorageDescription);
-            } else if (Type.NETWORK.equals(type)) {
+            } else if (Type.NETWORK.equals(m_type)) {
                 assertTrue(rd instanceof NetworkDescription);
             } else {
-                fail("Unknown type:" + type.name());
+                fail("Unknown type:" + m_type.name());
             }
             this.dumpDescription(rd);
         }
     }
     
     ////////////
-    // List resources
+    // Templates
     ////////////
-    private Object[] parametersForListResources() {
-        return typeToBeTested();
+    @Test
+    public void getTemplate() throws NotImplementedException, BadParameterException, 
+            IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
+            TimeoutException, NoSuccessException, DoesNotExistException {
+        assumeTrue(m_templatesForAcquire.size() > 0);
+        m_rm.getTemplate(m_templatesForAcquire.get(0));
     }
 
+    @Test(expected = DoesNotExistException.class)
+    public void unknownTemplate() throws NotImplementedException, BadParameterException, 
+            IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, 
+            TimeoutException, NoSuccessException, DoesNotExistException {
+        assumeTrue(m_templatesForAcquire.size() > 0);
+        String templateToTest = "thisTemplateDoesNotExists";
+        // Take the first template and insert "thisTemplateDoesNotExists" just before the last ']'
+        templateToTest = m_templatesForAcquire.get(0).replaceAll("]$", templateToTest + "]");
+        m_rm.getTemplate(templateToTest);
+    }
+
+    ////////////
+    // List resources
+    ////////////
+
     @Test
-    @Parameters
-    public void listResources(Type type) throws Exception {
-        List<String> resources = m_rm.listResources(type);
+    public void listResources() throws Exception {
+        List<String> resources = m_rm.listResources(m_type);
         int count = 1;
         for (String resourceId: resources) {
             Resource resource;
-            if (Type.NETWORK.equals(type)) {
+            if (Type.NETWORK.equals(m_type)) {
                 resource = m_rm.acquireNetwork(resourceId);
-            } else if (Type.STORAGE.equals(type)) {
+            } else if (Type.STORAGE.equals(m_type)) {
                 resource = m_rm.acquireStorage(resourceId);
-            } else if (Type.COMPUTE.equals(type)) {
+            } else if (Type.COMPUTE.equals(m_type)) {
                 resource = m_rm.acquireCompute(resourceId);
             } else {
-                throw new Exception("Type not supported: " + type.name());
+                throw new Exception("Type not supported: " + m_type.name());
             }
             this.dumpResource(resource);
             if (count++ == 10) {
@@ -141,9 +170,93 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         }
         
     }
+    
+    ////////////
+    // create+release
+    ////////////
+    @Test
+    public void acquireNewAndRelease() throws Exception {
+        m_currentResource = this.acquireResourceReadyNotForUse();
+        this.dumpResource(m_currentResource);
+        for (Context c: m_session.listContexts()) {
+            m_logger.info("** Context :" + c.getAttribute(Context.TYPE));
+            m_logger.debug(c.toString());
+        }
+    }
+
+    @Test
+    public void acquire2ResourcesInTheSameSessionAndRelease() throws Exception {
+        m_currentResource = this.acquireResourceReadyNotForUse();
+        Resource res2 = null;
+        try {
+            res2 = this.acquireResourceReadyNotForUse();
+            for (Context c: m_session.listContexts()) {
+                m_logger.info("** Context :" + c.getAttribute(Context.TYPE));
+                m_logger.debug(c.toString());
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            if (res2 != null) {
+                try {res2.release();} catch (Exception e) {}
+            }
+        }
+    }
+
+    @Test
+    public void acquireAndReconfigureAndRelease() throws Exception {
+        assumeTrue(m_templatesForReconfigure.size()>0);
+        m_currentResource = this.acquireResourceReadyNotForUse();
+        m_currentResource = this.reconfResourceReady(0);
+    }
+
     ////////
     // Utils
     ////////
+    /*
+     * instantiate and wait ACTIVE + wait delayBeforeUse
+     */
+    protected final Resource acquireResourceReadyForUse() throws Exception {
+        return this.acquireResourceReady(m_delayBeforeUseInSeconds);
+    }
+    /*
+     * instantiate and wait ACTIVE
+     */
+    protected final Resource acquireResourceReadyNotForUse() throws Exception {
+        return this.acquireResourceReady(0);
+    }
+    
+    private final Resource acquireResourceReady(int delay) throws Exception {
+        return this.getResourceFromTemplatesReady(delay, m_templatesForAcquire);
+    }
+    
+    private final Resource reconfResourceReady(int delay) throws Exception {
+        return this.getResourceFromTemplatesReady(delay, m_templatesForReconfigure);
+    }
+    
+    private final Resource getResourceFromTemplatesReady(int delay, List<String> templateList) throws Exception {
+        ResourceDescription nd = ResourceFactory.createResourceDescription(m_type);
+        if (templateList.size() > 0) {
+            String[] templates = new String[templateList.size()];
+            nd.setVectorAttribute(ResourceDescription.TEMPLATE, templateList.toArray(templates));
+        }
+        return this.acquireResourceFromDescReady(delay, nd);
+    }
+    
+    protected  final Resource acquireResourceFromDescReadyForUse(ResourceDescription nd) throws Exception {
+        return this.acquireResourceFromDescReady(m_delayBeforeUseInSeconds, nd);
+    }
+    
+    private final Resource acquireResourceFromDescReady(int delay, ResourceDescription nd) throws Exception {
+        Resource res = this.acquire(nd);
+        res.waitFor(120, State.ACTIVE);
+        assertEquals(State.ACTIVE, res.getState());
+        if (delay > 0) {
+            Thread.sleep(delay*1000);
+        }
+        return res;
+    }
+    
     
     protected void dumpDescription(ResourceDescription rd) throws Exception {
         for (String a: rd.listAttributes()) {
