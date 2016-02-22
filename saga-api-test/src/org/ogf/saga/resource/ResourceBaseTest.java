@@ -2,21 +2,22 @@ package org.ogf.saga.resource;
 
 import java.util.List;
 
+import junitparams.Parameters;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
-import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.IncorrectURLException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
-import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
@@ -52,6 +53,7 @@ import org.ogf.saga.url.URLFactory;
 * ***************************************************
 * Description:                                      */
 
+@RunWith(junitparams.JUnitParamsRunner.class)
 public abstract class ResourceBaseTest extends JSAGABaseTest {
 	
     private Logger m_logger = Logger.getLogger(this.getClass());
@@ -83,6 +85,14 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         m_templatesForReconfigure = super.getProperties(resourceprotocol, RECONFIGURE_TEMPLATE);
     }
 
+    protected Object[] typeToBeTested() {
+        return new Object[][] {
+                {Type.COMPUTE},
+                {Type.STORAGE},
+                {Type.NETWORK}
+        };
+    }
+
     @Before
     public void setUp() throws NotImplementedException, BadParameterException, IncorrectURLException, 
             AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
@@ -109,49 +119,43 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
         m_rm.getTemplate(templateToTest);
     }
 
+
+    private Object[] parametersForListTemplates() {
+        return typeToBeTested();
+    }
+
     @Test
-    public void listComputeTemplates() throws Exception  {
-        List<String> templates = m_rm.listTemplates(Type.COMPUTE);
-        assertTrue(templates.size()>0);
-        System.out.println(templates.get(0));
-        // Details of a template
-        ResourceDescription rd = m_rm.getTemplate(templates.get(0));
-        assertTrue(rd instanceof ComputeDescription);
-        this.dumpDescription(rd);
+    @Parameters()
+    public void listTemplates(Type type) throws Exception {
+        List<String> templates = m_rm.listTemplates(type);
+        assertNotNull(templates);
+        if (templates.size()>0) {
+            System.out.println(templates.get(0));
+            // Details of a template
+            ResourceDescription rd = m_rm.getTemplate(templates.get(0));
+            if (Type.COMPUTE.equals(type)) {
+                assertTrue(rd instanceof ComputeDescription);
+            } else if (Type.STORAGE.equals(type)) {
+                assertTrue(rd instanceof StorageDescription);
+            } else if (Type.NETWORK.equals(type)) {
+                assertTrue(rd instanceof NetworkDescription);
+            } else {
+                fail("Unknown type:" + type.name());
+            }
+            this.dumpDescription(rd);
+        }
     }
     
-
-    @Test
-    public void listStorageTemplates() throws NotImplementedException, TimeoutException, NoSuccessException  {
-        assertNotNull(m_rm.listTemplates(Type.STORAGE));
-    }
-
-    @Test
-    public void listNetworkTemplates() throws NotImplementedException, TimeoutException, NoSuccessException  {
-        assertNotNull(m_rm.listTemplates(Type.NETWORK));
-    }
-
     ////////////
     // List resources
     ////////////
-    @Test
-    public void listComputeResources() throws Exception, 
-        NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
-        this.listResources(Type.COMPUTE);
+    private Object[] parametersForListResources() {
+        return typeToBeTested();
     }
 
     @Test
-    public void listStorageResources() throws Exception, 
-        NoSuccessException, AuthenticationFailedException, AuthorizationFailedException  {
-        this.listResources(Type.STORAGE);
-    }
-
-    @Test
-    public void listNetworkResources() throws Exception  {
-        this.listResources(Type.NETWORK);
-    }
-
-    private void listResources(Type type) throws Exception {
+    @Parameters
+    public void listResources(Type type) throws Exception {
         List<String> resources = m_rm.listResources(type);
         int count = 1;
         for (String resourceId: resources) {
