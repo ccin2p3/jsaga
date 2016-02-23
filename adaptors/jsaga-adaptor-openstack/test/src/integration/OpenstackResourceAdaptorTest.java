@@ -7,10 +7,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.ogf.saga.resource.ComputeTest;
 import org.ogf.saga.resource.NetworkTest;
-import org.ogf.saga.resource.ResourceFactory;
 import org.ogf.saga.resource.StorageTest;
-import org.ogf.saga.resource.description.StorageDescription;
-import org.ogf.saga.resource.instance.Storage;
 
 @RunWith(Suite.class)
 @SuiteClasses({
