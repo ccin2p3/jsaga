@@ -18,9 +18,20 @@
             <question>Which security context should I use with this adaptor ?</question>
             <answer>Use a context of type "openstack", giving your tenant, your username and your password.</answer>
         </faq>
+        <faq id="additional">
+            <question>Should I define additional security contexts to access resources (eg. compute nodes) ?</question>
+            <answer>It depends on the type of nodes:
+                <ul>
+                    <li>Compute resource (Nova server): JSaga will automatically add a security context to access
+                    the SSHD server on the server. See below for optional arguments "KeypairName" and "PrivateKey"</li>
+                    <li>Storage resource (Swift container): no additional security needed</li>
+                    <li>Network resource (Neurone network): not supported yet</li>
+                </ul>
+            </answer>
+        </faq>
     </part>
-    <part id="execution">
-        <title>Execution management</title>
+    <part id="resource management">
+        <title>Resource management</title>
         <faq id="url">
             <question>What is the URL syntax understood by this adaptor ?</question>
             <answer>The URL must be:
@@ -28,8 +39,47 @@
 Where:
     <HOSTNAME> is the name of the host running the Openstack identity service,
     <PORT> is the port of the Openstack identity service.
+
+Optional arguments:
+    KeypairName= the key pair name installed on Openstack
+    PrivateKey= the local private key corresponding to the keypair
+    
+KeypairName and PrivateKey allow to access compute resources with a public key. Otherwise, access will be done
+with the password provided by Openstack when the compute resource was booted.
 ]]></pre>
             </answer>
+        </faq>
+    </part>
+    <part id="execution">
+        <title>Execution management on compute resources</title>
+        <faq id="acquireCompute">
+            <question>How do I describe the type of compute node I want to acquire ?</question>
+            <answer>Standard supported SAGA attributes are:
+                <ul>
+                <li>ComputeDescription.TEMPLATE=array of templates, typically an image and a flavor, designated by their
+                SAGA names (eg. "[openstack://HOSTNAME:5000/v2.0/]-[nova/images/IMAGENAME]"). </li>
+                <li>Other SAGA attributes are not supported yet.</li>
+                </ul>
+                <br/>
+                Out-of-SAGA attributes are:
+                <ul>
+                <li>"AdminUser"=username of the administrator, "root" by default.</li>
+                </ul>
+            </answer>
+            <question>How can I have the list of available templates for compute resources ?</question>
+            <answer>
+            <pre>
+        ResourceManager rm = ResourceFactory.createResourceManager(session, url);
+        rm.listTemplates(Type.COMPUTE);
+            </pre>
+            </answer>
+        </faq>
+    </part>
+    <part id="data">
+        <title>Data management on storage resources</title>
+        <faq id="acquireStorage">
+            <question>How do I describe the type of storage node I want to acquire ?</question>
+            <answer>Neither SAGA attributes are supported yet.</answer>
         </faq>
     </part>
 </faqs>
