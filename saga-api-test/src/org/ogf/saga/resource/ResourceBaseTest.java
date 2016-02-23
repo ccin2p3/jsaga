@@ -260,7 +260,14 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     
     protected void dumpDescription(ResourceDescription rd) throws Exception {
         for (String a: rd.listAttributes()) {
-            System.out.println("  * " + a + "=" + rd.getAttribute(a));
+            if (rd.isVectorAttribute(a)) {
+                System.out.println("  * " + a);
+                for (String v: rd.getVectorAttribute(a)) {
+                    System.out.println("    * " + v);
+                }
+            } else {
+                System.out.println("  * " + a + "=" + rd.getAttribute(a));
+            }
         }
     }
     

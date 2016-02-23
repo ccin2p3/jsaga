@@ -27,6 +27,7 @@ import org.ogf.saga.resource.instance.Resource;
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.api.types.ServiceType;
+import org.openstack4j.model.ModelEntity;
 import org.openstack4j.model.common.Link;
 import org.openstack4j.model.compute.ActionResponse;
 import org.openstack4j.model.compute.Address;
@@ -69,7 +70,13 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
 
     protected Logger m_logger = Logger.getLogger(OpenstackResourceAdaptor.class);
 
+    /**
+     * The keypair name already installed on openstack and used to connect to VM
+     */
     public static String PARAM_KEYPAIRNAME = "KeypairName";
+    /**
+     * The local private key corresponding to the keypair installed on openstack
+     */
     public static String PARAM_PRIVATEKEY = "PrivateKey";
     
     private String m_keypairName = null;
@@ -109,42 +116,52 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     @Override
     public Properties getDescription(String resourceId) 
             throws DoesNotExistException, NotImplementedException, BadParameterException {
-        Properties p = new Properties();
         m_logger.debug("Getting description of " + resourceId);
-        if (resourceId.startsWith(ServiceType.COMPUTE.getServiceName())) {
+        ModelEntity entity = this.getEntityByName(resourceId);
+        Properties p = new Properties();
+        if (entity instanceof Server) {
+            // NOVA server
             p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
             // search by name
-            Server server = this.getServerByName(resourceId);
+            Server server = (Server)entity;
             // get Flavor
+            List<String> templates = new ArrayList<String>();
             Flavor flavor = server.getFlavor();
             if (flavor != null) {
                 p.setProperty(ComputeDescription.MEMORY, Integer.toString(flavor.getRam()));
                 p.setProperty(ComputeDescription.SIZE, Integer.toString(flavor.getVcpus()));
+                templates.add(urlOfInternalId(internalIdOf(flavor)));
             }
-            // FIXME: this is not OS!
+            // get image
             Image image = server.getImage();
             if (image != null) {
-                p.setProperty(ComputeDescription.MACHINE_OS, image.getName());
+                templates.add(urlOfInternalId(internalIdOf(image)));
             }
-            return p;
-        } else if (resourceId.startsWith(ServiceType.OBJECT_STORAGE.getServiceName())){
+            if (templates.size()>0) {
+                p.put(ComputeDescription.TEMPLATE, templates.toArray(new String[templates.size()]));
+            }
+        } else if (entity instanceof SwiftContainer){
+            // OBJECT_STORAGE swift container
             p.setProperty(Resource.RESOURCE_TYPE, Type.STORAGE.name());
-            SwiftContainer sc = this.getContainerByName(resourceId);
+            SwiftContainer sc = (SwiftContainer)entity;
             p.setProperty(StorageDescription.SIZE, Long.toString(sc.getTotalSize()));
-            return p;
-        } else if (resourceId.startsWith(ServiceType.NETWORK.getServiceName())) {
+        } else if (entity instanceof Network) {
+            // NEURONE network 
             p.setProperty(Resource.RESOURCE_TYPE, Type.NETWORK.name());
-            return p;
+        } else {
+            throw new NotImplementedException();
         }
-        throw new NotImplementedException();
+        return p;
     }
 
     @Override
     public String[] getAccess(String resourceId) throws NotImplementedException, DoesNotExistException {
+        ModelEntity entity = this.getEntityByName(resourceId);
         List<String> accesses = new ArrayList<String>();
-        if (resourceId.startsWith(ServiceType.COMPUTE.getServiceName())) {
-            // search by name
-            Server server = this.getServerByName(resourceId);
+        if (entity instanceof Server) {
+            // NOVA server
+            // access = ssh://172.0.24.44
+            Server server = (Server)entity;
             for (List<? extends Address> addrs: server.getAddresses().getAddresses().values()) {
                 for (Address addr: addrs) {
                     m_logger.debug(addr.getAddr());
@@ -152,23 +169,25 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
                     accesses.add("ssh://" + addr.getAddr());
                 }
             }
-            return accesses.toArray(new String[accesses.size()]);
-        } else if (resourceId.startsWith(ServiceType.OBJECT_STORAGE.getServiceName())) {
+        } else if (entity instanceof SwiftContainer){
+            // OBJECT_STORAGE swift container
             // access = swift://keystone:5000/v2/object-store/containers/NAME
             accesses.add(m_os.getEndpoint().replaceAll("^.*://", "swift://") + resourceId);
-            return accesses.toArray(new String[accesses.size()]);
+        } else if (entity instanceof Network) {
+            // TODO network access
+        } else {
+            throw new NotImplementedException();
         }
-        throw new NotImplementedException();
+        return accesses.toArray(new String[accesses.size()]);
     }
 
     @Override
     public ResourceStatus getResourceStatus(String resourceId) throws DoesNotExistException, NotImplementedException {
-        if (resourceId.startsWith(ServiceType.COMPUTE.getServiceName())) {
-            Server server = this.getServerByName(resourceId);
-            return new OpenstackServerStatus(server);
-        } else if (resourceId.startsWith(ServiceType.OBJECT_STORAGE.getServiceName())) {
-            SwiftContainer sc = this.getContainerByName(resourceId);
-            return new OpenstackSwiftContainerStatus(sc);
+        ModelEntity entity = this.getEntityByName(resourceId);
+        if (entity instanceof Server) {
+            return new OpenstackServerStatus((Server)entity);
+        } else if (entity instanceof SwiftContainer){
+            return new OpenstackSwiftContainerStatus((SwiftContainer)entity);
         }
         throw new NotImplementedException();
     }
@@ -269,15 +288,16 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
             // TODO drain
             throw new NotImplementedException();
         }
-        if (resourceId.startsWith(ServiceType.COMPUTE.getServiceName())) {
-            Server server = this.getServerByName(resourceId);
+        ModelEntity entity = this.getEntityByName(resourceId);
+        if (entity instanceof Server) {
+            Server server = (Server)entity;
             ActionResponse ar = m_os.compute().servers().delete(server.getId());
             if (!ar.isSuccess()) {
                 throw new NoSuccessException(ar.getFault());
             }
             return;
-        } else if (resourceId.startsWith(ServiceType.OBJECT_STORAGE.getServiceName())) {
-            SwiftContainer sc = this.getContainerByName(resourceId);
+        } else if (entity instanceof SwiftContainer){
+            SwiftContainer sc = (SwiftContainer)entity;
             for (SwiftObject so: m_os.objectStorage().objects().list(sc.getName())) {
                 ActionResponse ar = m_os.objectStorage().objects().delete(sc.getName(), so.getName());
                 if (!ar.isSuccess()) {
@@ -306,25 +326,22 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     @Override
     public Properties getTemplate(String id) throws TimeoutException, NoSuccessException, 
                     DoesNotExistException, NotImplementedException {
+        ModelEntity entity = this.getEntityByName(id);
         Properties p = new Properties();
-        if (id.startsWith(ServiceType.COMPUTE.getServiceName())) {
+        if (entity instanceof Image) {
             p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
-            if (id.contains("/images/")) {
-                Image i = this.getImageByName(id);
-                p.setProperty(ComputeDescription.MACHINE_OS, i.getName());
-                // TODO: add other attributes
-                return p;
-            } else if (id.contains("/flavors")) {
-                Flavor f = this.getFlavorByName(id);
-                p.setProperty(ComputeDescription.MEMORY, Integer.toString(f.getRam()));
-                p.setProperty(ComputeDescription.SIZE, Integer.toString(f.getVcpus()));
-                return p;
-            } else {
-                throw new NotImplementedException();
-            }
+            Image i = (Image)entity;
+            p.setProperty(ComputeDescription.MACHINE_OS, i.getName());
+            // TODO: add other attributes
+        } else if (entity instanceof Flavor) {
+            p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
+            Flavor f = (Flavor)entity;
+            p.setProperty(ComputeDescription.MEMORY, Integer.toString(f.getRam()));
+            p.setProperty(ComputeDescription.SIZE, Integer.toString(f.getVcpus()));
         } else {
             throw new NotImplementedException();
         }
+        return p;
     }
 
     @Override
@@ -418,6 +435,13 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     ///////////////
     // Private 
     ///////////////
+    /*
+     * nova/images/xxx => [URL]-[nova/images/xxx]
+     * 
+     */
+    private String urlOfInternalId(String id) {
+        return "[" + m_os.getEndpoint() + "]-[" + id + "]";
+    }
     private String internalIdOf(Image i) {
         return ServiceType.COMPUTE.getServiceName() + "/images/" + i.getName();
     }
@@ -443,6 +467,26 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         return ServiceType.NETWORK.getServiceName() + "/networks/" + name;
     }
     
+    private ModelEntity getEntityByName(String resourceId) throws DoesNotExistException {
+        if (resourceId.startsWith(ServiceType.COMPUTE.getServiceName())) {
+            if (resourceId.contains("/servers/")) {
+                return this.getServerByName(resourceId);
+            } else if (resourceId.contains("/images/")) {
+                return this.getImageByName(resourceId);
+            } else if (resourceId.contains("/flavors")) {
+                return this.getFlavorByName(resourceId);
+            } else {
+                throw new DoesNotExistException(resourceId); 
+            }
+        } else if (resourceId.startsWith(ServiceType.OBJECT_STORAGE.getServiceName())) {
+            return this.getContainerByName(resourceId);
+        } else if (resourceId.startsWith(ServiceType.NETWORK.getServiceName())) {
+            
+        }
+        throw new DoesNotExistException(resourceId); 
+        
+    }
+        
     private Server getServerByName(String internalId) throws DoesNotExistException {
         String serverId = internalId.replaceAll(".*/servers/", "");
         Map<String,String> param = new HashMap<String,String>();
