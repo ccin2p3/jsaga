@@ -125,6 +125,13 @@ test.base.url=test://emulator.test.org:1234/</pre>
 <i>myprotocol</i>.maxQueuingTime=...
 <i>myprotocol</i>.candidate.host=...</pre>
                     </li>
+                    <li>For a resource adaptor:
+                        <pre><i>myprotocol</i>.rm.url=uri://...
+# optional test parameters:
+<i>myprotocol</i>.COMPUTE.delayBeforeUse=...
+<i>myprotocol</i>.COMPUTE.acquireTemplate.1=...
+<i>myprotocol</i>.COMPUTE.acquireTemplate.2=...</pre>
+                    </li>
                 </ul>
             </answer>
         </faq>

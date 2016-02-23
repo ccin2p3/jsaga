@@ -39,7 +39,7 @@ public class List {
                 <p><a href="download.html">Download</a> and install JSAGA.</p>
                 <p>Set the JSAGA_HOME environment variable to your JSAGA installation path.</p>
                 <p>Compile your grid application:</p>
-                <pre>javac -d . -classpath $JSAGA_HOME/lib/saga-api-1.1.1.jar List.java</pre>
+                <pre>javac -d . -classpath $JSAGA_HOME/lib/saga-api-1.1.1-rm.jar List.java</pre>
                 <p>Run your grid application:</p>
                 <pre>java -cp .:$JSAGA_HOME/lib/'*' -DJSAGA_HOME=$JSAGA_HOME List file:///</pre>
             </answer>
@@ -150,7 +150,7 @@ public class List {
                 <p>A <b>&lt;context&gt;</b> element may contains several occurences of each of the following elements:
                     <ul>
                         <li><b>&lt;attribute&gt;</b>: configures the context itself.</li>
-                        <li><b>&lt;data&gt;</b>/<b>&lt;job&gt;</b>:
+                        <li><b>&lt;data&gt;</b>/<b>&lt;job&gt;</b>/<b>&lt;resource&gt;</b>:
                             <ul>
                                 <li><b>&lt;attribute&gt;</b>: configures the data/job adaptor.</li>
                                 <li><b>&lt;alias&gt;</b>: replace default scheme with specified alias.
