@@ -122,6 +122,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
             p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
             // search by name
             Server server = (Server)entity;
+            p.setProperty(ComputeDescription.START, Long.toString(server.getLaunchedAt().getTime()/1000));
             // get Flavor
             List<String> templates = new ArrayList<String>();
             Flavor flavor = server.getFlavor();
@@ -434,7 +435,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
     // Private 
     ///////////////
     /*
-     * nova/images/xxx => [URL]-[nova/images/xxx]
+     * nova/images/image_name => [URL]-[nova/images/image_name]
      * 
      */
     private String urlOfInternalId(String id) {
