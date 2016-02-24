@@ -122,7 +122,9 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
             p.setProperty(Resource.RESOURCE_TYPE, Type.COMPUTE.name());
             // search by name
             Server server = (Server)entity;
-            p.setProperty(ComputeDescription.START, Long.toString(server.getLaunchedAt().getTime()/1000));
+            if (server.getLaunchedAt() != null) {
+                p.setProperty(ComputeDescription.START, Long.toString(server.getLaunchedAt().getTime()/1000));
+            }
             // get Flavor
             List<String> templates = new ArrayList<String>();
             Flavor flavor = server.getFlavor();
@@ -231,6 +233,8 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         ServerCreateBuilder scb = Builders.server();
         
         // TEMPLATE can be an IMAGE, FLAVOR
+        Boolean hasImage = false;
+        Boolean hasFlavor = false;
         Pattern p = Pattern.compile("(\\[.*]-\\[)(.+)(])");
         for (String template: (String[])description.get(ComputeDescription.TEMPLATE)) {
             // Check that template name is in the JSAGA form
@@ -242,24 +246,47 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
             // check image
             try {
                 scb.image(this.getImageByName(m.group(2)));
+                hasImage = true;
             } catch (DoesNotExistException e) {
                 try {
                     scb.flavor(this.getFlavorByName(m.group(2)));
+                    hasFlavor = true;
                 } catch (DoesNotExistException e1) {
                     throw new NoSuccessException(e1);
                 }
             }
         }
+        
+        // If no image, exception
+        if (!hasImage) {
+            throw new NoSuccessException("Image is mandatory");
+        }
+        
+        // if no flavor, get one with requirements MEMORY and SIZE
+        if (!hasFlavor) {
+            try {
+                scb.flavor(this.getMostAppropriateFlavorInList(m_os.compute().flavors().list(), description));
+            } catch (DoesNotExistException e) {
+                throw new NoSuccessException("No flavor matching requirements");
+            }
+        }
+        
+        // How we will connect to server
         Boolean connectWithKey = (m_keypairName != null && m_privateKey != null);
-        // TODO discover flavor if MEMORY, SIZE...
         if (connectWithKey) {
             scb.keypairName(m_keypairName);
         }
+        
+        // Give it a name
         String serverName = "jsaga-server-" + m_credential.getUserID() + "-" + UUID.randomUUID();
         scb.name(serverName);
+        
+        // Boot
         ServerCreate sc = scb.build();
         Server vm = m_os.compute().servers().boot(sc);
 //        Server vm = m_os.compute().servers().bootAndWaitActive(sc, 60000);
+        
+        // create the SecuredResource for a security context to be attached to the session
         SecuredResource sr;
         // getAdminPass is never null... even if keypair was provided
         if (connectWithKey) {
@@ -295,7 +322,7 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
                 throw new NoSuccessException(ar.getFault());
             }
             return;
-        } else if (entity instanceof SwiftContainer){
+        } else if (entity instanceof SwiftContainer) {
             SwiftContainer sc = (SwiftContainer)entity;
             for (SwiftObject so: m_os.objectStorage().objects().list(sc.getName())) {
                 ActionResponse ar = m_os.objectStorage().objects().delete(sc.getName(), so.getName());
@@ -348,17 +375,20 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
             NoSuccessException {
         List<? extends Image> listOfImages = m_os.compute().images().list();
         List<? extends Flavor> listOfFlavors = m_os.compute().flavors().list();
-        String[] listOfTemplates = new String[listOfImages.size()+listOfFlavors.size()];
-        int count=0;
+        List<String> listOfTemplates = new ArrayList<String>();
+        // list of ACTIVE images
         for (Image i: listOfImages) {
-            listOfTemplates[count] = this.internalIdOf(i);
-            count++;
+            if ("ACTIVE".equals(i.getStatus())) {
+                listOfTemplates.add(this.internalIdOf(i));
+            }
         }
+        // UNION with list of not disabled flavors
         for (Flavor f: listOfFlavors) {
-            listOfTemplates[count] = this.internalIdOf(f);
-            count++;
+            if (!f.isDisabled()) {
+                listOfTemplates.add(this.internalIdOf(f));
+            }
         }
-        return listOfTemplates;
+        return listOfTemplates.toArray(new String[listOfTemplates.size()]);
     }
 
     //////////////////
@@ -541,6 +571,35 @@ public class OpenstackResourceAdaptor extends OpenstackAdaptorAbstract
         throw new DoesNotExistException("This resource does not exist: " + containerId);
     }
 
+    /*
+     * unit testable
+     * get the "smallest" enabled and public flavor that matches both requested memory and cpus
+     */
+    Flavor getMostAppropriateFlavorInList(List<? extends Flavor> list, Properties constraints) throws DoesNotExistException {
+        int requestedRam = Integer.parseInt(constraints.getProperty(ComputeDescription.MEMORY, "0"));
+        int requestedCpu = Integer.parseInt(constraints.getProperty(ComputeDescription.SIZE, "1"));
+        Flavor mostAppropriateFlavor = null;
+        for (Flavor f: list) {
+            if (!f.isDisabled() &&
+                    f.isPublic() &&
+                    f.getRam() >= requestedRam &&
+                    f.getVcpus() >= requestedCpu) {
+                // check if this flavor is most appropriate than previous
+                if (mostAppropriateFlavor == null) {
+                    mostAppropriateFlavor = f;
+                } else {
+                    if (f.getRam() < mostAppropriateFlavor.getRam() && f.getVcpus() < mostAppropriateFlavor.getVcpus()) {
+                        mostAppropriateFlavor = f;
+                    }
+                }
+            }
+        }
+        if (mostAppropriateFlavor == null) {
+            throw new DoesNotExistException();
+        }
+        return mostAppropriateFlavor;
+    }
+    
     @Deprecated
     private String getHRef(List<? extends Link> links) throws NoSuccessException {
         for (Link link: links) {

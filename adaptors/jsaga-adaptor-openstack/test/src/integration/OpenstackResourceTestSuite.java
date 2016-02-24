@@ -11,12 +11,12 @@ import org.ogf.saga.resource.StorageTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    OpenstackResourceAdaptorTest.OpenstackServerTest.class
-    ,OpenstackResourceAdaptorTest.OpenstackSwiftContainerTest.class
-    ,OpenstackResourceAdaptorTest.OpenstackNeuroneTest.class
+    OpenstackResourceTestSuite.OpenstackServerTest.class
+    ,OpenstackResourceTestSuite.OpenstackSwiftContainerTest.class
+    ,OpenstackResourceTestSuite.OpenstackNeuroneTest.class
 })
 
-public class OpenstackResourceAdaptorTest {
+public class OpenstackResourceTestSuite {
     public static class OpenstackServerTest extends ComputeTest {
         public OpenstackServerTest() throws Exception { super("openstack");}
     }
