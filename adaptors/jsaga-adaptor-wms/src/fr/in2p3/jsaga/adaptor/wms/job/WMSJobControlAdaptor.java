@@ -14,6 +14,7 @@ import javax.xml.rpc.Stub;
 
 import org.apache.axis.SimpleTargetedChain;
 import org.apache.axis.configuration.SimpleProvider;
+import org.apache.log4j.Logger;
 import org.glite.jdl.AdParser;
 import org.glite.jdl.JobAdException;
 import org.glite.security.delegation.GrDPConstants;
@@ -86,6 +87,8 @@ import org.globus.gsi.X509Credential;
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         implements StagingJobAdaptorTwoPhase, CleanableJobAdaptor {
 
+    private static Logger m_logger = Logger.getLogger(WMSJobControlAdaptor.class);
+    
     private WMProxy_PortType m_client;
     private DelegationSoapBindingStub delegationServiceStub;
     private String delegationId;
@@ -175,7 +178,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         // ping service
         if ("true".equalsIgnoreCase((String) attributes.get(JobAdaptor.CHECK_AVAILABILITY))) {
             try {
-                m_client.getVersion();
+                m_logger.debug("Connected to WMS version " + m_client.getVersion());
             } catch (org.glite.wms.wmproxy.AuthenticationFaultType exc) {
                 disconnect();
                 throw new AuthenticationFailedException(createExceptionMessage(exc));
