@@ -69,16 +69,6 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
         return "wms";
     }
 
-    /** this method is ignored */
-    public Usage getUsage() {
-        return null;
-    }
-
-    /** this method is ignored */
-    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-        return null;
-    }
-  
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         m_wmsServerUrl = "https://"+host+":"+port+basePath;
         m_lbHost = WMStoLB.getInstance().getLBHost(m_wmsServerUrl);

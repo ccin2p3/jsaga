@@ -86,7 +86,6 @@ import org.globus.gsi.X509Credential;
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         implements StagingJobAdaptorTwoPhase, CleanableJobAdaptor {
 
-    private static final String DEFAULT_JDL_FILE = "DefaultJdlFile";
     private WMProxy_PortType m_client;
     private DelegationSoapBindingStub delegationServiceStub;
     private String delegationId;
@@ -101,32 +100,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
     public int getDefaultPort() {
         return 7443;
-    }
-
-    public Usage getUsage() {
-        return new UOr.Builder()
-                       .or(new UOptional(DEFAULT_JDL_FILE))
-                       .or(new UOptional("LBAddress"))
-                       .or(new UOptional("requirements"))
-                       .or(new UOptional("rank"))
-                       .or(new UOptional("virtualorganisation"))
-                       .or(new UOptionalInteger("RetryCount"))
-                       .or(new UOptionalInteger("ShallowRetryCount"))
-                       .or(new UOptional("OutputStorage"))
-                       .or(new UOptionalBoolean("AllowZippedISB"))
-                       .or(new UOptionalBoolean("PerusalFileEnable"))
-                       .or(new UOptional("ListenerStorage"))
-                       .or(new UOptional("MyProxyServer"))
-                       .or(new UOptional("DelegationID"))
-                       .build();
-    }
-
-    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-        return new Default[]{
-                    // JDL attributes
-                    new Default("requirements", "(other.GlueCEStateStatus==\"Production\")"),
-                    new Default("rank", "(-other.GlueCEStateEstimatedResponseTime)")
-                };
     }
 
     public JobMonitorAdaptor getDefaultJobMonitor() {
