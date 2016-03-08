@@ -110,6 +110,7 @@
         </profile>
     </profiles>
     <properties>
+        <dependency.locations.enabled>false</dependency.locations.enabled>
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding><!-- prevent some warnings -->
         <scala.version>2.10.0-M7</scala.version>
     </properties>
@@ -169,26 +170,11 @@
 
         <!-- plug-ins configuration -->
         <plugins>
-<!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.7</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>index</report>
-                            <report>dependencies</report> java.lang.OutOfMemoryError: Java heap space
-                            <report>dependency-convergence</report>
-                            <report>license</report>
-                            <report>summary</report>
-                            <report>project-team</report>
-                            <report>scm</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
+                <version>2.9</version>
             </plugin>
--->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
