@@ -7,7 +7,7 @@ Welcome to JSAGA
  JSAGA features includes:
 
     * enable uniform data management and execution management across
-      existing grid infrastructures.
+      existing grid and cloud infrastructures.
  
     * ease extension: adaptor interfaces are designed to minimize coding
       effort for integrating support of new technologies.
@@ -16,5 +16,4 @@ Welcome to JSAGA
     * operating system independent: most of the provided adaptors are
       written in full Java, and they are tested on Windows and Linux.
 
- JSAGA can also be used from Python applications, thanks to the
- {{{https://forge.in2p3.fr/projects/jpysaga}JPySAGA}} project.
+ 

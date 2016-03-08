@@ -11,7 +11,7 @@
                     <table>
                         <tr>
                             <th>JDK</th>
-                            <td>Download and install <a href="http://www.oracle.com/technetwork/indexes/downloads/index.html">JDK 1.6</a> or later versions.</td>
+                            <td>Download and install <a href="http://www.oracle.com/technetwork/indexes/downloads/index.html">JDK 1.7</a> or later versions.</td>
                         </tr>
                         <tr>
                             <th>JCE Unlimited Strength Jurisdiction Policy Files</th>
