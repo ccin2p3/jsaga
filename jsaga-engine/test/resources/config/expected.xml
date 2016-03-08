@@ -6,6 +6,8 @@
             <attribute name="UrlPrefix" value="DGrid"/>
             <attribute name="BaseUrlIncludes">
                 <item>DGrid-srm-&gt;srm</item>
+                <item>openstack://*.*de</item>
+                <item>openstack://localhost:8080</item>
                 <item>{gsiftp,gridftp-&gt;gsiftp}://cc*.*in2p3.fr/*/dteam</item>
                 <item>{gsiftp,gridftp-&gt;gsiftp}://*:1234</item>
                 <item>{gsiftp,gridftp-&gt;gsiftp}://*.*de</item>
@@ -19,6 +21,9 @@
             <attribute name="DataServiceAttributes">
                 <item>srb.Resource=toto</item>
                 <item>srb.Zone=titi</item>
+            </attribute>
+            <attribute name="ResourceServiceAttributes">
+                <item>openstack.Tenant=titi</item>
             </attribute>
         </context>
         <context type="VOMS">
