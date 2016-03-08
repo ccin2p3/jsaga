@@ -27,5 +27,6 @@
     <script>jsaga-logical-location</script>
     <script>jsaga-logical-metadata</script>
 
+    <script>jsaga-compute-acquire</script>
     <script>junit-run-test</script>
 </scripts>

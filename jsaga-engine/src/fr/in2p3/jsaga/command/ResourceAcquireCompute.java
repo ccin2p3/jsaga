@@ -1,12 +1,10 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.resource.ResourceFactory;
 import org.ogf.saga.resource.Type;
 import org.ogf.saga.resource.description.ComputeDescription;
-import org.ogf.saga.resource.description.ResourceDescription;
 import org.ogf.saga.resource.instance.Compute;
 import org.ogf.saga.resource.manager.ResourceManager;
 import org.ogf.saga.resource.task.State;
@@ -15,16 +13,13 @@ import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   JobInfo
- * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
- * Date:   2 oct. 2009
+ * File:   ResourceAcquireCompute
+ * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+ * Date:   24 feb 2016
  * ***************************************************
  * Description:                                      */
 /**
