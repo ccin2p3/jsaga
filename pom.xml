@@ -80,8 +80,8 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <maven.repository>file:///tmp/grid.in2p3.fr/maven2</maven.repository>
-                <project.web.site>file:///tmp/grid.in2p3.fr/jsaga/${project.version}</project.web.site>
+                <maven.repository>file:///tmp/maven.in2p3.fr/maven2</maven.repository>
+                <project.web.site>file:///tmp/software.in2p3.fr/jsaga/${project.version}</project.web.site>
             </properties>
         </profile>
         <profile>
