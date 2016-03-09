@@ -18,13 +18,14 @@
                     <li><a href="#Developing a security adaptor">Developing a security adaptor</a></li>
                     <li><a href="#Developing a data adaptor">Developing a data adaptor</a></li>
                     <li><a href="#Developing a job adaptor">Developing a job adaptor</a></li>
+                    <li><a href="#Developing a resource adaptor">Developing a resource adaptor</a></li>
                 </ul>
             </p>
 
 
             <section name="Introduction">
                 <p>Adding to JSAGA support for new technologies can be done by developing adaptors.
-                    There are 3 kind of adaptors: security adaptors, data adaptors and job adaptors.
+                    There are 4 kind of adaptors: security adaptors, data adaptors, job adaptors and resource adaptors.
                 </p>
                 <p>Adaptor interfaces are designed to be as close to legacy middleware API as possible.
                     A few interfaces are required, most of them are optional.
@@ -355,7 +356,46 @@
                 </subsection>
             </section>
 
+            <section name="Developing a resource adaptor">
+                <p>A resource adaptor can be able to manage compute resources or/and storage resources or/and network resources.</p>
 
+                <p>
+                A resource adaptor able to manage compute resources <b>must</b> implement either:
+                <ul>
+                    <li>the <xsl:apply-templates select="jelclass[@type='SecuredComputeResourceAdaptor']"/> if an additional
+                    security context will be necessary to connect to the resource (typically a SSH context to connect to a VM)
+                    </li>
+                    <li>the <xsl:apply-templates select="jelclass[@type='UnsecuredComputeResourceAdaptor']"/> if no additional
+                    security context will be necessary to connect to the resource.
+                    </li>
+                </ul>
+                </p>
+
+                <p>
+                A resource adaptor able to manage storage resources <b>must</b> implement either:
+                <ul>
+                    <li>the <xsl:apply-templates select="jelclass[@type='SecuredStorageResourceAdaptor']"/> if an additional
+                    security context will be necessary to connect to the resource.
+                    </li>
+                    <li>the <xsl:apply-templates select="jelclass[@type='UnsecuredStorageResourceAdaptor']"/> if no additional
+                    security context will be necessary to connect to the resource.
+                    </li>
+                </ul>
+                </p>
+
+                <p>
+                A resource adaptor able to manage network resources <b>must</b> implement either:
+                <ul>
+                    <li>the <xsl:apply-templates select="jelclass[@type='SecuredNetworkResourceAdaptor']"/> if an additional
+                    security context will be necessary to connect to the resource.
+                    </li>
+                    <li>the <xsl:apply-templates select="jelclass[@type='UnsecuredNetworkResourceAdaptor']"/> if no additional
+                    security context will be necessary to connect to the resource.
+                    </li>
+                </ul>
+                </p>
+            </section>
+            
             <section name="APPENDIX">
                 <xsl:for-each select="jelclass[
                         (@interface='true' and not(comment/attribute/@name='@deprecated')) or

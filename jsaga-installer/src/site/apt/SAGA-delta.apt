@@ -71,8 +71,17 @@ Deviations from SAGA specifications
 
         * job.sub_state (<<deprecated>>): added
 
+* Resource management
+
+    * Resource:
+    
+        * reconfig() has been renamed in reconfigure()
+    
+    * ResourceManager:
+    
+        * getResourceDescription() is not supported, use acquireResource().getDescription() instead.
+        
 * Streams, Remote Procedure Call
 
     * Will not be implemented.
 
-Note: <<deprecated>> deviations will be removed as soon as possible.

@@ -18,6 +18,7 @@
                     <li><a href="#Testing a security adaptor">Testing a security adaptor</a></li>
                     <li><a href="#Testing a data adaptor">Testing a data adaptor</a></li>
                     <li><a href="#Testing a job adaptor">Testing a job adaptor</a></li>
+                    <li><a href="#Testing a resource adaptor">Testing a resource adaptor</a></li>
                 </ul>
             </p>
 
@@ -179,6 +180,26 @@ public class <i>_MyProtocol_</i>TestSuite {
 }
                 </pre>
             </section>
+
+            <section name="Testing a resource adaptor">
+                <i>Copy-paste this code to your test class.</i>
+                <pre>package integration;
+
+@RunWith(Suite.class)
+@SuiteClasses({
+    <i>_MyProtocol_</i>TestSuite.<i>_WhatEverSubClassYouWantInYourTestSuite_</i>.class,
+    ...
+}) 
+public class <i>_MyProtocol_</i>TestSuite {
+
+    <xsl:text/>
+                    <xsl:for-each select="jelclass[@package='org.ogf.saga.resource'][contains(@type,'Test')][not(contains(@type,'ResourceBase'))][not(comment/attribute/@name='@deprecated')]">
+                        <xsl:call-template name="CODE_jelclass"/>
+                    </xsl:for-each>
+}
+                </pre>
+            </section>
+
         </body></document>
     </xsl:template>
 
