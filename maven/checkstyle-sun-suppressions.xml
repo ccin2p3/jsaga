@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.0//EN" "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
+<suppressions>
+    <!-- RULE: '*' is not preceded with whitespace -->
+    <!-- CONS: Makes it harder to distinguish the blocks in expression -->
+    <suppress files="." checks="WhitespaceAround"/>
+
+    <!-- RULE: Line is longer than 80 characters -->
+    <!-- CONS: 80 is way too short for today screens -->
+    <suppress files="." checks="LineLength"/>
+
+    <!-- RULE: Using the '.*' form of import should be avoided -->
+    <!-- CONS: Conflicting with Intellij IDEA "Optimize Imports" feature -->
+    <suppress files="." checks="AvoidStarImport"/>
+
+    <!-- RULE: Name 'm_*' must match pattern '^[a-z][a-zA-Z0-9]*$' -->
+    <!-- CONS: Conflicting with our own code-style rule based on prefix '*_' -->
+    <suppress files="." checks="MemberName"/>
+
+    <!-- RULE: '{' at column * should have line break after -->
+    <!-- CONS: Forcing these rules decrease readability when there is a lot of catch blocks -->
+    <suppress files="." checks="LeftCurly"/>
+    <suppress files="." checks="RightCurly"/>
+
+    <!-- ******************** specific to google code-style ******************** -->
+
+    <!-- RULE: Expected @throws tag for '***Exception' -->
+    <!-- CONS: The SAGA specification declares too many Exception to follow this rule -->
+    <suppress files="." checks="JavadocMethod"/>
+
+    <!-- RULE: Redundant 'public' modifier -->
+    <!-- CONS: Explicit is better than implicit -->
+    <suppress files="." checks="RedundantModifier"/>
+</suppressions>
