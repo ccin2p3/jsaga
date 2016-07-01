@@ -1,7 +1,8 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.job.*;
+import org.ogf.saga.job.JobFactory;
+import org.ogf.saga.job.JobService;
 import org.ogf.saga.resource.ResourceFactory;
 import org.ogf.saga.resource.Type;
 import org.ogf.saga.resource.description.ComputeDescription;
@@ -37,7 +38,7 @@ public class ResourceAcquireCompute extends AbstractCommand {
     }
 
     public static void main(String[] args) throws Exception {
-        JobRun command = new JobRun();
+        ResourceAcquireCompute command = new ResourceAcquireCompute();
         CommandLine line = command.parse(args);
         if (line.hasOption(OPT_HELP))
         {
