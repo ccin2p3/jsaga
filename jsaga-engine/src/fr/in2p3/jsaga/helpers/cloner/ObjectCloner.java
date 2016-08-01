@@ -15,7 +15,7 @@ import java.util.*;
  *
  */
 public class ObjectCloner<K,V> {
-    public Map<K,V> cloneMap(Map<K,V> map) throws CloneNotSupportedException {
+    public Map<K,V> shallowCloneMap(Map<K,V> map) throws CloneNotSupportedException {
         Map<K,V> mapClone = new HashMap<K,V>();
         for (Map.Entry<K,V> entry : map.entrySet()) {
             K key = entry.getKey();
@@ -25,7 +25,7 @@ public class ObjectCloner<K,V> {
         return mapClone;
     }
 
-    public List<V> cloneList(List<V> list) throws CloneNotSupportedException {
+    public List<V> shallowCloneList(List<V> list) throws CloneNotSupportedException {
         List<V> listClone = new ArrayList<V>();
         for (V value : list) {
             listClone.add(value);
