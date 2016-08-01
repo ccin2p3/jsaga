@@ -75,14 +75,13 @@ public class UniversalFile {
      * and with a trailing / if the file is a directory. 
      * It removes all "./" and remove recursively all "dir/../" sets
      * @return the canonical path of the file
-     * @throws IOException
      * 
      * To compute the canonical path, the method java.io.File.getCanonicalPath() is not used
      * because this method first converts this pathname to absolute form if necessary, as if by 
      * invoking the getAbsolutePath() method and some characters are not supported by Windows
      * 
      */
-    public String getCanonicalPath() throws IOException {
+    public String getCanonicalPath() {
     	String canon;
     	java.util.Stack path = new java.util.Stack();
     	for (String pathElement : getPath().split("/")) {
