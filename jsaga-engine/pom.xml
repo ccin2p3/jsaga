@@ -117,6 +117,7 @@
                 </executions>
             </plugin>
             <plugin>
+                <!-- used by "mvn cobertura:cobertura" -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
                 <version>2.7</version>
@@ -236,7 +237,7 @@
                 <version>2.6</version>
             </plugin>
             <plugin>
-                <!-- not needed for running mvn cobertura:cobertura -->
+                <!-- used by "mvn site" -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
                 <version>2.7</version>
