@@ -59,7 +59,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
         clone.m_monitorable = m_monitorable;
         clone.m_mode = m_mode;
         clone.m_type = m_type;
-        clone.m_callbacks = new ObjectCloner<Integer,Callback>().cloneMap(m_callbacks);
+        clone.m_callbacks = new ObjectCloner<Integer,Callback>().shallowCloneMap(m_callbacks);
         clone.m_cookieGenerator = m_cookieGenerator;
         return clone;
     }
