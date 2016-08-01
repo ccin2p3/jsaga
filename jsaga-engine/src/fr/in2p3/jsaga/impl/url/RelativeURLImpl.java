@@ -207,8 +207,6 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
 			return newURL;
 		} catch (BadParameterException e) {
             throw new RuntimeException(e);
-		} catch (IOException e) {
-            throw new RuntimeException(e);
 		}
 	}
 
