@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.engine.job.monitor;
 
 import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 
 /* ***************************************************
@@ -16,6 +17,6 @@ import org.ogf.saga.error.TimeoutException;
  *
  */
 public interface JobRegistry {
-    public void subscribeJob(String nativeJobId, JobMonitorCallback callback) throws TimeoutException, NoSuccessException;
-    public void unsubscribeJob(String nativeJobId) throws TimeoutException, NoSuccessException;
+    public void subscribeJob(String nativeJobId, JobMonitorCallback callback) throws NotImplementedException, TimeoutException, NoSuccessException;
+    public void unsubscribeJob(String nativeJobId) throws NotImplementedException, TimeoutException, NoSuccessException;
 }
