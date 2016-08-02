@@ -28,10 +28,6 @@ public abstract class AbstractDataStaging {
         m_append = append;
     }
 
-    public boolean isSubdirOf(URL baseURL) {
-        return m_localURL.toString().startsWith(baseURL.toString()+"/");
-    }
-
     public String getLocalProtocol() {
         return m_localURL.getScheme();
     }
