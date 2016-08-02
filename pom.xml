@@ -114,6 +114,13 @@
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding><!-- prevent some warnings -->
         <scala.version>2.10.0-M7</scala.version>
     </properties>
+    <repositories>
+        <!--  Added for INDIGO-DC Jenkins jobs -->
+         <repository>
+            <id>IN2P3</id>
+            <url>http://maven.in2p3.fr</url>
+        </repository>
+    </repositories>
 
     <build>
         <!-- plug-ins configuration -->
