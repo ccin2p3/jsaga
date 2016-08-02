@@ -19,7 +19,7 @@ public class QueryFilteredJobAdaptor extends JobAdaptorAbstract implements Query
 
     public JobStatus[] getFilteredStatus(Object[] filters) throws TimeoutException, NoSuccessException {
         return new JobStatus[] {
-                new JobStatus("3", null, null){
+                new JobStatus(""+filters[QueryFilteredJob.JOB_ID], null, null){
                     public String getModel() {return "TEST";}
                     public SubState getSubState() {return SubState.DONE;}
                 }
