@@ -160,11 +160,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
                     }
                 }
             }
-        } catch (IncorrectStateException e) {
-            throw new NoSuccessException(e);
-        } catch (DoesNotExistException e) {
-            throw new NoSuccessException(e);
-        } catch (BadParameterException e) {
+        } catch (IncorrectStateException | DoesNotExistException | BadParameterException e) {
             throw new NoSuccessException(e);
         }
         return m_attributes.m_Access.getObjects();
