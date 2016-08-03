@@ -47,10 +47,11 @@ import org.ogf.saga.session.Session;
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************/
 public abstract class AbstractResourceImpl<R extends Resource, RD extends ResourceDescription>
-        extends AbstractResourceTaskImpl<R> implements Resource<R,RD>
+        extends AbstractResourceTaskImpl<R,RD> implements Resource<R,RD>
 {
     protected Logger m_logger = Logger.getLogger(AbstractResourceImpl.class);
-    
+
+    private ResourceAttributes m_attributes;
     private RD m_description;
     private ResourceManager m_manager;
     private SecuredResource m_securedResourceContext = null;
@@ -110,6 +111,10 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
 
     // getters
     @Override
+    public String getResourceId() {
+        return m_attributes.m_ResourceID.getObject();
+    }
+    @Override
     public Type getType() {
         return m_attributes.m_Type.getObject();
     }
@@ -117,7 +122,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
     public ResourceManager getManager() {
         return m_manager;
     }
-    
+
     /**
      * Get accesses. Accesses are not required when resource is built because they might be
      * unavailable before resource is fully ACTIVE.
@@ -127,7 +132,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
                     AuthorizationFailedException, TimeoutException, NoSuccessException {
         try {
             if (m_attributes.m_Access.getValues().length == 0) {
-                String[] accesses = m_adaptor.getAccess(SAGAId.idFromSagaId(getId()));
+                String[] accesses = m_adaptor.getAccess(SAGAId.idFromSagaId(getResourceId()));
                 // set access
                 m_attributes.m_Access.setObjects(accesses);
                 // now that we have access we can build the context and add it if not already added
@@ -186,7 +191,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
                 m_attributes.m_ResourceID.setObject(SAGAId.idToSagaId(
                         ((AbstractSyncResourceManagerImpl)m_manager).getURL(), 
                         resourceId));
-                m_attributes.m_Access.setObjects(m_adaptor.getAccess(SAGAId.idFromSagaId(getId())));
+                m_attributes.m_Access.setObjects(m_adaptor.getAccess(SAGAId.idFromSagaId(getResourceId())));
                 // reload description
                 this.loadDescription();
             } catch (Exception e) {
@@ -200,7 +205,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
      * @throws IncorrectStateException */
     public void release() throws NoSuccessException, IncorrectStateException {
         try {
-            m_adaptor.release(SAGAId.idFromSagaId(getId()));
+            m_adaptor.release(SAGAId.idFromSagaId(getResourceId()));
         } catch (DoesNotExistException e) {
             throw new NoSuccessException(e);
         } catch (NotImplementedException e) {
@@ -281,7 +286,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
     private void loadDescription() throws TimeoutException, NoSuccessException, 
                 DoesNotExistException, NotImplementedException, BadParameterException {
         // adaptor sends back a properties with resource description
-        Properties description = m_adaptor.getDescription(SAGAId.idFromSagaId(getId()));
+        Properties description = m_adaptor.getDescription(SAGAId.idFromSagaId(getResourceId()));
         if (!getType().name().equals(description.getProperty(Resource.RESOURCE_TYPE))) {
             throw new NotImplementedException(getType().name() + " <> " + description.getProperty(Resource.RESOURCE_TYPE));
         }

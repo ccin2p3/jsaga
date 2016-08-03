@@ -274,7 +274,7 @@ public abstract class ResourceBaseTest extends JSAGABaseTest {
     protected void dumpResource(Resource resource) throws Exception {
         ResourceDescription rd = (ResourceDescription) resource.getDescription();
         assertNotNull(rd);
-        System.out.println(resource.getId());
+        System.out.println(resource.getResourceId());
         this.dumpDescription(rd);
         // display status
         System.out.println("  * status=" + resource.getState().name() + " // " 

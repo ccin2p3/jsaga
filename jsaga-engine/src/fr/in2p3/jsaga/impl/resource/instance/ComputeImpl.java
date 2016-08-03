@@ -51,7 +51,7 @@ public class ComputeImpl extends AbstractResourceImpl<Compute,ComputeDescription
     }
 
     public void release(boolean drain) throws DoesNotExistException, NotImplementedException, NoSuccessException, IncorrectStateException {
-        ((ComputeResourceAdaptor)m_adaptor).release(this.getId(), drain);
+        ((ComputeResourceAdaptor)m_adaptor).release(this.getResourceId(), drain);
     }
 
     @Override

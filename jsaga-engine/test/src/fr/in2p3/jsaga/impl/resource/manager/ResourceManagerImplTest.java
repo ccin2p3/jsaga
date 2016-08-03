@@ -160,7 +160,7 @@ public class ResourceManagerImplTest {
         }});
         rm = new ResourceManagerImpl(m_session, m_url, c_adaptor);
         Compute server = rm.acquireCompute("[url]-[server1]");
-        assertEquals("[url]-[server1]", server.getId());
+        assertEquals("[url]-[server1]", server.getResourceId());
         assertEquals("value", server.getDescription().getAttribute("attr"));
 
         // STORAGE
@@ -171,7 +171,7 @@ public class ResourceManagerImplTest {
         }});
         rm = new ResourceManagerImpl(m_session, m_url, s_adaptor);
         Storage repo = rm.acquireStorage("[url]-[repo1]");
-        assertEquals("[url]-[repo1]", repo.getId());
+        assertEquals("[url]-[repo1]", repo.getResourceId());
         assertEquals("value", repo.getDescription().getAttribute("attr"));
 
         // NETWORK
@@ -182,7 +182,7 @@ public class ResourceManagerImplTest {
         }});
         rm = new ResourceManagerImpl(m_session, m_url, n_adaptor);
         Network net = rm.acquireNetwork("[url]-[net1]");
-        assertEquals("[url]-[net1]", net.getId());
+        assertEquals("[url]-[net1]", net.getResourceId());
         assertEquals("value", net.getDescription().getAttribute("attr"));
     }
 
