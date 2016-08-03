@@ -29,7 +29,7 @@ public abstract class AbstractResourceTaskImpl<R extends Resource,RD extends Res
     private long m_stateLastUpdate = 0;
 
     // TODO: make this a parameter
-    private long m_stateLifetimeMillis = 30000;
+    private long m_stateLifetimeMillis = 5000;
     
     /** common to all constructors */
     public AbstractResourceTaskImpl(Session session, StateListener listener, ResourceAdaptor adaptor) {
