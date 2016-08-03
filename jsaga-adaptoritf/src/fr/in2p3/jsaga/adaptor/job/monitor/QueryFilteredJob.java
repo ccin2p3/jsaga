@@ -22,6 +22,8 @@ public interface QueryFilteredJob extends QueryJob {
     public static final int COLLECTION_NAME = 1;
     /** Item at position START_DATE is the beginning of the period (Date) */
     public static final int START_DATE = 2;
+    /** Item at position JOB_ID is the identifier of the job (String) */
+    public static final int JOB_ID = 3;
 
     /**
      * Get the status of jobs matching filter.

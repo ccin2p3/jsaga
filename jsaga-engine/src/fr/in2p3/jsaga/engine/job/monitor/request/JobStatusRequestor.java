@@ -25,6 +25,10 @@ public class JobStatusRequestor {
         m_adaptor = adaptor;
     }
 
+    public boolean supportsQueryStatus() {
+        return m_adaptor instanceof QueryJob;
+    }
+
     public JobStatus getJobStatus(String nativeJobId) throws NotImplementedException, TimeoutException, NoSuccessException {
         if (nativeJobId != null) {
             try {
@@ -34,14 +38,17 @@ public class JobStatusRequestor {
                     JobStatus[] statusArray = ((QueryListJob) m_adaptor).getStatusList(new String[]{nativeJobId});
                     return findJobStatus(statusArray, nativeJobId);
                 } else if (m_adaptor instanceof QueryFilteredJob) {
-                    Object[] filters = new Object[3];
+                    Object[] filters = new Object[4];
                     filters[QueryFilteredJob.USER_ID] = null;           //todo: set filter value
                     filters[QueryFilteredJob.COLLECTION_NAME] = null;   //todo: set filter value
                     Calendar cal = Calendar.getInstance();
                     cal.add(Calendar.DAY_OF_YEAR, -1);
                     filters[QueryFilteredJob.START_DATE] = cal.getTime();
+                    filters[QueryFilteredJob.JOB_ID] = nativeJobId;
                     JobStatus[] statusArray = ((QueryFilteredJob) m_adaptor).getFilteredStatus(filters);
                     return findJobStatus(statusArray, nativeJobId);
+                } else if (m_adaptor instanceof ListenJob) {
+                    throw new NoSuccessException("This adaptor requires the use of method waitFor() prior to calling method getState(): "+ m_adaptor.getClass().getName());
                 } else {
                     throw new NotImplementedException("Querying job status not implemented for adaptor: "+ m_adaptor.getClass().getName());
                 }

@@ -27,16 +27,14 @@ public abstract class AbstractJobStatusListener implements JobRegistry {
 
     protected abstract void doSubscribeJob(String nativeJobId, JobMonitorCallback callback) throws TimeoutException, NoSuccessException;
 
-    public void subscribeJob(String nativeJobId, JobMonitorCallback callback) throws TimeoutException, NoSuccessException {
+    public void subscribeJob(String nativeJobId, JobMonitorCallback callback) throws NotImplementedException, TimeoutException, NoSuccessException {
         // subscribe to next status changes
         this.doSubscribeJob(nativeJobId, callback);
 
-        // try to notify initial status
-        try {
+        // may try to notify initial status
+        if (m_requestor.supportsQueryStatus()) {
             JobStatus status = m_requestor.getJobStatus(nativeJobId);
             callback.setState(status.getSagaState(), status.getStateDetail(), status.getSubState(), status.getCause());
-        } catch (NotImplementedException e) {
-            // ignore if no QueryJob interface is implemented
         }
     }
 }

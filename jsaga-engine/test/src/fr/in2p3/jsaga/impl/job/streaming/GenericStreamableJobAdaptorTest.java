@@ -20,8 +20,12 @@ public class GenericStreamableJobAdaptorTest {
     public void localFileFactory() {
         String uniqId = "123";
         File f;
-        String prefix = System.getProperty("java.io.tmpdir") + System.getProperty("file.separator");
-        
+        String prefix = System.getProperty("java.io.tmpdir");
+        String separator = System.getProperty("file.separator");
+        if(!prefix.endsWith(separator)) {
+            prefix += separator;
+        }
+
         f = LocalFileFactory.getLocalInputFile(uniqId);
         assertEquals(prefix + "local-123.input", f.getAbsolutePath());
         f = LocalFileFactory.getLocalOutputFile(uniqId);
