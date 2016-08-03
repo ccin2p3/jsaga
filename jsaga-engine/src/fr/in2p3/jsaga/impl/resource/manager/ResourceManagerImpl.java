@@ -37,14 +37,11 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
             return super.listResourcesSync(type);
         } else {
             try {
-                try {
-                    return (List<String>) getResult(super.listResources(TaskMode.ASYNC, type), timeout);
-                } catch (PermissionDeniedException | BadParameterException
-                        | IncorrectStateException | AlreadyExistsException
-                        | DoesNotExistException | SagaIOException e) {
-                    throw new NoSuccessException(e);                }
+                return (List<String>) getResult(super.listResources(TaskMode.ASYNC, type), timeout);
+            } catch (IncorrectURLException | PermissionDeniedException | BadParameterException | IncorrectStateException 
+                    | AlreadyExistsException | DoesNotExistException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -56,16 +53,13 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
         } else {
             try {
                 return (List<String>) getResult(super.listTemplates(TaskMode.ASYNC, type), timeout);
+            } catch (IncorrectURLException | AuthenticationFailedException
+                    | AuthorizationFailedException
+                    | PermissionDeniedException | BadParameterException
+                    | IncorrectStateException | AlreadyExistsException
+                    | DoesNotExistException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
-            catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
     public ResourceDescription getTemplate(String id) throws NotImplementedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -75,14 +69,12 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
         } else {
             try {
                 return (ResourceDescription) getResult(super.getTemplate(TaskMode.ASYNC, id), timeout);
+            } catch (IncorrectURLException | AuthenticationFailedException
+                    | AuthorizationFailedException | PermissionDeniedException
+                    | IncorrectStateException | AlreadyExistsException
+                    | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
-            catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -95,13 +87,11 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
         } else {
             try {
                 return (Compute) getResult(super.acquireCompute(TaskMode.ASYNC, description), timeout);
+            } catch (IncorrectURLException | PermissionDeniedException
+                    | IncorrectStateException | AlreadyExistsException
+                    | DoesNotExistException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
     public Compute acquireCompute(String id) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -111,12 +101,11 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
         } else {
             try {
                 return (Compute) getResult(super.acquireCompute(TaskMode.ASYNC, id), timeout);
+            } catch (IncorrectURLException | PermissionDeniedException
+                    | IncorrectStateException | AlreadyExistsException
+                    | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
     public void releaseCompute(String id) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
@@ -126,12 +115,10 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
         } else {
             try {
                 getResult(super.releaseCompute(TaskMode.ASYNC, id), timeout);
+            } catch (IncorrectURLException | PermissionDeniedException
+                    | AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
     public void releaseCompute(String id, boolean drain) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
@@ -141,12 +128,10 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
         } else {
             try {
                 getResult(super.releaseCompute(TaskMode.ASYNC, id, drain), timeout);
+            } catch (IncorrectURLException | PermissionDeniedException
+                    | AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -159,13 +144,11 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
         } else {
             try {
                 return (Network) getResult(super.acquireNetwork(TaskMode.ASYNC, description), timeout);
+            } catch (IncorrectURLException | PermissionDeniedException
+                    | IncorrectStateException | AlreadyExistsException
+                    | DoesNotExistException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
     public Network acquireNetwork(String id) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -175,12 +158,11 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
         } else {
             try {
                 return (Network) getResult(super.acquireNetwork(TaskMode.ASYNC, id), timeout);
+            } catch (IncorrectURLException | PermissionDeniedException
+                    | IncorrectStateException | AlreadyExistsException
+                    | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
     public void releaseNetwork(String id) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
@@ -190,12 +172,10 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
         } else {
             try {
                 getResult(super.releaseNetwork(TaskMode.ASYNC, id), timeout);
+            } catch (IncorrectURLException | PermissionDeniedException
+                    | AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -208,13 +188,11 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
         } else {
             try {
                 return (Storage) getResult(super.acquireStorage(TaskMode.ASYNC, description), timeout);
+            } catch (IncorrectURLException | PermissionDeniedException
+                    | IncorrectStateException | AlreadyExistsException
+                    | DoesNotExistException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
     public Storage acquireStorage(String id) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -224,12 +202,11 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
         } else {
             try {
                 return (Storage) getResult(super.acquireStorage(TaskMode.ASYNC, id), timeout);
+            } catch (IncorrectURLException | PermissionDeniedException
+                    | IncorrectStateException | AlreadyExistsException
+                    | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
     public void releaseStorage(String id) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
@@ -239,12 +216,10 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
         } else {
             try {
                 getResult(super.releaseStorage(TaskMode.ASYNC, id), timeout);
+            } catch (IncorrectURLException | PermissionDeniedException
+                    | AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
