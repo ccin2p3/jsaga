@@ -29,6 +29,8 @@ import org.ogf.saga.url.URLFactory;
 import fr.in2p3.jsaga.adaptor.resource.ResourceStatus;
 import fr.in2p3.jsaga.adaptor.resource.compute.UnsecuredComputeResourceAdaptor;
 import fr.in2p3.jsaga.impl.resource.manager.ResourceManagerImpl;
+import fr.in2p3.jsaga.impl.resource.task.IndividualResourceStatusPoller;
+import fr.in2p3.jsaga.impl.resource.task.ResourceMonitorCallback;
 
 public class ResourceImplTest {
 
@@ -36,6 +38,7 @@ public class ResourceImplTest {
     private static URL m_url;
     private Mockery m_mockery;
     private ComputeImpl m_server;
+    IndividualResourceStatusPoller m_poller;
     final Properties m_desc = new Properties();
     
     @BeforeClass
@@ -65,6 +68,7 @@ public class ResourceImplTest {
         }});
         rm = new ResourceManagerImpl(m_session, m_url, ucra);
         m_server = new ComputeImpl(m_session, rm, ucra, "[url]-[id]");
+        m_poller = new IndividualResourceStatusPoller(ucra);
         //with secured adaptor
         /* this test does not work because SecuredResource ...
         final SecuredResource sr = new SecuredResource("[url]-[id]", "SSH");
@@ -139,6 +143,17 @@ public class ResourceImplTest {
         m_server.startListening();
         m_server.stopListening();
         
+    }
+    
+    @Test
+    public void individualResourceStatusPoller() throws Exception {
+        final ResourceMonitorCallback callback = m_mockery.mock(ResourceMonitorCallback.class);
+        m_mockery.checking(new Expectations() {{
+            allowing(callback).setState(with(any(State.class)), with(any(String.class))); will(returnValue(null));
+        }});
+        m_poller.subscribeResource("id", callback);
+        m_poller.run();
+        m_poller.unsubscribeResource("id");
     }
     
     private class DummyResourceStatus extends ResourceStatus {
