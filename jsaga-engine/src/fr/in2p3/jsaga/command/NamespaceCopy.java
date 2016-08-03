@@ -66,10 +66,9 @@ public class NamespaceCopy extends AbstractCommand {
                                 String value = metric.getAttribute(Metric.VALUE);
                                 String unit = metric.getAttribute(Metric.UNIT);
                                 System.out.println("Progress: "+value+" "+unit);
-                            }
-                            catch (NotImplementedException e) {throw e;}
-                            catch (AuthorizationFailedException e) {throw e;}
-                            catch (Exception e) {
+                            } catch (NotImplementedException | AuthorizationFailedException e) {
+                                throw e;
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                             // callback must stay registered

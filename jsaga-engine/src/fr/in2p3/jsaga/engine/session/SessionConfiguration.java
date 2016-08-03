@@ -113,10 +113,11 @@ public class SessionConfiguration {
         String type;
         try {
             type = context.getAttribute(Context.TYPE);
+        } catch (NotImplementedException | NoSuccessException e) {
+            throw e;
+        } catch (SagaException e) {
+            throw new NoSuccessException(e);
         }
-        catch (NotImplementedException e) {throw e;}
-        catch (NoSuccessException e) {throw e;}
-        catch (SagaException e) {throw new NoSuccessException(e);}
 
         // find config by type
         fr.in2p3.jsaga.generated.session.Contexts contextsCfg = m_config.getContexts();
@@ -139,8 +140,10 @@ public class SessionConfiguration {
                     context.setVectorAttribute(attributeCfg.getName(), attributeCfg.getItem());
                 }
             }
+        } catch (NoSuccessException e) {
+            throw e;
+        } catch (SagaException e) {
+            throw new NoSuccessException(e);
         }
-        catch (NoSuccessException e) {throw e;}
-        catch (SagaException e) {throw new NoSuccessException(e);}
     }
 }

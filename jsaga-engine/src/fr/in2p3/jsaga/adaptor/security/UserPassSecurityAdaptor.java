@@ -121,9 +121,7 @@ public class UserPassSecurityAdaptor implements ExpirableSecurityAdaptor {
                 default:
                     throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
             }
-        } catch(IncorrectStateException e) {
-            throw e;
-        } catch(NoSuccessException e) {
+        } catch(IncorrectStateException | NoSuccessException e) {
             throw e;
         } catch(Exception e) {
             throw new NoSuccessException(e);

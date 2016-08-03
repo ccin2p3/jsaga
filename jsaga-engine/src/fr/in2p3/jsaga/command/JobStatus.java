@@ -69,10 +69,9 @@ public class JobStatus extends AbstractCommand {
                         try {
                             String value = metric.getAttribute(Metric.VALUE);
                             System.out.println("Current state: "+value);
-                        }
-                        catch (NotImplementedException e) {throw e;}
-                        catch (AuthorizationFailedException e) {throw e;}
-                        catch (Exception e) {
+                        } catch (NotImplementedException | AuthorizationFailedException e) {
+                            throw e;
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                         // callback must stay registered
