@@ -53,9 +53,7 @@ public class AbstractResourceTaskImpl<R extends Resource>
         } else {
             try {
                 return m_adaptor.getResourceStatus(SAGAId.idFromSagaId(getId())).getSagaState();
-            } catch (DoesNotExistException e) {
-                throw new NoSuccessException(e);
-            } catch (BadParameterException e) {
+            } catch (DoesNotExistException | BadParameterException e) {
                 throw new NoSuccessException(e);
             }
         }
@@ -80,10 +78,11 @@ public class AbstractResourceTaskImpl<R extends Resource>
                         String value = metric.getAttribute(Metric.VALUE);
                         State current = State.valueOf(value);
                         resource.setState(current, null);
+                    } catch (NotImplementedException | AuthorizationFailedException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    catch (NotImplementedException e) {throw e;}
-                    catch (AuthorizationFailedException e) {throw e;}
-                    catch (Exception e) {e.printStackTrace();}
                     // callback must stay registered
                     return true;
                 }
@@ -112,13 +111,7 @@ public class AbstractResourceTaskImpl<R extends Resource>
 
             // stop listening
             m_metrics.m_State.removeCallback(cookie);
-        } catch (AuthenticationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (AuthorizationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (PermissionDeniedException e) {
-            throw new NoSuccessException(e);
-        } catch (BadParameterException e) {
+        } catch (AuthenticationFailedException | AuthorizationFailedException | PermissionDeniedException | BadParameterException e) {
             throw new NoSuccessException(e);
         }
     }
