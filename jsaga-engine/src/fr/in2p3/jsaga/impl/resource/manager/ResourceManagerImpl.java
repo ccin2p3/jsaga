@@ -37,15 +37,14 @@ public class ResourceManagerImpl extends AbstractAsyncResourceManagerImpl implem
             return super.listResourcesSync(type);
         } else {
             try {
-                return (List<String>) getResult(super.listResources(TaskMode.ASYNC, type), timeout);
+                try {
+                    return (List<String>) getResult(super.listResources(TaskMode.ASYNC, type), timeout);
+                } catch (PermissionDeniedException | BadParameterException
+                        | IncorrectStateException | AlreadyExistsException
+                        | DoesNotExistException | SagaIOException e) {
+                    throw new NoSuccessException(e);                }
             }
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
