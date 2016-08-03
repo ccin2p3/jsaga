@@ -49,6 +49,7 @@ public class TimeoutableFileImplTest extends JSAGABaseTest {
         m_readfile.close();
     }
 
+    @Test
     public void test_getSize() throws Exception {
         try {
             m_readfile.getSize();
