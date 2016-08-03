@@ -60,7 +60,7 @@ public class ResourceImplTest {
         c = new ComputeImpl(m_session, rm, ucra, "[url]-[id]");
         
         // checks
-        assertEquals("[url]-[id]", c.getId());
+        assertEquals("[url]-[id]", c.getResourceId());
         assertEquals(Type.COMPUTE, c.getType());
         assertSame(rm, c.getManager());
         assertEquals(2, c.getAccess().length);
