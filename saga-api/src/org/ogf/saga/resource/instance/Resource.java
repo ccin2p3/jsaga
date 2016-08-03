@@ -37,6 +37,18 @@ public interface Resource<R,RD> extends ResourceTask, Async, AsyncAttributes<R> 
     public static final String RESOURCE_DESCRIPTION = "Description";
 
     /**
+     * @return the resource identifier
+     *
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public String getResourceId() throws NotImplementedException, NoSuccessException;
+
+    /**
      * @return the resource type
      *
      * @exception NotImplementedException
