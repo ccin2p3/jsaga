@@ -45,6 +45,10 @@ public abstract class AbstractSyncResourceFactoryImpl extends ResourceFactory im
     }
 
     public ResourceManager doCreateManagerSync(Session session, URL rm) throws NotImplementedException, BadParameterException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
+        // rm cannot be null or empty because :
+        // 1. ResourceFactory.createResourceManager() creates a URL if null
+        // 2. URL.normalize() returns "./" when ""
+        // But anyway, we keep the check
         if (rm!=null && !rm.toString().equals("")) {
             // get context (security + config)
             ContextImpl context;
