@@ -28,12 +28,11 @@ public class ResourceFactoryImpl extends AbstractAsyncResourceFactoryImpl {
         } else {
             try {
                 return (ResourceManager) this.getResult(super.doCreateResourceManager(TaskMode.ASYNC, session, rm), timeout);
+            } catch (PermissionDeniedException | IncorrectStateException
+                    | AlreadyExistsException | DoesNotExistException
+                    | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 

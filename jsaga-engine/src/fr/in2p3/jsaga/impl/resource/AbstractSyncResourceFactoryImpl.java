@@ -50,9 +50,7 @@ public abstract class AbstractSyncResourceFactoryImpl extends ResourceFactory im
             ContextImpl context;
             try {
                 context = ((SessionImpl) session).getBestMatchingContext(rm);
-            } catch (DoesNotExistException e) {
-                throw new NoSuccessException(e);
-            } catch (PermissionDeniedException e) {
+            } catch (DoesNotExistException | PermissionDeniedException e) {
                 throw new NoSuccessException(e);
             }
 
