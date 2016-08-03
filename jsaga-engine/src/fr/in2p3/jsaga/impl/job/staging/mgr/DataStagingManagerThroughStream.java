@@ -129,11 +129,7 @@ public class DataStagingManagerThroughStream implements DataStagingManager {
 
             // returns
             return newJobDesc;
-        } catch (IncorrectStateException e) {
-            throw new NoSuccessException(e);
-        } catch (DoesNotExistException e) {
-            throw new NoSuccessException(e);
-        } catch (CloneNotSupportedException e) {
+        } catch (IncorrectStateException | DoesNotExistException | CloneNotSupportedException e) {
             throw new NoSuccessException(e);
         }
     }
@@ -253,12 +249,5 @@ public class DataStagingManagerThroughStream implements DataStagingManager {
         } catch (DoesNotExistException e) {
             return CLEANUP_DEFAULT;
         }
-    }
-
-    private static boolean isURL(String file) {
-        final boolean hasProtocolScheme = file.contains(":/");
-        final boolean isLinuxAbsolutePath = file.startsWith("/");
-        final boolean isWindowsAbsolutePath = file.indexOf(':')<=1;  // -1 or 1 (none or "_:")
-        return hasProtocolScheme && ! (isLinuxAbsolutePath || isWindowsAbsolutePath);
     }
 }

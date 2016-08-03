@@ -136,10 +136,9 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
                     return stayRegistered;
                 }
             });
-        }
-        catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
-        catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
-        catch (PermissionDeniedException e) {throw new NoSuccessException(e);}*/
+        } catch (AuthenticationFailedException | AuthorizationFailedException | PermissionDeniedException e) {
+            throw new NoSuccessException(e);
+        }*/
 
         // loop until task is finished (done, canceled or failed)
         try {
@@ -168,11 +167,9 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
             // callback may have not been removed
             try {
                 m_metric_TaskState.removeCallback(cookie);
+            } catch (BadParameterException | AuthenticationFailedException | AuthorizationFailedException | PermissionDeniedException e2) {
+                throw new NoSuccessException(e);
             }
-            catch (BadParameterException e2) {throw new NoSuccessException(e);}
-            catch (AuthenticationFailedException e2) {throw new NoSuccessException(e);}
-            catch (AuthorizationFailedException e2) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e2) {throw new NoSuccessException(e);}
         }*/
 
         // returns
@@ -274,19 +271,11 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
             case FAILED:
                 if (m_exception != null) {
                     try {throw m_exception;}
-                    catch(NotImplementedException e) {throw e;}
-                    catch(IncorrectURLException e) {throw e;}
-                    catch(AuthenticationFailedException e) {throw e;}
-                    catch(AuthorizationFailedException e) {throw e;}
-                    catch(PermissionDeniedException e) {throw e;}
-                    catch(BadParameterException e) {throw e;}
-                    catch(IncorrectStateException e) {throw e;}
-                    catch(AlreadyExistsException e) {throw e;}
-                    catch(DoesNotExistException e) {throw e;}
-                    catch(TimeoutException e) {throw e;}
-                    catch(SagaIOException e) {throw e;}
-                    catch(NoSuccessException e) {throw e;}
-                    catch(SagaException e) {throw new NoSuccessException(m_exception);}
+                    catch(NotImplementedException | NoSuccessException | TimeoutException | DoesNotExistException | AlreadyExistsException | IncorrectStateException | BadParameterException | PermissionDeniedException | AuthorizationFailedException | AuthenticationFailedException | IncorrectURLException | SagaIOException e) {
+                        throw e;
+                    } catch(SagaException e) {
+                        throw new NoSuccessException(m_exception);
+                    }
                 } else {
                     throw new NoSuccessException("task failed with unknown reason", this);
                 }

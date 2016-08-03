@@ -53,23 +53,15 @@ public abstract class ServiceConfigAttribute implements AttributeVector {
     	java.lang.reflect.Constructor constructor;
 		try {
 			constructor = clazz.getConstructor();
-		} catch (SecurityException e) {
-			throw new CloneNotSupportedException();
-		} catch (NoSuchMethodException e) {
+		} catch (SecurityException | NoSuchMethodException e) {
 			throw new CloneNotSupportedException();
 		}
 
-    	// And construct
+        // And construct
     	ServiceConfigAttribute clone;
 		try {
 			clone = (ServiceConfigAttribute)constructor.newInstance();
-		} catch (IllegalArgumentException e) {
-			throw new CloneNotSupportedException();
-		} catch (InstantiationException e) {
-			throw new CloneNotSupportedException();
-		} catch (IllegalAccessException e) {
-			throw new CloneNotSupportedException();
-		} catch (InvocationTargetException e) {
+		} catch (IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 			throw new CloneNotSupportedException();
 		}
         clone.m_values = m_values;

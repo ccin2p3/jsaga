@@ -58,11 +58,11 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
         if (type!=null && !type.equals("")) {
             try {
                 this.setAttribute(Context.TYPE, type);
+            } catch (NoSuccessException e) {
+                throw e;
+            } catch (SagaException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectStateException e) {throw e;}
-            catch (TimeoutException e) {throw e;}
-            catch (NoSuccessException e) {throw e;}
-            catch (SagaException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -303,10 +303,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             } else {
                 throw new NoSuccessException("[INTERNAL ERROR] Unexpected exception", this);
             }
-        } catch (BadParameterException e) {
-            throw new IncorrectStateException("Invalid attribute(s): " + e.getMessage(), e);
-        } catch (FileNotFoundException e) {
-            // Should not happen
+        } catch (BadParameterException | FileNotFoundException e) {
             throw new IncorrectStateException("Invalid attribute(s): " + e.getMessage(), e);
         }
         m_credential = m_adaptor.createSecurityCredential(
@@ -366,9 +363,11 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
                     ref.m_attributes.m_baseUrlIncludes,
                     ref.m_attributes.m_baseUrlExcludes,
                     m_attributes.m_baseUrlExcludes);
+        } catch (NoSuccessException e) {
+            throw e;
+        } catch (SagaException e) {
+            throw new NoSuccessException(e);
         }
-        catch (NoSuccessException e) {throw e;}
-        catch (SagaException e) {throw new NoSuccessException(e);}
     }
 
     /**
@@ -391,9 +390,11 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             if (m_attributes.m_urlPrefix.getValue() == null) {
                 m_attributes.m_urlPrefix.setValue(m_attributes.m_type.getValue()+position);
             }
+        } catch (NoSuccessException e) {
+            throw e;
+        } catch (SagaException e) {
+            throw new NoSuccessException(e);
         }
-        catch (NoSuccessException e) {throw e;}
-        catch (SagaException e) {throw new NoSuccessException(e);}
     }
 
     /**

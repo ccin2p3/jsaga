@@ -37,11 +37,9 @@ public class DataStagingManagerThroughSandboxTwoPhase extends DataStagingManager
             Directory dir = null;
             try {
                 dir = FileFactory.createDirectory(JSAGA_FACTORY, job.getSession(), url, Flags.CREATE.getValue());
-            } catch (IncorrectURLException e) {
+            } catch (IncorrectURLException | AlreadyExistsException e) {
                 throw new NoSuccessException(e);
-            } catch (AlreadyExistsException e) {
-                throw new NoSuccessException(e);
-            }finally{
+            } finally{
                 if(dir != null){
     	        	try{
     	        		dir.close();

@@ -49,12 +49,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (Long) getResult(super.getSize(TaskMode.ASYNC), timeout);
+            } catch (IncorrectURLException | BadParameterException | DoesNotExistException | SagaIOException | AlreadyExistsException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -65,10 +62,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (Integer) getResult(super.read(TaskMode.ASYNC, buffer, len), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -79,10 +75,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (Integer) getResult(super.read(TaskMode.ASYNC, buffer, offset, len), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -93,10 +88,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (Integer) getResult(super.read(TaskMode.ASYNC, buffer), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -107,10 +101,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (Integer) getResult(super.write(TaskMode.ASYNC, buffer, offset, len), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -121,10 +114,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (Integer) getResult(super.write(TaskMode.ASYNC, buffer, len), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -135,10 +127,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (Integer) getResult(super.write(TaskMode.ASYNC, buffer), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -149,11 +140,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (Long) getResult(super.seek(TaskMode.ASYNC, offset, whence), timeout);
+            } catch (IncorrectURLException | BadParameterException | AlreadyExistsException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -164,10 +153,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 getResult(super.readV(TaskMode.ASYNC, iovecs), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -178,10 +166,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 getResult(super.writeV(TaskMode.ASYNC, iovecs), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -192,11 +179,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (Integer) getResult(super.sizeP(TaskMode.ASYNC, pattern), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | SagaIOException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -207,10 +192,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (Integer) getResult(super.readP(TaskMode.ASYNC, pattern, buffer), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -221,10 +205,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (Integer) getResult(super.writeP(TaskMode.ASYNC, pattern, buffer), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -235,12 +218,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (List<String>) getResult(super.modesE(TaskMode.ASYNC), timeout);
+            } catch (IncorrectURLException | BadParameterException | DoesNotExistException | AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -251,11 +231,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (Integer) getResult(super.sizeE(TaskMode.ASYNC, emode, spec), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | SagaIOException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -266,10 +244,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (Integer) getResult(super.readE(TaskMode.ASYNC, emode, spec, buffer), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -280,10 +257,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else {
             try {
                 return (Integer) getResult(super.writeE(TaskMode.ASYNC, emode, spec, buffer), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 

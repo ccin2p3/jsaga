@@ -111,11 +111,7 @@ public class AbstractSyncDirectoryImpl extends AbstractNSDirectoryImpl implement
 				}
 	    	}
 			return total_size;
-		} catch (IncorrectURLException e) {
-			throw new NoSuccessException(e);
-		} catch (DoesNotExistException e) {
-			throw new NoSuccessException(e);
-		} catch (AlreadyExistsException e) {
+		} catch (IncorrectURLException | DoesNotExistException | AlreadyExistsException e) {
 			throw new NoSuccessException(e);
 		}
     }

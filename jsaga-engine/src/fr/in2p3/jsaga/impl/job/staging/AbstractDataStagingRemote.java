@@ -40,9 +40,7 @@ public abstract class AbstractDataStagingRemote extends AbstractDataStaging {
             } finally {
                 file.close();
             }
-        } catch (AlreadyExistsException e) {
-            throw new NoSuccessException(e);
-        } catch (IncorrectURLException e) {
+        } catch (AlreadyExistsException | IncorrectURLException e) {
             throw new NoSuccessException(e);
         }
     }
@@ -55,9 +53,7 @@ public abstract class AbstractDataStagingRemote extends AbstractDataStaging {
             } finally {
                 file.close();
             }
-        } catch (AlreadyExistsException e) {
-            throw new NoSuccessException(e);
-        } catch (IncorrectURLException e) {
+        } catch (AlreadyExistsException | IncorrectURLException e) {
             throw new NoSuccessException(e);
         }
     }

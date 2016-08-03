@@ -46,11 +46,7 @@ public class InputDataStagingToWorker extends AbstractDataStagingWorker {
             buffer = BufferFactory.createBuffer(JSAGA_FACTORY, (int) size);
             localFile.read(buffer, (int) size);
             localFile.close();
-        } catch (SagaIOException e) {
-            throw new NoSuccessException(e);
-        } catch (IncorrectURLException e) {
-            throw new NoSuccessException(e);
-        } catch (AlreadyExistsException e) {
+        } catch (SagaIOException | IncorrectURLException | AlreadyExistsException e) {
             throw new NoSuccessException(e);
         }
 

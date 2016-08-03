@@ -5,7 +5,6 @@ import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.*;
-import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.url.URL;
@@ -48,11 +47,9 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
         } else {
             try {
                 return (Long) getResult(super.getSize(TaskMode.ASYNC), timeout);
+            } catch (AlreadyExistsException | IncorrectURLException | SagaIOException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-			catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-			catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);} 
         }
     }
     
@@ -63,11 +60,9 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
         } else {
             try {
                 return (Long) getResult(super.getSize(TaskMode.ASYNC, flags), timeout);
+            } catch (AlreadyExistsException | IncorrectURLException | SagaIOException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-			catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-			catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
     // </extra specs>
@@ -79,9 +74,9 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
         } else {
             try {
                 return (Long) getResult(super.getSize(TaskMode.ASYNC, name, flags), timeout);
+            } catch (AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -92,9 +87,9 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
         } else {
             try {
                 return (Long) getResult(super.getSize(TaskMode.ASYNC, name), timeout);
+            } catch (AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -105,9 +100,9 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
         } else {
             try {
                 return (Boolean) getResult(super.isFile(TaskMode.ASYNC, name), timeout);
+            } catch (AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 

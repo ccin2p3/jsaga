@@ -9,18 +9,13 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
 import fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl;
-import fr.in2p3.jsaga.impl.logicalfile.AbstractSyncLogicalFileImpl;
-import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
-import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.*;
-import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
 
 import java.io.IOException;
-import java.util.List;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -167,22 +162,6 @@ public class FileCopyFrom {
         }
     }
 
-    private void getFromLogicalFile(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
-        // get location of source physical file
-        AbstractSyncLogicalFileImpl sourceLogicalFile = this.createSourceLogicalFile(source, flags);
-        List<URL> sourceLocations = sourceLogicalFile.listLocationsSync();
-        if (sourceLocations!=null && sourceLocations.size()>0) {
-            // get source physical file
-            URL sourcePhysicalUrl = sourceLocations.get(0);
-            // copy
-            m_targetFile.copyFromSync(sourcePhysicalUrl, flags);
-            // close source logical file
-            sourceLogicalFile.close();
-        } else {
-            throw new NoSuccessException("No location found for logical file: "+source);
-        }
-    }
-
     private AbstractSyncFileImpl createSourceFile(URL source) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         try {
             return (AbstractSyncFileImpl) FileFactory.createFile(JSAGA_FACTORY, m_session, source, Flags.READ.getValue());
@@ -190,16 +169,6 @@ public class FileCopyFrom {
             throw new NoSuccessException("Unexpected exception", e);
         } catch (DoesNotExistException doesNotExist) {
             throw new DoesNotExistException("Source file does not exist: "+source, doesNotExist.getCause());
-        }
-    }
-
-    private AbstractSyncLogicalFileImpl createSourceLogicalFile(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
-        int correctedFlags = flags;
-        correctedFlags = new FlagsHelper(correctedFlags).remove(JSAGAFlags.PRESERVETIMES, Flags.OVERWRITE);
-        try {
-            return (AbstractSyncLogicalFileImpl) LogicalFileFactory.createLogicalFile(JSAGA_FACTORY, m_session, source, correctedFlags);
-        } catch (AlreadyExistsException e) {
-            throw new NoSuccessException("Unexpected exception", e);
         }
     }
 }

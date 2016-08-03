@@ -387,9 +387,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     protected SyncNSDirectory _openNSDir(URL name) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         try {
             return (SyncNSDirectory) this.openDir(name, Flags.NONE.getValue());
-        } catch (DoesNotExistException e) {
-            throw new IncorrectStateException(e);
-        } catch (AlreadyExistsException e) {
+        } catch (DoesNotExistException | AlreadyExistsException e) {
             throw new IncorrectStateException(e);
         }
     }
@@ -398,9 +396,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     protected SyncNSEntry _openNSEntry(URL name) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         try {
             return (SyncNSEntry) this.open(name, Flags.NONE.getValue());
-        } catch (DoesNotExistException e) {
-            throw new IncorrectStateException(e);
-        } catch (AlreadyExistsException e) {
+        } catch (DoesNotExistException | AlreadyExistsException e) {
             throw new IncorrectStateException(e);
         }
     }

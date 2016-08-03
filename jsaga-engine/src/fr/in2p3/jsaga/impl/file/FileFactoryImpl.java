@@ -36,9 +36,9 @@ public class FileFactoryImpl extends AbstractAsyncFileFactoryImpl {
         } else {
             try {
                 return (File) this.getResult(super.doCreateFile(TaskMode.ASYNC, session, name, flags), timeout);
+            } catch (IncorrectStateException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -49,9 +49,9 @@ public class FileFactoryImpl extends AbstractAsyncFileFactoryImpl {
         } else {
             try {
                 return (FileInputStream) this.getResult(super.doCreateFileInputStream(TaskMode.ASYNC, session, name), timeout);
+            } catch (IncorrectStateException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -62,9 +62,9 @@ public class FileFactoryImpl extends AbstractAsyncFileFactoryImpl {
         } else {
             try {
                 return (FileOutputStream) this.getResult(super.doCreateFileOutputStream(TaskMode.ASYNC, session, name, append), timeout);
+            } catch (IncorrectStateException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -75,9 +75,9 @@ public class FileFactoryImpl extends AbstractAsyncFileFactoryImpl {
         } else {
             try {
                 return (Directory) this.getResult(super.doCreateDirectory(TaskMode.ASYNC, session, name, flags), timeout);
+            } catch (IncorrectStateException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 

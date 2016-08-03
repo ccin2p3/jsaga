@@ -69,13 +69,10 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
         } else {
             try {
                 return (List<String>) getResult(super.list(TaskMode.ASYNC), timeout);
+            } catch (IncorrectURLException | BadParameterException | AlreadyExistsException
+                    | IncorrectStateException | DoesNotExistException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
