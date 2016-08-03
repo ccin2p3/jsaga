@@ -52,6 +52,7 @@ public class GenericStreamableJobAdaptorTest {
         FileInputStream fis = new FileInputStream(LocalFileFactory.getLocalInputFile("123"));
         byte[] content = new byte[1024];
         int bytesRead = fis.read(content);
+        fis.close();
         assertEquals("INPUT_STRING", new String(content, 0, bytesRead));
         // delete input file
         LocalFileFactory.getLocalInputFile("123").delete();
