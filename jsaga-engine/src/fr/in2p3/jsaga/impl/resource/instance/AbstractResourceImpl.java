@@ -122,7 +122,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
     public ResourceManager getManager() {
         return m_manager;
     }
-
+    
     /**
      * Get accesses. Accesses are not required when resource is built because they might be
      * unavailable before resource is fully ACTIVE.
@@ -206,11 +206,7 @@ public abstract class AbstractResourceImpl<R extends Resource, RD extends Resour
     public void release() throws NoSuccessException, IncorrectStateException {
         try {
             m_adaptor.release(SAGAId.idFromSagaId(getResourceId()));
-        } catch (DoesNotExistException e) {
-            throw new NoSuccessException(e);
-        } catch (NotImplementedException e) {
-            throw new NoSuccessException(e);
-        } catch (BadParameterException e) {
+        } catch (DoesNotExistException | NotImplementedException | BadParameterException e) {
             throw new NoSuccessException(e);
         }
         // Try to remove security context from session

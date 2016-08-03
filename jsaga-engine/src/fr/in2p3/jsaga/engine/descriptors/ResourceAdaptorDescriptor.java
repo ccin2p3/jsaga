@@ -60,7 +60,7 @@ public class ResourceAdaptorDescriptor {
         if (clazz != null) {
             return clazz;
         } else {
-            throw new NoSuccessException("Found no data adaptor supporting scheme: "+ scheme);
+            throw new NoSuccessException("Found no resource adaptor supporting scheme: "+ scheme);
         }
     }
 
