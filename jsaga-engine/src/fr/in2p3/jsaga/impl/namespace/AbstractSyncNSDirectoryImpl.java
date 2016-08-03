@@ -556,9 +556,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
                         ((NSEntry) entry).close();
                     }
                 }
-            } catch (IncorrectURLException e) {
-                throw new NoSuccessException(e);
-            } catch (IncorrectStateException e) {
+            } catch (IncorrectURLException | IncorrectStateException e) {
                 throw new NoSuccessException(e);
             }
         } else {
@@ -599,13 +597,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     private SyncNSEntry _openNSEntry(URL name, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         try {
             return (SyncNSEntry) this.open(name, flags);
-        } catch (IncorrectURLException e) {
-            throw new NoSuccessException(e);
-        } catch (IncorrectStateException e) {
-            throw new NoSuccessException(e);
-        } catch (DoesNotExistException e) {
-            throw new NoSuccessException(e);
-        } catch (AlreadyExistsException e) {
+        } catch (IncorrectURLException | AlreadyExistsException | DoesNotExistException | IncorrectStateException e) {
             throw new NoSuccessException(e);
         }
     }

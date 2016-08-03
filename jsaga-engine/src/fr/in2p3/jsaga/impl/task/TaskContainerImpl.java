@@ -101,10 +101,9 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
                     return !m_tasks.isEmpty();
                 }
             });
-        }
-        catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
-        catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
-        catch (PermissionDeniedException e) {throw new NoSuccessException(e);}*/
+        } catch (AuthenticationFailedException | AuthorizationFailedException | PermissionDeniedException e) {
+            throw new NoSuccessException(e);
+        }*/
 
         String id = null;
         try {
@@ -130,11 +129,9 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
             // callback may have not been removed
             try {
                 m_metric_TaskContainerState.removeCallback(tcCookie);
+            } catch (BadParameterException | AuthenticationFailedException | AuthorizationFailedException | PermissionDeniedException e2) {
+                throw new NoSuccessException(e);
             }
-            catch (BadParameterException e2) {throw new NoSuccessException(e);}
-            catch (AuthenticationFailedException e2) {throw new NoSuccessException(e);}
-            catch (AuthorizationFailedException e2) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e2) {throw new NoSuccessException(e);}
         }*/
 
         return m_tasks.remove(id);

@@ -48,10 +48,9 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         } else {
             try {
                 getResult(super.addLocation(TaskMode.ASYNC, name), timeout);
+            } catch (AlreadyExistsException | DoesNotExistException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -62,9 +61,9 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         } else {
             try {
                 getResult(super.removeLocation(TaskMode.ASYNC, name), timeout);
+            } catch (AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -75,8 +74,9 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         } else {
             try {
                 getResult(super.updateLocation(TaskMode.ASYNC, nameOld, nameNew), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -87,12 +87,9 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         } else {
             try {
                 return (List<URL>) getResult(super.listLocations(TaskMode.ASYNC), timeout);
+            } catch (IncorrectURLException | BadParameterException | DoesNotExistException | AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -103,8 +100,9 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         } else {
             try {
                 getResult(super.replicate(TaskMode.ASYNC, name, flags), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -115,8 +113,9 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         } else {
             try {
                 getResult(super.replicate(TaskMode.ASYNC, name), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 

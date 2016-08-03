@@ -50,17 +50,9 @@ public class SessionImpl extends AbstractSagaObjectImpl implements Session {
                 if ("Unknown".equals((String)context.getAttribute(Context.TYPE))) {
                     throw new NoSuccessException("The context is missing the attribute Type");
                 }
-            } catch (NotImplementedException e) {
+            } catch (NotImplementedException | AuthenticationFailedException | PermissionDeniedException | AuthorizationFailedException e) {
                 throw new NoSuccessException(e.getMessage(), e);
-            } catch (AuthenticationFailedException e) {
-                throw new NoSuccessException(e.getMessage(), e);
-            } catch (AuthorizationFailedException e) {
-                throw new NoSuccessException(e.getMessage(), e);
-            } catch (PermissionDeniedException e) {
-                throw new NoSuccessException(e.getMessage(), e);
-            } catch (IncorrectStateException e) {
-                throw new NoSuccessException("The context is missing the attribute Type");
-            } catch (DoesNotExistException e) {
+            } catch (IncorrectStateException | DoesNotExistException e) {
                 throw new NoSuccessException("The context is missing the attribute Type");
             }
             if (! m_contexts.contains(ctxImpl)) {
@@ -79,9 +71,7 @@ public class SessionImpl extends AbstractSagaObjectImpl implements Session {
             // create or renew credential
             try {
                 ctxImpl.createCredential();
-            } catch (NotImplementedException e) {
-                throw new NoSuccessException(e);
-            } catch (IncorrectStateException e) {
+            } catch (NotImplementedException | IncorrectStateException e) {
                 throw new NoSuccessException(e);
             }
         } else {

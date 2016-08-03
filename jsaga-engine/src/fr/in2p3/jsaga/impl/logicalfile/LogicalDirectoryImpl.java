@@ -49,9 +49,9 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
         } else {
             try {
                 return (Boolean) getResult(super.isFile(TaskMode.ASYNC, name), timeout);
+            } catch (AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -62,11 +62,9 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
         } else {
             try {
                 return (List<URL>) getResult(super.find(TaskMode.ASYNC, namePattern, attrPattern, flags), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | SagaIOException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -77,11 +75,9 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
         } else {
             try {
                 return (List<URL>) getResult(super.find(TaskMode.ASYNC, namePattern, attrPattern), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | SagaIOException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 

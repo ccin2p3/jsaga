@@ -352,9 +352,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
                 } finally {
                     entry.close();
                 }
-            } catch (IncorrectURLException e) {
-                throw new NoSuccessException(e);
-            } catch (IncorrectStateException e) {
+            } catch (IncorrectURLException | IncorrectStateException e) {
                 throw new NoSuccessException(e);
             }
             return; //==========> EXIT
@@ -408,9 +406,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         try {
             String absolutePath = this.readLinkSync().getPath();
             return (AbstractSyncNSDirectoryImpl) this.openAbsoluteDir(absolutePath, Flags.NONE.getValue());
-        } catch (AlreadyExistsException e) {
-            throw new IncorrectStateException(e);
-        } catch (DoesNotExistException e) {
+        } catch (AlreadyExistsException | DoesNotExistException e) {
             throw new IncorrectStateException(e);
         }
     }
@@ -419,9 +415,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         try {
             String absolutePath = this.readLinkSync().getPath();
             return (AbstractSyncNSEntryImpl) this.openAbsolute(absolutePath, Flags.NONE.getValue());
-        } catch (AlreadyExistsException e) {
-            throw new IncorrectStateException(e);
-        } catch (DoesNotExistException e) {
+        } catch (AlreadyExistsException | DoesNotExistException e) {
             throw new IncorrectStateException(e);
         }
     }
@@ -446,9 +440,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         try {
             String parentAbsolutePath = this._getParentDirURL().getPath();
             this.openAbsoluteDir(parentAbsolutePath, Flags.CREATE.or(Flags.CREATEPARENTS)).close();
-        } catch (DoesNotExistException e) {
-            throw new NoSuccessException(e);
-        } catch (IncorrectStateException e) {
+        } catch (DoesNotExistException | IncorrectStateException e) {
             throw new NoSuccessException(e);
         }
     }

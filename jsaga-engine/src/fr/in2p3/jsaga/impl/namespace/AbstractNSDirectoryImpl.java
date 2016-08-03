@@ -52,10 +52,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (List<URL>) getResult(super.list(TaskMode.ASYNC, pattern, flags), timeout);
+            } catch (AlreadyExistsException | DoesNotExistException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -66,10 +65,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (List<URL>) getResult(super.list(TaskMode.ASYNC, flags), timeout);
+            } catch (AlreadyExistsException | DoesNotExistException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -80,10 +78,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (List<URL>) getResult(super.list(TaskMode.ASYNC, pattern), timeout);
+            } catch (AlreadyExistsException | DoesNotExistException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -94,10 +91,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (List<URL>) getResult(super.list(TaskMode.ASYNC), timeout);
+            } catch (AlreadyExistsException | SagaIOException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -108,11 +104,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (List<URL>) getResult(super.find(TaskMode.ASYNC, pattern, flags), timeout);
+            } catch (IncorrectURLException | SagaIOException | DoesNotExistException | AlreadyExistsException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -123,11 +117,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (List<URL>) getResult(super.find(TaskMode.ASYNC, pattern), timeout);
+            } catch (IncorrectURLException | SagaIOException | DoesNotExistException | AlreadyExistsException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -138,10 +130,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (Boolean) getResult(super.exists(TaskMode.ASYNC, name), timeout);
+            } catch (AlreadyExistsException | SagaIOException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -152,9 +143,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (Long) getResult(super.getMTime(TaskMode.ASYNC, name), timeout);
+            } catch (AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -165,9 +156,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (Boolean) getResult(super.isDir(TaskMode.ASYNC, name), timeout);
+            } catch (AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -178,9 +169,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (Boolean) getResult(super.isEntry(TaskMode.ASYNC, name), timeout);
+            } catch (AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -191,9 +182,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (Boolean) getResult(super.isLink(TaskMode.ASYNC, name), timeout);
+            } catch (AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -204,9 +195,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (URL) getResult(super.readLink(TaskMode.ASYNC, name), timeout);
+            } catch (AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -217,12 +208,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (Integer) getResult(super.getNumEntries(TaskMode.ASYNC), timeout);
+            } catch (IncorrectURLException | SagaIOException | DoesNotExistException | AlreadyExistsException | BadParameterException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -233,11 +221,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (URL) getResult(super.getEntry(TaskMode.ASYNC, entry), timeout);
+            } catch (IncorrectURLException | SagaIOException | AlreadyExistsException | BadParameterException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -248,8 +234,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.copy(TaskMode.ASYNC, source, target, flags), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -260,8 +247,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.copy(TaskMode.ASYNC, source, target), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -272,8 +260,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.copy(TaskMode.ASYNC, source, target, flags), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -284,8 +273,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.copy(TaskMode.ASYNC, source, target), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -296,8 +286,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.link(TaskMode.ASYNC, source, target, flags), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -308,8 +299,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.link(TaskMode.ASYNC, source, target), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -320,8 +312,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.link(TaskMode.ASYNC, source, target, flags), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -332,8 +325,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.link(TaskMode.ASYNC, source, target), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -344,8 +338,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.move(TaskMode.ASYNC, source, target, flags), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -356,8 +351,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.move(TaskMode.ASYNC, source, target), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -368,8 +364,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.move(TaskMode.ASYNC, source, target, flags), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -380,8 +377,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.move(TaskMode.ASYNC, source, target), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -392,9 +390,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.remove(TaskMode.ASYNC, target, flags), timeout);
+            } catch (AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -405,9 +403,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.remove(TaskMode.ASYNC, target), timeout);
+            } catch (AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -418,9 +416,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.remove(TaskMode.ASYNC, target, flags), timeout);
+            } catch (AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -431,9 +429,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.remove(TaskMode.ASYNC, target), timeout);
+            } catch (AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -444,8 +442,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.makeDir(TaskMode.ASYNC, target, flags), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -456,8 +455,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.makeDir(TaskMode.ASYNC, target), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -504,10 +504,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.permissionsAllow(TaskMode.ASYNC, target, id, permissions, flags), timeout);
+            } catch (AlreadyExistsException | SagaIOException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -518,10 +517,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.permissionsAllow(TaskMode.ASYNC, target, id, permissions), timeout);
+            } catch (AlreadyExistsException | SagaIOException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -532,10 +530,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.permissionsAllow(TaskMode.ASYNC, target, id, permissions, flags), timeout);
+            } catch (AlreadyExistsException | SagaIOException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -546,10 +543,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.permissionsAllow(TaskMode.ASYNC, target, id, permissions), timeout);
+            } catch (AlreadyExistsException | SagaIOException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -560,11 +556,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.permissionsDeny(TaskMode.ASYNC, target, id, permissions, flags), timeout);
+            } catch (IncorrectStateException | SagaIOException | DoesNotExistException | AlreadyExistsException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -575,11 +569,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.permissionsDeny(TaskMode.ASYNC, target, id, permissions), timeout);
+            } catch (IncorrectStateException | SagaIOException | DoesNotExistException | AlreadyExistsException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -590,11 +582,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.permissionsDeny(TaskMode.ASYNC, target, id, permissions, flags), timeout);
+            } catch (IncorrectStateException | SagaIOException | DoesNotExistException | AlreadyExistsException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -605,11 +595,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.permissionsDeny(TaskMode.ASYNC, target, id, permissions), timeout);
+            } catch (IncorrectStateException | SagaIOException | DoesNotExistException | AlreadyExistsException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -623,15 +611,11 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 return (URL) getResult(super.getCWD(TaskMode.ASYNC), timeout);
+            } catch (IncorrectURLException | SagaIOException | DoesNotExistException
+                    | AlreadyExistsException | BadParameterException | PermissionDeniedException
+                    | AuthorizationFailedException | AuthenticationFailedException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
-            catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -643,8 +627,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.copy(TaskMode.ASYNC, target, flags), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
     public void copy(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
@@ -654,8 +639,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.copy(TaskMode.ASYNC, target), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -667,8 +653,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.copyFrom(TaskMode.ASYNC, source, flags), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
     public void copyFrom(URL source) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
@@ -678,8 +665,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.copyFrom(TaskMode.ASYNC, source), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -691,8 +679,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.move(TaskMode.ASYNC, target, flags), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
     public void move(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
@@ -702,8 +691,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.move(TaskMode.ASYNC, target), timeout);
+            } catch (SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -715,11 +705,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.remove(TaskMode.ASYNC, flags), timeout);
+            } catch (IncorrectURLException | SagaIOException | DoesNotExistException | AlreadyExistsException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
     public void remove() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
@@ -729,11 +717,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.remove(TaskMode.ASYNC), timeout);
+            } catch (IncorrectURLException | SagaIOException | DoesNotExistException | AlreadyExistsException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
