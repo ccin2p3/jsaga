@@ -97,9 +97,7 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
             Job job = this.createJobSync(desc);
             job.run();
             return job;
-        } catch (IncorrectStateException e) {
-            throw new NoSuccessException(e);
-        } catch (DoesNotExistException e) {
+        } catch (IncorrectStateException | DoesNotExistException e) {
             throw new NoSuccessException(e);
         }
     }

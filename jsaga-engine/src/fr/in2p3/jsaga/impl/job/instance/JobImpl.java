@@ -48,15 +48,11 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
         } else {
             try {
                 getResult(super.run(TaskMode.ASYNC), timeout);
+            } catch (IncorrectURLException | AuthenticationFailedException | AuthorizationFailedException
+                    | PermissionDeniedException | BadParameterException | AlreadyExistsException
+                    | DoesNotExistException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
-            catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -67,15 +63,11 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
         } else {
             try {
                 getResult(super.cancel(TaskMode.ASYNC), timeout);
+            } catch (IncorrectURLException | AuthenticationFailedException | AuthorizationFailedException
+                    | BadParameterException | DoesNotExistException | AlreadyExistsException
+                    | SagaIOException | PermissionDeniedException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
-            catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -86,16 +78,11 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
         } else {
             try {
                 return (State) getResult(super.getState(TaskMode.ASYNC), timeout);
+            } catch (IncorrectURLException | AuthenticationFailedException | PermissionDeniedException
+                    | AuthorizationFailedException | AlreadyExistsException | DoesNotExistException
+                    | SagaIOException | BadParameterException | IncorrectStateException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
-            catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
-            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -108,12 +95,10 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
         } else {
             try {
                 return (JobDescription) getResult(super.getJobDescription(TaskMode.ASYNC), timeout);
+            } catch (IncorrectURLException | BadParameterException | AlreadyExistsException
+                    | IncorrectStateException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -139,12 +124,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
         } else {
             try {
                 getResult(super.suspend(TaskMode.ASYNC), timeout);
+            } catch (IncorrectURLException | BadParameterException | DoesNotExistException | SagaIOException | AlreadyExistsException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -155,12 +137,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
         } else {
             try {
                 getResult(super.resume(TaskMode.ASYNC), timeout);
+            } catch (IncorrectURLException | BadParameterException | DoesNotExistException | AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -171,12 +150,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
         } else {
             try {
                 getResult(super.checkpoint(TaskMode.ASYNC), timeout);
+            } catch (IncorrectURLException | BadParameterException | DoesNotExistException | AlreadyExistsException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (BadParameterException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -187,11 +163,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
         } else {
             try {
                 getResult(super.migrate(TaskMode.ASYNC, jd), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | SagaIOException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -202,11 +176,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
         } else {
             try {
                 getResult(super.signal(TaskMode.ASYNC, signum), timeout);
+            } catch (IncorrectURLException | AlreadyExistsException | SagaIOException | DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 

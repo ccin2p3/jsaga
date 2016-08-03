@@ -46,11 +46,7 @@ public class OutputDataStagingFromWorker extends AbstractDataStagingWorker {
             org.ogf.saga.file.File localFile = FileFactory.createFile(JSAGA_FACTORY, session, m_localURL, Flags.CREATE.or(append));
             localFile.write(buffer);
             localFile.close();
-        } catch (SagaIOException e) {
-            throw new NoSuccessException(e);
-        } catch (IncorrectURLException e) {
-            throw new NoSuccessException(e);
-        } catch (AlreadyExistsException e) {
+        } catch (SagaIOException | IncorrectURLException | AlreadyExistsException e) {
             throw new NoSuccessException(e);
         }
     }

@@ -266,15 +266,8 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             if (m_controlAdaptor instanceof StagingJobAdaptorTwoPhase) {
                 ((StagingJobAdaptorTwoPhase) m_controlAdaptor).start(m_nativeJobId);
             }
-        } catch (AuthorizationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (AuthenticationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (PermissionDeniedException e) {
-            throw new NoSuccessException(e);
-        } catch (DoesNotExistException e) {
-            throw new NoSuccessException(e);
-        } catch (BadParameterException e) {
+        } catch (AuthorizationFailedException | AuthenticationFailedException | PermissionDeniedException
+                | DoesNotExistException | BadParameterException e) {
             throw new NoSuccessException(e);
         }
     }
@@ -340,9 +333,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
                     // close job output and error streams after data staging
                     this.closeStreamsIfDoneAndInteractive();
                 }
-            } catch (PermissionDeniedException e) {
-                throw new NoSuccessException(e);
-            } catch (IncorrectStateException e) {
+            } catch (PermissionDeniedException | IncorrectStateException e) {
                 throw new NoSuccessException(e);
             }
             // cleanup
@@ -395,13 +386,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             // post-staging
             try {
                 m_stagingMgr.postStaging(this, m_nativeJobId);
-            } catch (AuthenticationFailedException e) {
-                throw new NoSuccessException(e);
-            } catch (AuthorizationFailedException e) {
-                throw new NoSuccessException(e);
-            } catch (BadParameterException e) {
-                throw new NoSuccessException(e);
-            } catch (DoesNotExistException e) {
+            } catch (AuthenticationFailedException | AuthorizationFailedException | BadParameterException | DoesNotExistException e) {
                 throw new NoSuccessException(e);
             }
         }
@@ -414,13 +399,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         // remove staging files
         try {
             dir = m_stagingMgr.cleanup(this, m_nativeJobId);
-        } catch (AuthenticationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (AuthorizationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (BadParameterException e) {
-            throw new NoSuccessException(e);
-        } catch (DoesNotExistException e) {
+        } catch (AuthenticationFailedException | AuthorizationFailedException | BadParameterException | DoesNotExistException e) {
             throw new NoSuccessException(e);
         } catch (NotImplementedException e){
         	// In case of read-only data adaptor for example.
@@ -468,11 +447,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             if (dir != null) {
                 try {
                     dir.remove();
-                } catch (AuthenticationFailedException e) {
-                    throw new NoSuccessException(e);
-                } catch (AuthorizationFailedException e) {
-                    throw new NoSuccessException(e);
-                } catch (BadParameterException e) {
+                } catch (AuthenticationFailedException | AuthorizationFailedException | BadParameterException e) {
                     throw new NoSuccessException(e);
                 }
             }

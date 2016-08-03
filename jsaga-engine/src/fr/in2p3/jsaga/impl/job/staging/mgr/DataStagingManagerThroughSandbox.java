@@ -60,9 +60,7 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
             try {
                 dir = FileFactory.createDirectory(JSAGA_FACTORY, job.getSession(), url);
                 return dir;
-            } catch (IncorrectURLException e) {
-                throw new NoSuccessException(e);
-            } catch (AlreadyExistsException e) {
+            } catch (IncorrectURLException | AlreadyExistsException e) {
                 throw new NoSuccessException(e);
             }
         }
@@ -81,11 +79,9 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
             URL to = URLFactory.createURL(JSAGA_FACTORY, pathToURL(transfer.getTo()));
             file = FileFactory.createFile(JSAGA_FACTORY, session, from, Flags.NONE.getValue());
             file.copy(to, append);
-        } catch (AlreadyExistsException e) {
+        } catch (AlreadyExistsException | IncorrectURLException e) {
             throw new NoSuccessException(e);
-        } catch (IncorrectURLException e) {
-            throw new NoSuccessException(e);
-        }finally{
+        } finally{
         	if(file != null){
 	        	try{
 	        		file.close();
@@ -116,11 +112,9 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
             URL urlToRemove = URLFactory.createURL(JSAGA_FACTORY, url);
             file = FileFactory.createFile(JSAGA_FACTORY, session, urlToRemove, Flags.NONE.getValue());
             file.remove();
-        } catch (AlreadyExistsException e) {
+        } catch (AlreadyExistsException | IncorrectURLException e) {
             throw new NoSuccessException(e);
-        } catch (IncorrectURLException e) {
-            throw new NoSuccessException(e);
-        }finally{
+        } finally{
         	if(file != null){
 	        	try{
 	        		file.close();

@@ -48,8 +48,7 @@ public class DataStagingManagerFactory {
 						return new StreamingManagerThroughSandboxOnePhase((StagingJobAdaptorOnePhase) adaptor, uniqId);
 					}
 				}
-			} catch (IncorrectStateException e1) {
-			} catch (DoesNotExistException e1) {
+			} catch (IncorrectStateException | DoesNotExistException e1) {
 			}
             // create data staging manager
             return new DataStagingManagerDummy();

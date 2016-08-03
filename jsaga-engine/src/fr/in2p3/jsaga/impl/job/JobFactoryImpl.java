@@ -36,11 +36,9 @@ public class JobFactoryImpl extends AbstractAsyncJobFactoryImpl {
         } else {
             try {
                 return (JobService) this.getResult(super.doCreateJobService(TaskMode.ASYNC, session, rm), timeout);
+            } catch (IncorrectStateException | AlreadyExistsException | DoesNotExistException | SagaIOException e) {
+                throw new NoSuccessException(e);
             }
-            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
