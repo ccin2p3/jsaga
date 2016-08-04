@@ -29,7 +29,7 @@ public abstract class AbstractResourceTaskImpl<R extends Resource,RD extends Res
     private long m_stateLastUpdate = 0;
 
     // TODO: make this a parameter
-    private long m_stateLifetimeMillis = 30000;
+    private long m_stateLifetimeMillis = 5000;
     
     /** common to all constructors */
     public AbstractResourceTaskImpl(Session session, StateListener listener, ResourceAdaptor adaptor) {
@@ -47,9 +47,7 @@ public abstract class AbstractResourceTaskImpl<R extends Resource,RD extends Res
         } else {
             try {
                 return m_adaptor.getResourceStatus(SAGAId.idFromSagaId(getResourceId())).getSagaState();
-            } catch (DoesNotExistException e) {
-                throw new NoSuccessException(e);
-            } catch (BadParameterException e) {
+            } catch (DoesNotExistException | BadParameterException e) {
                 throw new NoSuccessException(e);
             }
         }
@@ -74,10 +72,11 @@ public abstract class AbstractResourceTaskImpl<R extends Resource,RD extends Res
                         String value = metric.getAttribute(Metric.VALUE);
                         State current = State.valueOf(value);
                         resource.setState(current, null);
+                    } catch (NotImplementedException | AuthorizationFailedException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    catch (NotImplementedException e) {throw e;}
-                    catch (AuthorizationFailedException e) {throw e;}
-                    catch (Exception e) {e.printStackTrace();}
                     // callback must stay registered
                     return true;
                 }
@@ -106,13 +105,7 @@ public abstract class AbstractResourceTaskImpl<R extends Resource,RD extends Res
 
             // stop listening
             m_metrics.m_State.removeCallback(cookie);
-        } catch (AuthenticationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (AuthorizationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (PermissionDeniedException e) {
-            throw new NoSuccessException(e);
-        } catch (BadParameterException e) {
+        } catch (AuthenticationFailedException | AuthorizationFailedException | PermissionDeniedException | BadParameterException e) {
             throw new NoSuccessException(e);
         }
     }
