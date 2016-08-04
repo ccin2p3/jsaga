@@ -44,6 +44,7 @@
         <module>saga-api-test</module>
         <module>jsaga-adaptoritf</module>
         <module>jsaga-engine</module>
+        <module>jsaga-engine-it</module>
         <module>adaptors</module>
         <module>jsaga-adaptors</module>
         <module>jsaga-installer</module>
