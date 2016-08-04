@@ -1,15 +1,13 @@
-package fr.in2p3.jsaga.impl.logicalfile;
+package org.ogf.saga.file;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
-import org.apache.log4j.Logger;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ogf.saga.JSAGABaseTest;
-import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.TimeoutException;
-import org.ogf.saga.logicalfile.LogicalDirectory;
-import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -20,7 +18,7 @@ import org.ogf.saga.url.URLFactory;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   TimeoutableLogicalDirectoryImplTest
+ * File:   TimeoutableFileTest
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
  * Date:   28 mai 2009
  * ***************************************************
@@ -28,12 +26,11 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableLogicalDirectoryImplTest extends JSAGABaseTest {
-    private static final String m_url = "waitforever-logical://host/directory/";
-    private static Logger s_logger = Logger.getLogger(TimeoutableLogicalDirectoryImplTest.class);
-    private LogicalDirectory m_directory;
+public class TimeoutableFileTest extends JSAGABaseTest {
+    private static final String m_url = "waitforever://host/directory/file";
+    private File m_readfile, m_writefile;
 
-    public TimeoutableLogicalDirectoryImplTest() throws Exception {
+    public TimeoutableFileTest() throws Exception {
         super();
     }
 
@@ -41,33 +38,42 @@ public class TimeoutableLogicalDirectoryImplTest extends JSAGABaseTest {
     public void setUp() throws Exception {
         Session emptySession = SessionFactory.createSession(false);
         URL url = URLFactory.createURL(m_url);
-        m_directory = LogicalFileFactory.createLogicalDirectory(emptySession, url, Flags.NONE.getValue());
+        m_readfile = FileFactory.createFile(emptySession, url, Flags.READ.getValue());
+        m_writefile = FileFactory.createFile(emptySession, url, Flags.WRITE.getValue());
     }
 
     @After
     public void tearDown() throws Exception {
-        m_directory.close();
+        m_readfile.close();
     }
 
     @Test
-    public void test_find() throws Exception {
+    public void test_getSize() throws Exception {
         try {
-            m_directory.find("mymetadata", new String[0]);
+            m_readfile.getSize();
             fail("Expected exception: "+ TimeoutException.class);
         } catch (TimeoutException e) {
             assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
         }
     }
 
-    /** timeout not supported */
-    @Test(expected=NotImplementedException.class)
-    public void test_openLogicalDir() throws Exception {
-            m_directory.openLogicalDir(URLFactory.createURL(m_url));
+    @Test
+    public void test_read() throws Exception {
+        try {
+            m_readfile.read(BufferFactory.createBuffer(1024));
+            fail("Expected exception: "+ TimeoutException.class);
+        } catch (TimeoutException e) {
+            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
+        }
     }
 
-    /** timeout not supported */
-    @Test(expected=NotImplementedException.class)
-    public void test_openLogicalFile() throws Exception {
-            m_directory.openLogicalFile(URLFactory.createURL(m_url+"file"));
+    @Test
+    public void test_write() throws Exception {
+        try {
+            m_writefile.write(BufferFactory.createBuffer(1024));
+            fail("Expected exception: "+ TimeoutException.class);
+        } catch (TimeoutException e) {
+            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
+        }
     }
 }

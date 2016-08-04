@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.impl.namespace;
+package org.ogf.saga.namespace;
 
 import org.junit.After;
 import org.junit.Before;
@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
-import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
@@ -16,7 +15,7 @@ import org.ogf.saga.url.URLFactory;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   TimeoutableAbstractNSDirectoryImplTest
+ * File:   TimeoutableNSDirectoryTest
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
  * Date:   28 mai 2009
  * ***************************************************
@@ -24,11 +23,11 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableAbstractNSDirectoryImplTest extends JSAGABaseTest {
+public class TimeoutableNSDirectoryTest extends JSAGABaseTest {
     private static final String m_url = "waitforever://host/directory/";
     private NSDirectory m_directory;
 
-    public TimeoutableAbstractNSDirectoryImplTest() throws Exception {
+    public TimeoutableNSDirectoryTest() throws Exception {
         super();
     }
 

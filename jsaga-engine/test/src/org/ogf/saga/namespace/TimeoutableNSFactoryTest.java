@@ -1,10 +1,8 @@
-package fr.in2p3.jsaga.impl.namespace;
+package org.ogf.saga.namespace;
 
 import org.junit.Test;
 import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.TimeoutException;
-import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
@@ -14,7 +12,7 @@ import org.ogf.saga.url.URLFactory;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   TimeoutableNSFactoryImplTest
+ * File:   TimeoutableNSFactoryTest
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
  * Date:   28 mai 2009
  * ***************************************************
@@ -22,11 +20,11 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableNSFactoryImplTest extends JSAGABaseTest {
+public class TimeoutableNSFactoryTest extends JSAGABaseTest {
     private static final String m_urlDir = "waitforever://host/directory/?hangatconnect";
     private static final String m_urlFile = "waitforever://host/directory/file?hangatconnect";
 
-    public TimeoutableNSFactoryImplTest() throws Exception {
+    public TimeoutableNSFactoryTest() throws Exception {
         super();
     }
 

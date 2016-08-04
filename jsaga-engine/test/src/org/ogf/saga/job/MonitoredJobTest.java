@@ -1,13 +1,9 @@
-package fr.in2p3.jsaga.impl.job;
+package org.ogf.saga.job;
 
 import org.junit.Test;
 import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.SagaException;
-import org.ogf.saga.job.Job;
-import org.ogf.saga.job.JobDescription;
-import org.ogf.saga.job.JobFactory;
-import org.ogf.saga.job.JobService;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.State;
@@ -17,11 +13,11 @@ import org.ogf.saga.url.URLFactory;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   JobImplTest
+ * File:   MonitoredJobTest
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
  * ***************************************************/
-public class JobImplTest extends JSAGABaseTest {
-    public JobImplTest() throws Exception {
+public class MonitoredJobTest extends JSAGABaseTest {
+    public MonitoredJobTest() throws Exception {
         super();
     }
 

@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.impl.job;
+package org.ogf.saga.job;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
 
@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.TimeoutException;
-import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
@@ -17,7 +16,7 @@ import org.ogf.saga.url.URLFactory;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   TimeoutableJobImplTest
+ * File:   TimeoutableJobTest
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
  * Date:   28 mai 2009
  * ***************************************************
@@ -25,11 +24,11 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableJobImplTest extends JSAGABaseTest {
+public class TimeoutableJobTest extends JSAGABaseTest {
     private static final String m_url = "waitforever://host";
     private Job m_job;
 
-    public TimeoutableJobImplTest() throws Exception {
+    public TimeoutableJobTest() throws Exception {
         super();
     }
 

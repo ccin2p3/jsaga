@@ -1,5 +1,6 @@
-package fr.in2p3.jsaga.impl.task;
+package org.ogf.saga.task.impl;
 
+import fr.in2p3.jsaga.impl.task.AbstractTaskImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.task.State;
 

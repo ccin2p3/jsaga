@@ -1,18 +1,18 @@
-package fr.in2p3.jsaga.impl.task;
+package org.ogf.saga.task;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.ogf.saga.monitoring.*;
-import org.ogf.saga.task.Task;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.task.impl.TaskForTesting;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   AbstractTaskImplTest
+* File:   TaskTest
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
 * Date:   28 mars 2008
 * ***************************************************
@@ -20,7 +20,7 @@ import org.ogf.saga.error.AuthorizationFailedException;
 /**
  *
  */
-public class AbstractTaskImplTest extends Assert implements Callback {
+public class TaskTest extends Assert implements Callback {
 
     @Test
     public void test_notified_task() throws Exception {

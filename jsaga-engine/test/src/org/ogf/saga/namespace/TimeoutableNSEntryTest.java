@@ -1,11 +1,10 @@
-package fr.in2p3.jsaga.impl.namespace;
+package org.ogf.saga.namespace;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.TimeoutException;
-import org.ogf.saga.namespace.*;
 import org.ogf.saga.permissions.Permission;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -16,7 +15,7 @@ import org.ogf.saga.url.URLFactory;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   TimeoutableAbstractNSEntryImplTest
+ * File:   TimeoutableNSEntryTest
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
  * Date:   28 mai 2009
  * ***************************************************
@@ -24,11 +23,11 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableAbstractNSEntryImplTest extends JSAGABaseTest {
+public class TimeoutableNSEntryTest extends JSAGABaseTest {
     private static final String m_url = "waitforever://host/directory/file";
     private NSEntry m_entry;
 
-    public TimeoutableAbstractNSEntryImplTest() throws Exception {
+    public TimeoutableNSEntryTest() throws Exception {
         super();
     }
 
