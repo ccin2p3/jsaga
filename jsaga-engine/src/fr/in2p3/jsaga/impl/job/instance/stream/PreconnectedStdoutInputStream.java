@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.job.instance.stream;
 
-import fr.in2p3.jsaga.impl.job.instance.AbstractSyncJobImpl;
 import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.task.Task;
 
 import java.io.*;
 
@@ -22,7 +22,7 @@ public class PreconnectedStdoutInputStream extends JobStdoutInputStream {
     private OutputStreamContainer m_out;
 
     /** constructor for StreamableJobInteractiveSet */
-    public PreconnectedStdoutInputStream(AbstractSyncJobImpl job) {
+    public PreconnectedStdoutInputStream(Task job) {
         super(job);
         m_out = new OutputStreamContainer();
     }
@@ -32,7 +32,8 @@ public class PreconnectedStdoutInputStream extends JobStdoutInputStream {
     }
 
     /////////////////////////////////// interface InputStream ///////////////////////////////////
-
+    // TODO: InputStream methods are not used. Only getOutputStreamContainer is used.
+    // see AbstractSyncJobImpl
     public int read() throws IOException {return this.stream().read();}
     public int read(byte[] b) throws IOException {return this.stream().read(b);}
     public int read(byte[] b, int off, int len) throws IOException {return this.stream().read(b, off, len);}

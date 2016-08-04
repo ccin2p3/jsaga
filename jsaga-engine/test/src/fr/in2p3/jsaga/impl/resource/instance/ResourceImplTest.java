@@ -128,8 +128,8 @@ public class ResourceImplTest {
         assertSame(State.ACTIVE, m_server.getState());
         // after delay, the adaptor should be requested getResourceStatus()
         // see DummyResourceStatus which returns State.FINAL
-//        Thread.sleep(7000);
-//        assertSame(State.FINAL, c.getState());
+        Thread.sleep(7000);
+        assertSame(State.FINAL, m_server.getState());
         // waitfor
         m_server.setState(State.ACTIVE, "RUNNING");
         m_server.waitFor(2, State.FINAL);

@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.job.instance.stream;
 
 import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
-import fr.in2p3.jsaga.impl.job.instance.AbstractSyncJobImpl;
 import org.ogf.saga.error.*;
+import org.ogf.saga.task.Task;
 
 import java.io.*;
 
@@ -19,10 +19,10 @@ import java.io.*;
  *
  */
 public class JobStdinOutputStream extends Stdin {
-    protected AbstractSyncJobImpl m_job;
+    protected Task m_job;
     private JobIOGetterInteractive m_ioHandler;
 
-    public JobStdinOutputStream(AbstractSyncJobImpl job) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public JobStdinOutputStream(Task job) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
         m_job = job;
         switch(m_job.getState()) {
             case NEW:
@@ -83,6 +83,8 @@ public class JobStdinOutputStream extends Stdin {
                     return m_buffer;
                 case RUNNING:
                     if (m_stream == null) {
+                        // FIXME: m_ioHandler may be NULL is openJobIOHandler was not called before
+                        // TODO: remove this test because m_ioHandler is always a JobIOGetterInteractive
                         if (m_ioHandler instanceof JobIOGetterInteractive) {
                             m_stream = ((JobIOGetterInteractive)m_ioHandler).getStdin();
                         } else if (m_ioHandler instanceof JobIOGetter || m_ioHandler instanceof JobIOSetter) {
