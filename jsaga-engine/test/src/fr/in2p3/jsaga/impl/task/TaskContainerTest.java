@@ -1,9 +1,10 @@
-package org.ogf.saga.task;
+package fr.in2p3.jsaga.impl.task;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.ogf.saga.task.impl.AsyncTest;
-import org.ogf.saga.task.impl.TaskForTesting;
+import org.ogf.saga.task.*;
+import fr.in2p3.jsaga.impl.task.impl.AsyncTest;
+import fr.in2p3.jsaga.impl.task.impl.TaskForTesting;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

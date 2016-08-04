@@ -1,4 +1,4 @@
-package org.ogf.saga.task.impl;
+package fr.in2p3.jsaga.impl.task.impl;
 
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 
