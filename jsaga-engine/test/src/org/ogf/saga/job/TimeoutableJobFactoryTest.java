@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.impl.job;
+package org.ogf.saga.job;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
 
@@ -8,7 +8,6 @@ import org.junit.rules.ExpectedException;
 import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.TimeoutException;
-import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
@@ -18,7 +17,7 @@ import org.ogf.saga.url.URLFactory;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   TimeoutableJobFactoryImplTest
+ * File:   TimeoutableJobFactoryTest
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
  * Date:   5 juin 2009
  * ***************************************************
@@ -26,10 +25,10 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableJobFactoryImplTest extends JSAGABaseTest {
+public class TimeoutableJobFactoryTest extends JSAGABaseTest {
     private static final String m_url = "waitforever://host";
 
-    public TimeoutableJobFactoryImplTest() throws Exception {
+    public TimeoutableJobFactoryTest() throws Exception {
         super();
     }
 
@@ -41,7 +40,7 @@ public class TimeoutableJobFactoryImplTest extends JSAGABaseTest {
         Session emptySession = SessionFactory.createSession(false);
         URL url = URLFactory.createURL(m_url+"?hangatconnect");
         try {
-            JobFactoryImpl.createJobService(emptySession, url);
+            JobFactory.createJobService(emptySession, url);
             fail("Expected exception: "+ TimeoutException.class);
         } catch (TimeoutException e) {
             assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
@@ -54,7 +53,7 @@ public class TimeoutableJobFactoryImplTest extends JSAGABaseTest {
         URL url = URLFactory.createURL(m_url+"?invalid");
         thrown.expect(BadParameterException.class);
         thrown.expectMessage("Invalid");
-        JobFactoryImpl.createJobService(emptySession, url);
+        JobFactory.createJobService(emptySession, url);
     }
 
     @Test

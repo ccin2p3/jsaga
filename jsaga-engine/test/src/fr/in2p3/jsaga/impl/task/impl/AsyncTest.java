@@ -1,11 +1,13 @@
-package fr.in2p3.jsaga.impl.task;
+package fr.in2p3.jsaga.impl.task.impl;
 
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 
-import org.junit.Test;
+import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
-import org.ogf.saga.task.*;
+import org.ogf.saga.task.Async;
+import org.ogf.saga.task.Task;
+import org.ogf.saga.task.TaskMode;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

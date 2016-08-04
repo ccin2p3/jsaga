@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.impl.file;
+package org.ogf.saga.file;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
 import org.apache.log4j.Logger;
@@ -8,8 +8,6 @@ import org.junit.Test;
 import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
-import org.ogf.saga.file.Directory;
-import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -20,7 +18,7 @@ import org.ogf.saga.url.URLFactory;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   TimeoutableDirectoryImplTest
+ * File:   TimeoutableDirectoryTest
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
  * Date:   28 mai 2009
  * ***************************************************
@@ -28,14 +26,14 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableDirectoryImplTest extends JSAGABaseTest {
+public class TimeoutableDirectoryTest extends JSAGABaseTest {
     private static final String m_urlRoot = "waitforever://host/directory/";
     private static final String m_urlDir = m_urlRoot+"?hangatconnect";
     private static final String m_urlFile = m_urlRoot+"file?hangatconnect";
-    private static Logger s_logger = Logger.getLogger(TimeoutableDirectoryImplTest.class);
+    private static Logger s_logger = Logger.getLogger(TimeoutableDirectoryTest.class);
     private Directory m_directory;
 
-    public TimeoutableDirectoryImplTest() throws Exception {
+    public TimeoutableDirectoryTest() throws Exception {
         super();
     }
 

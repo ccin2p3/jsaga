@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.impl.logicalfile;
+package org.ogf.saga.logicalfile;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
 
@@ -7,8 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.TimeoutException;
-import org.ogf.saga.logicalfile.LogicalFile;
-import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -19,7 +17,7 @@ import org.ogf.saga.url.URLFactory;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   TimeoutableLogicalFileImplTest
+ * File:   TimeoutableLogicalFileTest
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
  * Date:   28 mai 2009
  * ***************************************************
@@ -27,11 +25,11 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableLogicalFileImplTest extends JSAGABaseTest {
+public class TimeoutableLogicalFileTest extends JSAGABaseTest {
     private static final String m_url = "waitforever-logical://host/directory/file";
     private LogicalFile m_file;
 
-    public TimeoutableLogicalFileImplTest() throws Exception {
+    public TimeoutableLogicalFileTest() throws Exception {
         super();
     }
 

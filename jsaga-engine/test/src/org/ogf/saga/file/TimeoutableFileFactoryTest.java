@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.impl.file;
+package org.ogf.saga.file;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
 import org.junit.Rule;
@@ -7,7 +7,6 @@ import org.junit.rules.ExpectedException;
 import org.ogf.saga.JSAGABaseTest;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.TimeoutException;
-import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -18,7 +17,7 @@ import org.ogf.saga.url.URLFactory;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   TimeoutableFileFactoryImplTest
+ * File:   TimeoutableFileFactoryTest
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
  * Date:   28 mai 2009
  * ***************************************************
@@ -26,11 +25,11 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class TimeoutableFileFactoryImplTest extends JSAGABaseTest {
+public class TimeoutableFileFactoryTest extends JSAGABaseTest {
     private static final String m_urlDir = "waitforever://host/directory/?hangatconnect";
     private static final String m_urlFile = "waitforever://host/directory/file?hangatconnect";
 
-    public TimeoutableFileFactoryImplTest() throws Exception {
+    public TimeoutableFileFactoryTest() throws Exception {
         super();
     }
 

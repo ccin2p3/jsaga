@@ -8,6 +8,7 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.monitoring.*;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
+import fr.in2p3.jsaga.impl.task.impl.AsyncTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
