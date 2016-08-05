@@ -26,23 +26,23 @@ public abstract class WaitForEverDataAdaptorAbstract extends WaitForEverAdaptorA
         return true;
     }
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        WaitForEverAdaptorAbstract.hang();
+        hang();
         return new WaitForEverFileAttributes();
     }
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        WaitForEverAdaptorAbstract.hang();
+        hang();
         return new FileAttributes[0];
     }
 
     ////////////////////////////////////// interface DataWriterAdaptor //////////////////////////////////////
 
     public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
-        WaitForEverAdaptorAbstract.hang();
+        hang();
     }
     public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        WaitForEverAdaptorAbstract.hang();
+        hang();
     }
     public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        WaitForEverAdaptorAbstract.hang();
+        hang();
     }
 }

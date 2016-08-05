@@ -1,5 +1,6 @@
-package fr.in2p3.jsaga.adaptor.data.impl;
+package org.ogf.saga;
 
+import fr.in2p3.jsaga.adaptor.data.impl.DataEmulatorConnection;
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.DirectoryType;
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.File;
 
