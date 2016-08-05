@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.adaptor.job;
 
+import fr.in2p3.jsaga.adaptor.job.impl.JobAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.job.impl.StatusTimerTask;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatusNotifier;
 import fr.in2p3.jsaga.adaptor.job.monitor.ListenIndividualJob;
 import org.ogf.saga.error.NoSuccessException;

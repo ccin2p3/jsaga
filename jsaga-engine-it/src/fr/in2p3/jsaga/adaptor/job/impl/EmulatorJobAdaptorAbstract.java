@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.job;
+package fr.in2p3.jsaga.adaptor.job.impl;
 
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;

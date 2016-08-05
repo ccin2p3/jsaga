@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.adaptor.job;
 
+import fr.in2p3.jsaga.adaptor.job.impl.EmulatorJobAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.job.impl.EmulatorJobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 import org.ogf.saga.error.NoSuccessException;

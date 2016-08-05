@@ -1,5 +1,6 @@
-package fr.in2p3.jsaga.adaptor.job;
+package fr.in2p3.jsaga.adaptor.job.impl;
 
+import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatusNotifier;
 

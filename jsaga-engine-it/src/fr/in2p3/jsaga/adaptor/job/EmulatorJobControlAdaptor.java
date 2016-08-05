@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXS
 import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
+import fr.in2p3.jsaga.adaptor.job.impl.EmulatorJobAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.JobDescription;
