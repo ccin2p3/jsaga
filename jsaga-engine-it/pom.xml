@@ -9,6 +9,18 @@
     <name>Integration tests for JSAGA engine</name>
     <build>
         <plugins>
+            <plugin>
+                <!-- used by "mvn cobertura:cobertura" -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <formats>
+                        <format>xml</format>
+                    </formats>
+                </configuration>
+            </plugin>
+
             <!-- todo: remove this (castor) -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
