@@ -1,5 +1,5 @@
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session"
-               extends="../test/resources/etc/jsaga-default-contexts.xml">
+               extends="../test/resources/home/jsaga-default-contexts.xml">
     <contexts>
         <context type="VOMS">
             <attribute name="UserVO" value="${VO}"/>
