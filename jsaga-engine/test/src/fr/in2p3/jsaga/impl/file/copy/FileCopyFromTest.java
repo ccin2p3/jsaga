@@ -32,7 +32,7 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
 import fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl;
 
-public class FileCopyTest {
+public class FileCopyFromTest {
     private static Mockery m_mockery;
     private static Session m_session;
     
@@ -46,7 +46,7 @@ public class FileCopyTest {
     }
     
     @Test
-    public void dataCopyDelegated() throws Exception {
+    public void dataCopyFromDelegated() throws Exception {
         final DataCopyDelegated adaptor = m_mockery.mock(DataCopyDelegated.class, "adaptor-delegated");
         final URL sourceOk = URLFactory.createURL("adaptor://host/path/to/exists");
         final URL sourceNotExist = URLFactory.createURL("adaptor://host/path/to/NOTexists");
@@ -61,30 +61,30 @@ public class FileCopyTest {
             allowing(adaptor).requestTransfer(sourceOk, destAlreadyExist, false, null); 
                 will(throwException(new AlreadyExistsException()));
         }});
-        AbstractSyncFileImpl m_source;
-        m_source = new DummyFile(m_session, sourceOk, adaptor, 0);
-        new FileCopy(m_session, m_source, adaptor).copy(destOk, 0, null);
+        AbstractSyncFileImpl m_dest;
+        m_dest = new DummyFile(m_session, destOk, adaptor, 0);
+        new FileCopyFrom(m_session, m_dest, adaptor).copyFrom(sourceOk, 0, null);
  
-        // target already exists
-        try {
-            new FileCopy(m_session, m_source, adaptor).copy(destAlreadyExist, 0, null);
-            fail("Expected AlreadyExistsException");
-        } catch (AlreadyExistsException aee) {
-            // OK
-        }
-        
         // source does not exist
-        m_source = new DummyFile(m_session, sourceNotExist, adaptor, 0);
         try {
-            new FileCopy(m_session,m_source, adaptor).copy(destOk, 0, null);
-            fail("Expected IncorrectStateException");
-        } catch (IncorrectStateException ise) {
+            new FileCopyFrom(m_session,m_dest, adaptor).copyFrom(sourceNotExist, 0, null);
+            fail("Expected DoesNotExistException");
+        } catch (DoesNotExistException e) {
             // OK
         }
 
+        // target already exists
+        m_dest = new DummyFile(m_session, destAlreadyExist, adaptor, 0);
+        try {
+            new FileCopyFrom(m_session, m_dest, adaptor).copyFrom(sourceOk, 0, null);
+            fail("Expected AlreadyExistsException");
+        } catch (IncorrectStateException e) {
+            // OK
+        }
+        
         // different scheme => NotImplementedException
         try {
-            new FileCopy(m_session, m_source, adaptor).copy(URLFactory.createURL("another://host/path/to/newentry"), 0, null);
+            new FileCopyFrom(m_session, m_dest, adaptor).copyFrom(URLFactory.createURL("another://host/path/to/newentry"), 0, null);
             fail("Expected NotImplementedException");
         } catch (NotImplementedException nie) {
             // OK
@@ -103,49 +103,37 @@ public class FileCopyTest {
         m_mockery.checking(new Expectations() {{
             allowing(adaptor).getType(); will(returnValue("adaptor"));
             allowing(adaptor).getDefaultPort(); will(returnValue(0));
-            allowing(adaptor).copy(sourceOk.getPath(), sourceOk.getHost(), 0, destOk.getPath(), false, null, null); 
+            allowing(adaptor).copyFrom(sourceOk.getHost(), 0, sourceOk.getPath(), destOk.getPath(), false, null); 
                 will(returnValue(null));
-            allowing(adaptor).copy(sourceNotExist.getPath(), sourceNotExist.getHost(), 0, destOk.getPath(), false, null, null); 
+            allowing(adaptor).copyFrom(sourceNotExist.getHost(), 0, sourceNotExist.getPath(), destOk.getPath(), false, null); 
                 will(throwException(new DoesNotExistException()));
-            allowing(adaptor).copy(sourceParentNotExist.getPath(), sourceParentNotExist.getHost(), 0, destOk.getPath(), false, null, null); 
-                will(throwException(new ParentDoesNotExist()));
-            allowing(adaptor).copy(sourceOk.getPath(), sourceOk.getHost(), 0, destAlreadyExist.getPath(), false, null, null); 
+            allowing(adaptor).copyFrom(sourceOk.getHost(), 0, sourceOk.getPath(), destAlreadyExist.getPath(), false, null); 
                 will(throwException(new AlreadyExistsException()));
         }});
-        AbstractSyncFileImpl m_source;
-        m_source = new DummyFile(m_session, sourceOk, adaptor, 0);
-        new FileCopy(m_session, m_source, adaptor).copy(destOk, 0, null);
+        AbstractSyncFileImpl m_dest;
+        m_dest = new DummyFile(m_session, destOk, adaptor, 0);
+        new FileCopyFrom(m_session, m_dest, adaptor).copyFrom(sourceOk, 0, null);
  
-        // target already exists
+        // source does not exist
         try {
-            new FileCopy(m_session, m_source, adaptor).copy(destAlreadyExist, 0, null);
-            fail("Expected AlreadyExistsException");
-        } catch (AlreadyExistsException aee) {
-            // OK
-        }
-
-      // source does not exist
-        m_source = new DummyFile(m_session, sourceNotExist, adaptor, 0);
-        try {
-            new FileCopy(m_session,m_source, adaptor).copy(destOk, 0, null);
-            fail("Expected IncorrectStateException");
-        } catch (IncorrectStateException ise) {
-            // OK
-        }
-
-        // parent source does not exist
-        m_source = new DummyFile(m_session, sourceParentNotExist, adaptor, 0);
-        try {
-            new FileCopy(m_session,m_source, adaptor).copy(destOk, 0, null);
+            new FileCopyFrom(m_session,m_dest, adaptor).copyFrom(sourceNotExist, 0, null);
             fail("Expected DoesNotExistException");
-        } catch (DoesNotExistException dnee) {
+        } catch (DoesNotExistException e) {
             // OK
         }
 
-        
+        // target already exists
+        m_dest = new DummyFile(m_session, destAlreadyExist, adaptor, 0);
+        try {
+            new FileCopyFrom(m_session, m_dest, adaptor).copyFrom(sourceOk, 0, null);
+            fail("Expected AlreadyExistsException");
+        } catch (IncorrectStateException aee) {
+            // OK
+        }
+
         // different scheme => NotImplementedException
         try {
-            new FileCopy(m_session, m_source, adaptor).copy(URLFactory.createURL("another://host/path/to/newentry"), 0, null);
+            new FileCopyFrom(m_session, m_dest, adaptor).copyFrom(URLFactory.createURL("another://host/path/to/newentry"), 0, null);
             fail("Expected NotImplementedException");
         } catch (NotImplementedException nie) {
             // OK
@@ -153,19 +141,7 @@ public class FileCopyTest {
     }
     
     @Test @Ignore("Impossible to test as destination adaptor is discovered by engine and thus cannot be mocked")
-    public void readerGetter() throws Exception {
-        final FileReaderGetter adaptor = m_mockery.mock(FileReaderGetter.class, "adaptor-readergetter");
-        final URL sourceOk = URLFactory.createURL("adaptor://host/path/to/exists");
-        final URL destOk = URLFactory.createURL("dest://host/path/to/newentry");
-
-        m_mockery.checking(new Expectations() {{
-            allowing(adaptor).getType(); will(returnValue("adaptor"));
-            allowing(adaptor).exists(sourceOk.getPath(), null); will(returnValue(true));
-        }});
-        AbstractSyncFileImpl m_source;
-        m_source = new DummyFile(m_session, sourceOk, adaptor, 0);
-        new FileCopy(m_session, m_source, adaptor).copy(destOk, 0, null);
- 
+    public void writePutter() throws Exception {
     }
     
     
