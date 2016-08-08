@@ -3,10 +3,12 @@ package fr.in2p3.jsaga.impl.namespace;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.BeforeClass;
-import org.ogf.saga.buffer.Buffer;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.SagaException;
@@ -17,7 +19,7 @@ import org.ogf.saga.url.URLFactory;
 
 import static org.junit.Assert.*;
 
-public class EntryImplTestAbstract {
+public class EntryImplTestAbstract<R extends DataReaderAdaptor, W extends DataWriterAdaptor> {
     protected static final FileAttributes DIRECTORY = new FileAttributes() {
         @Override public String getName() { return "dir"; }
         @Override public int getType() { return FileAttributes.TYPE_DIRECTORY; }
@@ -52,6 +54,9 @@ public class EntryImplTestAbstract {
         @Override public long getLastModified() { return 2000; }
     };
 
+    @Rule
+    public final TestName name = new TestName();
+
     protected static Mockery m_mockery;
     protected static Session m_session;
 
@@ -61,8 +66,8 @@ public class EntryImplTestAbstract {
         m_session = SessionFactory.createSession(false);
     }
 
-    protected static DataReaderAdaptor createAdaptor_directory() throws SagaException {
-        final DataReaderAdaptor adaptor = m_mockery.mock(DataReaderAdaptor.class, "adaptor-directory");
+    protected DataReaderAdaptor createAdaptor_directory() throws SagaException {
+        final DataReaderAdaptor adaptor = m_mockery.mock(DataReaderAdaptor.class, "adaptor-"+name.getMethodName());
         m_mockery.checking(new Expectations() {{
             allowing(adaptor).getType(); will(returnValue("adaptor"));
             allowing(adaptor).exists(with(any(String.class)), with(aNull(String.class))); will(returnValue(true));
@@ -72,19 +77,26 @@ public class EntryImplTestAbstract {
         }});
         return adaptor;
     }
-    protected static DataReaderAdaptor createAdaptor_entry(final Buffer buffer) throws SagaException {
-        final DataReaderAdaptor adaptor = m_mockery.mock(DataReaderAdaptor.class, "adaptor-file");
+    protected R createAdaptor_entry_read(Class<R> clazz) throws SagaException {
+        final R adaptor = m_mockery.mock(clazz, "adaptor-"+name.getMethodName());
         m_mockery.checking(new Expectations() {{
             allowing(adaptor).getType(); will(returnValue("adaptor"));
             allowing(adaptor).exists(with(any(String.class)), with(aNull(String.class))); will(returnValue(true));
             allowing(adaptor).getAttributes(with(any(String.class)), with(aNull(String.class))); will(returnValue(FILE));
             allowing(adaptor).disconnect(); will(returnValue(null));
-            allowing(buffer).getSize(); will(returnValue(4));
         }});
         return adaptor;
     }
-    protected static DataReaderAdaptor createAdaptor_link() throws SagaException {
-        final DataReaderAdaptor adaptor = m_mockery.mock(DataReaderAdaptor.class, "adaptor-link");
+    protected W createAdaptor_entry_write(Class<W> clazz) throws SagaException {
+        final W adaptor = m_mockery.mock(clazz, "adaptor-"+name.getMethodName());
+        m_mockery.checking(new Expectations() {{
+            allowing(adaptor).getType(); will(returnValue("adaptor"));
+            allowing(adaptor).disconnect(); will(returnValue(null));
+        }});
+        return adaptor;
+    }
+    protected R createAdaptor_link(Class<R> clazz) throws SagaException {
+        final R adaptor = m_mockery.mock(clazz, "adaptor-"+name.getMethodName());
         m_mockery.checking(new Expectations() {{
             allowing(adaptor).getType(); will(returnValue("adaptor"));
             allowing(adaptor).exists(with(any(String.class)), with(aNull(String.class))); will(returnValue(true));
