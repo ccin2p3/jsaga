@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.engine.session;
+package org.ogf.saga.session;
 
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 

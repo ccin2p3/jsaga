@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.dummy.abstracts;
+package fr.in2p3.jsaga.adaptor.security.impl;
 
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.ogf.saga.error.NoSuccessException;

@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.dummy.abstracts;
+package fr.in2p3.jsaga.adaptor.security.impl;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
