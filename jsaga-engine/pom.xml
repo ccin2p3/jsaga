@@ -176,8 +176,6 @@
                     <instrumentation>
                         <excludes>
                             <exclude>fr/in2p3/jsaga/command/**/*.class</exclude>
-                            <exclude>fr/in2p3/jsaga/adaptor/job/**/*.class</exclude>
-                            <exclude>fr/in2p3/jsaga/adaptor/data/**/*.class</exclude>
                             <exclude>fr/in2p3/jsaga/adaptor/schema/**/*.class</exclude>
                             <exclude>fr/in2p3/jsaga/engine/schema/**/*.class</exclude>
                             <exclude>fr/in2p3/jsaga/generated/**/*.class</exclude>
