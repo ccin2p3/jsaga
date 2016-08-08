@@ -29,7 +29,7 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 
-public class EntryImplTest {
+public class FileImplTest {
 
     private static Mockery m_mockery;
     private static Session m_session;
