@@ -1,9 +1,9 @@
-package fr.in2p3.jsaga.adaptor.dummy;
+package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.dummy.abstracts.AbstractDummySecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.AbstractDummySecurityAdaptor;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

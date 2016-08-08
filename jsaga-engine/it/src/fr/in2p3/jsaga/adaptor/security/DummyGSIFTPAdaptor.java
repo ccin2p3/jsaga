@@ -1,12 +1,12 @@
-package fr.in2p3.jsaga.adaptor.dummy;
+package fr.in2p3.jsaga.adaptor.security;
 
-import fr.in2p3.jsaga.adaptor.dummy.abstracts.AbstractDummyDataAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.AbstractDummyDataAdaptor;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   DummySRMAdaptor
+ * File:   DummyGSIFTPAdaptor
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
  * ***************************************************
  * Description:                                      */
@@ -14,8 +14,8 @@ import fr.in2p3.jsaga.adaptor.dummy.abstracts.AbstractDummyDataAdaptor;
 /**
  *
  */
-public class DummySRMAdaptor extends AbstractDummyDataAdaptor {
+public class DummyGSIFTPAdaptor extends AbstractDummyDataAdaptor {
     public String getType() {
-        return "srm";
+        return "gsiftp";
     }
 }

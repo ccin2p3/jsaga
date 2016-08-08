@@ -1,18 +1,15 @@
-package fr.in2p3.jsaga.engine.session;
+package org.ogf.saga.session;
 
+import fr.in2p3.jsaga.engine.session.SessionConfiguration;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.session.SessionImpl;
-import junit.framework.TestCase;
 
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.matchers.JUnitMatchers;
 import org.junit.rules.ExpectedException;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
-import org.ogf.saga.session.Session;
-import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URLFactory;
 
 import java.io.*;
