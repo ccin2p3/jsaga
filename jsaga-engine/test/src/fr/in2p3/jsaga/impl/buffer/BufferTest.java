@@ -8,6 +8,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.ogf.saga.buffer.Buffer;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.IncorrectStateException;
 
 public class BufferTest {
@@ -57,5 +59,34 @@ public class BufferTest {
     public void cloning() throws Exception {
         assertEquals(new String(((Buffer)m_app_buffer.clone()).getData()), new String(m_app_buffer.getData()));
         assertEquals(new String(((Buffer)m_imp_buffer.clone()).getData()), new String(m_imp_buffer.getData()));
+    }
+    
+    @Test(expected=BadParameterException.class)
+    public void closeAndSetSize() throws Exception {
+        m_imp_buffer.close();
+        m_imp_buffer.setSize();
+    }
+
+    @Test
+    public void closeAndGetSize() throws Exception {
+        m_imp_buffer.close();
+        assertEquals(-1, m_imp_buffer.getSize());
+        m_app_buffer.close();
+        assertEquals(-1, m_app_buffer.getSize());
+    }
+    
+    @Test(expected=DoesNotExistException.class)
+    public void getDataAppBufferClosed()  throws Exception {
+        this.closeAndGetData(m_app_buffer);
+    }
+    
+    @Test(expected=DoesNotExistException.class)
+    public void getDataImpBufferClosed()  throws Exception {
+        this.closeAndGetData(m_imp_buffer);
+    }
+    
+    private void closeAndGetData(Buffer buf) throws Exception {
+        buf.close();
+        buf.getData();
     }
 }
