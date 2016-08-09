@@ -17,7 +17,6 @@ import org.ogf.saga.error.NotImplementedException;
 
 import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.engine.session.SessionConfiguration;
-import fr.in2p3.jsaga.generated.session.Session;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 
 public class SessionImplTest {
