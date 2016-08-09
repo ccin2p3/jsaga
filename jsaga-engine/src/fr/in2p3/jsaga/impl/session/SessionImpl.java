@@ -82,6 +82,7 @@ public class SessionImpl extends AbstractSagaObjectImpl implements Session {
     public void removeContext(Context context) throws DoesNotExistException {
         if (context instanceof ContextImpl) {
             ContextImpl ctxImpl = (ContextImpl) context;
+            // FIXME: throw DoesNotExistException if remove returns false (SAGA Session spec)
             m_contexts.remove(ctxImpl);
         } else {
             throw new DoesNotExistException("Unsupported context implementation: "+context.getClass());
