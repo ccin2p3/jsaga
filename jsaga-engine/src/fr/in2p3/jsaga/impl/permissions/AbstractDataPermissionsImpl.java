@@ -74,6 +74,7 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
                         case PermissionAdaptor.SCOPE_USER:
                             if (adaptor instanceof PermissionAdaptorFull) {
                                 ((PermissionAdaptorFull)adaptor).setOwner(m_url.getPath(), _identifier);
+                                // TODO: what if file does not exist?
                             } else {
                                 throw new BadParameterException("Not supported for this protocol: "+m_url.getScheme(), this);
                             }
