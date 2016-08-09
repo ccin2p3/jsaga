@@ -1,11 +1,15 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
+import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.LogicalReaderMetaDataExtended;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReaderMetaData;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriterMetaData;
 import fr.in2p3.jsaga.impl.namespace.EntryImplTestAbstract;
 import org.jmock.Expectations;
 import org.junit.Test;
+import org.ogf.saga.error.AlreadyExistsException;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.url.URL;
 
 import java.util.HashMap;
@@ -57,5 +61,41 @@ public class LogicalFileImplTest extends EntryImplTestAbstract<LogicalReaderMeta
         String[] metadata = file.getVectorAttribute("foo");
         assertEquals(2, metadata.length);;
         assertEquals("bar1", metadata[0]);
+    }
+
+    @Test(expected = AlreadyExistsException.class)
+    public void create_AlreadyExists_FAILURE() throws Exception {
+        final LogicalWriterMetaData adaptor = createAdaptor_entry_write(LogicalWriterMetaData.class);
+        m_mockery.checking(new Expectations() {{
+            allowing(adaptor).create(with(any(String.class)), with(aNull(String.class))); will(throwException(new AlreadyExistsException()));
+        }});
+        new LogicalFileImpl(m_session, createURL(), adaptor, Flags.CREATE.or(Flags.EXCL));
+    }
+    @Test
+    public void create_AlreadyExists_SUCCESS() throws Exception {
+        final LogicalWriterMetaData adaptor = createAdaptor_entry_write(LogicalWriterMetaData.class);
+        m_mockery.checking(new Expectations() {{
+            allowing(adaptor).create(with(any(String.class)), with(aNull(String.class))); will(throwException(new AlreadyExistsException()));
+        }});
+        new LogicalFileImpl(m_session, createURL(), adaptor, Flags.CREATE.getValue());
+    }
+
+    @Test(expected = DoesNotExistException.class)
+    public void create_DoesNotExist_FAILURE() throws Exception {
+        final LogicalWriterMetaData adaptor = createAdaptor_entry_write(LogicalWriterMetaData.class);
+        m_mockery.checking(new Expectations() {{
+            allowing(adaptor).create(with(any(String.class)), with(aNull(String.class))); will(throwException(new ParentDoesNotExist()));
+        }});
+        new LogicalFileImpl(m_session, createURL(), adaptor, Flags.CREATE.getValue());
+    }
+    @Test
+    public void create_DoesNotExist_SUCCESS() throws Exception {
+        final LogicalWriterMetaData adaptor = createAdaptor_entry_write(LogicalWriterMetaData.class);
+        m_mockery.checking(new Expectations() {{
+            allowing(adaptor).create(with(any(String.class)), with(aNull(String.class))); will(
+                    onConsecutiveCalls(throwException(new ParentDoesNotExist()), returnValue(null)));
+            allowing(adaptor).makeDir(with(any(String.class)), with(any(String.class)), with(aNull(String.class)));
+        }});
+        new LogicalFileImpl(m_session, createURL(), adaptor, Flags.CREATE.or(Flags.CREATEPARENTS));
     }
 }
