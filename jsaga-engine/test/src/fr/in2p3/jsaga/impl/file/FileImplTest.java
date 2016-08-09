@@ -1,6 +1,8 @@
 package fr.in2p3.jsaga.impl.file;
 
+import fr.in2p3.jsaga.adaptor.data.read.FileReader;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 import fr.in2p3.jsaga.impl.namespace.EntryImplTestAbstract;
 import org.jmock.Expectations;
@@ -17,7 +19,7 @@ import java.io.ByteArrayOutputStream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class FileImplTest extends EntryImplTestAbstract {
+public class FileImplTest extends EntryImplTestAbstract<FileReader, FileWriter> {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -31,12 +33,15 @@ public class FileImplTest extends EntryImplTestAbstract {
     
     @Test
     public void file() throws Exception {
-        final Buffer buffer = m_mockery.mock(Buffer.class, "buffer-file");
-        FileImpl file = new FileImpl(m_session, createURL(), createAdaptor_entry(buffer), 0);
+        FileImpl file = new FileImpl(m_session, createURL(), createAdaptor_entry_read(FileReader.class), 0);
         assertEquals(1000, file.getSize());
         super.entry(file);
 
         // Cannot read if no READ flag
+        final Buffer buffer = m_mockery.mock(Buffer.class, "buffer-file");
+        m_mockery.checking(new Expectations() {{
+            allowing(buffer).getSize(); will(returnValue(4));
+        }});
         exception.expect(IncorrectStateException.class);
         exception.expectMessage("Reading file requires READ or READWRITE flags");
         assertEquals(4, file.read(buffer));
@@ -80,7 +85,7 @@ public class FileImplTest extends EntryImplTestAbstract {
 
     @Test
     public void link() throws Exception {
-        FileImpl file = new FileImpl(m_session, createURL(), createAdaptor_link(), 0);
+        FileImpl file = new FileImpl(m_session, createURL(), createAdaptor_link(FileReader.class), 0);
         assertTrue(file.isLink());
         file.close();
     }
