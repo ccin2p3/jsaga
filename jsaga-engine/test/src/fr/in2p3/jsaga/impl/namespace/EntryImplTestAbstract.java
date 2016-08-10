@@ -5,10 +5,10 @@ import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.BeforeClass;
 import org.junit.Rule;
-import org.junit.rules.TestName;
+import org.junit.rules.ExpectedException;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.SagaException;
@@ -54,56 +54,35 @@ public class EntryImplTestAbstract<R extends DataReaderAdaptor, W extends DataWr
         @Override public long getLastModified() { return 2000; }
     };
 
-    @Rule
-    public final TestName name = new TestName();
+    @Rule public final JUnitRuleMockery context = new JUnitRuleMockery();
+    @Rule public final ExpectedException exception = ExpectedException.none();
 
-    protected static Mockery m_mockery;
     protected static Session m_session;
 
     @BeforeClass
     public static void init() throws SagaException {
-        m_mockery = new Mockery();
         m_session = SessionFactory.createSession(false);
     }
 
-    protected DataReaderAdaptor createAdaptor_directory() throws SagaException {
-        final DataReaderAdaptor adaptor = m_mockery.mock(DataReaderAdaptor.class, "adaptor-"+name.getMethodName());
-        m_mockery.checking(new Expectations() {{
-            allowing(adaptor).getType(); will(returnValue("adaptor"));
-            allowing(adaptor).exists(with(any(String.class)), with(aNull(String.class))); will(returnValue(true));
+    protected void setDirectory(final R adaptor) throws SagaException {
+        this.setEntry(adaptor, DIRECTORY);
+        context.checking(new Expectations() {{
             allowing(adaptor).listAttributes(with(any(String.class)), with(aNull(String.class))); will(returnValue(new FileAttributes[]{FILE, LINK}));
-            allowing(adaptor).getAttributes(with(any(String.class)), with(aNull(String.class))); will(returnValue(DIRECTORY));
-            allowing(adaptor).disconnect(); will(returnValue(null));
         }});
-        return adaptor;
     }
-    protected R createAdaptor_entry_read(Class<R> clazz) throws SagaException {
-        final R adaptor = m_mockery.mock(clazz, "adaptor-"+name.getMethodName());
-        m_mockery.checking(new Expectations() {{
+    protected void setEntry(final R adaptor, final FileAttributes attributes) throws SagaException {
+        context.checking(new Expectations() {{
             allowing(adaptor).getType(); will(returnValue("adaptor"));
             allowing(adaptor).exists(with(any(String.class)), with(aNull(String.class))); will(returnValue(true));
-            allowing(adaptor).getAttributes(with(any(String.class)), with(aNull(String.class))); will(returnValue(FILE));
+            allowing(adaptor).getAttributes(with(any(String.class)), with(aNull(String.class))); will(returnValue(attributes));
             allowing(adaptor).disconnect(); will(returnValue(null));
         }});
-        return adaptor;
     }
-    protected W createAdaptor_entry_write(Class<W> clazz) throws SagaException {
-        final W adaptor = m_mockery.mock(clazz, "adaptor-"+name.getMethodName());
-        m_mockery.checking(new Expectations() {{
+    protected void setEntry(final W adaptor) throws SagaException {
+        context.checking(new Expectations() {{
             allowing(adaptor).getType(); will(returnValue("adaptor"));
             allowing(adaptor).disconnect(); will(returnValue(null));
         }});
-        return adaptor;
-    }
-    protected R createAdaptor_link(Class<R> clazz) throws SagaException {
-        final R adaptor = m_mockery.mock(clazz, "adaptor-"+name.getMethodName());
-        m_mockery.checking(new Expectations() {{
-            allowing(adaptor).getType(); will(returnValue("adaptor"));
-            allowing(adaptor).exists(with(any(String.class)), with(aNull(String.class))); will(returnValue(true));
-            allowing(adaptor).getAttributes(with(any(String.class)), with(aNull(String.class))); will(returnValue(LINK));
-            allowing(adaptor).disconnect(); will(returnValue(null));
-        }});
-        return adaptor;
     }
 
     protected static URL createURL() throws BadParameterException, NoSuccessException {
