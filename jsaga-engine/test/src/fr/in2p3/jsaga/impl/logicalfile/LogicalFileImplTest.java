@@ -32,14 +32,14 @@ public class LogicalFileImplTest extends EntryImplTestAbstract<LogicalReaderMeta
 
     @Test
     public void file() throws Exception {
-        super.setEntry(reader, FILE);
+        super.setEntry(reader, EntryType.FILE);
         LogicalFileImpl file = new LogicalFileImpl(m_session, createURL(), reader, 0);
         super.entry(file);
     }
 
     @Test
     public void link() throws Exception {
-        super.setEntry(reader, LINK);
+        super.setEntry(reader, EntryType.LINK);
         LogicalFileImpl file = new LogicalFileImpl(m_session, createURL(), reader, 0);
         assertTrue(file.isLink());
         file.close();
@@ -47,7 +47,7 @@ public class LogicalFileImplTest extends EntryImplTestAbstract<LogicalReaderMeta
 
     @Test
     public void listLocations() throws Exception {
-        super.setEntry(reader, FILE);
+        super.setEntry(reader, EntryType.FILE);
         context.checking(new Expectations() {{
             allowing(reader).listLocations(with(any(String.class)), with(aNull(String.class))); will(returnValue(new String[]{"location1","location2"}));
         }});
@@ -59,7 +59,7 @@ public class LogicalFileImplTest extends EntryImplTestAbstract<LogicalReaderMeta
 
     @Test
     public void listMetaData() throws Exception {
-        super.setEntry(reader, FILE);
+        super.setEntry(reader, EntryType.FILE);
         context.checking(new Expectations() {{
             allowing(reader).listMetaData(with(any(String.class)), with(aNull(String.class))); will(returnValue(new HashMap<String, String[]>(){{put("foo",new String[]{"bar1","bar2"});}}));
         }});

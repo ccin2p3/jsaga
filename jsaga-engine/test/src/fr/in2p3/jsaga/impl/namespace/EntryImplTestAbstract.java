@@ -1,11 +1,12 @@
 package fr.in2p3.jsaga.impl.namespace;
 
-import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import org.jmock.Expectations;
+import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -19,42 +20,21 @@ import org.ogf.saga.url.URLFactory;
 
 import static org.junit.Assert.*;
 
-public class EntryImplTestAbstract<R extends DataReaderAdaptor, W extends DataWriterAdaptor> {
-    protected static final FileAttributes DIRECTORY = new FileAttributes() {
-        @Override public String getName() { return "dir"; }
-        @Override public int getType() { return FileAttributes.TYPE_DIRECTORY; }
-        @Override public long getSize() { return 1000; }
-        @Override public PermissionBytes getUserPermission() { return null; }
-        @Override public PermissionBytes getGroupPermission() { return null; }
-        @Override public PermissionBytes getAnyPermission() { return null; }
-        @Override public String getOwner() { return "owner"; }
-        @Override public String getGroup() { return "group"; }
-        @Override public long getLastModified() { return 2000; }
-    };
-    protected static final FileAttributes FILE = new FileAttributes() {
-        @Override public String getName() { return "file1"; }
-        @Override public int getType() { return FileAttributes.TYPE_FILE; }
-        @Override public long getSize() { return 1000; }
-        @Override public PermissionBytes getUserPermission() { return null; }
-        @Override public PermissionBytes getGroupPermission() { return null; }
-        @Override public PermissionBytes getAnyPermission() { return null; }
-        @Override public String getOwner() { return "owner"; }
-        @Override public String getGroup() { return "group"; }
-        @Override public long getLastModified() { return 2000; }
-    };
-    protected static final FileAttributes LINK = new FileAttributes() {
-        @Override public String getName() { return "file2"; }
-        @Override public int getType() { return FileAttributes.TYPE_LINK; }
-        @Override public long getSize() { return 1000; }
-        @Override public PermissionBytes getUserPermission() { return null; }
-        @Override public PermissionBytes getGroupPermission() { return null; }
-        @Override public PermissionBytes getAnyPermission() { return null; }
-        @Override public String getOwner() { return "owner"; }
-        @Override public String getGroup() { return "group"; }
-        @Override public long getLastModified() { return 2000; }
-    };
+public abstract class EntryImplTestAbstract<R extends DataReaderAdaptor, W extends DataWriterAdaptor> {
+    protected enum EntryType {
+        DIRECTORY(FileAttributes.TYPE_DIRECTORY, "dir"),
+        FILE(FileAttributes.TYPE_FILE, "file1"),
+        LINK(FileAttributes.TYPE_LINK, "file2");
+        int flag; String name;
+        EntryType(int flag,String name){this.flag=flag; this.name=name;}
+    }
+    @Mock private FileAttributes entryAttributes;
+    @Mock private FileAttributes file1Attributes;
+    @Mock private FileAttributes file2Attributes;
 
-    @Rule public final JUnitRuleMockery context = new JUnitRuleMockery();
+    @Rule public final JUnitRuleMockery context = new JUnitRuleMockery() {{
+        setImposteriser(ClassImposteriser.INSTANCE);
+    }};
     @Rule public final ExpectedException exception = ExpectedException.none();
 
     protected static Session m_session;
@@ -65,16 +45,20 @@ public class EntryImplTestAbstract<R extends DataReaderAdaptor, W extends DataWr
     }
 
     protected void setDirectory(final R adaptor) throws SagaException {
-        this.setEntry(adaptor, DIRECTORY);
+        this.setEntry(adaptor, EntryType.DIRECTORY);
+        this.setFileAttributes(file1Attributes, EntryType.FILE);
+        this.setFileAttributes(file2Attributes, EntryType.LINK);
         context.checking(new Expectations() {{
-            allowing(adaptor).listAttributes(with(any(String.class)), with(aNull(String.class))); will(returnValue(new FileAttributes[]{FILE, LINK}));
+            allowing(adaptor).listAttributes(with(any(String.class)), with(aNull(String.class))); will(
+                    returnValue(new FileAttributes[]{file1Attributes, file2Attributes}));
         }});
     }
-    protected void setEntry(final R adaptor, final FileAttributes attributes) throws SagaException {
+    protected void setEntry(final R adaptor, final EntryType type) throws SagaException {
+        this.setFileAttributes(entryAttributes, type);
         context.checking(new Expectations() {{
             allowing(adaptor).getType(); will(returnValue("adaptor"));
             allowing(adaptor).exists(with(any(String.class)), with(aNull(String.class))); will(returnValue(true));
-            allowing(adaptor).getAttributes(with(any(String.class)), with(aNull(String.class))); will(returnValue(attributes));
+            allowing(adaptor).getAttributes(with(any(String.class)), with(aNull(String.class))); will(returnValue(entryAttributes));
             allowing(adaptor).disconnect(); will(returnValue(null));
         }});
     }
@@ -82,6 +66,16 @@ public class EntryImplTestAbstract<R extends DataReaderAdaptor, W extends DataWr
         context.checking(new Expectations() {{
             allowing(adaptor).getType(); will(returnValue("adaptor"));
             allowing(adaptor).disconnect(); will(returnValue(null));
+        }});
+    }
+    private void setFileAttributes(final FileAttributes attributes, final EntryType type) {
+        context.checking(new Expectations() {{
+            allowing(attributes).getName(); will(returnValue(type.name));
+            allowing(attributes).getType(); will(returnValue(type.flag));
+            allowing(attributes).getSize(); will(returnValue(1000L));
+            allowing(attributes).getOwner(); will(returnValue("owner"));
+            allowing(attributes).getGroup(); will(returnValue("group"));
+            allowing(attributes).getLastModified(); will(returnValue(2000L));
         }});
     }
 

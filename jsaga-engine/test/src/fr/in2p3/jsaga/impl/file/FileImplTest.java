@@ -36,7 +36,7 @@ public class FileImplTest extends EntryImplTestAbstract<FileReader, FileWriter> 
     
     @Test
     public void file() throws Exception {
-        super.setEntry(reader, FILE);
+        super.setEntry(reader, EntryType.FILE);
         FileImpl file = new FileImpl(m_session, createURL(), reader, 0);
         assertEquals(1000, file.getSize());
         super.entry(file);
@@ -54,7 +54,7 @@ public class FileImplTest extends EntryImplTestAbstract<FileReader, FileWriter> 
 
     @Test
     public void link() throws Exception {
-        super.setEntry(reader, LINK);
+        super.setEntry(reader, EntryType.LINK);
         FileImpl file = new FileImpl(m_session, createURL(), reader, 0);
         assertTrue(file.isLink());
         file.close();
