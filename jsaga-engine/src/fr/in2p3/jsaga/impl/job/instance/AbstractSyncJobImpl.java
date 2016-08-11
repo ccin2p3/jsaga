@@ -549,6 +549,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         if (m_nativeJobId == null) {
             throw new IncorrectStateException("Can not resume job in 'New' state", this);
         }
+        // TODO: why state is not checked before calling adaptor?
         if (m_controlAdaptor instanceof HoldableJobAdaptor && m_controlAdaptor instanceof SuspendableJobAdaptor) {
             if (!((HoldableJobAdaptor) m_controlAdaptor).release(m_nativeJobId)) {
                 if (!((SuspendableJobAdaptor) m_controlAdaptor).resume(m_nativeJobId)) {
