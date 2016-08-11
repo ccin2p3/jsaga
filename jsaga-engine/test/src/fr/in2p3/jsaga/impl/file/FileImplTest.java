@@ -10,6 +10,7 @@ import org.jmock.auto.Mock;
 import org.junit.Test;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.SagaException;
 import org.ogf.saga.namespace.Flags;
 
 import java.io.ByteArrayInputStream;
@@ -40,16 +41,6 @@ public class FileImplTest extends EntryImplTestAbstract<FileReader, FileWriter> 
         FileImpl file = new FileImpl(m_session, createURL(), reader, 0);
         assertEquals(1000, file.getSize());
         super.entry(file);
-
-        // Cannot read if no READ flag
-        context.checking(new Expectations() {{
-            allowing(buffer).getSize(); will(returnValue(4));
-        }});
-        exception.expect(IncorrectStateException.class);
-        exception.expectMessage("Reading file requires READ or READWRITE flags");
-        assertEquals(4, file.read(buffer));
-        exception.expectMessage("Writing file requires WRITE or READWRITE flags");
-        assertEquals(4, file.write(buffer));
     }
 
     @Test
@@ -58,6 +49,30 @@ public class FileImplTest extends EntryImplTestAbstract<FileReader, FileWriter> 
         FileImpl file = new FileImpl(m_session, createURL(), reader, 0);
         assertTrue(file.isLink());
         file.close();
+    }
+
+    @Test
+    public void buffer_IncorrectStateException_reading() throws SagaException {
+        super.setEntry(reader, EntryType.FILE);
+        FileImpl file = new FileImpl(m_session, createURL(), reader, 0);
+        context.checking(new Expectations() {{
+            allowing(buffer).getSize(); will(returnValue(4));
+        }});
+        exception.expect(IncorrectStateException.class);
+        exception.expectMessage("Writing file requires WRITE or READWRITE flags");
+        file.write(buffer);
+    }
+
+    @Test
+    public void buffer_IncorrectStateException_writing() throws SagaException {
+        super.setEntry(reader, EntryType.FILE);
+        FileImpl file = new FileImpl(m_session, createURL(), reader, 0);
+        context.checking(new Expectations() {{
+            allowing(buffer).getSize(); will(returnValue(4));
+        }});
+        exception.expect(IncorrectStateException.class);
+        exception.expectMessage("Reading file requires READ or READWRITE flags");
+        file.read(buffer);
     }
 
     @Test
