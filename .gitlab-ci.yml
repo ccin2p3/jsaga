@@ -16,6 +16,7 @@ cache:
 image: maven:3-jdk-7
 
 before_script:
+  - apt-get install g++
   - mvn -Dmaven.test.skip=true -f pom-unreleased.xml install
 
 check_job:
