@@ -16,7 +16,7 @@ cache:
 image: maven:3-jdk-7
 
 before_script:
-  - mvn --Dmaven.test.skip=true -f pom-unreleased.xml install
+  - mvn -Dmaven.test.skip=true -f pom-unreleased.xml install
 
 check_job:
   script: "mvn clean package"
