@@ -17,7 +17,7 @@ image: maven:3-jdk-7
 
 before_script:
   - apt-get update
-  - apt-get install g++
+  - apt-get -q -y install g++
 
 stages:
   - unreleased
