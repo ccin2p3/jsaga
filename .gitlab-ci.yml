@@ -16,8 +16,17 @@ cache:
 image: maven:3-jdk-7
 
 before_script:
+  - apt-get update
   - apt-get install g++
-  - mvn -Dmaven.test.skip=true -f pom-unreleased.xml install
 
-check_job:
+stages:
+  - unreleased
+  - jsaga
+
+unreleased_job:
+  stage: unreleased
+  script: "mvn -Dmaven.test.skip=true -f pom-unreleased.xml install" 
+
+jsaga_job:
+  stage: jsaga
   script: "mvn clean package"
