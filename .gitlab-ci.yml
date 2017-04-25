@@ -26,6 +26,9 @@ stages:
 unreleased_job:
   stage: unreleased
   script: "mvn -Dmaven.test.skip=true -f pom-unreleased.xml install" 
+  artifacts:
+    paths:
+    - .m2/repository
 
 jsaga_job:
   stage: jsaga
